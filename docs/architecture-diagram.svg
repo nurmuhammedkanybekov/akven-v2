@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 460" role="img" aria-label="Customer PWA and Admin Panel both call one Spring Boot API with JWT and role-based access, containing Catalog and Orders, Negotiation, and Audit Log. The Negotiation compartment sends context to an external LLM, which proposes a discount; a Policy Validator checks that proposal against the margin floor before anything reaches Catalog and Orders. Everything persists to one Postgres database with a pgvector extension.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#241F18"/>
+    </marker>
+  </defs>
+
+  <rect width="820" height="460" fill="#F5F1EA"/>
+
+  <!-- top row -->
+  <rect x="60" y="24" width="200" height="56" rx="8" fill="none" stroke="#241F18" stroke-width="1.5"/>
+  <text x="160" y="57" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#241F18">Customer PWA</text>
+
+  <rect x="300" y="24" width="200" height="56" rx="8" fill="none" stroke="#241F18" stroke-width="1.5"/>
+  <text x="400" y="57" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#241F18">Admin Panel</text>
+
+  <line x1="160" y1="80" x2="160" y2="138" stroke="#241F18" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="400" y1="80" x2="400" y2="138" stroke="#241F18" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- API band -->
+  <rect x="40" y="140" width="520" height="140" rx="10" fill="none" stroke="#2B5A63" stroke-width="1.8"/>
+  <text x="56" y="160" font-family="monospace" font-size="11.5" fill="#2B5A63">SPRING BOOT API · JWT + RBAC (customer / staff / admin)</text>
+
+  <rect x="60" y="176" width="150" height="84" rx="6" fill="#EAE2D2" stroke="#241F18" stroke-width="1"/>
+  <text x="135" y="213" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#241F18">Catalog</text>
+  <text x="135" y="229" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#241F18">&amp; Orders</text>
+
+  <rect x="225" y="176" width="150" height="84" rx="6" fill="#EAE2D2" stroke="#241F18" stroke-width="1"/>
+  <text x="300" y="222" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#241F18">Negotiation</text>
+
+  <rect x="390" y="176" width="150" height="84" rx="6" fill="#EAE2D2" stroke="#241F18" stroke-width="1"/>
+  <text x="465" y="222" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#241F18">Audit Log</text>
+
+  <!-- negotiation safety annex -->
+  <rect x="600" y="150" width="190" height="54" rx="8" fill="none" stroke="#241F18" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="695" y="172" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#241F18">LLM proposes</text>
+  <text x="695" y="188" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#8D8570">(RAG over catalog)</text>
+
+  <rect x="600" y="224" width="190" height="54" rx="8" fill="#DCEAE1" stroke="#2F6F52" stroke-width="1.8"/>
+  <text x="695" y="246" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#1C4633">Policy Validator</text>
+  <text x="695" y="262" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#1C4633">clamps to margin floor</text>
+
+  <line x1="695" y1="204" x2="695" y2="222" stroke="#241F18" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="375" y1="192" x2="598" y2="170" stroke="#241F18" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <text x="480" y="176" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#8D8570">query + context</text>
+
+  <line x1="598" y1="255" x2="377" y2="238" stroke="#2F6F52" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="480" y="270" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#1C4633">clamped discount only</text>
+
+  <!-- data layer -->
+  <line x1="300" y1="280" x2="300" y2="348" stroke="#241F18" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="60" y="350" width="480" height="70" rx="10" fill="none" stroke="#241F18" stroke-width="1.5"/>
+  <text x="300" y="381" text-anchor="middle" font-family="sans-serif" font-size="12.5" font-weight="600" fill="#241F18">PostgreSQL + pgvector</text>
+  <text x="300" y="399" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#8D8570">products · orders · users · margin-floor policy · embeddings · audit log</text>
+</svg>

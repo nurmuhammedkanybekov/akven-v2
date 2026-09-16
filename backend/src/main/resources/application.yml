@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: akven-thesis-backend
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/akven}
+    username: ${DB_USER:akven}
+    password: ${DB_PASSWORD:akven}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # schema comes from Flyway, not Hibernate auto-generation
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# Never commit real values for these — set via CI/CD variables or a local .env
+# that's in .gitignore. See docs/architecture.md, Security section.
+akven:
+  llm:
+    api-key: ${LLM_API_KEY:}
+  payments:
+    apple-pay-merchant-id: ${APPLE_PAY_MERCHANT_ID:}
+    google-pay-merchant-id: ${GOOGLE_PAY_MERCHANT_ID:}

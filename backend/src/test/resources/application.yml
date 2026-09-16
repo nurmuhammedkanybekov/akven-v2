@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:akven-test;MODE=PostgreSQL
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false   # pgvector/pgcrypto in V1 are Postgres-only; the smoke test just needs the context to load

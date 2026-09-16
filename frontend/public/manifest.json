@@ -1,0 +1,10 @@
+{
+  "name": "Ak&Ven",
+  "short_name": "Ak&Ven",
+  "description": "Korean-made socks, negotiated your way — Ak&Ven",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F1EA",
+  "theme_color": "#BE5A2E",
+  "icons": []
+}

@@ -1,0 +1,19 @@
+# Minimal CI now; grows into the Milestone 3 requirement (CI/CD running,
+# >80% test coverage on the model layer) as the negotiation module lands.
+stages:
+  - build
+
+backend-build:
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
+  cache:
+    paths:
+      - .m2/repository
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  script:
+    - cd backend
+    - mvn $MAVEN_OPTS -B test
+  rules:
+    - changes:
+        - backend/**/*

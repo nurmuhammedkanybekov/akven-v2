@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ak&Ven</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#BE5A2E">
+</head>
+<body>
+  <!--
+    Milestone 1 placeholder shell — proves the PWA manifest and service
+    worker wiring work. Phase 1 (Sept 26 – Oct 17) replaces this with the
+    real catalog/cart UI; Phase 2 adds the negotiation chat screen.
+    Framework choice (React/Vue/vanilla) is still open — see the open
+    questions in the thesis plan artifact if it needs Walid's input, otherwise
+    decide it as part of Phase 1 kickoff.
+  -->
+  <h1>Ak&amp;Ven</h1>
+  <p>Frontend build starts Phase 1. This file just proves the PWA shell registers.</p>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+  </script>
+</body>
+</html>
