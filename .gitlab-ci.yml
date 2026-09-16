@@ -1,12 +1,15 @@
 # Minimal CI now; grows into the Milestone 3 requirement (CI/CD running,
 # >80% test coverage on the model layer) as the negotiation module lands.
 stages:
-  - build
+  - test
 
-backend-build:
-  stage: build
+backend-test:
+  stage: test
   image: maven:3.9-eclipse-temurin-21
   cache:
+    key:
+      files:
+        - backend/pom.xml
     paths:
       - .m2/repository
   variables:
@@ -14,6 +17,11 @@ backend-build:
   script:
     - cd backend
     - mvn $MAVEN_OPTS -B test
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - backend/target/surefire-reports/TEST-*.xml
   rules:
     - changes:
         - backend/**/*

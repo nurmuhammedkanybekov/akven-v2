@@ -3,21 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ak&Ven</title>
+  <title>Ak&amp;Ven</title>
+  <meta name="description" content="Korean-made socks, negotiated your way — Ak&amp;Ven.">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#BE5A2E">
+  <meta name="theme-color" content="#2B5A63">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
 </head>
 <body>
   <!--
-    Milestone 1 placeholder shell — proves the PWA manifest and service
-    worker wiring work. Phase 1 (Sept 26 – Oct 17) replaces this with the
-    real catalog/cart UI; Phase 2 adds the negotiation chat screen.
-    Framework choice (React/Vue/vanilla) is still open — see the open
-    questions in the thesis plan artifact if it needs Walid's input, otherwise
-    decide it as part of Phase 1 kickoff.
+    Milestone 1 placeholder shell — proves the PWA manifest, icons, and
+    service worker wiring actually work end to end (installable, has a
+    working offline app shell). Phase 1 (Sept 26 – Oct 17) replaces the body
+    below with the real catalog/cart UI; Phase 2 adds the negotiation chat
+    screen. Framework choice (React/Vue/vanilla) is still open — see the
+    open questions in the thesis plan artifact if it needs Walid's input,
+    otherwise decide it as part of Phase 1 kickoff.
   -->
   <h1>Ak&amp;Ven</h1>
-  <p>Frontend build starts Phase 1. This file just proves the PWA shell registers.</p>
+  <p>Frontend build starts Phase 1. This shell proves the PWA installs and works offline.</p>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js");

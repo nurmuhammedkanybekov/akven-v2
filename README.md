@@ -17,15 +17,20 @@ instead of a static storefront.
   mechanism that keeps the negotiator's discounts safe.
 - [`backend/`](backend) — Spring Boot 3.3 / Java 17 skeleton: module
   structure (catalog, orders, negotiation, audit, users), JPA entities,
-  Flyway schema migration, health check, one context-load test.
-- [`frontend/`](frontend) — PWA shell placeholder (manifest + service worker
-  registration), to be built out in Phase 1.
-- Use-case diagram and wireframes for the 5 key screens — in progress, see
-  `docs/architecture.md`'s status list.
+  Flyway schema + seed-data migrations, a real RBAC shape in
+  `SecurityConfig`, health check, one context-load test.
+- [`frontend/`](frontend) — PWA shell: real manifest + branded icons (so it
+  actually installs), and a service worker that caches the shell itself for
+  offline reopen. Still a placeholder for the real catalog/cart UI, which is
+  Phase 1 work — see the TODO in `frontend/public/sw.js` for what Phase 1
+  adds on top of this.
+- Use-case diagram — done. Wireframes for the 5 key screens — in progress,
+  see `docs/architecture.md`'s status list.
 
 ## Running the backend locally
 
-Requires a PostgreSQL instance with the `pgvector` extension available.
+Requires a PostgreSQL 16+ instance with the `pgvector` extension available
+(`CREATE EXTENSION vector;` — see `db/migration/V1__init_schema.sql`).
 
 ```
 cd backend
@@ -35,8 +40,17 @@ export DB_PASSWORD=akven
 mvn spring-boot:run
 ```
 
+Flyway runs `V1__init_schema.sql` then `V2__seed_demo_data.sql`
+automatically on startup, so the catalog isn't empty on first run (two demo
+accounts too — `admin@akven.test` / `staff@akven.test`, see that file for
+the seed passwords). `V2` is demo-only and should move behind a Spring
+profile before there's a shared/production database — noted as a TODO in
+`docs/architecture.md`.
+
 `GET /actuator/health` confirms it's up. `mvn test` runs the smoke test
-against an in-memory H2 database, no Postgres required.
+against an in-memory H2 database, no Postgres required (Flyway is disabled
+for that profile since pgvector/pgcrypto are Postgres-only — see
+`src/test/resources/application.yml`).
 
 ## Roadmap
 

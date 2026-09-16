@@ -1,15 +1,26 @@
 package com.akven.thesis.order;
 
+import com.akven.thesis.common.AuditableEntity;
 import com.akven.thesis.user.User;
-import jakarta.persistence.*;
-import java.time.Instant;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "customer_order")
-public class Order {
+public class Order extends AuditableEntity {
 
     @Id
     @GeneratedValue
@@ -31,9 +42,6 @@ public class Order {
 
     private UUID negotiationSessionId;
 
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
-
     protected Order() {
         // JPA
     }
@@ -43,6 +51,7 @@ public class Order {
     }
 
     public UUID getId() { return id; }
+    public User getCustomer() { return customer; }
     public OrderStatus getStatus() { return status; }
     public List<OrderItem> getItems() { return items; }
 }

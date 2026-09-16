@@ -1,6 +1,19 @@
 package com.akven.thesis.catalog;
 
-import jakarta.persistence.*;
+import com.akven.thesis.common.AuditableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -12,7 +25,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "variant")
-public class Variant {
+public class Variant extends AuditableEntity {
 
     @Id
     @GeneratedValue
@@ -22,25 +35,45 @@ public class Variant {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String sku;
 
     private String size;
     private String color;
+
+    @Positive
     private Integer packSize;
 
+    @PositiveOrZero
     @Column(nullable = false)
     private BigDecimal price;
 
     /** Admin-only — never returned on customer-facing endpoints. */
+    @PositiveOrZero
     @Column(nullable = false)
     private BigDecimal costPrice;
 
+    @DecimalMin("0.00")
+    @DecimalMax("100.00")
     @Column(nullable = false)
     private BigDecimal marginFloorPct;
 
+    @PositiveOrZero
     @Column(nullable = false)
     private Integer stockQty = 0;
+
+    /** Held by open carts/pending orders. Storefront-visible stock is availableQty, not stockQty. */
+    @PositiveOrZero
+    @Column(nullable = false)
+    private Integer reservedQty = 0;
+
+    /** Database-generated (stock_qty - reserved_qty) — read-only from the app side. */
+    @Column(insertable = false, updatable = false)
+    private Integer availableQty;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
 
     protected Variant() {
         // JPA
@@ -62,6 +95,10 @@ public class Variant {
     public Product getProduct() { return product; }
     public String getSku() { return sku; }
     public BigDecimal getPrice() { return price; }
+    public BigDecimal getCostPrice() { return costPrice; }
     public BigDecimal getMarginFloorPct() { return marginFloorPct; }
     public Integer getStockQty() { return stockQty; }
+    public Integer getReservedQty() { return reservedQty; }
+    public Integer getAvailableQty() { return availableQty; }
+    public boolean isActive() { return active; }
 }

@@ -1,10 +1,20 @@
 {
+  "id": "/",
   "name": "Ak&Ven",
   "short_name": "Ak&Ven",
   "description": "Korean-made socks, negotiated your way — Ak&Ven",
+  "lang": "en",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#F5F1EA",
-  "theme_color": "#BE5A2E",
-  "icons": []
+  "theme_color": "#2B5A63",
+  "categories": ["shopping"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }

@@ -1,20 +1,32 @@
 package com.akven.thesis.user;
 
-import jakarta.persistence.*;
-import java.time.Instant;
+import com.akven.thesis.common.AuditableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.UUID;
 
 @Entity
 @Table(name = "app_user")
-public class User {
+public class User extends AuditableEntity {
 
     @Id
     @GeneratedValue
     private UUID id;
 
+    @Email
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String email;
 
+    @NotBlank
     @Column(nullable = false)
     private String passwordHash;
 
@@ -22,8 +34,8 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role;
 
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
 
     protected User() {
         // JPA
@@ -38,5 +50,5 @@ public class User {
     public UUID getId() { return id; }
     public String getEmail() { return email; }
     public Role getRole() { return role; }
-    public Instant getCreatedAt() { return createdAt; }
+    public boolean isActive() { return active; }
 }
