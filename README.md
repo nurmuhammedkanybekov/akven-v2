@@ -1,38 +1,74 @@
 # Ak&Ven
 
-Bachelor's thesis, ELTE IK, Autumn 2026 — Nurmuhammed, supervised by Prof. Walid Guettala.
+**Bachelor's thesis · ELTE IK · Autumn 2026**
+Nurmuhammed — supervised by Prof. Walid Guettala
+
+[![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
 Ak&Ven sells Korean-made socks — a special agreement with a Korean fabric and
 manufacturing partner produces them under the Ak&Ven house label, currently
-sold at Dordoi Bazaar in Bishkek, Kyrgyzstan. This project builds a custom
+sold at Dordoi Bazaar in Bishkek, Kyrgyzstan. This thesis builds a custom
 e-commerce platform for the brand, centered on an AI sales agent that
 negotiates price and bundles the way bazaar customers actually expect,
 instead of a static storefront.
 
-## What's here (Milestone 1 — due 25 Sept)
+## Contents
 
-- [`docs/architecture.md`](docs/architecture.md) and
-  [`docs/architecture-diagram.svg`](docs/architecture-diagram.svg) — system
-  design: the 3-layer architecture, data model, and the Policy Validator
-  mechanism that keeps the negotiator's discounts safe.
-- [`backend/`](backend) — Spring Boot 3.3 / Java 17 skeleton: module
-  structure (catalog, orders, negotiation, audit, users), JPA entities,
-  Flyway schema + seed-data migrations, a real RBAC shape in
-  `SecurityConfig`, health check, one context-load test.
-- [`frontend/`](frontend) — PWA shell: real manifest + branded icons (so it
-  actually installs), and a service worker that caches the shell itself for
-  offline reopen. Still a placeholder for the real catalog/cart UI, which is
-  Phase 1 work — see the TODO in `frontend/public/sw.js` for what Phase 1
-  adds on top of this.
-- Use-case diagram — done. Wireframes for the 5 key screens — in progress,
-  see `docs/architecture.md`'s status list.
+- [Documentation](#documentation)
+- [Architecture at a glance](#architecture-at-a-glance)
+- [Repository layout](#repository-layout)
+- [Running the backend locally](#running-the-backend-locally)
+- [Milestone 1 status](#milestone-1-status-due-25-sept)
+- [Roadmap](#roadmap)
+
+## Documentation
+
+| Document | What it covers |
+|---|---|
+| [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, functional requirements (FR), non-functional requirements (NFR) |
+| [`docs/use-case-diagram.svg`](docs/use-case-diagram.svg) | Full UML use-case diagram — «include»/«extend» dependencies, Admin/Staff generalization |
+| [`docs/wireframes.svg`](docs/wireframes.svg) | Wireframes for all 5 key screens across phone (browser + installed PWA), tablet, and laptop |
+| [`docs/architecture.md`](docs/architecture.md) | System design: the 3-layer architecture, data model, and the Policy Validator mechanism |
+| [`docs/architecture-diagram.svg`](docs/architecture-diagram.svg) | Architecture diagram — layered swimlanes, external system actors, request/data flow |
+
+## Architecture at a glance
+
+One Spring Boot API — JWT + RBAC (`CUSTOMER` / `STAFF` / `ADMIN`) — serves
+both the customer storefront and the admin panel as the same code path, not
+two separate systems.
+
+1. **Client layer** — a single installable PWA; customer and admin views are
+   role-gated routes of the same app.
+2. **API + negotiation layer** — Catalog & Orders, Negotiation (LLM + RAG,
+   Phase 2), Audit Log.
+3. **Data / ML layer** — PostgreSQL with the `pgvector` extension for
+   product/policy embeddings.
+
+The mechanism that matters: the LLM never sets a price. It proposes a
+discount as data; `PolicyValidator` is the only code allowed to turn that
+proposal into something that can touch an order, clamping it to the
+variant's stored margin floor — deterministic and immune to prompt
+injection by construction. Full write-up in
+[`docs/architecture.md`](docs/architecture.md).
+
+## Repository layout
+
+```
+.
+├── backend/            Spring Boot 3.3 / Java 17 — catalog, orders, negotiation, audit, users
+│   ├── src/main/java/com/akven/thesis/
+│   └── src/main/resources/db/migration/   Flyway schema + seed data
+├── frontend/           PWA shell — manifest, icons, service worker
+├── docs/               Requirement analysis, use-case diagram, wireframes, architecture
+└── .gitlab-ci.yml      Maven test stage, JUnit report, dependency cache
+```
 
 ## Running the backend locally
 
 Requires a PostgreSQL 16+ instance with the `pgvector` extension available
 (`CREATE EXTENSION vector;` — see `db/migration/V1__init_schema.sql`).
 
-```
+```bash
 cd backend
 export DB_URL=jdbc:postgresql://localhost:5432/akven
 export DB_USER=akven
@@ -44,17 +80,36 @@ Flyway runs `V1__init_schema.sql` then `V2__seed_demo_data.sql`
 automatically on startup, so the catalog isn't empty on first run (two demo
 accounts too — `admin@akven.test` / `staff@akven.test`, see that file for
 the seed passwords). `V2` is demo-only and should move behind a Spring
-profile before there's a shared/production database — noted as a TODO in
-`docs/architecture.md`.
+profile before there's a shared/production database.
 
-`GET /actuator/health` confirms it's up, and `/swagger-ui/index.html` gives a
-live, browsable API doc (every `@RestController` shows up automatically via
-springdoc-openapi — no separate doc to keep in sync). `mvn test` runs the smoke test
-against an in-memory H2 database, no Postgres required (Flyway is disabled
-for that profile since pgvector/pgcrypto are Postgres-only — see
-`src/test/resources/application.yml`).
+| Endpoint | Purpose |
+|---|---|
+| `GET /actuator/health` | Liveness check |
+| `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |
+| `/v3/api-docs` | Raw OpenAPI spec |
+
+`mvn test` runs the smoke test against an in-memory H2 database, no
+Postgres required (Flyway is disabled for that profile since
+pgvector/pgcrypto are Postgres-only — see `src/test/resources/application.yml`).
+
+## Milestone 1 status (due 25 Sept)
+
+| Deliverable | Status |
+|---|---|
+| Requirement analysis | Done |
+| Use-case diagram | Done |
+| Wireframes (5 key screens, full device matrix) | Done |
+| Architecture design + diagram | Done |
+| Backend skeleton (entities, migrations, RBAC, CI) | Done |
+| Frontend PWA shell | Done |
+| Live API docs (springdoc-openapi) | Done |
+| Real negotiation pipeline, auth, checkout | Phase 1–2 |
 
 ## Roadmap
 
 See the phased build plan (Milestones 1–4, final submission 1 Dec) in the
 thesis planning documents shared with the supervisor.
+
+---
+
+**Author:** Nurmuhammed — ELTE IK, 7th semester — supervised by Prof. Walid Guettala.
