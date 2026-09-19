@@ -65,6 +65,15 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
+    <!-- Live API docs (Swagger UI) — not part of Spring Boot's managed BOM, version pinned explicitly.
+         See config.OpenApiConfig for the metadata bean and SecurityConfig for the permitAll rule
+         that exposes /v3/api-docs/** and /swagger-ui/** without auth (docs, not data). -->
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>2.6.0</version>
+    </dependency>
+
     <!-- Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

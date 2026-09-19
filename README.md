@@ -47,7 +47,9 @@ the seed passwords). `V2` is demo-only and should move behind a Spring
 profile before there's a shared/production database — noted as a TODO in
 `docs/architecture.md`.
 
-`GET /actuator/health` confirms it's up. `mvn test` runs the smoke test
+`GET /actuator/health` confirms it's up, and `/swagger-ui/index.html` gives a
+live, browsable API doc (every `@RestController` shows up automatically via
+springdoc-openapi — no separate doc to keep in sync). `mvn test` runs the smoke test
 against an in-memory H2 database, no Postgres required (Flyway is disabled
 for that profile since pgvector/pgcrypto are Postgres-only — see
 `src/test/resources/application.yml`).

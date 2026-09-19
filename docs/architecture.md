@@ -109,7 +109,9 @@ violation, margin-invariant violation, duplicate email by case, and
 
 ## Status
 
-- [x] Architecture decided and documented (this file + diagram)
+- [x] Architecture decided and documented (this file + diagram — v2, redrawn to show
+      the three layers as explicit swimlanes, both external system actors including
+      Payment Provider, and the Policy Validator's exact place in the request path)
 - [x] Backend skeleton: module structure, entities, repositories, Flyway
       migration (schema + seed data), health check (`/actuator/health`),
       context-load test
@@ -121,6 +123,12 @@ violation, margin-invariant violation, duplicate email by case, and
       plumbing around it
 - [x] CI/build hygiene: JUnit test reports wired into GitLab's CI reports,
       dependency cache keyed on `pom.xml`, UTF-8 build encoding pinned
+- [x] Live API docs: springdoc-openapi wired in (`/swagger-ui/index.html`,
+      `/v3/api-docs`) — every `@RestController` shows up automatically, bearer-JWT
+      scheme pre-declared so "Authorize" works the moment real tokens exist
+- [x] Frontend shell has real content instead of a bare placeholder heading —
+      still not the storefront (that's Phase 1), but shows install/offline status
+      and the roadmap so it reads as intentional, not empty
 - [x] Use-case diagram
 - [ ] Wireframes for the 5 key screens — next
 - [ ] Real negotiation pipeline, auth (ported from Nevis), checkout — Phase 1–2
