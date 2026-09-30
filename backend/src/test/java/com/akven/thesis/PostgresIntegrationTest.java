@@ -15,13 +15,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * What H2 cannot prove, run against a real PostgreSQL 16 + pgvector database on a real server:
- * Flyway V1-V6, Hibernate schema validation (the context would not even start on drift), that the
+ * Flyway (all migrations), Hibernate schema validation (the context would not even start on drift), that the
  * seeded pgcrypto bcrypt hashes are accepted by Spring, jsonb audit rows, and the database-level
  * CHECK constraints that back the thesis's guardrail claims.
  *
@@ -128,6 +129,106 @@ class PostgresIntegrationTest {
         // The product is not in the shop until it has a variant, but it is findable in the admin list.
         assertThat(call("GET", "/api/admin/products?q=Mid-Long&pageSize=50", staff, null).get("items").toString())
                 .contains("ak-ven-mid-long-socks");
+    }
+
+    @Test
+    void orderConstraintsHoldInTheDatabaseItself() {
+        String customer = jdbc.queryForObject("select id::text from app_user where email = 'staff@akven.test'", String.class);
+        // FR-8: an order cannot be PAID without a payment reference.
+        assertThatThrownBy(() -> jdbc.update("insert into customer_order (customer_id, status) values (?::uuid, 'PAID')", customer))
+                .isInstanceOf(DataIntegrityViolationException.class).hasMessageContaining("customer_order_paid_has_ref_chk");
+        // Delivery needs an address.
+        assertThatThrownBy(() -> jdbc.update("insert into customer_order (customer_id, fulfillment_method) values (?::uuid, 'DELIVERY')", customer))
+                .isInstanceOf(DataIntegrityViolationException.class).hasMessageContaining("customer_order_delivery_address_chk");
+        // The same customer cannot create two orders with one idempotency key.
+        jdbc.update("insert into customer_order (customer_id, idempotency_key) values (?::uuid, 'db-idem-key-0000000001')", customer);
+        assertThatThrownBy(() -> jdbc.update("insert into customer_order (customer_id, idempotency_key) values (?::uuid, 'db-idem-key-0000000001')", customer))
+                .isInstanceOf(DataIntegrityViolationException.class).hasMessageContaining("customer_order_idempotency_uq");
+        // A negotiated offer can be used by one order line only.
+        jdbc.update("""
+                insert into negotiation_session (id, customer_id, variant_id, transcript, proposed_discount_pct, validated_discount_pct)
+                select '00000000-0000-0000-0000-00000000a001', ?::uuid, id, 't', 10, 10 from variant limit 1""", customer);
+        String order = jdbc.queryForObject("select id::text from customer_order where idempotency_key = 'db-idem-key-0000000001'", String.class);
+        String item = "insert into order_item (order_id, variant_id, quantity, agreed_price, negotiation_session_id) "
+                + "select ?::uuid, id, 1, 5, '00000000-0000-0000-0000-00000000a001' from variant order by sku limit 1 offset ?";
+        jdbc.update(item, order, 0);
+        assertThatThrownBy(() -> jdbc.update(item, order, 1))
+                .isInstanceOf(DataIntegrityViolationException.class).hasMessageContaining("order_item_negotiation_once_uq");
+    }
+
+    @Test
+    void sixShoppersRaceForTheLastPairOverRealHttpAndExactlyOneWins() throws Exception {
+        String admin = login("admin@akven.test", "changeme-admin");
+        String tag = Long.toString(System.nanoTime(), 36);
+        String productId = call("POST", "/api/admin/products", admin, "{\"name\":\"Race Sock " + tag + "\",\"category\":\"MEN\"}", 201).get("id").asText();
+        String sku = "RACE-" + tag.toUpperCase();
+        call("POST", "/api/admin/products/" + productId + "/variants", admin,
+                "{\"sku\":\"" + sku + "\",\"size\":\"M\",\"color\":\"Navy\",\"price\":10,\"costPrice\":4,\"marginFloorPct\":15,\"stockQty\":1}", 201);
+
+        int shoppers = 6;
+        List<String> tokens = new java.util.ArrayList<>();
+        for (int i = 0; i < shoppers; i++) {
+            tokens.add(call("POST", "/api/auth/register", null, "{\"email\":\"racer" + i + "-" + tag + "@akven.test\",\"password\":\"correct-horse-battery\"}", 201).get("token").asText());
+        }
+        String checkout = "{\"items\":[{\"sku\":\"" + sku + "\",\"quantity\":1}],"
+                + "\"fulfillment\":{\"method\":\"PICKUP\",\"contactName\":\"Racer\",\"contactPhone\":\"+996700000000\"},"
+                + "\"payment\":{\"method\":\"GOOGLE_PAY\",\"token\":\"sim_google_abcdef123456\"}}";
+        List<java.util.concurrent.CompletableFuture<HttpResponse<String>>> inFlight = new java.util.ArrayList<>();
+        java.util.concurrent.CountDownLatch go = new java.util.concurrent.CountDownLatch(1);
+        for (String token : tokens) {
+            HttpRequest r = HttpRequest.newBuilder(uri("/api/orders")).header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json").header("Idempotency-Key", java.util.UUID.randomUUID().toString())
+                    .POST(HttpRequest.BodyPublishers.ofString(checkout)).build();
+            inFlight.add(java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+                try { go.await(); return http.send(r, HttpResponse.BodyHandlers.ofString()); } catch (Exception e) { throw new RuntimeException(e); }
+            }));
+        }
+        go.countDown();
+        int created = 0, refused = 0;
+        for (var f : inFlight) {
+            int code = f.get().statusCode();
+            if (code == 201) created++; else if (code == 409) refused++; else throw new AssertionError("unexpected status " + code + ": " + f.get().body());
+        }
+        assertThat(created).as("orders created").isEqualTo(1);
+        assertThat(refused).as("refused for stock").isEqualTo(shoppers - 1);
+
+        JsonNode variant = call("GET", "/api/admin/products/" + productId, admin, null).get("variants").get(0);
+        assertThat(variant.get("stockQty").asInt()).isZero();
+        assertThat(variant.get("reservedQty").asInt()).isZero();
+    }
+
+    @Test
+    void fourIdenticalRequestsWithOneIdempotencyKeyCreateOneOrder() throws Exception {
+        String admin = login("admin@akven.test", "changeme-admin");
+        String tag = Long.toString(System.nanoTime(), 36);
+        String productId = call("POST", "/api/admin/products", admin, "{\"name\":\"Idem Sock " + tag + "\",\"category\":\"MEN\"}", 201).get("id").asText();
+        String sku = "IDEM-" + tag.toUpperCase();
+        call("POST", "/api/admin/products/" + productId + "/variants", admin,
+                "{\"sku\":\"" + sku + "\",\"price\":10,\"costPrice\":4,\"marginFloorPct\":15,\"stockQty\":10}", 201);
+        String token = call("POST", "/api/auth/register", null, "{\"email\":\"idem-" + tag + "@akven.test\",\"password\":\"correct-horse-battery\"}", 201).get("token").asText();
+        String key = java.util.UUID.randomUUID().toString();
+        String checkout = "{\"items\":[{\"sku\":\"" + sku + "\",\"quantity\":1}],"
+                + "\"fulfillment\":{\"method\":\"PICKUP\",\"contactName\":\"Doubleclick\",\"contactPhone\":\"+996700000000\"},"
+                + "\"payment\":{\"method\":\"APPLE_PAY\",\"token\":\"sim_apple_abcdef123456\"}}";
+        java.util.concurrent.CountDownLatch go = new java.util.concurrent.CountDownLatch(1);
+        List<java.util.concurrent.CompletableFuture<HttpResponse<String>>> inFlight = new java.util.ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            HttpRequest r = HttpRequest.newBuilder(uri("/api/orders")).header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json").header("Idempotency-Key", key).POST(HttpRequest.BodyPublishers.ofString(checkout)).build();
+            inFlight.add(java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+                try { go.await(); return http.send(r, HttpResponse.BodyHandlers.ofString()); } catch (Exception e) { throw new RuntimeException(e); }
+            }));
+        }
+        go.countDown();
+        int created = 0;
+        for (var f : inFlight) {
+            int code = f.get().statusCode();
+            assertThat(code).as(f.get().body()).isIn(200, 201, 409);        // the same order again, or "still being processed"
+            if (code == 201) created++;
+        }
+        assertThat(created).isEqualTo(1);
+        assertThat(call("GET", "/api/orders", token, null)).hasSize(1);       // one order, one sale
+        assertThat(call("GET", "/api/admin/products/" + productId, admin, null).get("variants").get(0).get("stockQty").asInt()).isEqualTo(9);
     }
 
     @Test

@@ -34,6 +34,13 @@ public abstract class IntegrationTest {
         return "Bearer " + jwtService.generateToken(user);
     }
 
+    /** A real token for a real customer with a given email (several customers are needed to test ownership and races). */
+    protected String tokenForEmail(String email, Role role) {
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> userRepository.save(new User(email, passwordEncoder.encode("test-password-123"), role)));
+        return "Bearer " + jwtService.generateToken(user);
+    }
+
     protected ResultActions getJson(String url, String token) throws Exception {
         var request = get(url);
         if (token != null) request.header("Authorization", token);
@@ -48,6 +55,7 @@ public abstract class IntegrationTest {
     }
 
     protected JsonNode json(ResultActions result) throws Exception {
-        return objectMapper.readTree(result.andReturn().getResponse().getContentAsString());
+        // JSON is UTF-8 by definition; MockMvc would otherwise decode the body as Latin-1 and mangle characters such as the ellipsis.
+        return objectMapper.readTree(result.andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 }

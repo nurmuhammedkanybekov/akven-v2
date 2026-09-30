@@ -19,7 +19,11 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Insert-only line item — no version/updated_at needed since it's never edited after checkout. */
+/**
+ * One line of an order. Besides the link to the variant it keeps a snapshot of what was bought (name, options, list
+ * price, discount), so the receipt stays true after the catalog is edited or the product is retired.
+ * unitPrice (agreed_price) is the validator-checked price, never a value the client or the language model supplied.
+ */
 @Entity
 @Table(name = "order_item", uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "variant_id"}))
 @EntityListeners(AuditingEntityListener.class)
@@ -41,10 +45,22 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    /** The final, validator-checked price for this line — never the LLM's raw proposal. */
+    /** Price of one unit after any validated discount. */
     @PositiveOrZero
-    @Column(nullable = false)
-    private BigDecimal agreedPrice;
+    @Column(name = "agreed_price", nullable = false)
+    private BigDecimal unitPrice;
+
+    @Column(nullable = false, length = 64) private String sku = "";
+    @Column(nullable = false) private String productName = "";
+    @Column(length = 160) private String productSlug;
+    @Column(length = 200) private String variantLabel;
+    @Column(length = 7) private String colorHex;
+    @Column(length = 500) private String imageUrl;
+    @Column(nullable = false) private BigDecimal listPrice = BigDecimal.ZERO;
+    @Column(nullable = false) private BigDecimal discountPct = BigDecimal.ZERO;
+
+    /** The negotiated offer this line used, if any. Cleared when the order is cancelled. */
+    private UUID negotiationSessionId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -54,17 +70,45 @@ public class OrderItem {
         // JPA
     }
 
-    public OrderItem(Order order, Variant variant, Integer quantity, BigDecimal agreedPrice) {
+    public OrderItem(Order order, Variant variant, int quantity, BigDecimal listPrice, BigDecimal discountPct,
+                     BigDecimal unitPrice, UUID negotiationSessionId, String productName, String productSlug,
+                     String variantLabel, String imageUrl) {
         this.order = order;
         this.variant = variant;
         this.quantity = quantity;
-        this.agreedPrice = agreedPrice;
+        this.listPrice = listPrice;
+        this.discountPct = discountPct;
+        this.unitPrice = unitPrice;
+        this.negotiationSessionId = negotiationSessionId;
+        this.sku = variant.getSku();
+        this.colorHex = variant.getColorHex();
+        this.productName = productName;
+        this.productSlug = productSlug;
+        this.variantLabel = variantLabel;
+        this.imageUrl = imageUrl;
+    }
+
+    public BigDecimal lineTotal() {
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    void releaseOffer() {
+        this.negotiationSessionId = null;
     }
 
     public UUID getId() { return id; }
     public Order getOrder() { return order; }
     public Variant getVariant() { return variant; }
     public Integer getQuantity() { return quantity; }
-    public BigDecimal getAgreedPrice() { return agreedPrice; }
+    public BigDecimal getUnitPrice() { return unitPrice; }
+    public String getSku() { return sku; }
+    public String getProductName() { return productName; }
+    public String getProductSlug() { return productSlug; }
+    public String getVariantLabel() { return variantLabel; }
+    public String getColorHex() { return colorHex; }
+    public String getImageUrl() { return imageUrl; }
+    public BigDecimal getListPrice() { return listPrice; }
+    public BigDecimal getDiscountPct() { return discountPct; }
+    public UUID getNegotiationSessionId() { return negotiationSessionId; }
     public Instant getCreatedAt() { return createdAt; }
 }

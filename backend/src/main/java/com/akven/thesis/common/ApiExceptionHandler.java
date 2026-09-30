@@ -1,5 +1,6 @@
 package com.akven.thesis.common;
 
+import com.akven.thesis.order.PaymentFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BusinessRuleException.class)
     ProblemDetail businessRule(BusinessRuleException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    /** 402 for a declined payment, 502 when the payment service failed. The order (when there is one) rides along. */
+    @ExceptionHandler(PaymentFailedException.class)
+    ProblemDetail paymentFailed(PaymentFailedException e) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(e.status()), e.getMessage());
+        if (e.order() != null) {
+            problem.setProperty("order", e.order());
+        }
+        return problem;
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)

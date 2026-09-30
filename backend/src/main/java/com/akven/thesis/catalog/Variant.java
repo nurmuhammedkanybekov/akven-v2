@@ -113,6 +113,39 @@ public class Variant extends AuditableEntity {
         this.marginFloorPct = marginFloorPct;
     }
 
+    /** Holds units for an order that is being paid. Never more than is available (the database also checks). */
+    public void reserve(int qty) {
+        if (qty <= 0 || qty > available()) {
+            throw new IllegalStateException("Cannot reserve " + qty + " of " + sku + " (available " + available() + ")");
+        }
+        reservedQty += qty;
+    }
+
+    /** Gives back a hold (payment declined or order cancelled before it was paid). */
+    public void releaseReservation(int qty) {
+        if (qty <= 0 || qty > reservedQty) {
+            throw new IllegalStateException("Cannot release " + qty + " of " + sku + " (reserved " + reservedQty + ")");
+        }
+        reservedQty -= qty;
+    }
+
+    /** The held units are sold: they leave the shelf and the hold together. */
+    public void commitSale(int qty) {
+        if (qty <= 0 || qty > reservedQty) {
+            throw new IllegalStateException("Cannot sell " + qty + " of " + sku + " (reserved " + reservedQty + ")");
+        }
+        reservedQty -= qty;
+        stockQty -= qty;
+    }
+
+    /** A paid order was cancelled before fulfilment: the units go back on the shelf. */
+    public void restock(int qty) {
+        if (qty <= 0) {
+            throw new IllegalStateException("Cannot restock " + qty);
+        }
+        stockQty += qty;
+    }
+
     public void setColorHex(String colorHex) { this.colorHex = colorHex; }
 
     public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }

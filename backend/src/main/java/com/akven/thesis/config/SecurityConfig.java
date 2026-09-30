@@ -98,7 +98,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/catalog/**", "/media/uploads/**").permitAll()
                 // Registration and login must be reachable without a token; everything else
                 // under /api/auth/** (e.g. /api/auth/me) stays behind anyRequest().authenticated().
-                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/cart/quote").permitAll()
                 .requestMatchers("/api/admin/**").hasAnyRole("STAFF", "ADMIN")
                 .anyRequest().authenticated()
             )

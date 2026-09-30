@@ -62,6 +62,13 @@ public class NegotiationSession {
         this.variant = variant;
     }
 
+    /** Stores what the assistant proposed and what the policy allowed. The validated value can never exceed the proposal. */
+    public void recordOutcome(String transcript, BigDecimal proposedDiscountPct, BigDecimal validatedDiscountPct) {
+        this.transcript = transcript;
+        this.proposedDiscountPct = proposedDiscountPct;
+        this.validatedDiscountPct = validatedDiscountPct;
+    }
+
     /** Mirrors the DB CHECK in application-layer validation, so a bad write fails fast with a clear message. */
     @AssertTrue(message = "validatedDiscountPct must not exceed proposedDiscountPct")
     private boolean isMarginInvariantSatisfied() {
