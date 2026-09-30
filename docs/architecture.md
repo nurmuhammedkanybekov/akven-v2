@@ -133,7 +133,17 @@ violation, margin-invariant violation, duplicate email by case, and
 
 - [x] Real authentication: `POST /api/auth/register`, `/login`, `/me`, backed by a real
       `JwtAuthenticationFilter` and a Spring Security `UserDetailsService` — see Security below
-- [ ] Full catalog API (product detail + variants, admin management)
+- [x] Catalog API: `GET /api/products` (filters: category, cut, occasion, collection, search,
+      size, color, price range, in-stock; pagination; whitelisted sort), `GET /api/products/{slug}`;
+      customer responses are explicit DTOs that never contain `costPrice` or `marginFloorPct`.
+      Admin API under `/api/admin/**`: create / edit / retire products (soft delete), variant
+      price and stock edits for STAFF and ADMIN, variant creation and `costPrice` /
+      `marginFloorPct` changes for ADMIN only (FR-11, enforced with `@PreAuthorize` on the
+      service), optimistic-version check on edits, every mutation written to `audit_log_entry`
+      in the same transaction (FR-13), ADMIN-only audit trail endpoints. Taxonomy added in
+      `V3` (category / cut / occasion with CHECK constraints), extra demo catalog in `V4`.
+      Errors use RFC 7807 problem details. Verified on H2 (26 tests) and on real
+      PostgreSQL 16 + pgvector (Flyway V1–V4, Hibernate schema validation, seeded bcrypt login).
 - [ ] Cart & checkout, simulated Apple Pay / Google Pay tokenization, inventory holds
 - [ ] Negotiation endpoint with a rule-based stand-in behind the same contract the real
       LLM will use in Milestone 3 — `PolicyValidator` already proven correct either way

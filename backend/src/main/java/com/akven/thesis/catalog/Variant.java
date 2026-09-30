@@ -91,7 +91,34 @@ public class Variant extends AuditableEntity {
         this.marginFloorPct = marginFloorPct;
     }
 
+    /** Staff-level edit: descriptive fields, selling price and stock. Never touches cost or margin floor. */
+    public void updateListing(String size, String color, Integer packSize, BigDecimal price,
+                              Integer stockQty, boolean active) {
+        this.size = size;
+        this.color = color;
+        this.packSize = packSize;
+        this.price = price;
+        this.stockQty = stockQty;
+        this.active = active;
+    }
+
+    /** Admin-only pricing policy: the two fields the negotiation guardrail is built on. */
+    public void updatePricingPolicy(BigDecimal costPrice, BigDecimal marginFloorPct) {
+        this.costPrice = costPrice;
+        this.marginFloorPct = marginFloorPct;
+    }
+
+    public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }
+
+    /** Computed here rather than read from the generated column, so it is correct on H2 and Postgres alike. */
+    public int available() {
+        return stockQty - reservedQty;
+    }
+
     public UUID getId() { return id; }
+    public String getSize() { return size; }
+    public String getColor() { return color; }
+    public Integer getPackSize() { return packSize; }
     public Product getProduct() { return product; }
     public String getSku() { return sku; }
     public BigDecimal getPrice() { return price; }

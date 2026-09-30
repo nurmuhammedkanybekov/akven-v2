@@ -121,7 +121,7 @@ Target: Prototype 1 — core backend + basic UI integrated, ~30–50% functional
 | Deliverable | Status |
 |---|---|
 | Real authentication (register / login / me, JWT filter, Spring Security wiring) | Done |
-| Full catalog API (product detail + variants, admin management) | Not started |
+| Full catalog API: public list with filters and pagination, product detail with variants, Men / Women / Kids / Bundles taxonomy (cut and occasion filters), admin management with audit log and ADMIN-only margin floor | Done |
 | Cart & checkout, simulated payment tokenization, inventory holds | Not started |
 | Negotiation endpoint (rule-based stand-in behind the real API contract) | Not started |
 | React frontend (catalog, cart/checkout, negotiate, minimal admin view) | Not started |

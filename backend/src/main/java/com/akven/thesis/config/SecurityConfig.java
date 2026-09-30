@@ -55,6 +55,10 @@ public class SecurityConfig {
             .exceptionHandling(eh -> eh.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                // On a real servlet container a 4xx/5xx is re-dispatched internally to /error, and that
+                // second dispatch carries no token. If /error required authentication, every 403 would be
+                // rewritten to 401. /error only renders a generic status body, so it is safe to open.
+                .requestMatchers("/error").permitAll()
                 // Live API docs (OpenApiConfig) — documentation, not data, so no auth required.
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()

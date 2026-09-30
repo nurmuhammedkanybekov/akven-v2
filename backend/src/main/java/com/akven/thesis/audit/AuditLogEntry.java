@@ -82,6 +82,8 @@ public class AuditLogEntry {
     public String getAction() { return action; }
     public String getEntityType() { return entityType; }
     public UUID getEntityId() { return entityId; }
+    public String getBeforeState() { return beforeState; }
+    public String getAfterState() { return afterState; }
     public String getCorrelationId() { return correlationId; }
     public Instant getCreatedAt() { return createdAt; }
 }
