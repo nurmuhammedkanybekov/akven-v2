@@ -8,3 +8,10 @@ spring:
       ddl-auto: create-drop
   flyway:
     enabled: false   # pgvector/pgcrypto in V1 are Postgres-only; the smoke test just needs the context to load
+
+# Test's own application.yml replaces (not merges with) the main one on the test
+# classpath, so JwtService's required properties need an explicit value here too.
+akven:
+  jwt:
+    secret: test-only-secret-key-not-for-production-use-1234567890
+    expiration-minutes: 60

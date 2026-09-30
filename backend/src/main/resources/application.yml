@@ -24,6 +24,11 @@ management:
 # Never commit real values for these — set via CI/CD variables or a local .env
 # that's in .gitignore. See docs/architecture.md, Security section.
 akven:
+  jwt:
+    # Dev-only default. Override with a real random secret (32+ bytes) via
+    # JWT_SECRET before this runs anywhere but a laptop — see JwtService.
+    secret: ${JWT_SECRET:dev-only-insecure-secret-change-in-production-min-32-bytes!!}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:1440}
   llm:
     api-key: ${LLM_API_KEY:}
   payments:

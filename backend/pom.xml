@@ -21,6 +21,7 @@
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <jjwt.version>0.12.6</jjwt.version>
   </properties>
 
   <dependencies>
@@ -53,10 +54,29 @@
       <artifactId>flyway-database-postgresql</artifactId>
     </dependency>
 
-    <!-- Security — JWT filter/RBAC to be ported in from the Nevis IAM project -->
+    <!-- Security — JWT auth (Milestone 2). See config.JwtService / JwtAuthenticationFilter. -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>${jjwt.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>${jjwt.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- Jackson (de)serializer for jjwt claims — jjwt-gson is the alternative, but Jackson is
+           already on the classpath via spring-boot-starter-web, so this adds no new library. -->
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>${jjwt.version}</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- Health check for CI / ops (Milestone 1's "health-check endpoint" = /actuator/health, free) -->

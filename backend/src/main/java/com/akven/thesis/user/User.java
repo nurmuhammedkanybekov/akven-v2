@@ -1,6 +1,7 @@
 package com.akven.thesis.user;
 
 import com.akven.thesis.common.AuditableEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -51,4 +52,12 @@ public class User extends AuditableEntity {
     public String getEmail() { return email; }
     public Role getRole() { return role; }
     public boolean isActive() { return active; }
+
+    /**
+     * Needed only by UserDetailsServiceImpl so Spring Security can verify a login attempt.
+     * @JsonIgnore is defense in depth: no endpoint returns a User entity today, but if one
+     * ever does, the hash must not go out with it.
+     */
+    @JsonIgnore
+    public String getPasswordHash() { return passwordHash; }
 }
