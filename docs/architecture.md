@@ -1,6 +1,6 @@
 # Ak&Ven — Architecture
 
-See [`architecture-diagram.svg`](./architecture-diagram.svg) for the system diagram this document describes.
+See [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) for the system diagram this document describes, [`diagrams/02-negotiation-validation-path.svg`](./diagrams/02-negotiation-validation-path.svg) for the Policy Validator trust boundary, [`diagrams/03-sequence-negotiation-turn.svg`](./diagrams/03-sequence-negotiation-turn.svg) for one negotiation turn, and [`diagrams/04-er-data-model.svg`](./diagrams/04-er-data-model.svg) for the data model.
 
 ## Why this shape
 
@@ -109,6 +109,8 @@ violation, margin-invariant violation, duplicate email by case, and
 
 ## Status
 
+**Milestone 1 (due 25 Sept) — complete, pushed to GitLab:**
+
 - [x] Architecture decided and documented (this file + diagram — v2, redrawn to show
       the three layers as explicit swimlanes, both external system actors including
       Payment Provider, and the Policy Validator's exact place in the request path)
@@ -119,41 +121,60 @@ violation, margin-invariant violation, duplicate email by case, and
       soft delete, audit trail as `jsonb`, chunk-aware RAG table — see above
 - [x] Frontend PWA shell: complete manifest with real generated icons
       (installable), a service worker that actually caches and serves the
-      shell offline — still a placeholder for the real UI, not for the PWA
-      plumbing around it
+      shell offline
 - [x] CI/build hygiene: JUnit test reports wired into GitLab's CI reports,
       dependency cache keyed on `pom.xml`, UTF-8 build encoding pinned
 - [x] Live API docs: springdoc-openapi wired in (`/swagger-ui/index.html`,
       `/v3/api-docs`) — every `@RestController` shows up automatically, bearer-JWT
       scheme pre-declared so "Authorize" works the moment real tokens exist
-- [x] Frontend shell has real content instead of a bare placeholder heading —
-      still not the storefront (that's Phase 1), but shows install/offline status
-      and the roadmap so it reads as intentional, not empty
-- [x] Use-case diagram
-- [ ] Wireframes for the 5 key screens — next
-- [ ] Real negotiation pipeline, auth (ported from Nevis), checkout — Phase 1–2
+- [x] Use-case diagram, wireframes (full device matrix), requirement analysis (incl. NFR-11)
+
+**Milestone 2 (due 20 Oct) — in progress:**
+
+- [x] Real authentication: `POST /api/auth/register`, `/login`, `/me`, backed by a real
+      `JwtAuthenticationFilter` and a Spring Security `UserDetailsService` — see Security below
+- [ ] Full catalog API (product detail + variants, admin management)
+- [ ] Cart & checkout, simulated Apple Pay / Google Pay tokenization, inventory holds
+- [ ] Negotiation endpoint with a rule-based stand-in behind the same contract the real
+      LLM will use in Milestone 3 — `PolicyValidator` already proven correct either way
+- [ ] React frontend (catalog, cart/checkout, negotiate, minimal admin view), using the
+      high-fidelity design direction (`docs/design-direction.html`) now locked in as scope
+- [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
+      Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
 
 ## Security
 
 See the full checklist (negotiator safety, auth/access, payments, operational)
 in the Ak&Ven Architecture reference doc maintained alongside the thesis
-plan. Summary of what's already reflected in this skeleton:
+plan. Summary of what's already reflected in this codebase:
 
-- Passwords are never stored in plaintext — `passwordHash` (bcrypt, via a
-  `PasswordEncoder` bean already wired in `SecurityConfig`); demo/seed
-  passwords are hashed the same way with pgcrypto directly in the
-  migration, never committed as plaintext.
+- Passwords are never stored in plaintext — `passwordHash` (bcrypt, via the
+  `PasswordEncoder` bean in `SecurityConfig`); demo/seed passwords are hashed
+  the same way with pgcrypto directly in the migration, never committed as
+  plaintext. Real accounts go through the same encoder via
+  `POST /api/auth/register`.
 - `Variant.costPrice` and `marginFloorPct` are admin-only fields — the
   catalog controller must not expose them on customer-facing endpoints;
   `marginFloorPct` writes will be restricted to `ADMIN` at the service
-  layer (FR-11) once catalog-management endpoints exist.
-- Secrets (`LLM_API_KEY`, payment merchant IDs) are read from environment
-  variables only (`application.yml`) — never committed.
-- `SecurityConfig` now has real shape, not a `permitAll` placeholder:
-  catalog `GET` is public, `/api/admin/**` requires `STAFF`/`ADMIN`,
-  everything else requires authentication, and method security
+  layer (FR-11) once catalog-management endpoints exist (Milestone 2).
+- Secrets (`JWT_SECRET`, `LLM_API_KEY`, payment merchant IDs) are read from
+  environment variables only (`application.yml`) — never committed. The
+  in-repo default for `JWT_SECRET` is explicitly dev-only; anywhere this
+  runs beyond a laptop needs a real random secret set via the environment.
+- `SecurityConfig` has real shape: catalog `GET` and `/api/auth/register`
+  `/login` are public, `/api/admin/**` requires `STAFF`/`ADMIN`, everything
+  else requires authentication, and method security
   (`@EnableMethodSecurity`) is on for finer-grained rules like FR-11.
-  `JwtAuthenticationFilter` is wired into the chain but still a stub — it
-  verifies nothing yet, so every non-public route correctly 401s until
-  Phase 2 fills in token verification. That TODO is tracked in the filter
-  and in `SecurityConfig` itself.
+- **`JwtAuthenticationFilter` now actually verifies tokens (Milestone 2)** —
+  it parses the `Authorization: Bearer` header, verifies the signature and
+  expiry via `JwtService`, and populates the `SecurityContext` from the
+  token's claims; a missing/invalid token leaves the request unauthenticated
+  rather than throwing, so `SecurityConfig`'s route rules are still what
+  actually reject it. `AuthenticationManager` is backed by
+  `UserDetailsServiceImpl` (loads a `User` by email) plus the existing
+  `PasswordEncoder` bean — Spring Boot auto-configures the
+  `DaoAuthenticationProvider` from those two, so login never compares
+  passwords by hand.
+- Verified with a real `mvn test` run (see `AuthControllerTest`) exercising
+  the actual register → login → protected-route flow against the H2 test
+  profile, not just reviewed by eye.

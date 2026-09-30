@@ -1,6 +1,6 @@
 # Ak&Ven — Requirement Analysis
 
-**Milestone 1 deliverable.** Companion to [`architecture.md`](./architecture.md) and [`architecture-diagram.svg`](./architecture-diagram.svg) — this document defines *what* the system must do; the architecture doc defines *how*. The use-case diagram and wireframes (next Milestone 1 deliverables) are drawn directly from the use cases listed here.
+**Milestone 1 deliverable.** Companion to [`architecture.md`](./architecture.md) and [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) — this document defines *what* the system must do; the architecture doc defines *how*. The use-case diagram and wireframes (next Milestone 1 deliverables) are drawn directly from the use cases listed here.
 
 ## 1. Purpose and scope
 

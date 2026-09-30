@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+
+jobs:
+  # Fast feedback: unit + MockMvc tests on H2 (same as `mvn test` locally).
+  backend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: mvn test
+        run: mvn -B test
+      - name: Upload surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: backend/target/surefire-reports/
+
+  # The part H2 cannot prove: Flyway migrations + pgvector + pgcrypto on real
+  # PostgreSQL, Hibernate schema validation, and that a bcrypt hash written by
+  # pgcrypto's crypt() is accepted by Spring's BCryptPasswordEncoder.
+  backend-postgres-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: akven
+          POSTGRES_USER: akven
+          POSTGRES_PASSWORD: akven
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U akven -d akven"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/akven
+      DB_USER: akven
+      DB_PASSWORD: akven
+      JWT_SECRET: ci-only-secret-0123456789-0123456789-0123456789
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Build jar
+        working-directory: backend
+        run: mvn -B -DskipTests package
+      - name: Boot the app against real PostgreSQL
+        run: |
+          nohup java -jar backend/target/*-SNAPSHOT.jar > app.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/actuator/health > /dev/null 2>&1; then
+              echo "app is up after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "app did not become healthy"; cat app.log; exit 1
+      - name: Smoke test — seeded admin can log in and use the token
+        run: |
+          set -e
+          TOKEN=$(curl -fsS -X POST http://localhost:8080/api/auth/login \
+            -H 'Content-Type: application/json' \
+            -d '{"email":"admin@akven.test","password":"changeme-admin"}' | jq -r .token)
+          test -n "$TOKEN" -a "$TOKEN" != "null"
+          ROLE=$(curl -fsS http://localhost:8080/api/auth/me -H "Authorization: Bearer $TOKEN" | jq -r .role)
+          echo "role from /me: $ROLE"; test "$ROLE" = "ADMIN"
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/auth/me)
+          echo "anonymous /me -> $CODE"; test "$CODE" = "401"
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/api/auth/login \
+            -H 'Content-Type: application/json' -d '{"email":"admin@akven.test","password":"wrong-password"}')
+          echo "wrong password -> $CODE"; test "$CODE" = "401"
+          curl -fsS http://localhost:8080/api/products > /dev/null
+      - name: Show app log on failure
+        if: failure()
+        run: cat app.log

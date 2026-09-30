@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1190" width="1100" height="1190" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Untrusted model output on the left, trusted deterministic code on the right. The negotiator proposes a discount; the Policy Validator clamps it to the variant&#x27;s margin floor; only the validated discount reaches the order, and both values are logged."><title>Negotiation request path and the Policy Validator</title><defs><marker id="m-filled-2B5A63" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L13,7 L0,13 z" fill="#2B5A63"/></marker><marker id="m-filled-2e7d46" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L13,7 L0,13 z" fill="#2e7d46"/></marker><marker id="m-filled-5b4b8a" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L13,7 L0,13 z" fill="#5b4b8a"/></marker></defs><rect width="1100" height="1190" fill="#ffffff"/><text x="40" y="54" font-size="30" font-weight="700" fill="#2B5A63" text-anchor="start">The Policy Validator — trust boundary for every discount</text>
+<text x="40" y="90" font-size="22" font-weight="400" fill="#555555" text-anchor="start">The model proposes; deterministic code decides</text>
+<rect x="40" y="120" width="440" height="716" rx="14" fill="#f7f4fb" stroke="#5b4b8a" stroke-width="2" stroke-dasharray="10 6"/>
+<rect x="620" y="120" width="440" height="716" rx="14" fill="#f1f8f3" stroke="#2e7d46" stroke-width="2" stroke-dasharray="10 6"/>
+<text x="70" y="158" font-size="23" font-weight="700" fill="#5b4b8a" text-anchor="start">UNTRUSTED — model output</text>
+<text x="650" y="158" font-size="23" font-weight="700" fill="#2e7d46" text-anchor="start">TRUSTED — server code</text>
+<rect x="60" y="190" width="400" height="88" rx="10" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.6"/>
+<text x="260" y="226" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Customer message</text>
+<text x="260" y="256" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">“Can I get 25% off three pairs?”</text>
+<rect x="60" y="320" width="400" height="88" rx="10" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.6"/>
+<text x="260" y="356" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Retrieve grounding data</text>
+<text x="260" y="386" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">price · stock · description</text>
+<rect x="60" y="450" width="400" height="88" rx="10" fill="#ece8f5" stroke="#5b4b8a" stroke-width="2.6"/>
+<text x="260" y="486" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Negotiator</text>
+<text x="260" y="516" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">stand-in (M2) · LLM + RAG (M3)</text>
+<rect x="60" y="580" width="400" height="88" rx="10" fill="#ece8f5" stroke="#5b4b8a" stroke-width="2.6"/>
+<text x="260" y="616" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Proposed discount</text>
+<text x="260" y="646" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">proposedDiscountPct = 25</text>
+<polyline points="260,280 260,318" fill="none" stroke="#5b4b8a" stroke-width="2.6" marker-end="url(#m-filled-5b4b8a)" stroke-linejoin="round"/>
+<polyline points="260,410 260,448" fill="none" stroke="#5b4b8a" stroke-width="2.6" marker-end="url(#m-filled-5b4b8a)" stroke-linejoin="round"/>
+<polyline points="260,540 260,578" fill="none" stroke="#5b4b8a" stroke-width="2.6" marker-end="url(#m-filled-5b4b8a)" stroke-linejoin="round"/>
+<rect x="640" y="190" width="400" height="88" rx="10" fill="#f4f4f4" stroke="#555555" stroke-width="2.6" stroke-dasharray="8 5"/>
+<text x="840" y="226" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Withheld from the model</text>
+<text x="840" y="256" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">costPrice · marginFloorPct</text>
+<rect x="640" y="320" width="400" height="88" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<text x="840" y="356" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Variant record</text>
+<text x="840" y="386" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">price · stock · marginFloorPct</text>
+<rect x="640" y="580" width="400" height="88" rx="10" fill="#e3f1e7" stroke="#2e7d46" stroke-width="2.6"/>
+<text x="840" y="616" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Policy Validator</text>
+<text x="840" y="646" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">min(proposed, floor), never below 0</text>
+<rect x="640" y="710" width="400" height="88" rx="10" fill="#e3f1e7" stroke="#2e7d46" stroke-width="2.6"/>
+<text x="840" y="746" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Validated discount</text>
+<text x="840" y="776" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">validatedDiscountPct = 15</text>
+<polyline points="638,364.0 462,364.0" fill="none" stroke="#2B5A63" stroke-width="2.6" marker-end="url(#m-filled-2B5A63)" stroke-linejoin="round"/>
+<text x="550" y="352.0" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">price, stock</text>
+<text x="550" y="392.0" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">no floor</text>
+<polyline points="840,410 840,578" fill="none" stroke="#2B5A63" stroke-width="2.6" marker-end="url(#m-filled-2B5A63)" stroke-linejoin="round"/>
+<text x="854" y="501.0" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">marginFloorPct</text>
+<polyline points="840,670 840,708" fill="none" stroke="#2e7d46" stroke-width="2.6" marker-end="url(#m-filled-2e7d46)" stroke-linejoin="round"/>
+<polyline points="462,624.0 638,624.0" fill="none" stroke="#5b4b8a" stroke-width="3" marker-end="url(#m-filled-5b4b8a)" stroke-linejoin="round"/>
+<text x="550" y="612.0" font-size="20" font-weight="700" fill="#5b4b8a" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">proposal</text>
+<text x="550" y="488" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle">trust</text>
+<text x="550" y="511" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle">boundary</text>
+<rect x="40" y="890" width="1020" height="168" rx="14" fill="#eef5f6" stroke="#2B5A63" stroke-width="2"/>
+<text x="70" y="928" font-size="23" font-weight="700" fill="#2B5A63" text-anchor="start">PERSISTENCE — trusted</text>
+<rect x="60" y="950" width="400" height="88" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<text x="260" y="986" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">NegotiationSession log</text>
+<text x="260" y="1016" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">both values stored separately</text>
+<rect x="640" y="950" width="400" height="88" rx="10" fill="#e3f1e7" stroke="#2e7d46" stroke-width="2.6"/>
+<text x="840" y="986" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">Cart &amp; order price</text>
+<text x="840" y="1016" font-size="20" font-weight="400" fill="#555555" text-anchor="middle">list price × (1 − validated)</text>
+<polyline points="260,670 260,888" fill="none" stroke="#5b4b8a" stroke-width="2.6" marker-end="url(#m-filled-5b4b8a)" stroke-linejoin="round"/>
+<text x="274" y="758" font-size="20" font-weight="700" fill="#5b4b8a" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">proposed</text>
+<polyline points="840,800 840,888" fill="none" stroke="#2e7d46" stroke-width="2.6" marker-end="url(#m-filled-2e7d46)" stroke-linejoin="round"/>
+<text x="854" y="874" font-size="20" font-weight="700" fill="#2e7d46" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">validated</text>
+<polyline points="638,754.0 550,754.0 550,994.0 462,994.0" fill="none" stroke="#2e7d46" stroke-width="2.6" marker-end="url(#m-filled-2e7d46)" stroke-linejoin="round"/>
+<text x="538" y="874" font-size="20" font-weight="700" fill="#2e7d46" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">validated</text>
+<rect x="40" y="1086" width="1020" height="72" rx="12" fill="#f4f4f4" stroke="#d0d0d0" stroke-width="2"/>
+<text x="550" y="1116" font-size="20" font-weight="700" fill="#555555" text-anchor="middle">Example</text>
+<text x="550" y="1144" font-size="23" font-weight="700" fill="#1b1b1b" text-anchor="middle">model asks 25 %  ·  margin floor is 15 %  ·  validator enforces 15 %</text></svg>
