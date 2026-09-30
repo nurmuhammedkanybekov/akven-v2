@@ -3,6 +3,7 @@
  * sign in, add a section, add a product with two colours, upload a photo, see it in the shop, remove it, put it back.
  * Also writes screenshots of each step to docs/design/ (thesis figures).
  *
+ * Set E2E_SLOW=1 to simulate a slow machine.
  * Needs: the backend on :8080 (demo profile, fresh database, CORS_ALLOWED_ORIGINS including http://localhost:4173) and
  * `npm run build` done. Run: npm run e2e
  */
@@ -26,6 +27,9 @@ await new Promise((r) => setTimeout(r, 2500));
 const browser = await launchBrowser();
 const ctx = await browser.newContext({ viewport: { width: 1360, height: 900 }, colorScheme: "light" });
 const page = await ctx.newPage();
+// E2E_SLOW=1 makes the browser 4 times slower, which is how a busy CI machine behaves. Steps that only pass on a fast
+// machine (typing before the page has switched) show up immediately.
+if (process.env.E2E_SLOW) await (await ctx.newCDPSession(page)).send("Emulation.setCPUThrottlingRate", { rate: Number(process.env.E2E_SLOW) || 4 });
 const problems = [];
 const failedCalls = [];
 page.on("response", (r) => { if (r.status() >= 400) failedCalls.push(`${r.status()} ${r.request().method()} ${r.url().replace(BASE, "")}`); });
@@ -67,7 +71,7 @@ try {
   await step("a new section is added and appears in the list", async () => {
     await page.getByRole("link", { name: "Sections and cuts" }).click();
     await page.getByRole("button", { name: "Add a section" }).first().click();
-    await page.getByLabel("Name").fill(SECTION);
+    await page.getByLabel("Name", { exact: true }).fill(SECTION);
     await page.getByRole("button", { name: "Add section" }).click();
     await page.locator(".av-term strong", { hasText: SECTION }).waitFor();
     await shot("admin-sections");
@@ -76,7 +80,10 @@ try {
   await step("a product is added with two colours, sizes and prices", async () => {
     await page.getByRole("link", { name: "Products" }).click();
     await page.getByRole("link", { name: "Add a product" }).first().click();
-    await page.getByLabel("Name").first().fill(PRODUCT);
+    // Wait for the editor itself: on a slow machine the list page is still showing, and its "Search by name" box
+    // would also match a loose "Name" label.
+    await page.getByRole("heading", { name: "Add a product" }).waitFor();
+    await page.getByLabel("Name", { exact: true }).fill(PRODUCT);
     await page.getByRole("button", { name: "Women" }).click();
     await page.getByLabel("Section").selectOption({ label: SECTION });
     await page.getByLabel("Cut").selectOption({ label: "Mid-long" });
@@ -208,7 +215,7 @@ try {
   await step("checkout asks for what it needs, and a declined payment keeps the bag", async () => {
     await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
     await page.getByText("Tell us who to ask for.").waitFor();
-    await page.getByLabel("Name").fill("Aida Test");
+    await page.getByLabel("Name", { exact: true }).fill("Aida Test");
     await page.getByLabel("Phone").fill("+996 700 123 456");
     await page.getByRole("radio", { name: /Delivery/ }).check();
     await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
@@ -240,7 +247,7 @@ try {
     await page.getByRole("button", { name: "Add to bag" }).click();
     await page.getByRole("link", { name: /Bag, 1 items/ }).click();
     await page.getByRole("link", { name: "Check out" }).click();
-    await page.getByLabel("Name").fill("Aida Test");
+    await page.getByLabel("Name", { exact: true }).fill("Aida Test");
     await page.getByLabel("Phone").fill("+996 700 123 456");
     await page.getByRole("button", { name: "Pay with Google Pay" }).click();
     await page.getByRole("dialog").getByRole("button", { name: /^Pay \$/ }).click();
