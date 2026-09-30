@@ -6,7 +6,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,9 +29,11 @@ public class AdminCatalogController {
     }
 
     @GetMapping("/products")
-    public PageResponse<AdminProductView> list(@RequestParam(defaultValue = "0") int page,
+    public PageResponse<AdminProductView> list(@RequestParam(required = false) String q,
+                                               @RequestParam(defaultValue = "active") String status,
+                                               @RequestParam(defaultValue = "0") int page,
                                                @RequestParam(defaultValue = "20") int pageSize) {
-        return service.list(page, pageSize);
+        return service.list(q, status, page, pageSize);
     }
 
     @GetMapping("/products/{id}")
@@ -53,6 +57,20 @@ public class AdminCatalogController {
     public ResponseEntity<Void> retire(Authentication auth, @PathVariable UUID id) {
         service.retireProduct(auth.getName(), id);
         return ResponseEntity.noContent().build();
+    }
+
+    /** Undo of the soft delete above. */
+    @PostMapping("/products/{id}/restore")
+    public AdminProductView restore(Authentication auth, @PathVariable UUID id) {
+        return service.restoreProduct(auth.getName(), id);
+    }
+
+    /** Adds one photo (JPEG, PNG or WebP, up to 5 MB) to the end of the product's gallery. */
+    @PostMapping(value = "/products/{id}/images/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AdminProductView uploadImage(Authentication auth, @PathVariable UUID id,
+                                        @RequestParam("file") MultipartFile file,
+                                        @RequestParam(value = "alt", required = false) String alt) {
+        return service.uploadImage(auth.getName(), id, file, alt);
     }
 
     @PutMapping("/products/{id}/images")

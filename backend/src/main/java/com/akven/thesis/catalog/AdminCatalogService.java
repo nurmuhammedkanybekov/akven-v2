@@ -11,9 +11,18 @@ import com.akven.thesis.common.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.Locale;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
+import com.akven.thesis.common.Slugs;
+import com.akven.thesis.media.MediaStorage;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -46,14 +55,21 @@ public class AdminCatalogService {
     private final AuditLogRepository auditLogRepository;
     private final AuditService auditService;
     private final ProductImageRepository imageRepository;
+    private final CatalogTermRepository termRepository;
+    private final MediaStorage mediaStorage;
+
+    private static final int MAX_IMAGES = 8;
 
     /** Routes that would be shadowed by fixed paths under /api/products. */
     private static final java.util.Set<String> RESERVED_SLUGS = java.util.Set.of("facets");
 
     public AdminCatalogService(ProductRepository productRepository, VariantRepository variantRepository,
                                AuditLogRepository auditLogRepository, AuditService auditService,
-                               ProductImageRepository imageRepository) {
+                               ProductImageRepository imageRepository, CatalogTermRepository termRepository,
+                               MediaStorage mediaStorage) {
         this.imageRepository = imageRepository;
+        this.termRepository = termRepository;
+        this.mediaStorage = mediaStorage;
         this.productRepository = productRepository;
         this.variantRepository = variantRepository;
         this.auditLogRepository = auditLogRepository;
@@ -62,10 +78,21 @@ public class AdminCatalogService {
 
     // ---- reads -----------------------------------------------------------------------------
 
+    /** status: "active" (default: visible in the shop), "retired" (hidden) or "all". q searches the name. */
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    public PageResponse<AdminProductView> list(int page, int size) {
-        Page<Product> products = productRepository.findAll(PageRequest.of(Math.max(page, 0),
+    public PageResponse<AdminProductView> list(String q, String status, int page, int size) {
+        Specification<Product> spec = (root, query, cb) -> {
+            List<Predicate> all = new ArrayList<>();
+            if ("retired".equalsIgnoreCase(status)) all.add(cb.isFalse(root.get("active")));
+            else if (!"all".equalsIgnoreCase(status)) all.add(cb.isTrue(root.get("active")));
+            if (q != null && !q.isBlank()) {
+                String like = "%" + q.trim().toLowerCase(Locale.ROOT).replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
+                all.add(cb.like(cb.lower(root.get("name")), like, '\\'));
+            }
+            return cb.and(all.toArray(new Predicate[0]));
+        };
+        Page<Product> products = productRepository.findAll(spec, PageRequest.of(Math.max(page, 0),
                 size <= 0 ? 20 : Math.min(size, 100), Sort.by("name").and(Sort.by("slug"))));
         List<UUID> ids = products.getContent().stream().map(Product::getId).toList();
         Map<UUID, List<Variant>> variants = ids.isEmpty() ? new HashMap<>()
@@ -96,26 +123,35 @@ public class AdminCatalogService {
 
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public AdminProductView createProduct(String actor, CreateProductRequest r) {
-        requireFacetsMatchCategory(r.category(), r.cut(), r.occasion());
-        if (RESERVED_SLUGS.contains(r.slug())) {
-            throw new BusinessRuleException("The slug '" + r.slug() + "' is reserved.");
+        CatalogTerm section = resolveTerm(r.sectionId(), TermKind.SECTION, null);
+        CatalogTerm cut = resolveTerm(r.cutId(), TermKind.CUT, null);
+        requireTermsMatchCategory(r.category(), section, cut);
+        String slug = r.slug() != null && !r.slug().isBlank() ? r.slug()
+                : Slugs.unique(r.name(), s -> RESERVED_SLUGS.contains(s) || productRepository.existsBySlug(s));
+        if (RESERVED_SLUGS.contains(slug)) {
+            throw new BusinessRuleException("The slug '" + slug + "' is reserved.");
         }
-        if (productRepository.existsBySlug(r.slug())) {
-            throw new ConflictException("A product with slug '" + r.slug() + "' already exists.");
+        if (productRepository.existsBySlug(slug)) {
+            throw new ConflictException("A product with slug '" + slug + "' already exists.");
         }
-        Product saved = productRepository.save(new Product(r.slug(), r.name().trim(), r.category(), r.cut(),
-                r.occasion(), r.collection(), r.description(), r.fabricComposition()));
+        Product product = new Product(slug, r.name().trim(), r.category(), section, cut,
+                blankToNull(r.collection()), blankToNull(r.description()), blankToNull(r.fabricComposition()));
+        product.setDetails(blankToNull(r.quality()), blankToNull(r.care()), blankToNull(r.origin()));
+        Product saved = productRepository.save(product);
         auditService.record(actor, "PRODUCT_CREATED", PRODUCT, saved.getId(), null, snapshot(saved));
         return view(saved);
     }
 
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public AdminProductView updateProduct(String actor, UUID productId, UpdateProductRequest r) {
-        requireFacetsMatchCategory(r.category(), r.cut(), r.occasion());
         Product product = requireProduct(productId);
+        CatalogTerm section = resolveTerm(r.sectionId(), TermKind.SECTION, product.getSection());
+        CatalogTerm cut = resolveTerm(r.cutId(), TermKind.CUT, product.getCut());
+        requireTermsMatchCategory(r.category(), section, cut);
         Map<String, Object> before = snapshot(product);
-        product.update(r.name().trim(), r.category(), r.cut(), r.occasion(),
-                r.collection(), r.description(), r.fabricComposition());
+        product.update(r.name().trim(), r.category(), section, cut, blankToNull(r.collection()),
+                blankToNull(r.description()), blankToNull(r.fabricComposition()),
+                blankToNull(r.quality()), blankToNull(r.care()), blankToNull(r.origin()));
         productRepository.saveAndFlush(product);
         auditService.record(actor, "PRODUCT_UPDATED", PRODUCT, productId, before, snapshot(product));
         return view(product);
@@ -134,16 +170,48 @@ public class AdminCatalogService {
         auditService.record(actor, "PRODUCT_RETIRED", PRODUCT, productId, before, snapshot(product));
     }
 
+    /** Undo of retire: the product shows in the storefront again. Idempotent, like retire. */
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public AdminProductView restoreProduct(String actor, UUID productId) {
+        Product product = requireProduct(productId);
+        if (!product.isActive()) {
+            Map<String, Object> before = snapshot(product);
+            product.restore();
+            productRepository.saveAndFlush(product);
+            auditService.record(actor, "PRODUCT_RESTORED", PRODUCT, productId, before, snapshot(product));
+        }
+        return view(product);
+    }
+
     /** STAFF and ADMIN. Replaces the ordered picture list (first = cover); audited with before and after. */
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public AdminProductView replaceImages(String actor, UUID productId, ReplaceImagesRequest r) {
         Product product = requireProduct(productId);
         List<Map<String, String>> before = imageSnapshot(imageRepository.findByProductIdOrderByPositionAsc(productId));
+        List<String> removedUrls = imageRepository.findByProductIdOrderByPositionAsc(productId).stream()
+                .map(ProductImage::getUrl).filter(u -> r.images().stream().noneMatch(n -> n.url().equals(u))).toList();
         imageRepository.deleteAllForProduct(productId);
         List<ProductImage> saved = imageRepository.saveAll(IntStream.range(0, r.images().size())
                 .mapToObj(i -> new ProductImage(productId, r.images().get(i).url(), r.images().get(i).alt().trim(), i))
                 .toList());
         auditService.record(actor, "PRODUCT_IMAGES_REPLACED", PRODUCT, productId, before, imageSnapshot(saved));
+        afterCommit(() -> removedUrls.forEach(mediaStorage::deleteQuietly));
+        return view(product);
+    }
+
+    /** Adds one uploaded photo at the end of the gallery. The file is validated by its content, see MediaStorage. */
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public AdminProductView uploadImage(String actor, UUID productId, MultipartFile file, String alt) {
+        Product product = requireProduct(productId);
+        List<ProductImage> existing = imageRepository.findByProductIdOrderByPositionAsc(productId);
+        if (existing.size() >= MAX_IMAGES) {
+            throw new BusinessRuleException("A product can have at most " + MAX_IMAGES + " photos.");
+        }
+        String url = mediaStorage.store(file);
+        String altText = alt != null && !alt.isBlank() ? alt.trim() : product.getName();
+        ProductImage saved = imageRepository.save(new ProductImage(productId, url, altText, existing.size()));
+        auditService.record(actor, "PRODUCT_IMAGE_ADDED", PRODUCT, productId, null,
+                Map.of("url", saved.getUrl(), "alt", saved.getAlt(), "position", saved.getPosition()));
         return view(product);
     }
 
@@ -159,8 +227,9 @@ public class AdminCatalogService {
             throw new ConflictException("A variant with SKU '" + r.sku() + "' already exists.");
         }
         requirePriceCoversCost(r.price(), r.costPrice());
-        Variant variant = new Variant(product, r.sku(), r.size(), r.color(), r.packSize(),
+        Variant variant = new Variant(product, r.sku(), blankToNull(r.size()), blankToNull(r.color()), r.packSize(),
                 r.price(), r.costPrice(), r.marginFloorPct());
+        variant.setColorHex(normalizeHex(r.colorHex()));
         variant.setStockQty(r.stockQty());
         Variant saved = variantRepository.saveAndFlush(variant);
         auditService.record(actor, "VARIANT_CREATED", VARIANT, saved.getId(), null, snapshot(saved));
@@ -178,7 +247,8 @@ public class AdminCatalogService {
         }
         requirePriceCoversCost(r.price(), variant.getCostPrice());
         Map<String, Object> before = snapshot(variant);
-        variant.updateListing(r.size(), r.color(), r.packSize(), r.price(), r.stockQty(), r.active());
+        variant.updateListing(blankToNull(r.size()), blankToNull(r.color()), normalizeHex(r.colorHex()), r.packSize(),
+                r.price(), r.stockQty(), r.active());
         variantRepository.saveAndFlush(variant);
         auditService.record(actor, "VARIANT_UPDATED", VARIANT, variantId, before, snapshot(variant));
         return AdminVariantView.of(variant);
@@ -216,9 +286,44 @@ public class AdminCatalogService {
         return variantRepository.findById(id).orElseThrow(() -> new NotFoundException("Variant not found: " + id));
     }
 
-    private static void requireFacetsMatchCategory(Category category, Cut cut, Occasion occasion) {
-        if (category == Category.BUNDLES && (cut != null || occasion != null)) {
-            throw new BusinessRuleException("Bundles cannot have a cut or an occasion.");
+    /**
+     * Looks up an admin-managed term of the right kind. A hidden (inactive) term cannot be newly assigned,
+     * but a product that already has it may keep it while being edited.
+     */
+    private CatalogTerm resolveTerm(UUID id, TermKind kind, CatalogTerm current) {
+        if (id == null) {
+            return null;
+        }
+        CatalogTerm term = termRepository.findByIdAndKind(id, kind)
+                .orElseThrow(() -> new BusinessRuleException("Unknown " + kind.name().toLowerCase() + "."));
+        if (!term.isActive() && !term.equals(current)) {
+            throw new BusinessRuleException("'" + term.getName() + "' is hidden. Show it again before using it.");
+        }
+        return term;
+    }
+
+    private static void requireTermsMatchCategory(Category category, CatalogTerm section, CatalogTerm cut) {
+        if (category == Category.BUNDLES && (section != null || cut != null)) {
+            throw new BusinessRuleException("Bundles cannot have a section or a cut.");
+        }
+    }
+
+    private static String blankToNull(String s) {
+        return s == null || s.isBlank() ? null : s.trim();
+    }
+
+    private static String normalizeHex(String hex) {
+        return hex == null || hex.isBlank() ? null : hex.trim().toUpperCase();
+    }
+
+    /** Runs after the surrounding transaction commits (or immediately when there is none). */
+    private static void afterCommit(Runnable action) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override public void afterCommit() { action.run(); }
+            });
+        } else {
+            action.run();
         }
     }
 
@@ -239,11 +344,14 @@ public class AdminCatalogService {
         m.put("slug", p.getSlug());
         m.put("name", p.getName());
         m.put("category", p.getCategory());
-        m.put("cut", p.getCut());
-        m.put("occasion", p.getOccasion());
+        m.put("section", p.getSection() == null ? null : p.getSection().getSlug());
+        m.put("cut", p.getCut() == null ? null : p.getCut().getSlug());
         m.put("collection", p.getCollection());
         m.put("description", p.getDescription());
         m.put("fabricComposition", p.getFabricComposition());
+        m.put("quality", p.getQuality());
+        m.put("care", p.getCare());
+        m.put("origin", p.getOrigin());
         m.put("active", p.isActive());
         return m;
     }
@@ -253,6 +361,7 @@ public class AdminCatalogService {
         m.put("sku", v.getSku());
         m.put("size", v.getSize());
         m.put("color", v.getColor());
+        m.put("colorHex", v.getColorHex());
         m.put("packSize", v.getPackSize());
         m.put("price", v.getPrice());
         m.put("costPrice", v.getCostPrice());

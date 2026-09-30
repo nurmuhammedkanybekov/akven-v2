@@ -42,6 +42,10 @@ public class Variant extends AuditableEntity {
     private String size;
     private String color;
 
+    /** Swatch shown next to the colour name, as #RRGGBB. Optional. */
+    @Column(length = 7)
+    private String colorHex;
+
     @Positive
     private Integer packSize;
 
@@ -92,10 +96,11 @@ public class Variant extends AuditableEntity {
     }
 
     /** Staff-level edit: descriptive fields, selling price and stock. Never touches cost or margin floor. */
-    public void updateListing(String size, String color, Integer packSize, BigDecimal price,
+    public void updateListing(String size, String color, String colorHex, Integer packSize, BigDecimal price,
                               Integer stockQty, boolean active) {
         this.size = size;
         this.color = color;
+        this.colorHex = colorHex;
         this.packSize = packSize;
         this.price = price;
         this.stockQty = stockQty;
@@ -108,6 +113,8 @@ public class Variant extends AuditableEntity {
         this.marginFloorPct = marginFloorPct;
     }
 
+    public void setColorHex(String colorHex) { this.colorHex = colorHex; }
+
     public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }
 
     /** Computed here rather than read from the generated column, so it is correct on H2 and Postgres alike. */
@@ -118,6 +125,7 @@ public class Variant extends AuditableEntity {
     public UUID getId() { return id; }
     public String getSize() { return size; }
     public String getColor() { return color; }
+    public String getColorHex() { return colorHex; }
     public Integer getPackSize() { return packSize; }
     public Product getProduct() { return product; }
     public String getSku() { return sku; }

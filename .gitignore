@@ -8,6 +8,9 @@ backend/target/
 *.iml
 .vscode/
 
+# Uploaded product photos (runtime data, not source)
+backend/data/
+
 # Frontend (Node)
 frontend/node_modules/
 frontend/dist/

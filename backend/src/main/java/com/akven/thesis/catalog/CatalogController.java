@@ -3,6 +3,7 @@ package com.akven.thesis.catalog;
 import com.akven.thesis.catalog.CatalogViews.Facets;
 import com.akven.thesis.catalog.CatalogViews.ProductDetail;
 import com.akven.thesis.catalog.CatalogViews.ProductSummary;
+import com.akven.thesis.catalog.CatalogViews.TermsView;
 import com.akven.thesis.common.PageResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
  * Responses are the explicit views in CatalogViews, which never contain cost or margin data.
  */
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api")
 public class CatalogController {
 
     private final CatalogService catalogService;
@@ -27,11 +28,11 @@ public class CatalogController {
         this.catalogService = catalogService;
     }
 
-    @GetMapping
+    @GetMapping("/products")
     public PageResponse<ProductSummary> list(
             @RequestParam(required = false) Category category,
-            @RequestParam(required = false) Cut cut,
-            @RequestParam(required = false) Occasion occasion,
+            @RequestParam(required = false) String section,
+            @RequestParam(required = false) String cut,
             @RequestParam(required = false) String collection,
             @RequestParam(required = false) String q,
             @RequestParam(defaultValue = "false") boolean inStock,
@@ -42,16 +43,16 @@ public class CatalogController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int pageSize,
             @RequestParam(defaultValue = "newest") String sort) {
-        return catalogService.list(filter(category, cut, occasion, collection, q, inStock, size, color, minPrice, maxPrice),
+        return catalogService.list(filter(category, section, cut, collection, q, inStock, size, color, minPrice, maxPrice),
                 page, pageSize, CatalogSort.parse(sort));
     }
 
     /** Counts for the filter sidebar, e.g. "Sport (4)". Takes the same filters as the list. */
-    @GetMapping("/facets")
+    @GetMapping("/products/facets")
     public Facets facets(
             @RequestParam(required = false) Category category,
-            @RequestParam(required = false) Cut cut,
-            @RequestParam(required = false) Occasion occasion,
+            @RequestParam(required = false) String section,
+            @RequestParam(required = false) String cut,
             @RequestParam(required = false) String collection,
             @RequestParam(required = false) String q,
             @RequestParam(defaultValue = "false") boolean inStock,
@@ -59,18 +60,24 @@ public class CatalogController {
             @RequestParam(required = false) String color,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice) {
-        return catalogService.facets(filter(category, cut, occasion, collection, q, inStock, size, color, minPrice, maxPrice));
+        return catalogService.facets(filter(category, section, cut, collection, q, inStock, size, color, minPrice, maxPrice));
     }
 
-    @GetMapping("/{slug}")
+    /** The admin-managed sections and cuts, for navigation and filter menus. */
+    @GetMapping("/catalog/terms")
+    public TermsView terms() {
+        return catalogService.terms();
+    }
+
+    @GetMapping("/products/{slug}")
     public ProductDetail detail(@PathVariable String slug) {
         return catalogService.detail(slug);
     }
 
-    private static CatalogFilter filter(Category category, Cut cut, Occasion occasion, String collection, String q,
+    private static CatalogFilter filter(Category category, String section, String cut, String collection, String q,
                                         boolean inStock, String size, String color,
                                         BigDecimal minPrice, BigDecimal maxPrice) {
-        return new CatalogFilter(category, cut, occasion, blankToNull(collection), blankToNull(q),
+        return new CatalogFilter(category, blankToNull(section), blankToNull(cut), blankToNull(collection), blankToNull(q),
                 inStock, blankToNull(size), blankToNull(color), minPrice, maxPrice);
     }
 

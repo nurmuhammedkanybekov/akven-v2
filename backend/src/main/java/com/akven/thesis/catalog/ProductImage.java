@@ -40,6 +40,7 @@ public class ProductImage {
         this.position = position;
     }
 
+    public UUID getId() { return id; }
     public UUID getProductId() { return productId; }
     public String getUrl() { return url; }
     public String getAlt() { return alt; }

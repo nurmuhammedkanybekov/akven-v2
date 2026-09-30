@@ -13,6 +13,11 @@ spring:
     username: ${DB_USER:akven}
     password: ${DB_PASSWORD:akven}
 
+  servlet:
+    multipart:
+      max-file-size: 5MB      # product photos; MediaStorage enforces the same limit and checks the content
+      max-request-size: 6MB
+
   jpa:
     hibernate:
       ddl-auto: validate   # schema comes from Flyway, not Hibernate auto-generation
@@ -47,6 +52,8 @@ akven:
   auth:
     max-failed-logins: ${AUTH_MAX_FAILED_LOGINS:5}
     lockout-minutes: ${AUTH_LOCKOUT_MINUTES:15}
+  media:
+    dir: ${MEDIA_DIR:./data/media}   # uploaded product photos live in <dir>/uploads; back this up
   cors:
     # Comma-separated exact origins; never a wildcard. Default is the Vite dev server.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

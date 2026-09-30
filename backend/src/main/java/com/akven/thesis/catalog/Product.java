@@ -5,6 +5,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -35,15 +38,15 @@ public class Product extends AuditableEntity {
     @Column(nullable = false, length = 16)
     private Category category;
 
-    /** Null for bundles. */
-    @Enumerated(EnumType.STRING)
-    @Column(length = 16)
-    private Cut cut;
+    /** The owners' own section (Classic, Sport, ...). Null for bundles. */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "section_id")
+    private CatalogTerm section;
 
-    /** Null for bundles. */
-    @Enumerated(EnumType.STRING)
-    @Column(length = 16)
-    private Occasion occasion;
+    /** How tall the sock is (Crew, Mid-long, ...). Null for bundles. */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cut_id")
+    private CatalogTerm cut;
 
     private String collection;
 
@@ -52,6 +55,17 @@ public class Product extends AuditableEntity {
 
     /** e.g. "80% merino wool / 20% nylon" — sourced from the Korean manufacturing partner. */
     private String fabricComposition;
+
+    /** Short quality label shown on the product page, e.g. "Premium merino". */
+    @Column(length = 120)
+    private String quality;
+
+    @Column(length = 500)
+    private String care;
+
+    /** Where it is made, e.g. "Korea". */
+    @Column(length = 80)
+    private String origin;
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
@@ -62,28 +76,43 @@ public class Product extends AuditableEntity {
         // JPA
     }
 
-    public Product(String slug, String name, Category category, Cut cut, Occasion occasion,
+    public Product(String slug, String name, Category category, CatalogTerm section, CatalogTerm cut,
                    String collection, String description, String fabricComposition) {
         this.slug = slug;
         this.name = name;
         this.category = category;
+        this.section = section;
         this.cut = cut;
-        this.occasion = occasion;
         this.collection = collection;
         this.description = description;
         this.fabricComposition = fabricComposition;
     }
 
     /** Edits everything except the slug, which is a stable public identifier. */
-    public void update(String name, Category category, Cut cut, Occasion occasion,
-                       String collection, String description, String fabricComposition) {
+    public void update(String name, Category category, CatalogTerm section, CatalogTerm cut, String collection,
+                       String description, String fabricComposition, String quality, String care, String origin) {
         this.name = name;
         this.category = category;
+        this.section = section;
         this.cut = cut;
-        this.occasion = occasion;
         this.collection = collection;
         this.description = description;
         this.fabricComposition = fabricComposition;
+        this.quality = quality;
+        this.care = care;
+        this.origin = origin;
+    }
+
+    public void setDetails(String quality, String care, String origin) {
+        this.quality = quality;
+        this.care = care;
+        this.origin = origin;
+    }
+
+    /** Undo of retire(): the product is visible in the storefront again. */
+    public void restore() {
+        this.active = true;
+        this.retiredAt = null;
     }
 
     /** Soft delete (FR-10): hides the product from the storefront but keeps it intact for historical orders. */
@@ -96,8 +125,11 @@ public class Product extends AuditableEntity {
     public String getSlug() { return slug; }
     public String getName() { return name; }
     public Category getCategory() { return category; }
-    public Cut getCut() { return cut; }
-    public Occasion getOccasion() { return occasion; }
+    public CatalogTerm getSection() { return section; }
+    public CatalogTerm getCut() { return cut; }
+    public String getQuality() { return quality; }
+    public String getCare() { return care; }
+    public String getOrigin() { return origin; }
     public String getCollection() { return collection; }
     public String getDescription() { return description; }
     public String getFabricComposition() { return fabricComposition; }

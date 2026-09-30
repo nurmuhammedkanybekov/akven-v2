@@ -21,27 +21,45 @@ public final class AdminCatalogDtos {
     private AdminCatalogDtos() {
     }
 
+    static final String HEX = "#[0-9a-fA-F]{6}";
+
+    // ---- products ---------------------------------------------------------------------------
+
+    /**
+     * slug is optional: when blank it is made from the name ("Mid-Long Socks" becomes "mid-long-socks", with a number
+     * added if taken). sectionId and cutId point at admin-managed terms and must be empty for bundles.
+     */
     public record CreateProductRequest(
-            @NotBlank @Size(max = 160) @Pattern(regexp = "[a-z0-9]+(-[a-z0-9]+)*",
+            @Size(max = 160) @Pattern(regexp = "[a-z0-9]+(-[a-z0-9]+)*",
                     message = "must be lowercase letters, digits and hyphens") String slug,
             @NotBlank @Size(max = 255) String name,
-            @NotNull Category category, Cut cut, Occasion occasion,
+            @NotNull Category category, UUID sectionId, UUID cutId,
             @Size(max = 255) String collection,
             @Size(max = 2000) String description,
-            @Size(max = 255) String fabricComposition) {}
+            @Size(max = 255) String fabricComposition,
+            @Size(max = 120) String quality,
+            @Size(max = 500) String care,
+            @Size(max = 80) String origin) {}
 
     /** Slug is deliberately absent: it is a stable public identifier and is never changed. */
     public record UpdateProductRequest(
             @NotBlank @Size(max = 255) String name,
-            @NotNull Category category, Cut cut, Occasion occasion,
+            @NotNull Category category, UUID sectionId, UUID cutId,
             @Size(max = 255) String collection,
             @Size(max = 2000) String description,
-            @Size(max = 255) String fabricComposition) {}
+            @Size(max = 255) String fabricComposition,
+            @Size(max = 120) String quality,
+            @Size(max = 500) String care,
+            @Size(max = 80) String origin) {}
 
-    /** ADMIN only: creating a variant sets its cost price and margin floor. */
+    // ---- variants (size / colour / pack) ---------------------------------------------------
+
+    /** ADMIN only: creating a variant sets its cost price and margin floor. colorHex is the swatch, as #RRGGBB. */
     public record CreateVariantRequest(
             @NotBlank @Size(max = 64) String sku,
-            @Size(max = 32) String size, @Size(max = 64) String color, @Positive Integer packSize,
+            @Size(max = 32) String size, @Size(max = 64) String color,
+            @Pattern(regexp = HEX, message = "must look like #C9A24B") String colorHex,
+            @Positive Integer packSize,
             @NotNull @PositiveOrZero BigDecimal price,
             @NotNull @PositiveOrZero BigDecimal costPrice,
             @NotNull @DecimalMin("0.00") @DecimalMax("100.00") BigDecimal marginFloorPct,
@@ -53,7 +71,9 @@ public final class AdminCatalogDtos {
      * a stale screen is rejected with 409 instead of silently overwriting someone else's change.
      */
     public record UpdateVariantRequest(
-            @Size(max = 32) String size, @Size(max = 64) String color, @Positive Integer packSize,
+            @Size(max = 32) String size, @Size(max = 64) String color,
+            @Pattern(regexp = HEX, message = "must look like #C9A24B") String colorHex,
+            @Positive Integer packSize,
             @NotNull @PositiveOrZero BigDecimal price,
             @NotNull @PositiveOrZero Integer stockQty,
             @NotNull Boolean active,
@@ -65,36 +85,80 @@ public final class AdminCatalogDtos {
             @NotNull @DecimalMin("0.00") @DecimalMax("100.00") BigDecimal marginFloorPct,
             Integer version) {}
 
+    // ---- images -----------------------------------------------------------------------------
+
     /** Only our own media path or https: rules out javascript: and data: URLs. */
     public record ImageRequest(
             @NotBlank @Size(max = 500) @Pattern(regexp = "(https://|/media/)[^\\s\"'<>]+",
                     message = "must start with https:// or /media/ and contain no spaces or quotes") String url,
             @NotBlank @Size(max = 255) String alt) {}
 
-    /** Replaces the whole ordered image list; the first entry becomes the cover image. */
+    /** Replaces the whole ordered image list (this is also how photos are reordered or removed); first = cover. */
     public record ReplaceImagesRequest(@NotNull @Size(max = 8) List<@Valid @NotNull ImageRequest> images) {}
 
-    public record AdminVariantView(UUID id, String sku, String size, String color, Integer packSize,
+    public record AdminImageView(UUID id, String url, String alt, int position) {
+        static AdminImageView of(ProductImage i) {
+            return new AdminImageView(i.getId(), i.getUrl(), i.getAlt(), i.getPosition());
+        }
+    }
+
+    // ---- sections and cuts ------------------------------------------------------------------
+
+    /** slug is made from the name. */
+    public record CreateTermRequest(
+            @NotNull TermKind kind,
+            @NotBlank @Size(max = 120) String name,
+            @Size(max = 500) String description) {}
+
+    /** active=false hides the section or cut from storefront filters; the products keep it. */
+    public record UpdateTermRequest(
+            @NotBlank @Size(max = 120) String name,
+            @Size(max = 500) String description,
+            @NotNull Boolean active) {}
+
+    /** The new order of all terms of one kind, first to last. */
+    public record ReorderTermsRequest(
+            @NotNull TermKind kind,
+            @NotNull @Size(min = 1, max = 100) List<@NotNull UUID> ids) {}
+
+    public record AdminTermRef(UUID id, String slug, String name) {
+        static AdminTermRef of(CatalogTerm t) {
+            return t == null ? null : new AdminTermRef(t.getId(), t.getSlug(), t.getName());
+        }
+    }
+
+    public record AdminTermView(UUID id, TermKind kind, String slug, String name, String description,
+                                int position, boolean active, long productCount, Integer version) {
+        static AdminTermView of(CatalogTerm t, long productCount) {
+            return new AdminTermView(t.getId(), t.getKind(), t.getSlug(), t.getName(), t.getDescription(),
+                    t.getPosition(), t.isActive(), productCount, t.getVersion());
+        }
+    }
+
+    // ---- responses --------------------------------------------------------------------------
+
+    public record AdminVariantView(UUID id, String sku, String size, String color, String colorHex, Integer packSize,
                                    BigDecimal price, BigDecimal costPrice, BigDecimal marginFloorPct,
                                    int stockQty, int reservedQty, int availableQty,
                                    boolean active, Integer version) {
         static AdminVariantView of(Variant v) {
-            return new AdminVariantView(v.getId(), v.getSku(), v.getSize(), v.getColor(), v.getPackSize(),
-                    v.getPrice(), v.getCostPrice(), v.getMarginFloorPct(),
+            return new AdminVariantView(v.getId(), v.getSku(), v.getSize(), v.getColor(), v.getColorHex(),
+                    v.getPackSize(), v.getPrice(), v.getCostPrice(), v.getMarginFloorPct(),
                     v.getStockQty(), v.getReservedQty(), v.available(), v.isActive(), v.getVersion());
         }
     }
 
-    public record AdminProductView(UUID id, String slug, String name, Category category, Cut cut,
-                                   Occasion occasion, String collection, String description,
-                                   String fabricComposition, boolean active, Instant retiredAt,
-                                   Integer version, List<CatalogViews.ImageView> images,
-                                   List<AdminVariantView> variants) {
+    public record AdminProductView(UUID id, String slug, String name, Category category,
+                                   AdminTermRef section, AdminTermRef cut, String collection, String description,
+                                   String fabricComposition, String quality, String care, String origin,
+                                   boolean active, Instant retiredAt, Integer version,
+                                   List<AdminImageView> images, List<AdminVariantView> variants) {
         static AdminProductView of(Product p, List<Variant> variants, List<ProductImage> images) {
-            return new AdminProductView(p.getId(), p.getSlug(), p.getName(), p.getCategory(), p.getCut(),
-                    p.getOccasion(), p.getCollection(), p.getDescription(), p.getFabricComposition(),
+            return new AdminProductView(p.getId(), p.getSlug(), p.getName(), p.getCategory(),
+                    AdminTermRef.of(p.getSection()), AdminTermRef.of(p.getCut()), p.getCollection(), p.getDescription(),
+                    p.getFabricComposition(), p.getQuality(), p.getCare(), p.getOrigin(),
                     p.isActive(), p.getRetiredAt(), p.getVersion(),
-                    images.stream().map(CatalogViews.ImageView::of).toList(),
+                    images.stream().map(AdminImageView::of).toList(),
                     variants.stream().map(AdminVariantView::of).toList());
         }
     }

@@ -16,6 +16,10 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
     boolean existsBySlug(String slug);
 
+    long countBySectionId(java.util.UUID termId);
+
+    long countByCutId(java.util.UUID termId);
+
     /** Storefront listing (UC-1) — retired products are excluded, not deleted. */
     List<Product> findByActiveTrue();
 }

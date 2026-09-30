@@ -44,8 +44,8 @@ final class ProductSpecifications {
             List<Predicate> all = new ArrayList<>();
             all.add(cb.isTrue(root.get("active")));
             if (f.category() != null) all.add(cb.equal(root.get("category"), f.category()));
-            if (f.cut() != null) all.add(cb.equal(root.get("cut"), f.cut()));
-            if (f.occasion() != null) all.add(cb.equal(root.get("occasion"), f.occasion()));
+            if (f.section() != null) all.add(cb.equal(root.get("section").get("slug"), f.section()));
+            if (f.cut() != null) all.add(cb.equal(root.get("cut").get("slug"), f.cut()));
             if (f.collection() != null) {
                 all.add(cb.equal(cb.lower(root.get("collection")), f.collection().toLowerCase(Locale.ROOT)));
             }

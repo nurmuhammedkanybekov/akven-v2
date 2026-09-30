@@ -2,21 +2,21 @@
 
 Working branch: `nurmss`. Status: Phase A (auth) done. Everything below is still to do.
 
-## Catalog taxonomy (decided)
+## Catalog structure (decided, revised in V7)
 
-Modelled on how the best sock stores (Bombas, Stance, Happy Socks, Uniqlo) organise products:
-audience is the top navigation, everything else is a filter.
+Modelled on how the best sock stores (Bombas, Stance, Happy Socks, Uniqlo) organise products: audience is the top
+navigation, everything else is a filter. The owners wanted to add their own sections, so sections and cuts are
+data they manage in the admin, not fixed lists.
 
 | Level | Field | Values |
 |---|---|---|
-| Top navigation | `category` | MEN, WOMEN, KIDS, BUNDLES |
-| Filter: cut | `cut` | CREW, ANKLE, NO_SHOW, KNEE_HIGH |
-| Filter: occasion | `occasion` | EVERYDAY, SPORT, THERMAL, DRESS |
-| Filter: other | existing columns | size, color, pack size, fabric, in stock, price range |
-| Merchandising | `collection` (existing) | named product lines |
+| Top navigation (fixed) | `category` | MEN, WOMEN, KIDS, BUNDLES |
+| Owner-managed | `section` | Classic, Casual, Sport, Thermal to start; the owners add more (for example "Premium Gold Line") |
+| Owner-managed | `cut` | No-show, Ankle, Crew, Mid-long, Knee-high to start; the owners add more |
+| Filter: other | existing columns | size, colour, pack size, fabric, in stock, price range |
+| Merchandising | `collection` (free text) | named product lines |
 
-Bundles have a category but no cut or occasion. Schema change goes in a new `V3` migration with CHECK constraints
-and a back-fill of the seed products. API: `GET /api/products?category=MEN&occasion=SPORT&cut=CREW&inStock=true&page=0`.
+Bundles have a category but no section or cut. API: `GET /api/products?category=MEN&section=sport&cut=crew&inStock=true&page=0`.
 
 ## Phases
 
@@ -39,6 +39,6 @@ and a back-fill of the seed products. API: `GET /api/products?category=MEN&occas
 
 ## Open questions
 
-- Final list of cuts and occasions (above is a proposal).
+- Final starting list of sections and cuts (the owners can change them any time in the admin).
 - Does the customer ever see the proposed discount? Default: no, only the validated value; a demo flag shows both.
 - LLM API key needed before Milestone 3.

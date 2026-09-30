@@ -1,19 +1,24 @@
 package com.akven.thesis.catalog;
 
+import com.akven.thesis.catalog.CatalogViews.FacetOption;
 import com.akven.thesis.catalog.CatalogViews.Facets;
 import com.akven.thesis.catalog.CatalogViews.ImageView;
 import com.akven.thesis.catalog.CatalogViews.ProductDetail;
 import com.akven.thesis.catalog.CatalogViews.ProductSummary;
+import com.akven.thesis.catalog.CatalogViews.TermInfo;
+import com.akven.thesis.catalog.CatalogViews.TermsView;
 import com.akven.thesis.common.NotFoundException;
 import com.akven.thesis.common.PageResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +40,13 @@ public class CatalogService {
     private final ProductRepository productRepository;
     private final VariantRepository variantRepository;
     private final ProductImageRepository imageRepository;
+    private final CatalogTermRepository termRepository;
     private final EntityManager entityManager;
 
     public CatalogService(ProductRepository productRepository, VariantRepository variantRepository,
-                          ProductImageRepository imageRepository, EntityManager entityManager) {
+                          ProductImageRepository imageRepository, CatalogTermRepository termRepository,
+                          EntityManager entityManager) {
+        this.termRepository = termRepository;
         this.productRepository = productRepository;
         this.variantRepository = variantRepository;
         this.imageRepository = imageRepository;
@@ -72,33 +80,51 @@ public class CatalogService {
     }
 
     /**
-     * Counts per category / cut / occasion for the current filters. Each dimension ignores its own
+     * Counts per category / section / cut for the current filters. Each dimension ignores its own
      * selection, so picking "Men" still shows how many Women's products there are to switch to.
-     * Every value appears, with 0 where nothing matches, so the UI never has to guess.
+     * Every active section and cut appears, with 0 where nothing matches, in the admin's order.
      */
     public Facets facets(CatalogFilter filter) {
-        return new Facets(
-                count("category", ProductSpecifications.storefront(filter.withoutCategory()), Category.class),
-                count("cut", ProductSpecifications.storefront(filter.withoutCut()), Cut.class),
-                count("occasion", ProductSpecifications.storefront(filter.withoutOccasion()), Occasion.class));
+        Map<Category, Long> categories = new EnumMap<>(Category.class);
+        for (Category c : Category.values()) {
+            categories.put(c, 0L);
+        }
+        countBy("category", ProductSpecifications.storefront(filter.withoutCategory()))
+                .forEach((value, n) -> categories.put((Category) value, n));
+        return new Facets(categories,
+                options(TermKind.SECTION, "section", ProductSpecifications.storefront(filter.withoutSection())),
+                options(TermKind.CUT, "cut", ProductSpecifications.storefront(filter.withoutCut())));
     }
 
-    private <E extends Enum<E>> Map<E, Long> count(String attribute,
-            org.springframework.data.jpa.domain.Specification<Product> spec, Class<E> type) {
+    public TermsView terms() {
+        return new TermsView(
+                termRepository.findByKindAndActiveTrueOrderByPositionAscNameAsc(TermKind.SECTION).stream().map(TermInfo::of).toList(),
+                termRepository.findByKindAndActiveTrueOrderByPositionAscNameAsc(TermKind.CUT).stream().map(TermInfo::of).toList());
+    }
+
+    private List<FacetOption> options(TermKind kind, String attribute, Specification<Product> spec) {
+        Map<Object, Long> counts = countBy(attribute + ".id", spec);
+        return termRepository.findByKindAndActiveTrueOrderByPositionAscNameAsc(kind).stream()
+                .map(t -> new FacetOption(t.getSlug(), t.getName(), counts.getOrDefault(t.getId(), 0L)))
+                .toList();
+    }
+
+    /** SELECT attribute, count(*) ... GROUP BY attribute, under the storefront specification. */
+    private Map<Object, Long> countBy(String attributePath, Specification<Product> spec) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
         Root<Product> root = cq.from(Product.class);
-        cq.multiselect(root.get(attribute).alias("value"), cb.count(root).alias("n"))
-                .where(spec.toPredicate(root, cq, cb))
-                .groupBy(root.get(attribute));
-        Map<E, Long> counts = new EnumMap<>(type);
-        for (E e : type.getEnumConstants()) {
-            counts.put(e, 0L);
+        Path<Object> path = root.get(attributePath.split("\\.")[0]);
+        if (attributePath.contains(".")) {
+            path = path.get(attributePath.split("\\.")[1]);
         }
+        cq.multiselect(path.alias("value"), cb.count(root).alias("n"))
+                .where(spec.toPredicate(root, cq, cb))
+                .groupBy(path);
+        Map<Object, Long> counts = new HashMap<>();
         for (Tuple t : entityManager.createQuery(cq).getResultList()) {
-            E value = t.get("value", type);
-            if (value != null) {
-                counts.put(value, t.get("n", Long.class));
+            if (t.get("value") != null) {
+                counts.put(t.get("value"), t.get("n", Long.class));
             }
         }
         return counts;

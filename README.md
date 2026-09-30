@@ -95,10 +95,11 @@ start unless `JWT_SECRET` is a real random value
 | `POST /api/auth/register` | Customer self-registration |
 | `POST /api/auth/login` | Issues a JWT for an existing account |
 | `GET /api/auth/me` | Current authenticated user (requires a bearer token) |
-| `GET /api/products` | Catalog: filters (category, cut, occasion, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
-| `GET /api/products/facets` | Counts per category / cut / occasion for the current filters |
+| `GET /api/products` | Catalog: filters (category, section, cut, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
+| `GET /api/products/facets` | Counts per category / section / cut for the current filters |
+| `GET /api/catalog/terms` | The owners' sections and cuts (for menus and filters) |
 | `GET /api/products/{slug}` | Product detail with variants and images |
-| `/api/admin/**` | Catalog management (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
+| `/api/admin/**` | Catalog management: products, variants, sections and cuts, photo upload, retire and restore (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
 | `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |
 | `/v3/api-docs` | Raw OpenAPI spec |
 
@@ -139,7 +140,7 @@ Target: Prototype 1 — core backend + basic UI integrated, ~30–50% functional
 | Deliverable | Status |
 |---|---|
 | Real authentication (register / login / me, JWT filter, Spring Security wiring) | Done |
-| Full catalog API: public list with filters and pagination, product detail with variants, Men / Women / Kids / Bundles taxonomy (cut and occasion filters), admin management with audit log and ADMIN-only margin floor | Done |
+| Full catalog API: public list with filters and pagination, product detail with variants, Men / Women / Kids / Bundles plus owner-managed sections and cuts, admin management with audit log and ADMIN-only margin floor | Done |
 | Cart & checkout, simulated payment tokenization, inventory holds | Not started |
 | Negotiation endpoint (rule-based stand-in behind the real API contract) | Not started |
 | Ak&Ven design system: logo rebuilt from the shop sign, tokens (light and dark, WCAG-checked), components, living style guide | Done |

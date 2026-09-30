@@ -136,7 +136,7 @@ violation, margin-invariant violation, duplicate email by case, and
 
 - [x] Real authentication: `POST /api/auth/register`, `/login`, `/me`, backed by a real
       `JwtAuthenticationFilter` and a Spring Security `UserDetailsService` — see Security below
-- [x] Catalog API: `GET /api/products` (filters: category, cut, occasion, collection, search,
+- [x] Catalog API: `GET /api/products` (filters: category, section, cut, collection, search,
       size, color, price range, in-stock; pagination; whitelisted sort), `GET /api/products/{slug}`;
       customer responses are explicit DTOs that never contain `costPrice` or `marginFloorPct`.
       Admin API under `/api/admin/**`: create / edit / retire products (soft delete), variant
@@ -144,9 +144,17 @@ violation, margin-invariant violation, duplicate email by case, and
       `marginFloorPct` changes for ADMIN only (FR-11, enforced with `@PreAuthorize` on the
       service), optimistic-version check on edits, every mutation written to `audit_log_entry`
       in the same transaction (FR-13), ADMIN-only audit trail endpoints. Taxonomy added in
-      `V3` (category / cut / occasion with CHECK constraints), extra demo catalog in `V4`.
+      `V3` (category, cut, occasion) and reworked in `V7`: sections and cuts became admin-managed rows
+      (`catalog_term`) so the owners can add their own; audience (Men / Women / Kids / Bundles) stays fixed.
+      Extra demo catalog in `V4`.
       Errors use RFC 7807 problem details. Verified on H2 and on real PostgreSQL 16 +
       pgvector (Flyway, Hibernate schema validation, seeded bcrypt login).
+- [x] Owner-managed catalog (`V7`): sections and cuts created, renamed, hidden, reordered and deleted
+      from the admin API (a term still used by products cannot be deleted, only hidden); products carry
+      quality, care and origin; variants carry a colour swatch (`#RRGGBB`); "delete" is a soft delete
+      with Restore; photos are uploaded from the admin (JPEG, PNG, WebP, 5 MB; type decided by the file's
+      content, random stored names, SVG refused) and served from `/media/uploads/`; the product list has
+      search and a retired filter; slugs are generated from the name when omitted.
 - [x] Catalog extras: product images (`V5`: ordered, alt text, https or `/media/` URLs only),
       filter counts (`/api/products/facets`), sort by price, batch-loaded admin list.
 - [x] Hardening: login lockout (5 failures per client address and account, then `429` with

@@ -24,23 +24,33 @@ class CatalogControllerTest extends IntegrationTest {
     @Autowired private ProductRepository productRepository;
     @Autowired private VariantRepository variantRepository;
     @Autowired private ProductImageRepository imageRepository;
+    @Autowired private CatalogTermRepository termRepository;
 
     @BeforeEach
     void seed() {
         if (productRepository.existsBySlug("it-men-sport-crew")) {
             return;
         }
-        product("it-men-sport-crew", "Men Sport Crew", Category.MEN, Cut.CREW, Occasion.SPORT,
-                variant("IT-MSC-M", "M", "Black", 1, "6.00", "2.40", "15.00", 10));
-        product("it-women-ankle", "Women Ankle", Category.WOMEN, Cut.ANKLE, Occasion.EVERYDAY,
-                variant("IT-WA-S", "S", "Rose", 3, "12.00", "5.00", "20.00", 0));
+        CatalogTerm sport = termRepository.save(new CatalogTerm(TermKind.SECTION, "it-sport", "It Sport", null, 90));
+        CatalogTerm casual = termRepository.save(new CatalogTerm(TermKind.SECTION, "it-casual", "It Casual", null, 91));
+        CatalogTerm hidden = termRepository.save(new CatalogTerm(TermKind.SECTION, "it-hidden", "It Hidden", null, 92));
+        hidden.update("It Hidden", null, false);
+        termRepository.save(hidden);
+        termRepository.save(new CatalogTerm(TermKind.CUT, "it-crew", "It Crew", null, 90));
+        CatalogTerm ankle = termRepository.save(new CatalogTerm(TermKind.CUT, "it-ankle", "It Ankle", null, 91));
+        CatalogTerm crew = termRepository.findByKindOrderByPositionAscNameAsc(TermKind.CUT).stream()
+                .filter(t -> t.getSlug().equals("it-crew")).findFirst().orElseThrow();
+        product("it-men-sport-crew", "Men Sport Crew", Category.MEN, sport, crew,
+                variant("IT-MSC-M", "M", "Black", "#1F1D1A", 1, "6.00", "2.40", "15.00", 10));
+        product("it-women-ankle", "Women Ankle", Category.WOMEN, casual, ankle,
+                variant("IT-WA-S", "S", "Rose", "#E0A7A0", 3, "12.00", "5.00", "20.00", 0));
         product("it-bundle", "Family Bundle", Category.BUNDLES, null, null,
-                variant("IT-B-ONE", "One size", "Mixed", 10, "30.00", "15.00", "10.00", 5));
+                variant("IT-B-ONE", "One size", "Mixed", null, 10, "30.00", "15.00", "10.00", 5));
         UUID menId = productRepository.findBySlug("it-men-sport-crew").orElseThrow().getId();
         imageRepository.save(new ProductImage(menId, "/media/products/it-men-sport-crew-1.svg", "Men Sport Crew", 0));
         imageRepository.save(new ProductImage(menId, "/media/products/it-men-sport-crew-2.svg", "Side view", 1));
-        Product retired = product("it-retired", "Retired Sock", Category.MEN, Cut.CREW, Occasion.EVERYDAY,
-                variant("IT-R-M", "M", "Grey", 1, "5.00", "2.00", "10.00", 9));
+        Product retired = product("it-retired", "Retired Sock", Category.MEN, casual, crew,
+                variant("IT-R-M", "M", "Grey", null, 1, "5.00", "2.00", "10.00", 9));
         retired.retire();
         productRepository.save(retired);
     }
@@ -70,22 +80,36 @@ class CatalogControllerTest extends IntegrationTest {
     }
 
     @Test
-    void filtersByCategoryCutAndOccasion() throws Exception {
+    void filtersByCategorySectionAndCut() throws Exception {
         getJson("/api/products?collection=" + COLLECTION + "&category=MEN", null)
                 .andExpect(jsonPath("$.items.length()").value(1))
                 .andExpect(jsonPath("$.items[0].slug").value("it-men-sport-crew"));
 
-        getJson("/api/products?collection=" + COLLECTION + "&cut=ANKLE", null)
+        getJson("/api/products?collection=" + COLLECTION + "&cut=it-ankle", null)
                 .andExpect(jsonPath("$.items.length()").value(1))
-                .andExpect(jsonPath("$.items[0].slug").value("it-women-ankle"));
+                .andExpect(jsonPath("$.items[0].slug").value("it-women-ankle"))
+                .andExpect(jsonPath("$.items[0].cut.name").value("It Ankle"));
 
-        getJson("/api/products?collection=" + COLLECTION + "&occasion=SPORT", null)
+        getJson("/api/products?collection=" + COLLECTION + "&section=it-sport", null)
                 .andExpect(jsonPath("$.items.length()").value(1))
-                .andExpect(jsonPath("$.items[0].slug").value("it-men-sport-crew"));
+                .andExpect(jsonPath("$.items[0].slug").value("it-men-sport-crew"))
+                .andExpect(jsonPath("$.items[0].section.slug").value("it-sport"));
 
         getJson("/api/products?collection=" + COLLECTION + "&category=BUNDLES", null)
                 .andExpect(jsonPath("$.items[0].slug").value("it-bundle"))
-                .andExpect(jsonPath("$.items[0].cut").doesNotExist());
+                .andExpect(jsonPath("$.items[0].cut").doesNotExist())
+                .andExpect(jsonPath("$.items[0].section").doesNotExist());
+    }
+
+    @Test
+    void publicTermsListOnlyActiveOnesInAdminOrder() throws Exception {
+        getJson("/api/catalog/terms", null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections[?(@.slug=='it-sport')].name").value("It Sport"))
+                .andExpect(jsonPath("$.sections[?(@.slug=='it-hidden')]").isEmpty())
+                .andExpect(jsonPath("$.cuts[?(@.slug=='it-ankle')].name").value("It Ankle"));
+        String body = getJson("/api/catalog/terms", null).andReturn().getResponse().getContentAsString();
+        assertThat(body.indexOf("it-sport")).isLessThan(body.indexOf("it-casual"));   // position 90 before 91
     }
 
     @Test
@@ -108,22 +132,35 @@ class CatalogControllerTest extends IntegrationTest {
 
     @Test
     void facetsCountEachDimensionIgnoringItsOwnSelection() throws Exception {
-        // Only our three "It" products have this collection: MEN crew sport, WOMEN ankle everyday, BUNDLES.
+        // Only our three "It" products have this collection: MEN sport/crew, WOMEN casual/ankle, BUNDLES.
         getJson("/api/products/facets?collection=" + COLLECTION, null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.category.MEN").value(1))
                 .andExpect(jsonPath("$.category.WOMEN").value(1))
                 .andExpect(jsonPath("$.category.BUNDLES").value(1))
                 .andExpect(jsonPath("$.category.KIDS").value(0))
-                .andExpect(jsonPath("$.cut.CREW").value(1))
-                .andExpect(jsonPath("$.occasion.SPORT").value(1))
-                .andExpect(jsonPath("$.occasion.DRESS").value(0));
+                .andExpect(jsonPath("$.section[?(@.slug=='it-sport')].count").value(1))
+                .andExpect(jsonPath("$.section[?(@.slug=='it-casual')].count").value(1))
+                .andExpect(jsonPath("$.section[?(@.slug=='it-hidden')]").isEmpty())   // hidden terms are not offered
+                .andExpect(jsonPath("$.cut[?(@.slug=='it-crew')].count").value(1));
 
-        // Choosing category=MEN narrows cut/occasion counts, but the category counts still show the alternatives.
+        // Choosing category=MEN narrows section/cut counts, but the category counts still show the alternatives.
         getJson("/api/products/facets?collection=" + COLLECTION + "&category=MEN", null)
                 .andExpect(jsonPath("$.category.WOMEN").value(1))
-                .andExpect(jsonPath("$.cut.ANKLE").value(0))
-                .andExpect(jsonPath("$.cut.CREW").value(1));
+                .andExpect(jsonPath("$.cut[?(@.slug=='it-ankle')].count").value(0))
+                .andExpect(jsonPath("$.cut[?(@.slug=='it-crew')].count").value(1));
+    }
+
+    @Test
+    void detailCarriesQualityCareOriginAndColourSwatches() throws Exception {
+        getJson("/api/products/it-men-sport-crew", null)
+                .andExpect(jsonPath("$.quality").value("Premium test cotton"))
+                .andExpect(jsonPath("$.care").value("Wash cold"))
+                .andExpect(jsonPath("$.origin").value("Korea"))
+                .andExpect(jsonPath("$.section.name").value("It Sport"))
+                .andExpect(jsonPath("$.variants[0].colorHex").value("#1F1D1A"));
+        getJson("/api/products?collection=" + COLLECTION + "&category=MEN", null)
+                .andExpect(jsonPath("$.items[0].colors[0]").value("#1F1D1A"));
     }
 
     @Test
@@ -195,17 +232,20 @@ class CatalogControllerTest extends IntegrationTest {
 
     // ---- helpers ---------------------------------------------------------------------------
 
-    private Product product(String slug, String name, Category c, Cut cut, Occasion o, Variant v) {
-        Product p = productRepository.save(new Product(slug, name, c, cut, o, COLLECTION, "desc", "100% cotton"));
+    private Product product(String slug, String name, Category c, CatalogTerm section, CatalogTerm cut, Variant v) {
+        Product p = new Product(slug, name, c, section, cut, COLLECTION, "desc", "100% cotton");
+        p.setDetails("Premium test cotton", "Wash cold", "Korea");
+        p = productRepository.save(p);
         setProduct(v, p);
         variantRepository.save(v);
         return p;
     }
 
-    private static Variant variant(String sku, String size, String color, int pack,
+    private static Variant variant(String sku, String size, String color, String hex, int pack,
                                    String price, String cost, String floor, int stock) {
         Variant v = new Variant(null, sku, size, color, pack, new BigDecimal(price), new BigDecimal(cost),
                 new BigDecimal(floor));
+        v.setColorHex(hex);
         v.setStockQty(stock);
         return v;
     }
