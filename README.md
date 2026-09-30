@@ -99,6 +99,9 @@ start unless `JWT_SECRET` is a real random value
 | `GET /api/products/facets` | Counts per category / section / cut for the current filters |
 | `GET /api/catalog/terms` | The owners' sections and cuts (for menus and filters) |
 | `GET /api/products/{slug}` | Product detail with variants and images |
+| `POST /api/cart/quote` | Today's prices and availability for a cart (public; negotiated prices only for their owner) |
+| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock) |
+| `GET /api/orders`, `GET /api/orders/{id}`, `POST /api/orders/{id}/cancel` | The customer's own orders |
 | `/api/admin/**` | Catalog management: products, variants, sections and cuts, photo upload, retire and restore (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
 | `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |
 | `/v3/api-docs` | Raw OpenAPI spec |
@@ -143,6 +146,24 @@ Sign in at `/login`. Demo accounts (demo profile only): `admin@akven.test` / `ch
 | **Remove** a product from the shop (instantly, reversible) and **put it back** | The product's page; nothing is ever hard-deleted, so past orders stay intact |
 | See who changed what (admins) | The product's page, History |
 
+**How a customer buys**
+
+1. **Bag:** "Add to bag" on any product. The bag lives in the browser (no account needed, survives a reload, works
+   offline, shared between tabs). It remembers *which item and how many*; prices are always asked from the server.
+2. **Checkout:** signing in (or creating an account) is needed here. The customer gives a name and phone, chooses pick-up
+   or delivery, and pays with **Apple Pay or Google Pay**. In this project the wallet is a **simulated** sheet: it returns
+   a one-time token, never a card number, and no money moves. A switch in the sheet makes the "bank" decline, to show a
+   failed payment. Real merchant integration is out of scope; the code sits behind a `PaymentProvider` interface.
+3. **Order:** confirmation page, then history under "Your orders". A customer can cancel while it is paid and not yet
+   completed: the payment is refunded and the socks go back on the shelf.
+4. **Shop team:** Admin, Orders, "To fulfil": open an order, **Mark as completed**, or cancel and refund.
+
+**Safety rules built into checkout:** the server decides every price (a negotiated price applies only if it is that
+customer's, for that item, recent, unused, and never below the margin floor); the last pair can only be sold once
+(rows are locked while stock is checked); pressing pay twice cannot pay twice (idempotency key); an order is only
+"paid" with a payment reference from a confirmed token; a declined payment releases the stock; every change is in the
+audit log.
+
 Staff can do everything except create colours and sizes or change cost and discount limit (those are admin-only,
 because they drive the pricing guardrail). Until a product has photos the shop shows a branded placeholder.
 
@@ -179,7 +200,8 @@ Target: Prototype 1 — core backend + basic UI integrated, ~30–50% functional
 | Ak&Ven design system: logo rebuilt from the shop sign, tokens (light and dark, WCAG-checked), components, living style guide | Done |
 | Shop pages: home, catalog with live filters and counts, product page with colour swatches and sizes, login | Done |
 | Admin: products, colours and sizes, photo upload, sections and cuts, remove and restore, history | Done |
-| Cart, checkout, order history and the negotiation chat | Not started |
+| Cart (works offline), checkout with simulated Apple Pay / Google Pay, order history, cancel with refund; admin orders (fulfil, cancel) | Done |
+| Negotiation endpoint and chat (rule-based stand-in behind the real contract) | Not started |
 | `requirement-analysis.md` / use-case diagram updated for the locked-in design direction | Not started |
 
 ## Roadmap

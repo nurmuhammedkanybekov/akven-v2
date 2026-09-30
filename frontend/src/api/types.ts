@@ -106,3 +106,37 @@ export interface VariantUpdateInput {
   size: string | null; color: string | null; colorHex: string | null; packSize: number | null;
   price: number; stockQty: number; active: boolean; version?: number;
 }
+
+// ---- cart and orders ----
+
+export type FulfillmentMethod = "PICKUP" | "DELIVERY";
+export type PaymentMethod = "APPLE_PAY" | "GOOGLE_PAY";
+export type OrderStatus = "PENDING" | "PAID" | "FULFILLED" | "CANCELLED";
+export type LineProblem = "NONE" | "UNAVAILABLE" | "SOLD_OUT" | "NOT_ENOUGH_STOCK";
+
+export interface CartLineRequest { sku: string; quantity: number; negotiationSessionId?: string }
+
+export interface QuoteLine {
+  sku: string; productSlug: string | null; productName: string; variantLabel: string | null; colorHex: string | null;
+  imageUrl: string | null; quantity: number; listPrice: number | null; discountPct: number | null; unitPrice: number | null;
+  lineTotal: number | null; availableQty: number; problem: LineProblem; note: string | null;
+}
+export interface Quote { lines: QuoteLine[]; total: number; canCheckout: boolean }
+
+export interface OrderItemView {
+  sku: string; productName: string; productSlug: string | null; variantLabel: string | null; colorHex: string | null;
+  imageUrl: string | null; quantity: number; listPrice: number; discountPct: number; unitPrice: number; lineTotal: number;
+}
+export interface OrderView {
+  id: string; reference: string; status: OrderStatus; total: number; createdAt: string; paidAt: string | null;
+  fulfilledAt: string | null; cancelledAt: string | null;
+  fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null };
+  payment: { method: string; reference: string } | null;
+  items: OrderItemView[];
+  customerEmail: string | null;
+}
+export interface CheckoutBody {
+  items: CartLineRequest[];
+  fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null };
+  payment: { method: PaymentMethod; token: string };
+}

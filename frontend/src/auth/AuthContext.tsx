@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { setAccessToken, setUnauthorizedHandler } from "../api/client";
-import { login as loginRequest } from "../api/endpoints";
+import { login as loginRequest, register as registerRequest } from "../api/endpoints";
 import type { Role } from "../api/types";
 
 interface Session { token: string; email: string; role: Role }
@@ -9,6 +9,7 @@ interface AuthState {
   isStaff: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<Session>;
+  signUp: (email: string, password: string) => Promise<Session>;
   signOut: () => void;
 }
 
@@ -43,20 +44,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // An expired or revoked token (401) signs the visitor out everywhere at once.
   setUnauthorizedHandler(signOut);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const r = await loginRequest(email, password);
+  const start = useCallback((r: { token: string; email: string; role: Session["role"] }) => {
     const next = { token: r.token, email: r.email, role: r.role };
     setAccessToken(next.token);
     store(next);
     setSession(next);
     return next;
   }, []);
+  const signIn = useCallback(async (email: string, password: string) => start(await loginRequest(email, password)), [start]);
+  // Registering signs the new customer straight in.
+  const signUp = useCallback(async (email: string, password: string) => start(await registerRequest(email, password)), [start]);
 
   const value = useMemo<AuthState>(() => ({
-    session, signIn, signOut,
+    session, signIn, signUp, signOut,
     isStaff: session?.role === "STAFF" || session?.role === "ADMIN",
     isAdmin: session?.role === "ADMIN",
-  }), [session, signIn, signOut]);
+  }), [session, signIn, signUp, signOut]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -2,6 +2,7 @@ import { api } from "./client";
 import type {
   AdminProduct, AdminTerm, AdminVariant, AuditEntry, AuthResponse, Facets, PageResponse, ProductDetail,
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
+  CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -14,6 +15,24 @@ function qs(params: Record<string, string | number | boolean | null | undefined>
 // ---- auth ----
 export const login = (email: string, password: string) =>
   api<AuthResponse>("/api/auth/login", { method: "POST", body: { email, password } });
+
+export const register = (email: string, password: string) =>
+  api<AuthResponse>("/api/auth/register", { method: "POST", body: { email, password } });
+
+// ---- cart and orders ----
+export const quoteCart = (items: CartLineRequest[], signal?: AbortSignal) =>
+  api<Quote>("/api/cart/quote", { method: "POST", body: { items }, signal });
+/** idempotencyKey: a fresh random value per checkout attempt; sending it again returns the same order instead of a second one. */
+export const checkout = (body: CheckoutBody, idempotencyKey: string) =>
+  api<OrderView>("/api/orders", { method: "POST", body, headers: { "Idempotency-Key": idempotencyKey } });
+export const listMyOrders = () => api<OrderView[]>("/api/orders");
+export const getMyOrder = (id: string) => api<OrderView>(`/api/orders/${id}`);
+export const cancelMyOrder = (id: string) => api<OrderView>(`/api/orders/${id}/cancel`, { method: "POST" });
+export const adminListOrders = (p: { status?: OrderStatus; page?: number; pageSize?: number }) =>
+  api<PageResponse<OrderView>>(`/api/admin/orders${qs(p)}`);
+export const adminGetOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}`);
+export const adminFulfilOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}/fulfil`, { method: "POST" });
+export const adminCancelOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}/cancel`, { method: "POST" });
 
 // ---- shop ----
 export interface CatalogQuery {

@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useCart } from "../cart/CartContext";
+import { QuantityStepper } from "../components/QuantityStepper";
+import { useToast } from "../components/Toast";
 import { getProduct } from "../api/endpoints";
 import { ApiError } from "../api/client";
 import type { ProductDetail, VariantView } from "../api/types";
@@ -25,6 +28,9 @@ function ProductView({ product }: { product: ProductDetail }) {
   const variants = product.variants;
   const [sku, setSku] = useState(() => (variants.find((v) => v.availableQty > 0) ?? variants[0])?.sku);
   const [imageIndex, setImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const cart = useCart();
+  const toast = useToast();
   const current: VariantView | undefined = variants.find((v) => v.sku === sku);
 
   const colors = useMemo(() => {
@@ -108,8 +114,16 @@ function ProductView({ product }: { product: ProductDetail }) {
 
           {current && <div className="av-row"><StockBadge available={current.availableQty} /></div>}
           <div className="av-stack">
-            <Button size="lg" disabled block>Add to bag</Button>
-            <p className="av-small">Ordering opens in the next release. You can already browse the full range.</p>
+            {current && current.availableQty > 0 && (
+              <div className="av-row"><QuantityStepper value={Math.min(quantity, current.availableQty)} max={Math.min(99, current.availableQty)} label="Quantity" onChange={setQuantity} /></div>
+            )}
+            <Button size="lg" block disabled={!current || current.availableQty <= 0} onClick={() => {
+              if (!current) return;
+              cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: [current.color, current.size, current.packSize && current.packSize > 1 ? `${current.packSize} pairs` : null].filter(Boolean).join(", ") || null,
+                colorHex: current.colorHex, imageUrl: product.images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, current.availableQty), current.availableQty);
+              toast("Added to your bag");
+            }}>{current && current.availableQty <= 0 ? "Sold out" : "Add to bag"}</Button>
+            {cart.count > 0 && <p className="av-small"><Link to="/cart">View your bag ({cart.count})</Link></p>}
           </div>
 
           <dl className="av-specs">

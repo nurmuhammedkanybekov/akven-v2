@@ -27,6 +27,7 @@ export function AdminLayout() {
         <Link to="/admin" aria-label="Ak&Ven admin"><Logo height={22} /></Link>
         <nav className="av-admin__nav" aria-label="Admin">
           <NavLink to="/admin" end>Products</NavLink>
+          <NavLink to="/admin/orders">Orders</NavLink>
           <NavLink to="/admin/sections">Sections and cuts</NavLink>
           <Link to="/" target="_blank" rel="noreferrer">View the shop</Link>
         </nav>

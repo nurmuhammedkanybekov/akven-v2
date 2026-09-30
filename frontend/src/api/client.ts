@@ -31,10 +31,11 @@ interface RequestOptions {
   body?: unknown;
   form?: FormData;
   signal?: AbortSignal;
+  headers?: Record<string, string>;
 }
 
-export async function api<T>(path: string, { method = "GET", body, form, signal }: RequestOptions = {}): Promise<T> {
-  const headers: Record<string, string> = { Accept: "application/json" };
+export async function api<T>(path: string, { method = "GET", body, form, signal, headers: extra }: RequestOptions = {}): Promise<T> {
+  const headers: Record<string, string> = { Accept: "application/json", ...extra };
   const token = accessToken;
   if (token) headers.Authorization = `Bearer ${token}`;
   let payload: BodyInit | undefined;

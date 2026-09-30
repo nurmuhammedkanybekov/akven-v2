@@ -32,6 +32,8 @@ page.on("response", (r) => { if (r.status() >= 400) failedCalls.push(`${r.status
 page.on("pageerror", (e) => problems.push(`page error: ${e.message}`));
 page.on("console", (m) => { if (m.type() === "error" && !/status of 40[0-9]/.test(m.text())) problems.push(`console: ${m.text()}`); });
 
+let productUrl = "";
+const CUSTOMER = `customer-${stamp}@akven.test`;
 const step = async (name, fn) => { process.stdout.write(`- ${name} ... `); await fn(); console.log("ok"); };
 const shot = (name, opts = {}) => page.screenshot({ path: path.join(shots, `${name}.png`), ...opts });
 
@@ -142,6 +144,7 @@ try {
     await shot("shop-catalog-filtered");
     await card.click();
     await page.getByRole("heading", { name: PRODUCT }).waitFor();
+    productUrl = page.url();
     await page.getByRole("button", { name: "Cream" }).click();
     await page.getByRole("button", { name: "L", exact: true }).waitFor();
     await page.getByText("Only 3 left").waitFor();
@@ -149,7 +152,6 @@ try {
   });
 
   await step("removing the product hides it from the shop at once, and restoring brings it back", async () => {
-    const productUrl = page.url();
     await page.goto(`${BASE}/admin`);
     await page.getByLabel("Search by name").fill(stamp);
     await page.getByRole("link", { name: new RegExp(PRODUCT) }).click();
@@ -176,6 +178,111 @@ try {
     await page.getByRole("button", { name: "Sign out" }).click();
     await page.goto(`${BASE}/admin`);
     await page.waitForURL(/\/login/);
+  });
+
+
+  // ---------------------------------------------------------------- the customer's journey
+  await step("a visitor puts 2 pairs in the bag from the product page", async () => {
+    await page.goto(productUrl);
+    await page.getByRole("button", { name: "Cream" }).click();
+    await page.getByRole("button", { name: "L", exact: true }).click();
+    await page.getByRole("button", { name: "Increase quantity" }).click();
+    await page.getByRole("button", { name: "Add to bag" }).click();
+    await page.getByText("Added to your bag").waitFor();
+    await page.getByRole("link", { name: /Bag, 2 items/ }).waitFor();
+  });
+  await step("the bag shows today's price and a visitor must sign in to check out; registering brings them back", async () => {
+    await page.getByRole("link", { name: /Bag, 2 items/ }).click();
+    await page.getByRole("heading", { name: "Bag (2)" }).waitFor();
+    await page.getByText("$19.00").first().waitFor();
+    await shot("shop-cart");
+    await page.getByRole("link", { name: "Check out" }).click();
+    await page.waitForURL(/\/login\?next=%2Fcheckout/);
+    await page.getByRole("link", { name: "Create an account" }).click();
+    await page.getByRole("heading", { name: "Create an account" }).waitFor();
+    await page.getByLabel("Email").fill(CUSTOMER);
+    await page.getByLabel("Password").fill("correct-horse-battery");
+    await page.getByRole("button", { name: "Create account" }).click();
+    await page.waitForURL(`${BASE}/checkout`);
+  });
+  await step("checkout asks for what it needs, and a declined payment keeps the bag", async () => {
+    await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
+    await page.getByText("Tell us who to ask for.").waitFor();
+    await page.getByLabel("Name").fill("Aida Test");
+    await page.getByLabel("Phone").fill("+996 700 123 456");
+    await page.getByRole("radio", { name: /Delivery/ }).check();
+    await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
+    await page.getByText("Enter the delivery address, or choose pickup.").waitFor();
+    await page.getByRole("radio", { name: /Pick up/ }).check();
+    await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
+    const sheet = page.getByRole("dialog");
+    await sheet.getByText("This is a demonstration wallet").waitFor();
+    await shot("shop-checkout");
+    await sheet.getByText("Demo: make the bank decline this payment").click();   // click it like a person: the visible label
+    await sheet.getByRole("button", { name: "Pay $19.00" }).click();
+    await page.getByText(/bank declined the payment/).waitFor();
+    const saved = JSON.parse(await page.evaluate(() => localStorage.getItem("akven-cart-v1")));
+    assert.equal(saved.length, 1);                                   // the declined payment did not cost the customer their bag
+    assert.equal(saved[0].quantity, 2);
+  });
+  await step("paying with a working wallet creates a paid order and the stock drops", async () => {
+    await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Pay $19.00" }).click();
+    await page.waitForURL(/\/orders\/[0-9a-f-]{36}/);
+    await page.getByText(/Thank you! Your order AV-[0-9A-F]{8} is paid/).waitFor();
+    await page.getByText("Paid", { exact: true }).first().waitFor();
+    await shot("shop-order");
+    await page.goto(productUrl);
+    await page.getByRole("button", { name: "Cream" }).click();
+    await page.getByText("Only 1 left").waitFor();              // 3 in stock, 2 sold
+  });
+  await step("the last pair can be bought, then cancelling returns it to the shelf", async () => {
+    await page.getByRole("button", { name: "Add to bag" }).click();
+    await page.getByRole("link", { name: /Bag, 1 items/ }).click();
+    await page.getByRole("link", { name: "Check out" }).click();
+    await page.getByLabel("Name").fill("Aida Test");
+    await page.getByLabel("Phone").fill("+996 700 123 456");
+    await page.getByRole("button", { name: "Pay with Google Pay" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: /^Pay \$/ }).click();
+    await page.waitForURL(/\/orders\/[0-9a-f-]{36}/);
+    await page.goto(productUrl);
+    await page.getByRole("button", { name: "Cream" }).click();
+    await page.getByText("Sold out", { exact: true }).first().waitFor();
+    await page.getByRole("link", { name: /Your orders/ }).click();
+    await page.getByRole("link", { name: /AV-/ }).first().click();       // the newest order (1 pair)
+    await page.getByRole("button", { name: "Cancel this order" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Cancel the order" }).click();
+    await page.getByText("Cancelled", { exact: true }).first().waitFor();
+    await page.goto(productUrl);
+    await page.getByRole("button", { name: "Cream" }).click();
+    await page.getByText("Only 1 left").waitFor();              // the cancelled pair is back
+  });
+  await step("the shop team sees the paid order, marks it completed, and the customer can no longer cancel it", async () => {
+    await page.goto(`${BASE}/orders`);
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.goto(`${BASE}/login`);
+    await page.getByLabel("Email").fill("staff@akven.test");
+    await page.getByLabel("Password").fill("changeme-staff");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/admin`);
+    await page.getByRole("link", { name: "Orders" }).click();
+    await page.getByText(CUSTOMER).first().waitFor();
+    await shot("admin-orders");
+    await page.getByRole("row", { name: new RegExp(CUSTOMER) }).getByRole("link").first().click();
+    await page.getByRole("button", { name: "Mark as completed" }).click();
+    await page.getByText("Completed", { exact: true }).first().waitFor();
+    await page.getByRole("button", { name: "Sign out" }).click();
+
+    await page.goto(`${BASE}/login`);
+    await page.getByLabel("Email").fill(CUSTOMER);
+    await page.getByLabel("Password").fill("correct-horse-battery");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/`);
+    await page.goto(`${BASE}/orders`);
+    await page.getByText("Completed", { exact: true }).first().waitFor();
+    await page.getByRole("link", { name: /AV-/ }).filter({ hasText: "Completed" }).first().click();
+    await page.getByText("Completed", { exact: true }).first().waitFor();
+    assert.equal(await page.getByRole("button", { name: "Cancel this order" }).count(), 0);
   });
 
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);

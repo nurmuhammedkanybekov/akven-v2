@@ -185,7 +185,19 @@ violation, margin-invariant violation, duplicate email by case, and
       password, add a section, add a product with two colours, suggested codes that collide get a number,
       photo upload (and refusal of a disguised file), shop filter count, swatches, remove and restore, refused
       deletion of a section that products use, sign-out.
-- [ ] Cart, checkout with simulated payment, order history, and the negotiation chat
+- [x] Cart, checkout and orders (Phase C). Client-side bag (localStorage, validated on read, cross-tab,
+      offline); public price quote; `POST /api/orders` with server-side pricing (`PricingService`), row locks on the
+      variants in SKU order (the last pair goes to one buyer, opposite-order carts cannot deadlock), an idempotency
+      key backed by a unique index, `PaymentProvider` interface with a simulated wallet (token shape whitelist, card
+      numbers refused, decline and outage paths that cancel the order and release the stock and are committed),
+      order status machine in the entity (PENDING to PAID to FULFILLED; cancel from PENDING or PAID with refund and
+      restock), receipt snapshot on each line, database CHECKs (PAID needs a payment reference, delivery needs an
+      address, an offer is used once), audit on every state change, admin orders (fulfil, cancel). Verified by
+      concurrency tests on H2 and over real HTTP on PostgreSQL, and by the browser journey in `npm run e2e`.
+      Not built on purpose: real payment provider, async payment confirmation and expiry of abandoned PENDING
+      orders (the simulated provider answers synchronously), shipping costs and taxes.
+- [ ] Negotiation: `Negotiator` interface, rule-based stand-in, `PolicyValidator` clamp, persisted proposed versus
+      validated discount, chat UI, admin transcripts. Checkout already consumes validated offers.
 - [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
       Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
 
