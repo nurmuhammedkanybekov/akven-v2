@@ -1,60 +1,57 @@
-// Offline-first PWA shell.
+// Offline-first PWA service worker.
 //
-// Milestone 1 scope: cache the app shell itself (this file's job) so the
-// page installs and reopens offline. Phase 1 (Sept 26 – Oct 17) extends the
-// fetch handler below with cache-first /api/products browsing and a
-// queued-write cart strategy — the "offline cart caching" item in the
-// AI-first MVP scope — without needing to touch the install/activate logic
-// here again.
+// Strategies:
+//  - Navigations: network first, fall back to the cached app shell ("/"), so the installed app opens offline.
+//  - Static, content-addressed files (/assets/*, fonts, /media/*, /brand/*, /icons/*): cache first, filled as used.
+//  - /api/**: never touched here. A worker that silently served stale prices or stock would be worse than no
+//    offline support. The offline cart is handled in the app (client-side), not by caching API responses.
 
-const CACHE_VERSION = "v1";
-const SHELL_CACHE = `akven-shell-${CACHE_VERSION}`;
-
-const SHELL_ASSETS = [
-  "/",
-  "/manifest.json",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-];
+const VERSION = "v2";
+const SHELL_CACHE = `akven-shell-${VERSION}`;
+const STATIC_CACHE = `akven-static-${VERSION}`;
+const SHELL_ASSETS = ["/", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/brand/logo-gold.svg"];
+const STATIC_PREFIXES = ["/assets/", "/media/", "/brand/", "/icons/"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(SHELL_CACHE)
-      .then((cache) => cache.addAll(SHELL_ASSETS))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(
-        keys.filter((key) => key.startsWith("akven-shell-") && key !== SHELL_CACHE)
-            .map((key) => caches.delete(key))
-      ))
+      .then((keys) => Promise.all(keys
+        .filter((key) => key.startsWith("akven-") && key !== SHELL_CACHE && key !== STATIC_CACHE)
+        .map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
 
-// Cache-first for the shell itself; anything else (notably /api/**) just
-// goes to the network untouched until Phase 1 defines a real strategy per
-// endpoint — a shell that silently served stale API data would be worse
-// than no offline support at all.
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
-  const isShellAsset = event.request.method === "GET"
-      && url.origin === self.location.origin
-      && SHELL_ASSETS.includes(url.pathname);
+  const { request } = event;
+  if (request.method !== "GET") return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
 
-  if (!isShellAsset) {
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).then((response) => {
+        const copy = response.clone();
+        caches.open(SHELL_CACHE).then((cache) => cache.put("/", copy));
+        return response;
+      }).catch(() => caches.match("/"))
+    );
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
-  );
+  if (STATIC_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) {
+    event.respondWith(
+      caches.match(request).then((cached) => cached || fetch(request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      }))
+    );
+  }
 });
-
-// TODO Phase 1: cache-first for GET /api/products (short TTL), network-first
-// for POST /api/negotiate, and a queued write-behind strategy (e.g. via
-// IndexedDB + Background Sync) for cart mutations made while offline.

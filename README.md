@@ -32,7 +32,7 @@ instead of a static storefront.
 | [`docs/wireframes.svg`](docs/wireframes.svg) | Wireframes for all 5 key screens across phone (browser + installed PWA), tablet, and laptop |
 | [`docs/architecture.md`](docs/architecture.md) | System design: the 3-layer architecture, data model, and the Policy Validator mechanism |
 | [`docs/diagrams/`](docs/diagrams/README.md) | Thesis figures (large print-size text): architecture overview, Policy Validator trust boundary, negotiation sequence diagram, ER diagram |
-| [`docs/design-direction.html`](docs/design-direction.html) | High-fidelity visual design (locked in for Milestone 2) — Home, Catalog, Product, Cart & Checkout, Negotiate, Admin |
+| [`docs/brand.md`](docs/brand.md) | Brand and design system: logo, colour, type, how to regenerate assets; screenshots in [`docs/design/`](docs/design/) |
 
 ## Architecture at a glance
 
@@ -62,7 +62,7 @@ rule-based stand-in or the real LLM later. Full write-up in
 ├── backend/            Spring Boot 3.3 / Java 17 — catalog, orders, negotiation, audit, users, auth
 │   ├── src/main/java/com/akven/thesis/
 │   └── src/main/resources/db/migration/   Flyway schema + seed data
-├── frontend/           PWA shell — manifest, icons, service worker (React app lands here in Milestone 2)
+├── frontend/           React + TypeScript + Vite PWA: design system and style guide (shop pages follow), manifest, icons, service worker
 ├── docs/               Requirement analysis, use-case diagram, wireframes, architecture, design direction
 └── .gitlab-ci.yml      Maven test stage, JUnit report, dependency cache
 ```
@@ -142,7 +142,8 @@ Target: Prototype 1 — core backend + basic UI integrated, ~30–50% functional
 | Full catalog API: public list with filters and pagination, product detail with variants, Men / Women / Kids / Bundles taxonomy (cut and occasion filters), admin management with audit log and ADMIN-only margin floor | Done |
 | Cart & checkout, simulated payment tokenization, inventory holds | Not started |
 | Negotiation endpoint (rule-based stand-in behind the real API contract) | Not started |
-| React frontend (catalog, cart/checkout, negotiate, minimal admin view) | Not started |
+| Ak&Ven design system: logo rebuilt from the shop sign, tokens (light and dark, WCAG-checked), components, living style guide | Done |
+| React frontend pages (catalog, cart/checkout, negotiate, minimal admin view) | Not started |
 | `requirement-analysis.md` / use-case diagram updated for the locked-in design direction | Not started |
 
 ## Roadmap

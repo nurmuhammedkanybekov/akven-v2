@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ak&amp;Ven</title>
+  <meta name="description" content="Korean-made socks, negotiated your way. Ak&amp;Ven.">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FCFBF8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#100E0B" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <script>
+    // Apply the saved theme before first paint so a dark-mode visitor never sees a white flash.
+    try {
+      var t = localStorage.getItem("akven-theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) { /* storage blocked: fall back to the system preference in CSS */ }
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

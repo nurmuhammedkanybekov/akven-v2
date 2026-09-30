@@ -159,8 +159,13 @@ violation, margin-invariant violation, duplicate email by case, and
 - [ ] Cart & checkout, simulated Apple Pay / Google Pay tokenization, inventory holds
 - [ ] Negotiation endpoint with a rule-based stand-in behind the same contract the real
       LLM will use in Milestone 3 — `PolicyValidator` already proven correct either way
-- [ ] Ak&Ven design system (tokens, wordmark, components, live style guide), then the React
-      frontend (catalog, cart/checkout, negotiate, minimal admin view) built on it
+- [x] Ak&Ven design system (`docs/brand.md`): logo rebuilt from the shop sign as clean vector,
+      tokens for a light and a dark theme with an automated WCAG contrast test, accessible
+      components (buttons, fields, chips, product card, the negotiation offer that shows
+      proposed versus validated price), a living style guide, generated product illustrations,
+      new PWA icons and a service worker with explicit offline strategies. React + TypeScript +
+      Vite in `frontend/`, built and tested in CI on GitHub and GitLab.
+- [ ] Shop pages on top of it (catalog, product, cart/checkout, negotiate, minimal admin view)
 - [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
       Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
 
