@@ -3,7 +3,7 @@
  * "maskable" icons keep the mark inside the central safe zone so Android can crop them to any shape.
  * Run: npm run icons
  */
-import { chromium } from "playwright-core";
+import { launchBrowser } from "./browser.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,7 +25,7 @@ const targets = [
   ["icon-192-maskable.png", 192, 0.46], ["icon-512-maskable.png", 512, 0.46],
   ["favicon-32.png", 32, 0.78],
 ];
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium", args: ["--no-sandbox"] });
+const browser = await launchBrowser();
 const page = await browser.newPage();
 for (const [file, size, fraction] of targets) {
   await page.setViewportSize({ width: size, height: size });

@@ -1,5 +1,10 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render as rtlRender, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
+import type { ReactElement } from "react";
+
+/** Every component can contain router links, so tests render inside a MemoryRouter. */
+const render = (ui: ReactElement) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 import { Button } from "../components/Button";
 import { StockBadge } from "../components/Badge";
 import { Input } from "../components/Field";
@@ -18,9 +23,9 @@ describe("format helpers", () => {
     expect(discountedPrice(17.5, 15)).toBe(14.88);   // 14.875 rounds up, as a shop would
     expect(discountedPrice(9, 0)).toBe(9);
   });
-  it("describes a product without inventing a cut for bundles", () => {
-    expect(productMeta({ category: "MEN", cut: "CREW", occasion: "SPORT" })).toBe("Men · Crew · Sport");
-    expect(productMeta({ category: "BUNDLES", cut: null, occasion: null })).toBe("Bundles");
+  it("describes a product without inventing a section or cut for bundles", () => {
+    expect(productMeta({ category: "MEN", section: { slug: "sport", name: "Sport" }, cut: { slug: "crew", name: "Crew" } })).toBe("Men · Sport · Crew");
+    expect(productMeta({ category: "BUNDLES", section: null, cut: null })).toBe("Bundles");
   });
 });
 
@@ -79,14 +84,14 @@ describe("Stock and price wording", () => {
 
 describe("ProductCard", () => {
   it("links to the product, carries alt text and a from-price", () => {
-    render(<ProductCard product={SAMPLE_PRODUCTS[0]} href="/products/merino-dress-black" />);
+    render(<ProductCard product={SAMPLE_PRODUCTS[0]} to="/products/merino-dress-black" />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/products/merino-dress-black");
     expect(screen.getByRole("img")).toHaveAttribute("alt", "Merino Dress Sock, Ak&Ven");
     expect(screen.getByText("From")).toBeInTheDocument();
     expect(screen.getByText("$8.00")).toBeInTheDocument();
   });
   it("marks sold-out products", () => {
-    render(<ProductCard product={SAMPLE_PRODUCTS[2]} href="/x" />);
+    render(<ProductCard product={SAMPLE_PRODUCTS[2]} to="/x" />);
     expect(screen.getByText("Sold out")).toBeInTheDocument();
   });
 });

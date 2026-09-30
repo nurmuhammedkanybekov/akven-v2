@@ -173,7 +173,19 @@ violation, margin-invariant violation, duplicate email by case, and
       proposed versus validated price), a living style guide, generated product illustrations,
       new PWA icons and a service worker with explicit offline strategies. React + TypeScript +
       Vite in `frontend/`, built and tested in CI on GitHub and GitLab.
-- [ ] Shop pages on top of it (catalog, product, cart/checkout, negotiate, minimal admin view)
+- [x] Shop pages and owner admin on top of it: home, catalog (audience tabs, the owners' sections and
+      cuts as filter chips with live counts, stock, sort, everything in the URL), product page (photo
+      gallery, colour swatches, sizes, packs, stock wording), login; admin with a role guard, product list
+      with search and a removed filter, one add/edit screen (details, colours and sizes, photos, remove and
+      restore, history), sections and cuts manager. Client-side routing (React Router 7), a small typed API
+      client that turns the backend's problem-detail errors into form messages, the login token kept in
+      `sessionStorage` and handed to the API layer synchronously (an effect-based hand-over lost the token on
+      page reload; regression test in `src/test/auth.test.tsx`).
+- [x] Verified in a real browser against the real stack (`npm run e2e`, also in CI): sign-in, refused wrong
+      password, add a section, add a product with two colours, suggested codes that collide get a number,
+      photo upload (and refusal of a disguised file), shop filter count, swatches, remove and restore, refused
+      deletion of a section that products use, sign-out.
+- [ ] Cart, checkout with simulated payment, order history, and the negotiation chat
 - [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
       Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
 

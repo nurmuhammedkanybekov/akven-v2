@@ -121,6 +121,39 @@ AKVEN_PG_URL=jdbc:postgresql://localhost:5432/akven_it mvn test -Dtest=PostgresI
 
 CI runs it on every push (`backend-postgres-it`).
 
+## Running the shop and the admin
+
+```bash
+cd frontend
+npm install
+npm run dev          # http://localhost:5173, forwards /api and uploaded photos to the backend on :8080
+```
+
+Sign in at `/login`. Demo accounts (demo profile only): `admin@akven.test` / `changeme-admin` (ADMIN) and
+`staff@akven.test` / `changeme-staff` (STAFF). Staff are sent to the admin at `/admin`.
+
+**What the owners can do in the admin, without a developer**
+
+| Task | Where |
+|---|---|
+| Add, rename, hide, reorder or delete a **section** (Classic, Sport, "Premium Gold Line"...) or a **cut** (Crew, Mid-long...) | Sections and cuts, or "+ Add a new section" right inside the product form |
+| Add a product: name, who it is for, section, cut, quality, fabric, care, origin | Products, Add a product |
+| Add each **colour and size** with a swatch, price, stock, cost and the biggest discount the assistant may give | Product form, or later on the product's page |
+| Upload **photos** whenever they exist (JPEG, PNG, WebP, up to 5 MB, 8 per product; first is the cover) | The product's page, Photos |
+| **Remove** a product from the shop (instantly, reversible) and **put it back** | The product's page; nothing is ever hard-deleted, so past orders stay intact |
+| See who changed what (admins) | The product's page, History |
+
+Staff can do everything except create colours and sizes or change cost and discount limit (those are admin-only,
+because they drive the pricing guardrail). Until a product has photos the shop shows a branded placeholder.
+
+Uploaded photos are stored under `MEDIA_DIR` (default `backend/data/media`); back that folder up. If the site is
+served through a proxy that rewrites the `Host` header (Vite's dev proxy does), list the site's own origin in
+`CORS_ALLOWED_ORIGINS` or the backend will refuse its requests.
+
+Checks that drive a real browser: `npm run e2e` (needs the backend running on a fresh demo database and
+`CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173`; it adds a section and a product, uploads a photo,
+finds it in the shop, removes and restores it) and `npm run screenshots`. CI runs the end-to-end check on every push.
+
 ## Milestone 1 status (due 25 Sept)
 
 | Deliverable | Status |
@@ -144,7 +177,9 @@ Target: Prototype 1 — core backend + basic UI integrated, ~30–50% functional
 | Cart & checkout, simulated payment tokenization, inventory holds | Not started |
 | Negotiation endpoint (rule-based stand-in behind the real API contract) | Not started |
 | Ak&Ven design system: logo rebuilt from the shop sign, tokens (light and dark, WCAG-checked), components, living style guide | Done |
-| React frontend pages (catalog, cart/checkout, negotiate, minimal admin view) | Not started |
+| Shop pages: home, catalog with live filters and counts, product page with colour swatches and sizes, login | Done |
+| Admin: products, colours and sizes, photo upload, sections and cuts, remove and restore, history | Done |
+| Cart, checkout, order history and the negotiation chat | Not started |
 | `requirement-analysis.md` / use-case diagram updated for the locked-in design direction | Not started |
 
 ## Roadmap

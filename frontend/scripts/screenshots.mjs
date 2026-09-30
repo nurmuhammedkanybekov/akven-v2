@@ -3,7 +3,7 @@
  * into docs/design/. These double as thesis figures and as a visual record of the design system.
  * Run: npm run build && npm run screenshots
  */
-import { chromium } from "playwright-core";
+import { launchBrowser } from "./browser.mjs";
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -15,7 +15,7 @@ fs.mkdirSync(out, { recursive: true });
 
 const server = spawn("npx", ["vite", "preview", "--port", "4173", "--strictPort"], { cwd: root, stdio: "ignore" });
 await new Promise((r) => setTimeout(r, 2500));
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium", args: ["--no-sandbox"] });
+const browser = await launchBrowser();
 
 const shots = [
   ["styleguide-phone", 390, 844, "light"],

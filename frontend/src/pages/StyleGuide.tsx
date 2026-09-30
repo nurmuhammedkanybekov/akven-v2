@@ -45,7 +45,7 @@ export function StyleGuide() {
   return (
     <>
       <a className="av-skip-link" href="#main">Skip to content</a>
-      <Header cartCount={2} current="/women" extra={<ThemeToggle theme={theme} onToggle={toggle} />} />
+      <Header cartCount={2} extra={<ThemeToggle theme={theme} onToggle={toggle} />} />
       <main id="main">
         <section style={{ background: "var(--black)", color: "var(--on-black)" }}>
           <div className="av-container" style={{ paddingBlock: "var(--space-9)", display: "grid", gap: "var(--space-6)", justifyItems: "start" }}>
@@ -124,7 +124,7 @@ export function StyleGuide() {
 
         <Section id="catalog" eyebrow="05 · Catalog" title="Product cards" lead="Real data shapes from the API, real illustrations, and an honest sold-out state.">
           <div className="av-grid-products">
-            {SAMPLE_PRODUCTS.map((p) => <ProductCard key={p.slug} product={p} href={`/products/${p.slug}`} />)}
+            {SAMPLE_PRODUCTS.map((p) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} />)}
           </div>
         </Section>
 

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Logo } from "../brand/Logo";
 
 export function Footer() {
@@ -10,11 +11,11 @@ export function Footer() {
         </div>
         <nav className="av-stack" aria-label="Shop">
           <span className="av-eyebrow">Shop</span>
-          <a href="/men">Men</a><a href="/women">Women</a><a href="/kids">Kids</a><a href="/bundles">Bundles</a>
+          <Link to="/men">Men</Link><Link to="/women">Women</Link><Link to="/kids">Kids</Link><Link to="/bundles">Bundles</Link>
         </nav>
         <nav className="av-stack" aria-label="Help">
-          <span className="av-eyebrow">Help</span>
-          <a href="/orders">My orders</a><a href="/negotiate">How haggling works</a>
+          <span className="av-eyebrow">Shop info</span>
+          <Link to="/shop">All socks</Link>
         </nav>
       </div>
     </footer>
