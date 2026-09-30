@@ -16,10 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Write side of the catalog. Role rules live here on the service methods (not only on URLs)
@@ -42,9 +45,15 @@ public class AdminCatalogService {
     private final VariantRepository variantRepository;
     private final AuditLogRepository auditLogRepository;
     private final AuditService auditService;
+    private final ProductImageRepository imageRepository;
+
+    /** Routes that would be shadowed by fixed paths under /api/products. */
+    private static final java.util.Set<String> RESERVED_SLUGS = java.util.Set.of("facets");
 
     public AdminCatalogService(ProductRepository productRepository, VariantRepository variantRepository,
-                               AuditLogRepository auditLogRepository, AuditService auditService) {
+                               AuditLogRepository auditLogRepository, AuditService auditService,
+                               ProductImageRepository imageRepository) {
+        this.imageRepository = imageRepository;
         this.productRepository = productRepository;
         this.variantRepository = variantRepository;
         this.auditLogRepository = auditLogRepository;
@@ -58,14 +67,22 @@ public class AdminCatalogService {
     public PageResponse<AdminProductView> list(int page, int size) {
         Page<Product> products = productRepository.findAll(PageRequest.of(Math.max(page, 0),
                 size <= 0 ? 20 : Math.min(size, 100), Sort.by("name").and(Sort.by("slug"))));
-        return PageResponse.of(products, p -> AdminProductView.of(p, variantRepository.findByProductIdOrderBySkuAsc(p.getId())));
+        List<UUID> ids = products.getContent().stream().map(Product::getId).toList();
+        Map<UUID, List<Variant>> variants = ids.isEmpty() ? new HashMap<>()
+                : variantRepository.findByProductIdInOrderBySkuAsc(ids).stream()
+                        .collect(Collectors.groupingBy(v -> v.getProduct().getId()));
+        Map<UUID, List<ProductImage>> images = ids.isEmpty() ? new HashMap<>()
+                : imageRepository.findByProductIdInOrderByPositionAsc(ids).stream()
+                        .collect(Collectors.groupingBy(ProductImage::getProductId));
+        return PageResponse.of(products, p -> AdminProductView.of(p,
+                variants.getOrDefault(p.getId(), List.of()), images.getOrDefault(p.getId(), List.of())));
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public AdminProductView get(UUID productId) {
         Product product = requireProduct(productId);
-        return AdminProductView.of(product, variantRepository.findByProductIdOrderBySkuAsc(productId));
+        return view(product);
     }
 
     @Transactional(readOnly = true)
@@ -80,13 +97,16 @@ public class AdminCatalogService {
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public AdminProductView createProduct(String actor, CreateProductRequest r) {
         requireFacetsMatchCategory(r.category(), r.cut(), r.occasion());
+        if (RESERVED_SLUGS.contains(r.slug())) {
+            throw new BusinessRuleException("The slug '" + r.slug() + "' is reserved.");
+        }
         if (productRepository.existsBySlug(r.slug())) {
             throw new ConflictException("A product with slug '" + r.slug() + "' already exists.");
         }
         Product saved = productRepository.save(new Product(r.slug(), r.name().trim(), r.category(), r.cut(),
                 r.occasion(), r.collection(), r.description(), r.fabricComposition()));
         auditService.record(actor, "PRODUCT_CREATED", PRODUCT, saved.getId(), null, snapshot(saved));
-        return AdminProductView.of(saved, List.of());
+        return view(saved);
     }
 
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
@@ -98,7 +118,7 @@ public class AdminCatalogService {
                 r.collection(), r.description(), r.fabricComposition());
         productRepository.saveAndFlush(product);
         auditService.record(actor, "PRODUCT_UPDATED", PRODUCT, productId, before, snapshot(product));
-        return AdminProductView.of(product, variantRepository.findByProductIdOrderBySkuAsc(productId));
+        return view(product);
     }
 
     /** Soft delete (FR-10). Retiring an already retired product is a no-op, so the call is idempotent. */
@@ -112,6 +132,19 @@ public class AdminCatalogService {
         product.retire();
         productRepository.saveAndFlush(product);
         auditService.record(actor, "PRODUCT_RETIRED", PRODUCT, productId, before, snapshot(product));
+    }
+
+    /** STAFF and ADMIN. Replaces the ordered picture list (first = cover); audited with before and after. */
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public AdminProductView replaceImages(String actor, UUID productId, ReplaceImagesRequest r) {
+        Product product = requireProduct(productId);
+        List<Map<String, String>> before = imageSnapshot(imageRepository.findByProductIdOrderByPositionAsc(productId));
+        imageRepository.deleteAllForProduct(productId);
+        List<ProductImage> saved = imageRepository.saveAll(IntStream.range(0, r.images().size())
+                .mapToObj(i -> new ProductImage(productId, r.images().get(i).url(), r.images().get(i).alt().trim(), i))
+                .toList());
+        auditService.record(actor, "PRODUCT_IMAGES_REPLACED", PRODUCT, productId, before, imageSnapshot(saved));
+        return view(product);
     }
 
     // ---- variants --------------------------------------------------------------------------
@@ -165,6 +198,15 @@ public class AdminCatalogService {
     }
 
     // ---- helpers ---------------------------------------------------------------------------
+
+    private AdminProductView view(Product product) {
+        return AdminProductView.of(product, variantRepository.findByProductIdOrderBySkuAsc(product.getId()),
+                imageRepository.findByProductIdOrderByPositionAsc(product.getId()));
+    }
+
+    private static List<Map<String, String>> imageSnapshot(List<ProductImage> images) {
+        return images.stream().map(i -> Map.of("url", i.getUrl(), "alt", i.getAlt())).toList();
+    }
 
     private Product requireProduct(UUID id) {
         return productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found: " + id));

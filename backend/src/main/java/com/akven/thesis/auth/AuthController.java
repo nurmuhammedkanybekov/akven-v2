@@ -4,6 +4,7 @@ import com.akven.thesis.config.JwtService;
 import com.akven.thesis.user.Role;
 import com.akven.thesis.user.User;
 import com.akven.thesis.user.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -36,9 +37,12 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final LoginAttemptService loginAttempts;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           AuthenticationManager authenticationManager, JwtService jwtService) {
+                           AuthenticationManager authenticationManager, JwtService jwtService,
+                           LoginAttemptService loginAttempts) {
+        this.loginAttempts = loginAttempts;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -59,8 +63,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request,
+                                              HttpServletRequest http) {
         String email = request.email().trim().toLowerCase();
+        String attemptKey = LoginAttemptService.key(http.getRemoteAddr(), email);
+        long retryAfter = loginAttempts.secondsUntilAllowed(attemptKey);
+        if (retryAfter > 0) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .header("Retry-After", String.valueOf(retryAfter)).build();
+        }
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, request.password()));
@@ -68,8 +79,10 @@ public class AuthController {
             // so auth.getName() is the canonical (lowercased) email UserDetailsServiceImpl used.
             User user = userRepository.findByEmail(auth.getName()).orElseThrow();
             String token = jwtService.generateToken(user);
+            loginAttempts.recordSuccess(attemptKey);
             return ResponseEntity.ok(new AuthResponse(token, user.getEmail(), user.getRole().name()));
         } catch (BadCredentialsException e) {
+            loginAttempts.recordFailure(attemptKey);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

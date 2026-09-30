@@ -82,4 +82,25 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register").contentType("application/json").content(body))
                 .andExpect(status().isConflict());
     }
+
+    @Test
+    void repeatedWrongPasswordsLockTheAccountForThatClientWith429() throws Exception {
+        mockMvc.perform(post("/api/auth/register").contentType("application/json")
+                        .content(objectMapper.writeValueAsString(
+                                new AuthController.RegisterRequest("locked@example.com", "correct-horse-battery"))))
+                .andExpect(status().isCreated());
+        String wrong = objectMapper.writeValueAsString(new AuthController.LoginRequest("locked@example.com", "nope-nope-nope"));
+
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(post("/api/auth/login").contentType("application/json").content(wrong))
+                    .andExpect(status().isUnauthorized());
+        }
+        // Sixth attempt: refused before the password is even checked, even with the RIGHT password.
+        mockMvc.perform(post("/api/auth/login").contentType("application/json")
+                        .content(objectMapper.writeValueAsString(
+                                new AuthController.LoginRequest("locked@example.com", "correct-horse-battery"))))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .header().exists("Retry-After"));
+    }
 }

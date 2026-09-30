@@ -1,9 +1,11 @@
 package com.akven.thesis.audit;
 
+import com.akven.thesis.common.CorrelationIdFilter;
 import com.akven.thesis.common.NotFoundException;
 import com.akven.thesis.user.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +38,13 @@ public class AuditService {
                 .orElseThrow(() -> new NotFoundException("Acting user no longer exists"))
                 .getId();
         repository.save(new AuditLogEntry(actorId, action, entityType, entityId,
-                toJson(before), toJson(after), UUID.randomUUID().toString()));
+                toJson(before), toJson(after), correlationId()));
+    }
+
+    /** The current request's id (see CorrelationIdFilter); a fresh one when called outside a request. */
+    private static String correlationId() {
+        String id = MDC.get(CorrelationIdFilter.MDC_KEY);
+        return id != null ? id : UUID.randomUUID().toString();
     }
 
     private String toJson(Object snapshot) {

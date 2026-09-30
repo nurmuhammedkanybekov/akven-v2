@@ -16,9 +16,15 @@ backend-test:
     MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   script:
     - cd backend
-    - mvn $MAVEN_OPTS -B test
+    # `verify` = tests + the JaCoCo gate (fails below 80% line coverage).
+    - mvn $MAVEN_OPTS -B verify
+    - |
+      awk -F, 'NR>1 {m+=$8; c+=$9} END {printf "Line coverage: %.1f%%\n", 100*c/(m+c)}' target/site/jacoco/jacoco.csv
+  coverage: '/Line coverage: (\d+\.\d+)%/'
   artifacts:
     when: always
+    paths:
+      - backend/target/site/jacoco/
     reports:
       junit:
         - backend/target/surefire-reports/TEST-*.xml

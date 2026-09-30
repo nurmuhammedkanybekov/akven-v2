@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +23,7 @@ class CatalogControllerTest extends IntegrationTest {
 
     @Autowired private ProductRepository productRepository;
     @Autowired private VariantRepository variantRepository;
+    @Autowired private ProductImageRepository imageRepository;
 
     @BeforeEach
     void seed() {
@@ -34,6 +36,9 @@ class CatalogControllerTest extends IntegrationTest {
                 variant("IT-WA-S", "S", "Rose", 3, "12.00", "5.00", "20.00", 0));
         product("it-bundle", "Family Bundle", Category.BUNDLES, null, null,
                 variant("IT-B-ONE", "One size", "Mixed", 10, "30.00", "15.00", "10.00", 5));
+        UUID menId = productRepository.findBySlug("it-men-sport-crew").orElseThrow().getId();
+        imageRepository.save(new ProductImage(menId, "/media/products/it-men-sport-crew-1.svg", "Men Sport Crew", 0));
+        imageRepository.save(new ProductImage(menId, "/media/products/it-men-sport-crew-2.svg", "Side view", 1));
         Product retired = product("it-retired", "Retired Sock", Category.MEN, Cut.CREW, Occasion.EVERYDAY,
                 variant("IT-R-M", "M", "Grey", 1, "5.00", "2.00", "10.00", 9));
         retired.retire();
@@ -99,6 +104,53 @@ class CatalogControllerTest extends IntegrationTest {
         getJson("/api/products?collection=" + COLLECTION + "&minPrice=10&maxPrice=20", null)
                 .andExpect(jsonPath("$.items[0].slug").value("it-women-ankle"))
                 .andExpect(jsonPath("$.totalItems").value(1));
+    }
+
+    @Test
+    void facetsCountEachDimensionIgnoringItsOwnSelection() throws Exception {
+        // Only our three "It" products have this collection: MEN crew sport, WOMEN ankle everyday, BUNDLES.
+        getJson("/api/products/facets?collection=" + COLLECTION, null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.category.MEN").value(1))
+                .andExpect(jsonPath("$.category.WOMEN").value(1))
+                .andExpect(jsonPath("$.category.BUNDLES").value(1))
+                .andExpect(jsonPath("$.category.KIDS").value(0))
+                .andExpect(jsonPath("$.cut.CREW").value(1))
+                .andExpect(jsonPath("$.occasion.SPORT").value(1))
+                .andExpect(jsonPath("$.occasion.DRESS").value(0));
+
+        // Choosing category=MEN narrows cut/occasion counts, but the category counts still show the alternatives.
+        getJson("/api/products/facets?collection=" + COLLECTION + "&category=MEN", null)
+                .andExpect(jsonPath("$.category.WOMEN").value(1))
+                .andExpect(jsonPath("$.cut.ANKLE").value(0))
+                .andExpect(jsonPath("$.cut.CREW").value(1));
+    }
+
+    @Test
+    void sortsByPriceAscendingAndDescending() throws Exception {
+        // cheapest variants: men crew 6.00, bundle 30.00, women ankle 12.00
+        getJson("/api/products?collection=" + COLLECTION + "&sort=price_asc", null)
+                .andExpect(jsonPath("$.items[0].slug").value("it-men-sport-crew"))
+                .andExpect(jsonPath("$.items[1].slug").value("it-women-ankle"))
+                .andExpect(jsonPath("$.items[2].slug").value("it-bundle"))
+                .andExpect(jsonPath("$.totalItems").value(3));
+        getJson("/api/products?collection=" + COLLECTION + "&sort=price_desc", null)
+                .andExpect(jsonPath("$.items[0].slug").value("it-bundle"))
+                .andExpect(jsonPath("$.items[2].slug").value("it-men-sport-crew"));
+    }
+
+    @Test
+    void coverImageOnCardsAndAllImagesOnDetail() throws Exception {
+        getJson("/api/products?collection=" + COLLECTION + "&category=MEN", null)
+                .andExpect(jsonPath("$.items[0].image.url").value("/media/products/it-men-sport-crew-1.svg"))
+                .andExpect(jsonPath("$.items[0].image.alt").value("Men Sport Crew"));
+        getJson("/api/products/it-men-sport-crew", null)
+                .andExpect(jsonPath("$.images.length()").value(2))
+                .andExpect(jsonPath("$.images[0].url").value("/media/products/it-men-sport-crew-1.svg"))
+                .andExpect(jsonPath("$.images[1].alt").value("Side view"));
+        // A product with no pictures still renders, with no image.
+        getJson("/api/products?collection=" + COLLECTION + "&category=BUNDLES", null)
+                .andExpect(jsonPath("$.items[0].image").doesNotExist());
     }
 
     @Test

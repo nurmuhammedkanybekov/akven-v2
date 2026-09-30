@@ -22,6 +22,9 @@ public interface VariantRepository extends JpaRepository<Variant, UUID> {
     /** Batch load for a page of products, so listing a page costs one extra query, not one per product. */
     List<Variant> findByProductIdInAndActiveTrue(Collection<UUID> productIds);
 
+    /** Batch load for the admin list (active or not). */
+    List<Variant> findByProductIdInOrderBySkuAsc(Collection<UUID> productIds);
+
     /** Admin view: every variant of one product, active or not. */
     List<Variant> findByProductIdOrderBySkuAsc(UUID productId);
 }

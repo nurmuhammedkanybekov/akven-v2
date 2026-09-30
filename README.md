@@ -77,15 +77,17 @@ cd backend
 export DB_URL=jdbc:postgresql://localhost:5432/akven
 export DB_USER=akven
 export DB_PASSWORD=akven
-export JWT_SECRET=$(openssl rand -base64 48)   # required beyond a laptop; a dev default exists otherwise
-mvn spring-boot:run
+mvn spring-boot:run          # default profile = demo: demo accounts + demo catalog, dev JWT secret allowed
 ```
 
-Flyway runs `V1__init_schema.sql` then `V2__seed_demo_data.sql`
-automatically on startup, so the catalog isn't empty on first run (two demo
-accounts too — `admin@akven.test` / `staff@akven.test`, see that file for
-the seed passwords). `V2` is demo-only and should move behind a Spring
-profile before there's a shared/production database.
+**Profiles.** `demo` is active by default and loads `db/seed/` (demo accounts
+`admin@akven.test` / `staff@akven.test`, a demo catalog and placeholder images)
+on top of the real migrations in `db/migration/`. Anything shared or real must
+run with `SPRING_PROFILES_ACTIVE=prod`: no seed data, and the app refuses to
+start unless `JWT_SECRET` is a real random value
+(`export JWT_SECRET=$(openssl rand -base64 48)`). Other settings:
+`CORS_ALLOWED_ORIGINS` (default `http://localhost:5173`) and
+`AUTH_MAX_FAILED_LOGINS` / `AUTH_LOCKOUT_MINUTES` (default 5 / 15).
 
 | Endpoint | Purpose |
 |---|---|
@@ -93,14 +95,30 @@ profile before there's a shared/production database.
 | `POST /api/auth/register` | Customer self-registration |
 | `POST /api/auth/login` | Issues a JWT for an existing account |
 | `GET /api/auth/me` | Current authenticated user (requires a bearer token) |
+| `GET /api/products` | Catalog: filters (category, cut, occasion, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
+| `GET /api/products/facets` | Counts per category / cut / occasion for the current filters |
+| `GET /api/products/{slug}` | Product detail with variants and images |
+| `/api/admin/**` | Catalog management (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
 | `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |
 | `/v3/api-docs` | Raw OpenAPI spec |
 
 `mvn test` runs the test suite against an in-memory H2 database, no
 Postgres required (Flyway is disabled for that profile since
 pgvector/pgcrypto are Postgres-only — see `src/test/resources/application.yml`).
-`AuthControllerTest` exercises the real register → login → protected-route
-flow end to end.
+The tests exercise real flows end to end (register → login → protected route,
+catalog filters, admin rules, audit log). `mvn verify` additionally enforces a
+JaCoCo gate of 80% line coverage (report in `target/site/jacoco/index.html`).
+
+`PostgresIntegrationTest` runs on real PostgreSQL: Flyway, Hibernate schema
+validation, role rules on a real server, database CHECK constraints. It is
+skipped unless a database is given; point it at an **empty** one:
+
+```bash
+createdb akven_it
+AKVEN_PG_URL=jdbc:postgresql://localhost:5432/akven_it mvn test -Dtest=PostgresIntegrationTest
+```
+
+CI runs it on every push (`backend-postgres-it`).
 
 ## Milestone 1 status (due 25 Sept)
 

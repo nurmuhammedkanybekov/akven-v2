@@ -35,8 +35,17 @@ public class JwtService {
     private final SecretKey signingKey;
     private final long expirationMinutes;
 
+    /** Prefix of the insecure default in application.yml. Refusing it outside dev is a startup guard. */
+    static final String DEV_SECRET_PREFIX = "dev-only-insecure";
+
     public JwtService(@Value("${akven.jwt.secret}") String secret,
-                       @Value("${akven.jwt.expiration-minutes}") long expirationMinutes) {
+                       @Value("${akven.jwt.expiration-minutes}") long expirationMinutes,
+                       @Value("${akven.jwt.allow-dev-secret:false}") boolean allowDevSecret) {
+        if (secret.startsWith(DEV_SECRET_PREFIX) && !allowDevSecret) {
+            throw new IllegalStateException("Refusing to start with the built-in development JWT secret. "
+                    + "Set JWT_SECRET to a random value of at least 32 bytes (openssl rand -base64 48), "
+                    + "or run with the demo profile for local development.");
+        }
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMinutes = expirationMinutes;
     }

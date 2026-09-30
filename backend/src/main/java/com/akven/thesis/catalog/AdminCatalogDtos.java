@@ -1,5 +1,6 @@
 package com.akven.thesis.catalog;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -64,6 +65,15 @@ public final class AdminCatalogDtos {
             @NotNull @DecimalMin("0.00") @DecimalMax("100.00") BigDecimal marginFloorPct,
             Integer version) {}
 
+    /** Only our own media path or https: rules out javascript: and data: URLs. */
+    public record ImageRequest(
+            @NotBlank @Size(max = 500) @Pattern(regexp = "(https://|/media/)[^\\s\"'<>]+",
+                    message = "must start with https:// or /media/ and contain no spaces or quotes") String url,
+            @NotBlank @Size(max = 255) String alt) {}
+
+    /** Replaces the whole ordered image list; the first entry becomes the cover image. */
+    public record ReplaceImagesRequest(@NotNull @Size(max = 8) List<@Valid @NotNull ImageRequest> images) {}
+
     public record AdminVariantView(UUID id, String sku, String size, String color, Integer packSize,
                                    BigDecimal price, BigDecimal costPrice, BigDecimal marginFloorPct,
                                    int stockQty, int reservedQty, int availableQty,
@@ -78,11 +88,13 @@ public final class AdminCatalogDtos {
     public record AdminProductView(UUID id, String slug, String name, Category category, Cut cut,
                                    Occasion occasion, String collection, String description,
                                    String fabricComposition, boolean active, Instant retiredAt,
-                                   Integer version, List<AdminVariantView> variants) {
-        static AdminProductView of(Product p, List<Variant> variants) {
+                                   Integer version, List<CatalogViews.ImageView> images,
+                                   List<AdminVariantView> variants) {
+        static AdminProductView of(Product p, List<Variant> variants, List<ProductImage> images) {
             return new AdminProductView(p.getId(), p.getSlug(), p.getName(), p.getCategory(), p.getCut(),
                     p.getOccasion(), p.getCollection(), p.getDescription(), p.getFabricComposition(),
                     p.isActive(), p.getRetiredAt(), p.getVersion(),
+                    images.stream().map(CatalogViews.ImageView::of).toList(),
                     variants.stream().map(AdminVariantView::of).toList());
         }
     }

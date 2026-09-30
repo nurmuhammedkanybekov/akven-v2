@@ -22,7 +22,25 @@ final class ProductSpecifications {
     }
 
     static Specification<Product> storefront(CatalogFilter f) {
+        return storefront(f, CatalogSort.NEWEST);
+    }
+
+    /**
+     * Price sorting orders by each product's cheapest active variant. It lives here because Spring Data's
+     * Sort can only name columns of the root entity. The count query (result type Long) must not be ordered.
+     */
+    static Specification<Product> storefront(CatalogFilter f, CatalogSort sort) {
         return (root, query, cb) -> {
+            if ((sort == CatalogSort.PRICE_ASC || sort == CatalogSort.PRICE_DESC) && query.getResultType() != Long.class) {
+                Subquery<BigDecimal> cheapest = query.subquery(BigDecimal.class);
+                Root<Variant> mv = cheapest.from(Variant.class);
+                cheapest.select(cb.min(mv.<BigDecimal>get("price")))
+                        .where(cb.equal(mv.get("product"), root), cb.isTrue(mv.get("active")));
+                boolean asc = sort == CatalogSort.PRICE_ASC;
+                // Products with no sellable variant go last in either direction.
+                var key = cb.coalesce(cheapest, asc ? new BigDecimal("999999999") : BigDecimal.ONE.negate());
+                query.orderBy(asc ? cb.asc(key) : cb.desc(key), cb.asc(root.get("slug")));
+            }
             List<Predicate> all = new ArrayList<>();
             all.add(cb.isTrue(root.get("active")));
             if (f.category() != null) all.add(cb.equal(root.get("category"), f.category()));

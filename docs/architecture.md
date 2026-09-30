@@ -96,10 +96,13 @@ service layer checks that":
   policy notes, etc.), and an `ivfflat` index is created now so Phase 2
   doesn't need a breaking migration, only a `REINDEX` once real embeddings
   exist.
-- **Seed data (`V2__seed_demo_data.sql`)** gives the catalog a handful of
-  realistic products/variants for local development and defense
+- **Seed data (`db/seed/`, `demo` profile only)** gives the catalog realistic
+  products, variants and placeholder images for local development and defense
   screenshots; demo passwords are hashed in-migration with pgcrypto's
   `crypt(..., gen_salt('bf'))` rather than committed as plaintext anywhere.
+  The seed files keep their original version numbers (V2, V4, V6) and content,
+  so their Flyway checksums are unchanged; a non-demo profile simply never loads
+  them and therefore never creates the demo accounts.
 
 Verified by actually running both migrations against a real
 PostgreSQL 16 + pgvector instance (not just reviewed by eye), including the
@@ -142,13 +145,22 @@ violation, margin-invariant violation, duplicate email by case, and
       service), optimistic-version check on edits, every mutation written to `audit_log_entry`
       in the same transaction (FR-13), ADMIN-only audit trail endpoints. Taxonomy added in
       `V3` (category / cut / occasion with CHECK constraints), extra demo catalog in `V4`.
-      Errors use RFC 7807 problem details. Verified on H2 (26 tests) and on real
-      PostgreSQL 16 + pgvector (Flyway V1–V4, Hibernate schema validation, seeded bcrypt login).
+      Errors use RFC 7807 problem details. Verified on H2 and on real PostgreSQL 16 +
+      pgvector (Flyway, Hibernate schema validation, seeded bcrypt login).
+- [x] Catalog extras: product images (`V5`: ordered, alt text, https or `/media/` URLs only),
+      filter counts (`/api/products/facets`), sort by price, batch-loaded admin list.
+- [x] Hardening: login lockout (5 failures per client address and account, then `429` with
+      `Retry-After`), startup refusal of the built-in JWT secret outside the `demo` profile,
+      security headers (CSP on `/api/**`, no-referrer, permissions policy), explicit CORS
+      origins without credentials, a correlation id on every request that shows up in logs
+      and in audit entries, demo seed data moved behind the `demo` Spring profile
+      (`db/seed/`), a JaCoCo coverage gate (80% lines, currently above 90%), and
+      `PostgresIntegrationTest` in CI for everything H2 cannot prove.
 - [ ] Cart & checkout, simulated Apple Pay / Google Pay tokenization, inventory holds
 - [ ] Negotiation endpoint with a rule-based stand-in behind the same contract the real
       LLM will use in Milestone 3 — `PolicyValidator` already proven correct either way
-- [ ] React frontend (catalog, cart/checkout, negotiate, minimal admin view), using the
-      high-fidelity design direction (`docs/design-direction.html`) now locked in as scope
+- [ ] Ak&Ven design system (tokens, wordmark, components, live style guide), then the React
+      frontend (catalog, cart/checkout, negotiate, minimal admin view) built on it
 - [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
       Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
 
@@ -164,13 +176,21 @@ plan. Summary of what's already reflected in this codebase:
   plaintext. Real accounts go through the same encoder via
   `POST /api/auth/register`.
 - `Variant.costPrice` and `marginFloorPct` are admin-only fields — the
-  catalog controller must not expose them on customer-facing endpoints;
-  `marginFloorPct` writes will be restricted to `ADMIN` at the service
-  layer (FR-11) once catalog-management endpoints exist (Milestone 2).
+  customer-facing responses are explicit DTOs without them (asserted by
+  tests); `costPrice` / `marginFloorPct` writes and variant creation are
+  restricted to `ADMIN` with `@PreAuthorize` on the service (FR-11), so the
+  rule holds for any caller, not just one URL.
 - Secrets (`JWT_SECRET`, `LLM_API_KEY`, payment merchant IDs) are read from
   environment variables only (`application.yml`) — never committed. The
-  in-repo default for `JWT_SECRET` is explicitly dev-only; anywhere this
-  runs beyond a laptop needs a real random secret set via the environment.
+  in-repo default for `JWT_SECRET` is dev-only and is accepted only by the
+  `demo` profile; any other profile refuses to start without a real random
+  secret, so a forgotten variable fails loudly instead of running insecurely.
+- **A bug only a real server exposed:** on Tomcat a `403` is re-dispatched
+  internally to `/error`; with `/error` protected, that second dispatch (which
+  carries no token) rewrote every `403` to `401`. MockMvc never performs that
+  dispatch, so the H2 tests passed. `/error` is now public (it renders only a
+  generic status body) and `RealServerSecurityTest` /
+  `PostgresIntegrationTest` assert 401-versus-403 on a real embedded server.
 - `SecurityConfig` has real shape: catalog `GET` and `/api/auth/register`
   `/login` are public, `/api/admin/**` requires `STAFF`/`ADMIN`, everything
   else requires authentication, and method security

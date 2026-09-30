@@ -162,6 +162,85 @@ class AdminCatalogControllerTest extends IntegrationTest {
     }
 
     @Test
+    void imagesCanBeReplacedAreOrderedAndAudited() throws Exception {
+        String staff = tokenFor(Role.STAFF);
+        UUID id = createProduct(staff, "image-product");
+        ReplaceImagesRequest body = new ReplaceImagesRequest(List.of(
+                new ImageRequest("/media/products/image-product-1.svg", "Front"),
+                new ImageRequest("https://cdn.example.com/side.jpg", "Side")));
+
+        sendJson("PUT", "/api/admin/products/" + id + "/images", staff, body)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.images[0].alt").value("Front"))
+                .andExpect(jsonPath("$.images[1].url").value("https://cdn.example.com/side.jpg"));
+        // Replacing again with the same positions must work (bulk delete happens before re-insert).
+        sendJson("PUT", "/api/admin/products/" + id + "/images", staff,
+                new ReplaceImagesRequest(List.of(new ImageRequest("/media/products/new.svg", "Only"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.images.length()").value(1));
+        assertThat(auditLogRepository.findByEntityTypeAndEntityIdOrderByCreatedAtDesc("PRODUCT", id))
+                .extracting(AuditLogEntry::getAction).contains("PRODUCT_IMAGES_REPLACED");
+        sendJson("PUT", "/api/admin/products/" + id + "/images", null, body).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void unsafeImageUrlsAreRejected() throws Exception {
+        String staff = tokenFor(Role.STAFF);
+        UUID id = createProduct(staff, "unsafe-image-product");
+        for (String bad : List.of("javascript:alert(1)", "data:text/html;base64,AAAA", "http://insecure.example.com/a.jpg",
+                "/media/a b.svg", "//evil.example.com/a.jpg")) {
+            sendJson("PUT", "/api/admin/products/" + id + "/images", staff,
+                    new ReplaceImagesRequest(List.of(new ImageRequest(bad, "x"))))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors").exists());
+        }
+        List<ImageRequest> nine = java.util.Collections.nCopies(9, new ImageRequest("/media/a.svg", "x"));
+        sendJson("PUT", "/api/admin/products/" + id + "/images", staff, new ReplaceImagesRequest(nine))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void reservedSlugIsRefused() throws Exception {
+        sendJson("POST", "/api/admin/products", tokenFor(Role.STAFF), newProduct("facets"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void stockCannotBeSetBelowWhatIsAlreadyReserved() throws Exception {
+        String staff = tokenFor(Role.STAFF);
+        UUID variantId = createVariant(staff, tokenFor(Role.ADMIN), "reserved-stock-product", "RS-1");
+        Variant v = variantRepository.findById(variantId).orElseThrow();
+        org.springframework.test.util.ReflectionTestUtils.setField(v, "reservedQty", 20);
+        variantRepository.saveAndFlush(v);
+
+        sendJson("PUT", "/api/admin/variants/" + variantId, staff,
+                new UpdateVariantRequest("M", "Black", 1, new BigDecimal("8.00"), 19, true, null))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Stock cannot be set below the quantity already reserved (20)."));
+        sendJson("PUT", "/api/admin/variants/" + variantId, staff,
+                new UpdateVariantRequest("M", "Black", 1, new BigDecimal("8.00"), 20, true, null))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void auditEntryCarriesTheRequestsCorrelationId() throws Exception {
+        String staff = tokenFor(Role.STAFF);
+        String requestId = "trace-0123456789";
+        String response = mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .post("/api/admin/products").header("Authorization", staff).header("X-Request-Id", requestId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(newProduct("correlated-product"))))
+                .andExpect(status().isCreated())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .header().string("X-Request-Id", requestId))
+                .andReturn().getResponse().getContentAsString();
+        UUID id = UUID.fromString(objectMapper.readTree(response).get("id").asText());
+
+        assertThat(auditLogRepository.findByEntityTypeAndEntityIdOrderByCreatedAtDesc("PRODUCT", id).get(0)
+                .getCorrelationId()).isEqualTo(requestId);
+    }
+
+    @Test
     void auditTrailIsAdminOnly() throws Exception {
         UUID id = createProduct(tokenFor(Role.STAFF), "audit-visible-product");
         getJson("/api/admin/products/" + id + "/audit", tokenFor(Role.STAFF)).andExpect(status().isForbidden());

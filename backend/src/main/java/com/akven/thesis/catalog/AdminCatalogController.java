@@ -55,6 +55,12 @@ public class AdminCatalogController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/products/{id}/images")
+    public AdminProductView replaceImages(Authentication auth, @PathVariable UUID id,
+                                          @Valid @RequestBody ReplaceImagesRequest body) {
+        return service.replaceImages(auth.getName(), id, body);
+    }
+
     @GetMapping("/products/{id}/audit")
     public List<AuditEntryView> productAudit(@PathVariable UUID id) {
         return service.auditTrail(AdminCatalogService.PRODUCT, id);
