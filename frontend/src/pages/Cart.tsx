@@ -67,7 +67,7 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
 
   return (
     <li className="av-cartline">
-      <Link to={`/products/${line.productSlug}`} className="av-cartline__img"><ProductImage image={(q?.imageUrl ?? line.imageUrl) ? { url: (q?.imageUrl ?? line.imageUrl)!, alt: "" } : null} /></Link>
+      <Link to={`/products/${line.productSlug}`} className="av-cartline__img" aria-hidden="true" tabIndex={-1}><ProductImage image={(q?.imageUrl ?? line.imageUrl) ? { url: (q?.imageUrl ?? line.imageUrl)!, alt: "" } : null} /></Link>
       <div className="av-cartline__body">
         <Link to={`/products/${line.productSlug}`} className="av-cartline__name">{line.productName}</Link>
         <span className="av-small av-muted">

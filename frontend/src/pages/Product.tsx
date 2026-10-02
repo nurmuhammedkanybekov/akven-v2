@@ -128,8 +128,8 @@ function ProductView({ product }: { product: ProductDetail }) {
           </div>
 
           {current && current.availableQty > 0 && (
-            <NegotiationChat sku={current.sku} quantity={Math.min(quantity, current.availableQty)} onAccept={(offer) => {
-              const qty = Math.min(quantity, current.availableQty);
+            <NegotiationChat sku={current.sku} quantity={Math.min(quantity, current.availableQty)} onAccept={(offer, offeredQty) => {
+              const qty = Math.min(offeredQty, current.availableQty);
               cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: [current.color, current.size, current.packSize && current.packSize > 1 ? `${current.packSize} pairs` : null].filter(Boolean).join(", ") || null,
                 colorHex: current.colorHex, imageUrl: product.images[0]?.url ?? null, unitPrice: offer.offerPrice, negotiationSessionId: offer.sessionId }, qty, current.availableQty);
               toast(`Added at ${offer.validatedDiscountPct}% off`);

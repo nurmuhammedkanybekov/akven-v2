@@ -34,8 +34,8 @@ describe("NegotiationChat", () => {
     expect(await screen.findByText(/Best I can do/)).toBeInTheDocument();
     expect(negotiate).toHaveBeenCalledWith("SKU-1", "give me 40% off", 2);
     expect(screen.queryByText(/Proposed/)).toBeNull(); // the raw proposal is hidden unless the server is in demo mode
-    await userEvent.click(screen.getByRole("button", { name: "Add to bag at this price" }));
-    expect(onAccept).toHaveBeenCalledWith(offer);
+    await userEvent.click(screen.getByRole("button", { name: "Add 2 pairs at this price" }));
+    expect(onAccept).toHaveBeenCalledWith(offer, 2);
   });
 
   it("shows both numbers when the server runs in demo mode", async () => {

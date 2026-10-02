@@ -46,6 +46,10 @@ public class NegotiationSession {
     @Column(columnDefinition = "text")
     private String transcript; // TODO Phase 2: normalize into a separate turn-by-turn table if needed for evaluation
 
+    /** How many pairs the offer was negotiated for. The price only applies to an order of at least this many. */
+    @Column(nullable = false)
+    private int quantity = 1;
+
     private BigDecimal proposedDiscountPct;
     private BigDecimal validatedDiscountPct;
 
@@ -60,6 +64,11 @@ public class NegotiationSession {
     public NegotiationSession(User customer, Variant variant) {
         this.customer = customer;
         this.variant = variant;
+    }
+
+    public NegotiationSession(User customer, Variant variant, int quantity) {
+        this(customer, variant);
+        this.quantity = Math.max(1, quantity);
     }
 
     /** Stores what the assistant proposed and what the policy allowed. The validated value can never exceed the proposal. */
@@ -77,6 +86,7 @@ public class NegotiationSession {
     }
 
     public UUID getId() { return id; }
+    public int getQuantity() { return quantity; }
     public User getCustomer() { return customer; }
     public Variant getVariant() { return variant; }
     public String getTranscript() { return transcript; }
