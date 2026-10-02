@@ -203,9 +203,14 @@ violation, margin-invariant violation, duplicate email by case, and
       validated numbers. Customers never receive the proposal unless `akven.demo.expose-proposal` is on. A sliding
       window limits each customer to 20 messages per 10 minutes (429). STAFF and ADMIN read transcripts at
       `/api/admin/negotiations`. Offers feed checkout through `negotiationSessionId`, where they are re-checked
-      and clamped again. The Milestone 3 LLM replaces only `Negotiator`.
+      and clamped again. An offer remembers the number of pairs it was negotiated for (V10) and only applies to an
+      order of at least that many, so a 10-pair price cannot be used on one pair. The Milestone 3 LLM replaces only `Negotiator`.
 - [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
       Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
+
+- [x] Quality gates in the browser run: `npm run e2e` runs the axe accessibility rules (serious and critical findings
+      fail it) on the public pages, bag, product chat, product editor and admin lists. Rarely used screens (admin,
+      checkout, orders, style guide) are loaded on demand: the shop's first script went from 298 kB to 187 kB.
 
 ## Security
 

@@ -157,6 +157,33 @@ class PostgresIntegrationTest {
     }
 
     @Test
+    void anOverGenerousAssistantIsCappedOnARealServerAndTheEvidenceIsInTheDatabase() throws Exception {
+        String tag = Long.toString(System.nanoTime(), 36);
+        String token = call("POST", "/api/auth/register", null, "{\"email\":\"haggle-" + tag + "@akven.test\",\"password\":\"correct-horse-battery\"}", 201).get("token").asText();
+        String sku = call("GET", "/api/products/merino-dress-black", null, null).get("variants").get(0).get("sku").asText();
+
+        JsonNode reply = call("POST", "/api/negotiate", token, "{\"variantSku\":\"" + sku + "\",\"message\":\"give me 90% off\",\"quantity\":3}");
+        String id = reply.get("sessionId").asText();
+        assertThat(reply.get("validatedDiscountPct").decimalValue()).isLessThan(new java.math.BigDecimal("90"));
+
+        var row = jdbc.queryForMap("select proposed_discount_pct p, validated_discount_pct v, quantity q from negotiation_session where id = ?::uuid", id);
+        assertThat((java.math.BigDecimal) row.get("p")).isEqualByComparingTo("90");
+        assertThat(((java.math.BigDecimal) row.get("v")).compareTo((java.math.BigDecimal) row.get("p"))).isLessThanOrEqualTo(0);
+        assertThat(row.get("q")).isEqualTo(3);
+
+        // The database refuses a validated value above the proposal, and a quantity below one, by itself.
+        assertThatThrownBy(() -> jdbc.update("update negotiation_session set validated_discount_pct = 95 where id = ?::uuid", id))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update("update negotiation_session set quantity = 0 where id = ?::uuid", id))
+                .isInstanceOf(DataIntegrityViolationException.class);
+
+        // The shop team can read it back; a customer cannot.
+        String staff = login("staff@akven.test", "changeme-staff");
+        assertThat(call("GET", "/api/admin/negotiations/" + id, staff, null).get("clamped").asBoolean()).isTrue();
+        assertThat(status("GET", "/api/admin/negotiations/" + id, token, null)).isEqualTo(403);
+    }
+
+    @Test
     void sixShoppersRaceForTheLastPairOverRealHttpAndExactlyOneWins() throws Exception {
         String admin = login("admin@akven.test", "changeme-admin");
         String tag = Long.toString(System.nanoTime(), 36);

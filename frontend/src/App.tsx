@@ -1,11 +1,5 @@
+import { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AdminLayout } from "./admin/AdminLayout";
-import { AdminOrderDetail } from "./admin/AdminOrderDetail";
-import { AdminNegotiations } from "./admin/AdminNegotiations";
-import { AdminOrders } from "./admin/AdminOrders";
-import { AdminProducts } from "./admin/AdminProducts";
-import { AdminTerms } from "./admin/AdminTerms";
-import { ProductEditor } from "./admin/ProductEditor";
 import { AuthProvider } from "./auth/AuthContext";
 import { CartProvider } from "./cart/CartContext";
 import { RequireAuth } from "./components/RequireAuth";
@@ -13,15 +7,24 @@ import { ToastProvider } from "./components/Toast";
 import { ShopLayout } from "./layouts/ShopLayout";
 import { CartPage } from "./pages/Cart";
 import { CatalogPage } from "./pages/Catalog";
-import { CheckoutPage } from "./pages/Checkout";
 import { HomePage } from "./pages/Home";
 import { LoginPage } from "./pages/Login";
 import { NotFoundPage } from "./pages/NotFound";
-import { OrderDetailPage } from "./pages/OrderDetail";
-import { OrdersPage } from "./pages/Orders";
 import { ProductPage } from "./pages/Product";
 import { RegisterPage } from "./pages/Register";
-import { StyleGuide } from "./pages/StyleGuide";
+
+// Rarely used screens (admin, checkout, order history, style guide) load on demand, so the shop opens faster.
+const AdminLayout = lazy(() => import("./admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
+const AdminOrderDetail = lazy(() => import("./admin/AdminOrderDetail").then((m) => ({ default: m.AdminOrderDetail })));
+const AdminNegotiations = lazy(() => import("./admin/AdminNegotiations").then((m) => ({ default: m.AdminNegotiations })));
+const AdminOrders = lazy(() => import("./admin/AdminOrders").then((m) => ({ default: m.AdminOrders })));
+const AdminProducts = lazy(() => import("./admin/AdminProducts").then((m) => ({ default: m.AdminProducts })));
+const AdminTerms = lazy(() => import("./admin/AdminTerms").then((m) => ({ default: m.AdminTerms })));
+const ProductEditor = lazy(() => import("./admin/ProductEditor").then((m) => ({ default: m.ProductEditor })));
+const CheckoutPage = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.CheckoutPage })));
+const OrderDetailPage = lazy(() => import("./pages/OrderDetail").then((m) => ({ default: m.OrderDetailPage })));
+const OrdersPage = lazy(() => import("./pages/Orders").then((m) => ({ default: m.OrdersPage })));
+const StyleGuide = lazy(() => import("./pages/StyleGuide").then((m) => ({ default: m.StyleGuide })));
 
 export default function App() {
   return (
@@ -29,6 +32,7 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <CartProvider>
+          <Suspense fallback={<div className="av-container av-page" role="status" aria-live="polite">Loading…</div>}>
           <Routes>
             <Route element={<ShopLayout />}>
               <Route index element={<HomePage />} />
@@ -57,6 +61,7 @@ export default function App() {
               <Route path="sections" element={<AdminTerms />} />
             </Route>
           </Routes>
+          </Suspense>
           </CartProvider>
         </ToastProvider>
       </AuthProvider>

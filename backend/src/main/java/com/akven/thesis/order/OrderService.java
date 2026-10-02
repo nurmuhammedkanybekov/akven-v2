@@ -126,7 +126,7 @@ public class OrderService {
             if (v.available() < qty) {
                 throw new ConflictException("Only " + v.available() + " left of " + name + ".");
             }
-            PricingService.PricedLine priced = pricing.price(v, offers.get(v.getSku()), customer);
+            PricingService.PricedLine priced = pricing.price(v, offers.get(v.getSku()), customer, qty);
             order.addItem(new OrderItem(order, v, qty, priced.listPrice(), priced.discountPct(), priced.unitPrice(), priced.sessionId(),
                     name, v.getProduct().getSlug(), CartService.label(v), cover.get(v.getProduct().getId().toString())));
             v.reserve(qty);

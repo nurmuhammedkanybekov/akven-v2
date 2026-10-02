@@ -66,7 +66,7 @@ public class CartService {
             BigDecimal pct = BigDecimal.ZERO, unit = list;
             String note = null;
             try {
-                PricingService.PricedLine priced = pricing.price(v, item.negotiationSessionId(), customer);
+                PricingService.PricedLine priced = pricing.price(v, item.negotiationSessionId(), customer, item.quantity());
                 pct = priced.discountPct();
                 unit = priced.unitPrice();
             } catch (BusinessRuleException e) {

@@ -82,12 +82,12 @@ public class NegotiationService {
                 : proposal.replyTemplate();
         String reply = fill(template, validated, offer);
 
-        NegotiationSession session = new NegotiationSession(customer, variant);
+        NegotiationSession session = new NegotiationSession(customer, variant, quantity);
         session.recordOutcome("Customer: " + request.message().strip() + "\nAssistant (as proposed): " + proposal.replyTemplate()
                 + "\nAssistant (as sent): " + reply, proposed, validated);
         sessions.saveAndFlush(session);
         audit.record(customerEmail, "NEGOTIATION", "NEGOTIATION_SESSION", session.getId(), null,
-                Map.of("sku", variant.getSku(), "proposedPct", proposed, "validatedPct", validated));
+                Map.of("sku", variant.getSku(), "quantity", quantity, "proposedPct", proposed, "validatedPct", validated));
 
         return new NegotiateResponse(session.getId(), reply, validated, list, offer,
                 session.getCreatedAt() == null ? null : session.getCreatedAt().plus(offerTtl), exposeProposal ? proposed : null);
@@ -108,7 +108,7 @@ public class NegotiationService {
     static SessionView view(NegotiationSession s) {
         boolean clamped = s.getProposedDiscountPct() != null && s.getValidatedDiscountPct() != null
                 && s.getValidatedDiscountPct().compareTo(s.getProposedDiscountPct()) < 0;
-        return new SessionView(s.getId(), s.getCustomer().getEmail(), s.getVariant().getSku(), s.getVariant().getProduct().getName(),
+        return new SessionView(s.getId(), s.getCustomer().getEmail(), s.getVariant().getSku(), s.getVariant().getProduct().getName(), s.getQuantity(),
                 s.getProposedDiscountPct(), s.getValidatedDiscountPct(), clamped, s.getTranscript(), s.getCreatedAt());
     }
 

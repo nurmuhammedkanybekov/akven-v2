@@ -39,6 +39,15 @@ page.on("console", (m) => { if (m.type() === "error" && !/status of 40[0-9]/.tes
 let productUrl = "";
 const CUSTOMER = `customer-${stamp}@akven.test`;
 const step = async (name, fn) => { process.stdout.write(`- ${name} ... `); await fn(); console.log("ok"); };
+const axeSource = fs.readFileSync(path.join(root, "node_modules/axe-core/axe.min.js"), "utf8");
+/** Runs the axe accessibility rules on the page as it is now; serious or critical findings fail the run. */
+const a11y = async (label) => {
+  await page.evaluate(axeSource);
+  const bad = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ["violations"] })).violations
+    .filter((v) => v.impact === "serious" || v.impact === "critical")
+    .map((v) => `${v.id} (${v.impact}): ${v.nodes.slice(0, 2).map((n) => n.target.join(" ")).join(" | ")}`));
+  assert.deepEqual(bad, [], `accessibility problems on ${label}:\n${bad.join("\n")}`);
+};
 const shot = (name, opts = {}) => page.screenshot({ path: path.join(shots, `${name}.png`), ...opts });
 
 try {
@@ -104,6 +113,7 @@ try {
     await page.getByRole("button", { name: "+ Add another colour or size" }).click();
     await fillOption(1, "Cream", "L", "9.5", "3");
     await shot("admin-product-new", { fullPage: true });
+    await a11y("the product editor");
     await page.getByRole("button", { name: "Add product" }).click();
     await page.waitForURL(/\/admin\/products\/[0-9a-f-]{36}/);
     await page.getByRole("heading", { name: PRODUCT }).waitFor();
@@ -189,6 +199,14 @@ try {
 
 
   // ---------------------------------------------------------------- the customer's journey
+  await step("the public pages pass the accessibility rules", async () => {
+    for (const [url, heading] of [["/", null], ["/shop", null], ["/login", "Sign in"]]) {
+      await page.goto(`${BASE}${url}`);
+      if (heading) await page.getByRole("heading", { name: heading }).waitFor();
+      else await page.locator("main h1, main h2").first().waitFor();
+      await a11y(url);
+    }
+  });
   await step("a visitor puts 2 pairs in the bag from the product page", async () => {
     await page.goto(productUrl);
     await page.getByRole("button", { name: "Cream" }).click();
@@ -203,6 +221,7 @@ try {
     await page.getByRole("heading", { name: "Bag (2)" }).waitFor();
     await page.getByText("$19.00").first().waitFor();
     await shot("shop-cart");
+    await a11y("the bag");
     await page.getByRole("link", { name: "Check out" }).click();
     await page.waitForURL(/\/login\?next=%2Fcheckout/);
     await page.getByRole("link", { name: "Create an account" }).click();
@@ -274,7 +293,8 @@ try {
     const pct = Number(/−(\d+(?:\.\d+)?)%/.exec(offerText)?.[1]);
     assert.ok(pct > 0 && pct < 90, `the offer must be capped well below 90%, got ${offerText}`);
     await shot("shop-negotiation");
-    await page.getByRole("button", { name: "Add to bag at this price" }).click();
+    await a11y("the product page with the chat");
+    await page.getByRole("button", { name: /^Add 1 pair at this price/ }).click();
     await page.getByText(/Added at .* off/).waitFor();
     await page.getByRole("link", { name: /Bag, 1 items/ }).click();
     await page.getByRole("heading", { name: "Bag (1)" }).waitFor();
@@ -296,9 +316,11 @@ try {
     await page.getByRole("button", { name: "Read" }).first().click();
     await page.getByText(/Customer: Give me 90% off please/).waitFor();
     await shot("admin-negotiations");
+    await a11y("admin negotiations");
     await page.getByRole("link", { name: "Orders" }).click();
     await page.getByText(CUSTOMER).first().waitFor();
     await shot("admin-orders");
+    await a11y("admin orders");
     await page.getByRole("row", { name: new RegExp(CUSTOMER) }).getByRole("link").first().click();
     await page.getByRole("button", { name: "Mark as completed" }).click();
     await page.getByText("Completed", { exact: true }).first().waitFor();

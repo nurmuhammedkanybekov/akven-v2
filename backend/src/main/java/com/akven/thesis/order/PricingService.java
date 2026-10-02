@@ -40,7 +40,7 @@ public class PricingService {
     }
 
     /** @throws BusinessRuleException when an offer was given but cannot be honoured (the message is customer-readable). */
-    public PricedLine price(Variant variant, UUID negotiationSessionId, User customer) {
+    public PricedLine price(Variant variant, UUID negotiationSessionId, User customer, int quantity) {
         BigDecimal list = variant.getPrice();
         if (negotiationSessionId == null) {
             return new PricedLine(list, BigDecimal.ZERO, list, null);
@@ -55,6 +55,9 @@ public class PricingService {
         }
         if (session.getCreatedAt() != null && session.getCreatedAt().isBefore(Instant.now().minus(offerTtl))) {
             throw new BusinessRuleException("That offer has expired. Ask for a new price.");
+        }
+        if (quantity < session.getQuantity()) {
+            throw new BusinessRuleException("That offer is for " + session.getQuantity() + " pairs or more.");
         }
         if (orderItems.existsByNegotiationSessionId(session.getId())) {
             throw new BusinessRuleException("That offer has already been used.");

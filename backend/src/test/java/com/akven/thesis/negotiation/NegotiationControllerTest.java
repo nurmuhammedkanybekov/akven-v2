@@ -85,6 +85,24 @@ class NegotiationControllerTest extends IntegrationTest {
     }
 
     @Test
+    void anOfferForSeveralPairsDoesNotApplyToASinglePair() throws Exception {
+        Variant v = data.variant(20);
+        String token = tokenForEmail(email(), Role.CUSTOMER);
+        JsonNode reply = chat(token, v, "I want a bundle, best price", 5);
+        String id = reply.get("sessionId").asText();
+        assertThat(reply.get("validatedDiscountPct").decimalValue()).isGreaterThan(BigDecimal.ZERO);
+
+        JsonNode one = json(sendJson("POST", "/api/cart/quote", token, Map.of("items", java.util.List.of(
+                Map.of("sku", v.getSku(), "quantity", 1, "negotiationSessionId", id)))).andExpect(status().isOk()));
+        assertThat(one.get("lines").get(0).get("discountPct").decimalValue()).isEqualByComparingTo("0");
+        assertThat(one.get("lines").get(0).get("note").asText()).contains("5 pairs or more");
+
+        JsonNode five = json(sendJson("POST", "/api/cart/quote", token, Map.of("items", java.util.List.of(
+                Map.of("sku", v.getSku(), "quantity", 5, "negotiationSessionId", id)))).andExpect(status().isOk()));
+        assertThat(five.get("lines").get(0).get("discountPct").decimalValue()).isGreaterThan(BigDecimal.ZERO);
+    }
+
+    @Test
     void anonymousIsRefused() throws Exception {
         sendJson("POST", "/api/negotiate", null, Map.of("variantSku", "X", "message", "hi")).andExpect(status().isUnauthorized());
     }

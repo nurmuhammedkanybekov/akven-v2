@@ -26,7 +26,7 @@ public final class NegotiationDtos {
                                     BigDecimal offerPrice, Instant expiresAt, BigDecimal proposedDiscountPct) {}
 
     /** Shop-team view: both numbers, the person and the item. Never carries cost price or margin floor. */
-    public record SessionView(UUID id, String customerEmail, String sku, String productName,
+    public record SessionView(UUID id, String customerEmail, String sku, String productName, int quantity,
                               BigDecimal proposedDiscountPct, BigDecimal validatedDiscountPct, boolean clamped,
                               String transcript, Instant createdAt) {}
 }

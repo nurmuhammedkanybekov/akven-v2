@@ -8,14 +8,14 @@ import { Alert } from "./Alert";
 import { Button } from "./Button";
 import { ChatBubble, NegotiationOffer } from "./Negotiation";
 
-type Turn = { from: "customer"; text: string } | { from: "seller"; text: string; offer: NegotiateResponse };
+type Turn = { from: "customer"; text: string } | { from: "seller"; text: string; offer: NegotiateResponse; quantity: number };
 
 interface Props {
   sku: string;
   quantity: number;
   disabled?: boolean;
   /** Called when the customer accepts an offer: the product page puts the item in the bag at that offer. */
-  onAccept: (offer: NegotiateResponse) => void;
+  onAccept: (offer: NegotiateResponse, quantity: number) => void;
 }
 
 const SUGGESTIONS = ["Can I get a better price?", "I'll take 5 pairs, what can you do?", "Could you do 10% off?"];
@@ -53,7 +53,7 @@ export function NegotiationChat({ sku, quantity, disabled, onAccept }: Props) {
     setTurns((t) => [...t, { from: "customer", text: clean }]);
     try {
       const offer = await negotiate(sku, clean, quantity);
-      setTurns((t) => [...t, { from: "seller", text: offer.reply, offer }]);
+      setTurns((t) => [...t, { from: "seller", text: offer.reply, offer, quantity }]);
     } catch (e) {
       setError(e instanceof ApiError && e.status === 429 ? e.message : "The assistant could not answer just now. Please try again.");
     } finally { setBusy(false); }
@@ -90,8 +90,8 @@ export function NegotiationChat({ sku, quantity, disabled, onAccept }: Props) {
         <Button type="submit" variant="secondary" disabled={disabled || busy || !text.trim()}>Send</Button>
       </form>
       {lastOffer && (
-        <Button block variant="accent" disabled={disabled} onClick={() => onAccept(lastOffer.offer)}>
-          Add to bag at this price
+        <Button block variant="accent" disabled={disabled} onClick={() => onAccept(lastOffer.offer, lastOffer.quantity)}>
+          Add {lastOffer.quantity === 1 ? "1 pair" : `${lastOffer.quantity} pairs`} at this price
         </Button>
       )}
     </section>
