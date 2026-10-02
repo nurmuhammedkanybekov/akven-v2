@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1638" width="1100" height="1638" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Simplified entity-relationship diagram of the seven core Ak&amp;Ven tables with key columns and crow's-foot relationships."><title>Data model (core) — entity-relationship diagram</title>
+<rect width="1100" height="1638" fill="#ffffff"/>
+<rect x="4.0" y="4.0" width="468.6" height="618.0" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
+<rect x="4.0" y="666.0" width="468.6" height="718.0" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
+<rect x="627.4" y="4.0" width="468.6" height="428.0" rx="14" fill="#efeaf7" stroke="#a596cf" stroke-width="2"/>
+<rect x="627.4" y="488.0" width="468.6" height="768.0" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
+<polyline points="148.6,396.0 148.6,322.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="148.6,612.0 148.6,718.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="148.6,984.0 148.6,1058.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="772.0,540.0 772.0,422.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="772.0,980.0 772.0,906.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="462.6,481.0 508.6,481.0 508.6,191.0 637.4,191.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="637.4,391.0 552.6,391.0 552.6,1243.0 462.6,1243.0" fill="none" stroke="#5b4b8a" stroke-width="2.2" stroke-linejoin="round" stroke-dasharray="10 7"/>
+<polyline points="637.4,625.0 590.6,625.0 590.6,1293.0 462.6,1293.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="14.0,1539.0 78.0,1539.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="292.0,1539.0 356.0,1539.0" fill="none" stroke="#1d1d1b" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="596.4,1539.0 660.4,1539.0" fill="none" stroke="#5b4b8a" stroke-width="2.2" stroke-linejoin="round" stroke-dasharray="10 7"/>
+<rect x="14.0" y="56.0" width="448.6" height="266.0" rx="8" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<path d="M14.0,116.0 V64.0 Q14.0,56.0 22.0,56.0 H454.6 Q462.6,56.0 462.6,64.0 V116.0 Z" fill="#1d1d1b"/>
+<rect x="22.0" y="119.8" width="71.0" height="42.5" rx="21.25" fill="#b8891c" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="15.2" y="166.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="22.0" y="169.8" width="69.1" height="42.5" rx="21.25" fill="#ffffff" stroke="#1d1d1b" stroke-width="1.8"/>
+<rect x="15.2" y="266.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="14.0" y="396.0" width="448.6" height="216.0" rx="8" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<path d="M14.0,456.0 V404.0 Q14.0,396.0 22.0,396.0 H454.6 Q462.6,396.0 462.6,404.0 V456.0 Z" fill="#1d1d1b"/>
+<rect x="22.0" y="459.8" width="71.0" height="42.5" rx="21.25" fill="#b8891c" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="15.2" y="506.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="22.0" y="509.8" width="74.8" height="42.5" rx="21.25" fill="#ffffff" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="14.0" y="718.0" width="448.6" height="266.0" rx="8" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<path d="M14.0,778.0 V726.0 Q14.0,718.0 22.0,718.0 H454.6 Q462.6,718.0 462.6,726.0 V778.0 Z" fill="#1d1d1b"/>
+<rect x="22.0" y="781.8" width="71.0" height="42.5" rx="21.25" fill="#b8891c" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="15.2" y="828.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="22.0" y="831.8" width="69.1" height="42.5" rx="21.25" fill="#ffffff" stroke="#1d1d1b" stroke-width="1.8"/>
+<rect x="15.2" y="928.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="14.0" y="1058.0" width="448.6" height="316.0" rx="8" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<path d="M14.0,1118.0 V1066.0 Q14.0,1058.0 22.0,1058.0 H454.6 Q462.6,1058.0 462.6,1066.0 V1118.0 Z" fill="#1d1d1b"/>
+<rect x="22.0" y="1121.8" width="71.0" height="42.5" rx="21.25" fill="#b8891c" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="15.2" y="1168.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="22.0" y="1171.8" width="69.1" height="42.5" rx="21.25" fill="#ffffff" stroke="#1d1d1b" stroke-width="1.8"/>
+<rect x="22.0" y="1221.8" width="74.8" height="42.5" rx="21.25" fill="#ffffff" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="15.2" y="1268.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="22.0" y="1271.8" width="69.1" height="42.5" rx="21.25" fill="#ffffff" stroke="#1d1d1b" stroke-width="1.8"/>
+<rect x="637.4" y="56.0" width="448.6" height="366.0" rx="8" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.4"/>
+<path d="M637.4,116.0 V64.0 Q637.4,56.0 645.4,56.0 H1078.0 Q1086.0,56.0 1086.0,64.0 V116.0 Z" fill="#5b4b8a"/>
+<rect x="645.4" y="119.8" width="71.0" height="42.5" rx="21.25" fill="#b8891c" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="638.6" y="166.0" width="446.2" height="50.0" rx="0" fill="#f4f1fa" stroke="none" stroke-width="0"/>
+<rect x="645.4" y="169.8" width="69.1" height="42.5" rx="21.25" fill="#ffffff" stroke="#1d1d1b" stroke-width="1.8"/>
+<rect x="645.4" y="219.8" width="69.1" height="42.5" rx="21.25" fill="#ffffff" stroke="#1d1d1b" stroke-width="1.8"/>
+<rect x="638.6" y="266.0" width="446.2" height="50.0" rx="0" fill="#f4f1fa" stroke="none" stroke-width="0"/>
+<rect x="638.6" y="316.0" width="446.2" height="50.0" rx="0" fill="#2e7d46" stroke="none" stroke-width="0" fill-opacity="0.10"/>
+<circle cx="664.4" cy="341.0" r="19.0" fill="#2e7d46"/>
+<rect x="638.6" y="366.0" width="446.2" height="50.0" rx="0" fill="#f4f1fa" stroke="none" stroke-width="0"/>
+<rect x="638.6" y="366.0" width="446.2" height="50.0" rx="0" fill="#2e7d46" stroke="none" stroke-width="0" fill-opacity="0.10"/>
+<circle cx="664.4" cy="391.0" r="19.0" fill="#2e7d46"/>
+<rect x="637.4" y="540.0" width="448.6" height="366.0" rx="8" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<path d="M637.4,600.0 V548.0 Q637.4,540.0 645.4,540.0 H1078.0 Q1086.0,540.0 1086.0,548.0 V600.0 Z" fill="#1d1d1b"/>
+<rect x="645.4" y="603.8" width="71.0" height="42.5" rx="21.25" fill="#b8891c" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="638.6" y="650.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="645.4" y="653.8" width="69.1" height="42.5" rx="21.25" fill="#ffffff" stroke="#1d1d1b" stroke-width="1.8"/>
+<rect x="645.4" y="703.8" width="74.8" height="42.5" rx="21.25" fill="#ffffff" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="638.6" y="750.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="638.6" y="800.0" width="446.2" height="50.0" rx="0" fill="#b3502f" stroke="none" stroke-width="0" fill-opacity="0.10"/>
+<circle cx="664.4" cy="825.0" r="19.0" fill="#b3502f"/>
+<rect x="638.6" y="850.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="638.6" y="850.0" width="446.2" height="50.0" rx="0" fill="#b3502f" stroke="none" stroke-width="0" fill-opacity="0.10"/>
+<circle cx="664.4" cy="875.0" r="19.0" fill="#b3502f"/>
+<rect x="637.4" y="980.0" width="448.6" height="266.0" rx="8" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<path d="M637.4,1040.0 V988.0 Q637.4,980.0 645.4,980.0 H1078.0 Q1086.0,980.0 1086.0,988.0 V1040.0 Z" fill="#1d1d1b"/>
+<rect x="645.4" y="1043.8" width="71.0" height="42.5" rx="21.25" fill="#b8891c" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="638.6" y="1090.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<rect x="645.4" y="1093.8" width="74.8" height="42.5" rx="21.25" fill="#ffffff" stroke="#b8891c" stroke-width="1.8"/>
+<rect x="638.6" y="1190.0" width="446.2" height="50.0" rx="0" fill="#f6f4ee" stroke="none" stroke-width="0"/>
+<line x1="136.5" y1="386.1" x2="160.7" y2="386.1" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="136.5" y1="377.3" x2="160.7" y2="377.3" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="344.0" x2="161.8" y2="322.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="344.0" x2="148.6" y2="322.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="344.0" x2="135.4" y2="322.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="148.6" cy="353.9" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="160.7" y1="621.9" x2="136.5" y2="621.9" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="160.7" y1="630.7" x2="136.5" y2="630.7" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="696.0" x2="135.4" y2="718.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="696.0" x2="148.6" y2="718.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="696.0" x2="161.8" y2="718.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="148.6" cy="686.1" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="160.7" y1="993.9" x2="136.5" y2="993.9" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="160.7" y1="1002.7" x2="136.5" y2="1002.7" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="1036.0" x2="135.4" y2="1058.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="1036.0" x2="148.6" y2="1058.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="148.6" y1="1036.0" x2="161.8" y2="1058.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="148.6" cy="1026.1" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="759.9" y1="530.1" x2="784.1" y2="530.1" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="759.9" y1="521.3" x2="784.1" y2="521.3" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="772.0" y1="444.0" x2="785.2" y2="422.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="772.0" y1="444.0" x2="772.0" y2="422.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="772.0" y1="444.0" x2="758.8" y2="422.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="772.0" cy="453.9" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="759.9" y1="970.1" x2="784.1" y2="970.1" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="759.9" y1="961.3" x2="784.1" y2="961.3" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="772.0" y1="928.0" x2="785.2" y2="906.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="772.0" y1="928.0" x2="772.0" y2="906.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="772.0" y1="928.0" x2="758.8" y2="906.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="772.0" cy="937.9" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="472.5" y1="468.9" x2="472.5" y2="493.1" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="481.3" y1="468.9" x2="481.3" y2="493.1" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="615.4" y1="191.0" x2="637.4" y2="204.2" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="615.4" y1="191.0" x2="637.4" y2="191.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="615.4" y1="191.0" x2="637.4" y2="177.8" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="605.5" cy="191.0" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="627.5" y1="403.1" x2="627.5" y2="378.9" stroke="#5b4b8a" stroke-width="2.4"/>
+<circle cx="612.1" cy="391.0" r="6.6" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.4"/>
+<line x1="472.5" y1="1230.9" x2="472.5" y2="1255.1" stroke="#5b4b8a" stroke-width="2.4"/>
+<circle cx="487.9" cy="1243.0" r="6.6" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.4"/>
+<line x1="627.5" y1="637.1" x2="627.5" y2="612.9" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="618.7" y1="637.1" x2="618.7" y2="612.9" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="484.6" y1="1293.0" x2="462.6" y2="1279.8" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="484.6" y1="1293.0" x2="462.6" y2="1293.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="484.6" y1="1293.0" x2="462.6" y2="1306.2" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="494.5" cy="1293.0" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="68.1" y1="1551.1" x2="68.1" y2="1526.9" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="59.3" y1="1551.1" x2="59.3" y2="1526.9" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="334.0" y1="1539.0" x2="356.0" y2="1552.2" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="334.0" y1="1539.0" x2="356.0" y2="1539.0" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="334.0" y1="1539.0" x2="356.0" y2="1525.8" stroke="#1d1d1b" stroke-width="2.4"/>
+<circle cx="324.1" cy="1539.0" r="6.6" fill="#ffffff" stroke="#1d1d1b" stroke-width="2.4"/>
+<line x1="650.5" y1="1551.1" x2="650.5" y2="1526.9" stroke="#5b4b8a" stroke-width="2.4"/>
+<circle cx="635.1" cy="1539.0" r="6.6" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.4"/>
+<text x="14.0" y="39.7" font-size="34" font-weight="700" fill="#6e520f">IDENTITY</text>
+<text x="317.2" y="701.7" font-size="34" font-weight="700" fill="#6e520f">ORDERS</text>
+<text x="637.4" y="39.7" font-size="34" font-weight="700" fill="#5b4b8a">AI / NEGOTIATION</text>
+<text x="923.0" y="523.7" font-size="34" font-weight="700" fill="#6e520f">CATALOG</text>
+<text x="22.0" y="99.0" font-size="36" font-weight="700" fill="#ffffff">audit_log_entry</text>
+<text x="57.5" y="153.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">PK</text>
+<text x="103.0" y="153.2" font-size="34" fill="#1d1d1b">id</text>
+<text x="56.6" y="203.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">FK</text>
+<text x="103.0" y="203.2" font-size="34" fill="#1d1d1b">actor_id</text>
+<text x="103.0" y="253.2" font-size="34" fill="#1d1d1b">action</text>
+<text x="103.0" y="303.2" font-size="34" fill="#1d1d1b">entity_type</text>
+<text x="22.0" y="439.0" font-size="36" font-weight="700" fill="#ffffff">app_user</text>
+<text x="57.5" y="493.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">PK</text>
+<text x="106.8" y="493.2" font-size="34" fill="#1d1d1b">id</text>
+<text x="59.4" y="543.2" font-size="34" text-anchor="middle" font-weight="700" fill="#6e520f">UQ</text>
+<text x="106.8" y="543.2" font-size="34" fill="#1d1d1b">email</text>
+<text x="106.8" y="593.2" font-size="34" fill="#1d1d1b">role</text>
+<text x="22.0" y="761.0" font-size="36" font-weight="700" fill="#ffffff">customer_order</text>
+<text x="57.5" y="815.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">PK</text>
+<text x="103.0" y="815.2" font-size="34" fill="#1d1d1b">id</text>
+<text x="56.6" y="865.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">FK</text>
+<text x="103.0" y="865.2" font-size="34" fill="#1d1d1b">customer_id</text>
+<text x="103.0" y="915.2" font-size="34" fill="#1d1d1b">status</text>
+<text x="103.0" y="965.2" font-size="34" fill="#1d1d1b">payment_ref</text>
+<text x="22.0" y="1101.0" font-size="36" font-weight="700" fill="#ffffff">order_item</text>
+<text x="57.5" y="1155.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">PK</text>
+<text x="106.8" y="1155.2" font-size="34" fill="#1d1d1b">id</text>
+<text x="56.6" y="1205.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">FK</text>
+<text x="106.8" y="1205.2" font-size="34" fill="#1d1d1b">order_id</text>
+<text x="59.4" y="1255.2" font-size="34" text-anchor="middle" font-weight="700" fill="#6e520f">UQ</text>
+<text x="106.8" y="1255.2" font-size="34" fill="#1d1d1b">negotiation_session_id</text>
+<text x="56.6" y="1305.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">FK</text>
+<text x="106.8" y="1305.2" font-size="34" fill="#1d1d1b">variant_id</text>
+<text x="106.8" y="1355.2" font-size="34" fill="#1d1d1b">agreed_price</text>
+<text x="645.4" y="99.0" font-size="36" font-weight="700" fill="#ffffff">negotiation_session</text>
+<text x="680.9" y="153.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">PK</text>
+<text x="726.4" y="153.2" font-size="34" fill="#1d1d1b">id</text>
+<text x="679.9" y="203.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">FK</text>
+<text x="726.4" y="203.2" font-size="34" fill="#1d1d1b">customer_id</text>
+<text x="679.9" y="253.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">FK</text>
+<text x="726.4" y="253.2" font-size="34" fill="#1d1d1b">variant_id</text>
+<text x="726.4" y="303.2" font-size="34" fill="#1d1d1b">quantity</text>
+<text x="664.4" y="353.2" font-size="34" text-anchor="middle" font-weight="700" fill="#ffffff">2</text>
+<text x="726.4" y="353.2" font-size="34" fill="#1d1d1b">proposed_discount_pct</text>
+<text x="664.4" y="403.2" font-size="34" text-anchor="middle" font-weight="700" fill="#ffffff">2</text>
+<text x="726.4" y="403.2" font-size="34" fill="#1d1d1b">validated_discount_pct</text>
+<text x="645.4" y="583.0" font-size="36" font-weight="700" fill="#ffffff">variant</text>
+<text x="680.9" y="637.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">PK</text>
+<text x="730.2" y="637.2" font-size="34" fill="#1d1d1b">id</text>
+<text x="679.9" y="687.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">FK</text>
+<text x="730.2" y="687.2" font-size="34" fill="#1d1d1b">product_id</text>
+<text x="682.8" y="737.2" font-size="34" text-anchor="middle" font-weight="700" fill="#6e520f">UQ</text>
+<text x="730.2" y="737.2" font-size="34" fill="#1d1d1b">sku</text>
+<text x="730.2" y="787.2" font-size="34" fill="#1d1d1b">price</text>
+<text x="664.4" y="837.2" font-size="34" text-anchor="middle" font-weight="700" fill="#ffffff">1</text>
+<text x="730.2" y="837.2" font-size="34" fill="#1d1d1b">cost_price</text>
+<text x="664.4" y="887.2" font-size="34" text-anchor="middle" font-weight="700" fill="#ffffff">1</text>
+<text x="730.2" y="887.2" font-size="34" fill="#1d1d1b">margin_floor_pct</text>
+<text x="645.4" y="1023.0" font-size="36" font-weight="700" fill="#ffffff">product</text>
+<text x="680.9" y="1077.2" font-size="34" text-anchor="middle" font-weight="700" fill="#1d1d1b">PK</text>
+<text x="730.2" y="1077.2" font-size="34" fill="#1d1d1b">id</text>
+<text x="682.8" y="1127.2" font-size="34" text-anchor="middle" font-weight="700" fill="#6e520f">UQ</text>
+<text x="730.2" y="1127.2" font-size="34" fill="#1d1d1b">slug</text>
+<text x="730.2" y="1177.2" font-size="34" fill="#1d1d1b">name</text>
+<text x="730.2" y="1227.2" font-size="34" fill="#1d1d1b">category</text>
+<text x="162.6" y="372.0" font-size="34" font-style="italic" fill="#1d1d1b">performs</text>
+<text x="162.6" y="656.0" font-size="34" font-style="italic" fill="#1d1d1b">places</text>
+<text x="162.6" y="1034.0" font-size="34" font-style="italic" fill="#1d1d1b">contains</text>
+<text x="786.0" y="472.0" font-size="34" font-style="italic" fill="#1d1d1b">negotiated for</text>
+<text x="786.0" y="956.0" font-size="34" font-style="italic" fill="#1d1d1b">has options</text>
+<text x="539.1" y="291.0" font-size="34" text-anchor="middle" font-style="italic" fill="#1d1d1b" transform="rotate(-90 539.1 291.0)">negotiates</text>
+<text x="539.2" y="967.5" font-size="34" text-anchor="middle" font-style="italic" fill="#5b4b8a" transform="rotate(-90 539.2 967.5)">redeemed by</text>
+<text x="522.6" y="1331.0" font-size="34" font-style="italic" fill="#1d1d1b">sold as</text>
+<circle cx="33" cy="1431" r="19" fill="#b3502f"/>
+<text x="33.0" y="1442.0" font-size="34" text-anchor="middle" font-weight="700" fill="#ffffff">1</text>
+<text x="66.0" y="1442.0" font-size="34" fill="#1d1d1b">never sent to the AI or the customer</text>
+<circle cx="33" cy="1485" r="19" fill="#2e7d46"/>
+<text x="33.0" y="1496.0" font-size="34" text-anchor="middle" font-weight="700" fill="#ffffff">2</text>
+<text x="66.0" y="1496.0" font-size="34" fill="#1d1d1b">DB CHECK: validated ≤ proposed</text>
+<text x="90.0" y="1550.0" font-size="34" fill="#1d1d1b">exactly one</text>
+<text x="368.0" y="1550.0" font-size="34" fill="#1d1d1b">zero or many</text>
+<text x="672.4" y="1550.0" font-size="34" fill="#1d1d1b">logical, no FK</text>
+<text x="550.0" y="1616.0" font-size="34" text-anchor="middle" font-style="italic" fill="#55524a">Figure 4b. Core data model: 7 of 10 tables, key columns.</text>
+</svg>
