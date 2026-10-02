@@ -67,6 +67,16 @@ rule-based stand-in or the real LLM later. Full write-up in
 └── .gitlab-ci.yml      Maven test stage, JUnit report, dependency cache
 ```
 
+## One command with Docker
+
+```bash
+docker compose up --build        # then open http://localhost:8081
+```
+
+Starts PostgreSQL (with pgvector), the backend and the shop behind one address, in demo mode (admin
+`admin@akven.test` / `changeme-admin`). Photos uploaded in the admin live in a Docker volume. CI builds and smoke-tests
+this setup on every push.
+
 ## Running the backend locally
 
 Requires a PostgreSQL 16+ instance with the `pgvector` extension available
