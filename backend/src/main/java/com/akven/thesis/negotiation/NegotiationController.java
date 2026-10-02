@@ -1,30 +1,27 @@
 package com.akven.thesis.negotiation;
 
-import org.springframework.http.HttpStatus;
+import com.akven.thesis.negotiation.NegotiationDtos.NegotiateRequest;
+import com.akven.thesis.negotiation.NegotiationDtos.NegotiateResponse;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Negotiation chat endpoint — LLM + RAG pipeline is Phase 2 (Oct 21 – Nov 7).
- * Stubbed with 501 for now so the route, and PolicyValidator's place in front
- * of it, are visible in the skeleton from day one.
+ * The customer's chat. Needs a signed-in customer, because an offer belongs to a person and can only be used
+ * by them (see PricingService). The response carries only validated numbers.
  */
 @RestController
 @RequestMapping("/api/negotiate")
 public class NegotiationController {
 
-    private final PolicyValidator policyValidator;
+    private final NegotiationService service;
 
-    public NegotiationController(PolicyValidator policyValidator) {
-        this.policyValidator = policyValidator;
+    public NegotiationController(NegotiationService service) {
+        this.service = service;
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-    public void negotiate(@RequestBody NegotiationRequest request) {
-        // TODO Phase 2: call the RAG/LLM pipeline, then policyValidator.clamp(...)
-        // before anything is written to a NegotiationSession or an Order.
-        throw new UnsupportedOperationException("Negotiation pipeline lands in Phase 2 — see docs/architecture.md");
+    public NegotiateResponse negotiate(Authentication auth, @Valid @RequestBody NegotiateRequest body) {
+        return service.negotiate(auth.getName(), body);
     }
-
-    public record NegotiationRequest(String variantSku, String message) {}
 }

@@ -10,10 +10,6 @@ import java.math.BigDecimal;
  * plain, deterministic, and independent of the LLM call — treat whatever the
  * negotiation service hands in as untrusted input, the same way you'd never
  * trust a client-submitted price.
- *
- * TODO (Phase 2 — RAG + negotiator core): wire this into NegotiationService
- * once the LLM call exists. Until then this is intentionally the only
- * "decision" the negotiation module makes — everything else is scaffolding.
  */
 @Component
 public class PolicyValidator {

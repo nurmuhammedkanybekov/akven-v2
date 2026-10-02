@@ -2,7 +2,7 @@ import { api } from "./client";
 import type {
   AdminProduct, AdminTerm, AdminVariant, AuditEntry, AuthResponse, Facets, PageResponse, ProductDetail,
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
-  CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote,
+  CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote, NegotiateResponse, NegotiationSessionView,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -33,6 +33,12 @@ export const adminListOrders = (p: { status?: OrderStatus; page?: number; pageSi
 export const adminGetOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}`);
 export const adminFulfilOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}/fulfil`, { method: "POST" });
 export const adminCancelOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}/cancel`, { method: "POST" });
+
+// ---- negotiation ----
+export const negotiate = (variantSku: string, message: string, quantity: number) =>
+  api<NegotiateResponse>("/api/negotiate", { method: "POST", body: { variantSku, message, quantity } });
+export const adminListNegotiations = (p: { page?: number; pageSize?: number }) =>
+  api<PageResponse<NegotiationSessionView>>(`/api/admin/negotiations${qs(p)}`);
 
 // ---- shop ----
 export interface CatalogQuery {

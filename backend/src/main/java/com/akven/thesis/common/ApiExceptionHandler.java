@@ -1,5 +1,6 @@
 package com.akven.thesis.common;
 
+import com.akven.thesis.negotiation.TooManyRequestsException;
 import com.akven.thesis.order.PaymentFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -43,6 +44,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BusinessRuleException.class)
     ProblemDetail businessRule(BusinessRuleException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    ProblemDetail tooMany(TooManyRequestsException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, e.getMessage());
     }
 
     /** 402 for a declined payment, 502 when the payment service failed. The order (when there is one) rides along. */

@@ -100,6 +100,8 @@ start unless `JWT_SECRET` is a real random value
 | `GET /api/catalog/terms` | The owners' sections and cuts (for menus and filters) |
 | `GET /api/products/{slug}` | Product detail with variants and images |
 | `POST /api/cart/quote` | Today's prices and availability for a cart (public; negotiated prices only for their owner) |
+| `POST /api/negotiate` | Chat message `{variantSku, message, quantity?}` → validated offer `{sessionId, reply, validatedDiscountPct, offerPrice}` (signed in; 20 messages per 10 minutes, then 429). Pass `sessionId` as `negotiationSessionId` in the bag |
+| `GET /api/admin/negotiations`, `GET /api/admin/negotiations/{id}` | Proposed against validated discount and the transcript (STAFF / ADMIN) |
 | `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock) |
 | `GET /api/orders`, `GET /api/orders/{id}`, `POST /api/orders/{id}/cancel` | The customer's own orders |
 | `/api/admin/**` | Catalog management: products, variants, sections and cuts, photo upload, retire and restore (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
@@ -158,6 +160,12 @@ Sign in at `/login`. Demo accounts (demo profile only): `admin@akven.test` / `ch
    completed: the payment is refunded and the socks go back on the shelf.
 4. **Shop team:** Admin, Orders, "To fulfil": open an order, **Mark as completed**, or cancel and refund.
 
+**Negotiation:** the assistant (today a rule-based stand-in, an LLM in Milestone 3, same contract) never sees the cost
+price or margin floor, and it never sets a price. Whatever discount it proposes is clamped by the `PolicyValidator` to
+the margin floor before it is stored or shown, the reply the customer reads is a template filled with the validated
+numbers, and both the proposal and the validated value are kept. Customers only get the validated value. To show both
+side by side in a demo, start the backend with `AKVEN_DEMO_EXPOSE_PROPOSAL=true`. Try asking for "50% off" on any product.
+
 **Safety rules built into checkout:** the server decides every price (a negotiated price applies only if it is that
 customer's, for that item, recent, unused, and never below the margin floor); the last pair can only be sold once
 (rows are locked while stock is checked); pressing pay twice cannot pay twice (idempotency key); an order is only
@@ -195,13 +203,13 @@ Target: Prototype 1 — core backend + basic UI integrated, ~30–50% functional
 |---|---|
 | Real authentication (register / login / me, JWT filter, Spring Security wiring) | Done |
 | Full catalog API: public list with filters and pagination, product detail with variants, Men / Women / Kids / Bundles plus owner-managed sections and cuts, admin management with audit log and ADMIN-only margin floor | Done |
-| Cart & checkout, simulated payment tokenization, inventory holds | Not started |
-| Negotiation endpoint (rule-based stand-in behind the real API contract) | Not started |
+| Cart & checkout, simulated payment tokenization, inventory holds | Done |
+| Negotiation endpoint (rule-based stand-in behind the real API contract), rate limit, transcripts for the shop team | Done |
 | Ak&Ven design system: logo rebuilt from the shop sign, tokens (light and dark, WCAG-checked), components, living style guide | Done |
 | Shop pages: home, catalog with live filters and counts, product page with colour swatches and sizes, login | Done |
 | Admin: products, colours and sizes, photo upload, sections and cuts, remove and restore, history | Done |
 | Cart (works offline), checkout with simulated Apple Pay / Google Pay, order history, cancel with refund; admin orders (fulfil, cancel) | Done |
-| Negotiation endpoint and chat (rule-based stand-in behind the real contract) | Not started |
+| Negotiation chat on the product page; admin transcripts showing proposed against validated | Done |
 | `requirement-analysis.md` / use-case diagram updated for the locked-in design direction | Not started |
 
 ## Roadmap

@@ -5,7 +5,8 @@ export function formatPrice(amount: number, currency = "USD", locale = "en"): st
 
 /** The price after a discount, rounded to cents the same way a shop would. */
 export function discountedPrice(list: number, discountPct: number): number {
-  return Math.round(list * (1 - discountPct / 100) * 100) / 100;
+  // Multiply before dividing and nudge by a hair, so half-cents round up exactly like the server does (9.50 at 15% is 8.08).
+  return Math.round(list * (100 - discountPct) + 1e-9) / 100;
 }
 
 /** "30 Sep 2026, 18:16" in the visitor's own time zone. */

@@ -1,6 +1,6 @@
 # Milestone 2 plan (Prototype 1, due 20 Oct 2026)
 
-Working branch: `nurmss`. Status: Phase A (auth) done. Everything below is still to do.
+Working branch: `nurmss`. Status: phases A to D done (auth, catalog, orders, negotiation). Frontend is built; docs and CI polish remain.
 
 ## Catalog structure (decided, revised in V7)
 

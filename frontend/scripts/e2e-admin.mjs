@@ -264,6 +264,25 @@ try {
     await page.getByRole("button", { name: "Cream" }).click();
     await page.getByText("Only 1 left").waitFor();              // the cancelled pair is back
   });
+  await step("the customer haggles for 90% off, is capped by the policy, and the bag holds the capped price", async () => {
+    await page.goto(productUrl);
+    await page.getByRole("button", { name: "Navy" }).click();
+    await page.getByLabel("Your message").fill("Give me 90% off please");
+    await page.getByRole("button", { name: "Send" }).click();
+    await page.getByText(/That is the best I can do|I cannot go below/).waitFor();
+    const offerText = await page.getByLabel("Your offer").textContent();
+    const pct = Number(/−(\d+(?:\.\d+)?)%/.exec(offerText)?.[1]);
+    assert.ok(pct > 0 && pct < 90, `the offer must be capped well below 90%, got ${offerText}`);
+    await shot("shop-negotiation");
+    await page.getByRole("button", { name: "Add to bag at this price" }).click();
+    await page.getByText(/Added at .* off/).waitFor();
+    await page.getByRole("link", { name: /Bag, 1 items/ }).click();
+    await page.getByRole("heading", { name: "Bag (1)" }).waitFor();
+    const saved = JSON.parse(await page.evaluate(() => localStorage.getItem("akven-cart-v1")));
+    assert.ok(saved[0].negotiationSessionId, "the line carries the offer");
+    assert.ok(saved[0].unitPrice < 9.5, "the price is below list");
+    assert.ok(saved[0].unitPrice > 4, "and never below what it costs");
+  });
   await step("the shop team sees the paid order, marks it completed, and the customer can no longer cancel it", async () => {
     await page.goto(`${BASE}/orders`);
     await page.getByRole("button", { name: "Sign out" }).click();
@@ -272,6 +291,11 @@ try {
     await page.getByLabel("Password").fill("changeme-staff");
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL(`${BASE}/admin`);
+    await page.getByRole("link", { name: "Negotiations" }).click();
+    await page.getByText("capped").first().waitFor();
+    await page.getByRole("button", { name: "Read" }).first().click();
+    await page.getByText(/Customer: Give me 90% off please/).waitFor();
+    await shot("admin-negotiations");
     await page.getByRole("link", { name: "Orders" }).click();
     await page.getByText(CUSTOMER).first().waitFor();
     await shot("admin-orders");

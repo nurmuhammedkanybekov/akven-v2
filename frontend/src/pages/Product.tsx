@@ -9,6 +9,7 @@ import type { ProductDetail, VariantView } from "../api/types";
 import { Skeleton } from "../components/Alert";
 import { StockBadge } from "../components/Badge";
 import { Button } from "../components/Button";
+import { NegotiationChat } from "../components/NegotiationChat";
 import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
 import { useAsync } from "../hooks/useAsync";
@@ -125,6 +126,15 @@ function ProductView({ product }: { product: ProductDetail }) {
             }}>{current && current.availableQty <= 0 ? "Sold out" : "Add to bag"}</Button>
             {cart.count > 0 && <p className="av-small"><Link to="/cart">View your bag ({cart.count})</Link></p>}
           </div>
+
+          {current && current.availableQty > 0 && (
+            <NegotiationChat sku={current.sku} quantity={Math.min(quantity, current.availableQty)} onAccept={(offer) => {
+              const qty = Math.min(quantity, current.availableQty);
+              cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: [current.color, current.size, current.packSize && current.packSize > 1 ? `${current.packSize} pairs` : null].filter(Boolean).join(", ") || null,
+                colorHex: current.colorHex, imageUrl: product.images[0]?.url ?? null, unitPrice: offer.offerPrice, negotiationSessionId: offer.sessionId }, qty, current.availableQty);
+              toast(`Added at ${offer.validatedDiscountPct}% off`);
+            }} />
+          )}
 
           <dl className="av-specs">
             {details.filter(([, v]) => v).map(([k, v]) => <div key={k}><dt className="av-eyebrow">{k}</dt><dd>{v}</dd></div>)}

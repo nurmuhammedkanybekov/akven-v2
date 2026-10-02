@@ -18,14 +18,16 @@ interface OfferProps {
   validatedDiscountPct: number;
   /** What the language model suggested. Only passed in the demo/defence mode, never to real customers. */
   proposedDiscountPct?: number;
+  /** The price the server worked out. When given it is shown as it is, never recalculated in the browser. */
+  offerPrice?: number;
 }
 
 /**
  * The thesis in one component. The model PROPOSES (purple), the pricing policy VALIDATES (green) and only
  * the validated figure sets the price. When the model over-asks, the difference is shown on purpose.
  */
-export function NegotiationOffer({ listPrice, validatedDiscountPct, proposedDiscountPct }: OfferProps) {
-  const offer = discountedPrice(listPrice, validatedDiscountPct);
+export function NegotiationOffer({ listPrice, validatedDiscountPct, proposedDiscountPct, offerPrice }: OfferProps) {
+  const offer = offerPrice ?? discountedPrice(listPrice, validatedDiscountPct);
   const clamped = proposedDiscountPct !== undefined && proposedDiscountPct > validatedDiscountPct;
   return (
     <div className="av-offer" aria-label="Your offer">

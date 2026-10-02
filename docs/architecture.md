@@ -164,8 +164,8 @@ violation, margin-invariant violation, duplicate email by case, and
       and in audit entries, demo seed data moved behind the `demo` Spring profile
       (`db/seed/`), a JaCoCo coverage gate (80% lines, currently above 90%), and
       `PostgresIntegrationTest` in CI for everything H2 cannot prove.
-- [ ] Cart & checkout, simulated Apple Pay / Google Pay tokenization, inventory holds
-- [ ] Negotiation endpoint with a rule-based stand-in behind the same contract the real
+- [x] Cart & checkout, simulated Apple Pay / Google Pay tokenization, inventory holds
+- [x] Negotiation endpoint with a rule-based stand-in behind the same contract the real
       LLM will use in Milestone 3 — `PolicyValidator` already proven correct either way
 - [x] Ak&Ven design system (`docs/brand.md`): logo rebuilt from the shop sign as clean vector,
       tokens for a light and a dark theme with an automated WCAG contrast test, accessible
@@ -196,8 +196,14 @@ violation, margin-invariant violation, duplicate email by case, and
       concurrency tests on H2 and over real HTTP on PostgreSQL, and by the browser journey in `npm run e2e`.
       Not built on purpose: real payment provider, async payment confirmation and expiry of abandoned PENDING
       orders (the simulated provider answers synchronously), shipping costs and taxes.
-- [ ] Negotiation: `Negotiator` interface, rule-based stand-in, `PolicyValidator` clamp, persisted proposed versus
-      validated discount, chat UI, admin transcripts. Checkout already consumes validated offers.
+- [x] Negotiation (Phase D). `POST /api/negotiate`: `NegotiationService` builds a `NegotiationContext` (product, price,
+      quantity, message; no cost price or margin floor by construction), asks the `Negotiator` (rule-based stand-in,
+      deliberately willing to over-promise), clamps with `PolicyValidator`, stores proposed and validated on a
+      `NegotiationSession` (DB CHECK validated <= proposed) and answers with a reply template filled with the
+      validated numbers. Customers never receive the proposal unless `akven.demo.expose-proposal` is on. A sliding
+      window limits each customer to 20 messages per 10 minutes (429). STAFF and ADMIN read transcripts at
+      `/api/admin/negotiations`. Offers feed checkout through `negotiationSessionId`, where they are re-checked
+      and clamped again. The Milestone 3 LLM replaces only `Negotiator`.
 - [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
       Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
 

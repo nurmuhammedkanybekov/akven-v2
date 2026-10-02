@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AdminLayout } from "./admin/AdminLayout";
 import { AdminOrderDetail } from "./admin/AdminOrderDetail";
+import { AdminNegotiations } from "./admin/AdminNegotiations";
 import { AdminOrders } from "./admin/AdminOrders";
 import { AdminProducts } from "./admin/AdminProducts";
 import { AdminTerms } from "./admin/AdminTerms";
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="products/new" element={<ProductEditor />} />
               <Route path="products/:id" element={<ProductEditor />} />
               <Route path="orders" element={<AdminOrders />} />
+              <Route path="negotiations" element={<AdminNegotiations />} />
               <Route path="orders/:id" element={<AdminOrderDetail />} />
               <Route path="sections" element={<AdminTerms />} />
             </Route>

@@ -28,6 +28,7 @@ export function AdminLayout() {
         <nav className="av-admin__nav" aria-label="Admin">
           <NavLink to="/admin" end>Products</NavLink>
           <NavLink to="/admin/orders">Orders</NavLink>
+          <NavLink to="/admin/negotiations">Negotiations</NavLink>
           <NavLink to="/admin/sections">Sections and cuts</NavLink>
           <Link to="/" target="_blank" rel="noreferrer">View the shop</Link>
         </nav>

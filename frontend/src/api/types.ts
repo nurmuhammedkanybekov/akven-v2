@@ -140,3 +140,15 @@ export interface CheckoutBody {
   fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null };
   payment: { method: PaymentMethod; token: string };
 }
+
+// ---- negotiation ----
+
+export interface NegotiateResponse {
+  sessionId: string; reply: string; validatedDiscountPct: number; listPrice: number; offerPrice: number; expiresAt: string | null;
+  /** Present only when the server runs in demo mode (AKVEN_DEMO_EXPOSE_PROPOSAL=true). */
+  proposedDiscountPct?: number;
+}
+export interface NegotiationSessionView {
+  id: string; customerEmail: string; sku: string; productName: string; proposedDiscountPct: number | null;
+  validatedDiscountPct: number | null; clamped: boolean; transcript: string | null; createdAt: string;
+}
