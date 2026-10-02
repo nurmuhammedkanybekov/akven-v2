@@ -1,0 +1,69 @@
+/* Reset, typography and layout primitives. Everything reads from tokens.css. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; }
+h1, h2, h3, h4, p { margin: 0; }
+
+h1, h2, h3, .av-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.av-display { font-size: var(--text-display); line-height: 0.98; letter-spacing: -0.02em; }
+h1 { font-size: var(--text-h1); }
+h2 { font-size: var(--text-h2); }
+h3 { font-size: var(--text-h3); line-height: 1.15; }
+.av-lead { font-size: 1.125rem; color: var(--ink-2); max-width: 56ch; }
+.av-small { font-size: var(--text-small); color: var(--ink-2); }
+.av-muted { color: var(--ink-3); }
+
+/* Small mono label: section eyebrows, SKUs, meta. */
+.av-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.av-container {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.av-visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.av-skip-link {
+  position: absolute; left: var(--space-4); top: -4rem; z-index: 100;
+  background: var(--ink); color: var(--on-ink);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
+  transition: top var(--dur-fast) var(--ease);
+}
+.av-skip-link:focus { top: var(--space-4); }
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

@@ -1,0 +1,24 @@
+# Backend (Maven/Java)
+backend/target/
+*.class
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Uploaded product photos (runtime data, not source)
+backend/data/
+
+# Frontend (Node)
+frontend/node_modules/
+frontend/dist/
+
+# Secrets — never commit these; see backend/src/main/resources/application.yml
+.env
+.env.*
+!*.env.example
+
+# OS
+.DS_Store

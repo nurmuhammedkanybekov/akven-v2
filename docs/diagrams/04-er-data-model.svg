@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1100" width="1100" height="1100" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Eight PostgreSQL tables: app_user, customer_order, order_item, negotiation_session, variant, product, product_embedding and audit_log_entry, with one-to-many relationships between them."><title>Data model — entity-relationship diagram</title><defs></defs><rect width="1100" height="1100" fill="#ffffff"/><text x="40" y="54" font-size="30" font-weight="700" fill="#2B5A63" text-anchor="start">Data model — the eight tables</text>
+<text x="40" y="90" font-size="22" font-weight="400" fill="#555555" text-anchor="start">Key columns only; full DDL is in V1__init_schema.sql</text>
+<rect x="40" y="150" width="270" height="222" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<rect x="41.3" y="151.3" width="267.4" height="44" rx="9" fill="#e3eef0" stroke="#e3eef0" stroke-width="0"/>
+<polyline points="40,194 310,194" fill="none" stroke="#2B5A63" stroke-width="2" stroke-linejoin="round"/>
+<text x="175.0" y="181" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">audit_log_entry</text>
+<text x="54" y="220" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="296" y="220" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="54" y="248" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">actor_id</text>
+<text x="296" y="248" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="54" y="276" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">action</text>
+<text x="54" y="304" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">entity_type · entity_id</text>
+<text x="54" y="332" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">before / after_state (jsonb)</text>
+<text x="54" y="360" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">correlation_id</text>
+<rect x="415" y="150" width="270" height="222" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<rect x="416.3" y="151.3" width="267.4" height="44" rx="9" fill="#e3eef0" stroke="#e3eef0" stroke-width="0"/>
+<polyline points="415,194 685,194" fill="none" stroke="#2B5A63" stroke-width="2" stroke-linejoin="round"/>
+<text x="550.0" y="181" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">app_user</text>
+<text x="429" y="220" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="671" y="220" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="429" y="248" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">email (unique, lower-case)</text>
+<text x="429" y="276" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">password_hash (bcrypt)</text>
+<text x="429" y="304" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">role (RBAC)</text>
+<text x="429" y="332" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">is_active</text>
+<text x="429" y="360" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">version (optimistic lock)</text>
+<rect x="790" y="150" width="270" height="222" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<rect x="791.3" y="151.3" width="267.4" height="44" rx="9" fill="#e3eef0" stroke="#e3eef0" stroke-width="0"/>
+<polyline points="790,194 1060,194" fill="none" stroke="#2B5A63" stroke-width="2" stroke-linejoin="round"/>
+<text x="925.0" y="181" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">customer_order</text>
+<text x="804" y="220" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="1046" y="220" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="804" y="248" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">customer_id</text>
+<text x="1046" y="248" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="804" y="276" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">status</text>
+<text x="804" y="304" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">payment_ref (token only)</text>
+<text x="804" y="332" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="start">negotiation_session_id</text>
+<text x="804" y="360" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">version (optimistic lock)</text>
+<rect x="415" y="450" width="270" height="222" rx="10" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.6"/>
+<rect x="416.3" y="451.3" width="267.4" height="44" rx="9" fill="#ece8f5" stroke="#ece8f5" stroke-width="0"/>
+<polyline points="415,494 685,494" fill="none" stroke="#5b4b8a" stroke-width="2" stroke-linejoin="round"/>
+<text x="550.0" y="481" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">negotiation_session</text>
+<text x="429" y="520" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="671" y="520" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="429" y="548" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">customer_id</text>
+<text x="671" y="548" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="429" y="576" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">variant_id</text>
+<text x="671" y="576" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="429" y="604" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">transcript</text>
+<text x="429" y="632" font-size="20" font-weight="700" fill="#5b4b8a" text-anchor="start">proposed_discount_pct</text>
+<text x="429" y="660" font-size="20" font-weight="700" fill="#2e7d46" text-anchor="start">validated_discount_pct</text>
+<rect x="790" y="450" width="270" height="222" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<rect x="791.3" y="451.3" width="267.4" height="44" rx="9" fill="#e3eef0" stroke="#e3eef0" stroke-width="0"/>
+<polyline points="790,494 1060,494" fill="none" stroke="#2B5A63" stroke-width="2" stroke-linejoin="round"/>
+<text x="925.0" y="481" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">order_item</text>
+<text x="804" y="520" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="1046" y="520" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="804" y="548" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">order_id</text>
+<text x="1046" y="548" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="804" y="576" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">variant_id</text>
+<text x="1046" y="576" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="804" y="604" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">quantity</text>
+<text x="804" y="632" font-size="20" font-weight="700" fill="#2e7d46" text-anchor="start">agreed_price (validated)</text>
+<text x="804" y="660" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="start">unique (order, variant)</text>
+<rect x="40" y="750" width="270" height="222" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<rect x="41.3" y="751.3" width="267.4" height="44" rx="9" fill="#e3eef0" stroke="#e3eef0" stroke-width="0"/>
+<polyline points="40,794 310,794" fill="none" stroke="#2B5A63" stroke-width="2" stroke-linejoin="round"/>
+<text x="175.0" y="781" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">product</text>
+<text x="54" y="820" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="296" y="820" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="54" y="848" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">slug (unique)</text>
+<text x="54" y="876" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">name</text>
+<text x="54" y="904" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">collection</text>
+<text x="54" y="932" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">description</text>
+<text x="54" y="960" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">is_active (soft delete)</text>
+<rect x="415" y="750" width="270" height="222" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<rect x="416.3" y="751.3" width="267.4" height="44" rx="9" fill="#e3eef0" stroke="#e3eef0" stroke-width="0"/>
+<polyline points="415,794 685,794" fill="none" stroke="#2B5A63" stroke-width="2" stroke-linejoin="round"/>
+<text x="550.0" y="781" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">variant</text>
+<text x="429" y="820" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="671" y="820" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="429" y="848" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">product_id</text>
+<text x="671" y="848" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="429" y="876" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">sku (unique)</text>
+<text x="429" y="904" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">price · cost_price</text>
+<text x="429" y="932" font-size="20" font-weight="700" fill="#2e7d46" text-anchor="start">margin_floor_pct</text>
+<text x="429" y="960" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">stock · reserved · available</text>
+<rect x="790" y="750" width="270" height="222" rx="10" fill="#ffffff" stroke="#5b4b8a" stroke-width="2.6"/>
+<rect x="791.3" y="751.3" width="267.4" height="44" rx="9" fill="#ece8f5" stroke="#ece8f5" stroke-width="0"/>
+<polyline points="790,794 1060,794" fill="none" stroke="#5b4b8a" stroke-width="2" stroke-linejoin="round"/>
+<text x="925.0" y="781" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">product_embedding</text>
+<text x="804" y="820" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">id</text>
+<text x="1046" y="820" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="end">PK</text>
+<text x="804" y="848" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">variant_id</text>
+<text x="1046" y="848" font-size="20" font-weight="700" fill="#555555" text-anchor="end">FK</text>
+<text x="804" y="876" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">chunk_index</text>
+<text x="804" y="904" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">content</text>
+<text x="804" y="932" font-size="20" font-weight="700" fill="#5b4b8a" text-anchor="start">embedding vector(1536)</text>
+<text x="804" y="960" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="start">unique (variant, chunk)</text>
+<rect x="40" y="450" width="270" height="222" rx="10" fill="#f4f4f4" stroke="#d0d0d0" stroke-width="2"/>
+<text x="54" y="481" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="start">Legend</text>
+<text x="54" y="518" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="start">PK</text>
+<text x="92" y="518" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">primary key</text>
+<text x="54" y="546" font-size="20" font-weight="700" fill="#555555" text-anchor="start">FK</text>
+<text x="92" y="546" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">foreign key</text>
+<text x="54" y="574" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start">1 — *</text>
+<text x="128" y="574" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">one-to-many</text>
+<polyline points="54,596 110,596" fill="none" stroke="#555555" stroke-width="2.4" stroke-dasharray="8 6" stroke-linejoin="round"/>
+<text x="122" y="602" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">logical link, no FK</text>
+<text x="54" y="630" font-size="20" font-weight="700" fill="#5b4b8a" text-anchor="start">proposed</text>
+<text x="152" y="630" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">untrusted</text>
+<text x="54" y="658" font-size="20" font-weight="700" fill="#2e7d46" text-anchor="start">validated</text>
+<text x="152" y="658" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">enforced</text>
+<polyline points="310,270 415,270" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="316" y="262" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<text x="409" y="262" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<polyline points="685,220 790,220" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="691" y="212" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<text x="784" y="212" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<polyline points="550.0,372 550.0,450" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="560.0" y="396" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<text x="560.0" y="440" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<polyline points="925.0,372 925.0,450" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="935.0" y="396" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<text x="935.0" y="440" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<polyline points="550.0,672 550.0,750" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="560.0" y="696" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<text x="560.0" y="740" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<polyline points="310,820 415,820" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="316" y="812" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<text x="409" y="812" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<polyline points="685,900 790,900" fill="none" stroke="#5b4b8a" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="691" y="892" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<text x="784" y="892" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<polyline points="790,620 750,620 750,820 685,820" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="784" y="612" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">*</text>
+<text x="691" y="812" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">1</text>
+<polyline points="685,513 715,513 715,325 790,325" fill="none" stroke="#555555" stroke-width="2.4" stroke-dasharray="8 6" stroke-linejoin="round"/>
+<text x="40" y="1036" font-size="20" font-weight="400" fill="#555555" text-anchor="start">Database-level guards:  validated ≤ proposed discount  ·  stock ≥ reserved</text>
+<text x="40" y="1064" font-size="20" font-weight="400" fill="#555555" text-anchor="start">one order_item per SKU per order  ·  case-insensitive unique email</text></svg>

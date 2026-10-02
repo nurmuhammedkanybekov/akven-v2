@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1230" width="1100" height="1230" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Sequence of one negotiation turn: the customer&#x27;s message reaches the Negotiation API, which loads the variant, asks the untrusted negotiator for a proposal, has the Policy Validator clamp it to the margin floor, stores both values and replies with the validated discount."><title>One negotiation turn — sequence diagram</title><defs><marker id="m-filled-1b1b1b" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L13,7 L0,13 z" fill="#1b1b1b"/></marker><marker id="m-filled-2B5A63" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L13,7 L0,13 z" fill="#2B5A63"/></marker><marker id="m-filled-2e7d46" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L13,7 L0,13 z" fill="#2e7d46"/></marker><marker id="m-filled-5b4b8a" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L13,7 L0,13 z" fill="#5b4b8a"/></marker><marker id="m-open-1b1b1b" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1,1 L13,7 L1,13" fill="none" stroke="#1b1b1b" stroke-width="2"/></marker><marker id="m-open-2B5A63" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1,1 L13,7 L1,13" fill="none" stroke="#2B5A63" stroke-width="2"/></marker><marker id="m-open-2e7d46" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1,1 L13,7 L1,13" fill="none" stroke="#2e7d46" stroke-width="2"/></marker><marker id="m-open-5b4b8a" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1,1 L13,7 L1,13" fill="none" stroke="#5b4b8a" stroke-width="2"/></marker></defs><rect width="1100" height="1230" fill="#ffffff"/><text x="40" y="54" font-size="30" font-weight="700" fill="#2B5A63" text-anchor="start">One negotiation turn — who talks to whom</text>
+<text x="40" y="90" font-size="22" font-weight="400" fill="#555555" text-anchor="start">The proposal is data; only the validator's answer is stored and offered</text>
+<rect x="40.0" y="124" width="160" height="72" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<text x="120" y="156" font-size="21" font-weight="700" fill="#1b1b1b" text-anchor="middle">Customer UI</text>
+<text x="120" y="182" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle">React app</text>
+<polyline points="120,196 120,1125" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-dasharray="8 7" stroke-linejoin="round"/>
+<rect x="240.0" y="124" width="200" height="72" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<text x="340" y="156" font-size="21" font-weight="700" fill="#1b1b1b" text-anchor="middle">Negotiation API</text>
+<text x="340" y="182" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle">Spring Boot</text>
+<polyline points="340,196 340,1125" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-dasharray="8 7" stroke-linejoin="round"/>
+<rect x="480.0" y="124" width="160" height="72" rx="10" fill="#ffffff" stroke="#2B5A63" stroke-width="2.6"/>
+<text x="560" y="156" font-size="21" font-weight="700" fill="#1b1b1b" text-anchor="middle">Database</text>
+<text x="560" y="182" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle">PostgreSQL</text>
+<polyline points="560,196 560,1125" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-dasharray="8 7" stroke-linejoin="round"/>
+<rect x="680.0" y="124" width="160" height="72" rx="10" fill="#ece8f5" stroke="#5b4b8a" stroke-width="2.6"/>
+<text x="760" y="156" font-size="21" font-weight="700" fill="#1b1b1b" text-anchor="middle">Negotiator</text>
+<text x="760" y="182" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle">untrusted</text>
+<polyline points="760,196 760,1125" fill="none" stroke="#5b4b8a" stroke-width="2" stroke-dasharray="8 7" stroke-linejoin="round"/>
+<rect x="872.0" y="124" width="176" height="72" rx="10" fill="#e3f1e7" stroke="#2e7d46" stroke-width="2.6"/>
+<text x="960" y="156" font-size="21" font-weight="700" fill="#1b1b1b" text-anchor="middle">Policy Validator</text>
+<text x="960" y="182" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle">trusted</text>
+<polyline points="960,196 960,1125" fill="none" stroke="#2e7d46" stroke-width="2" stroke-dasharray="8 7" stroke-linejoin="round"/>
+<polyline points="120,268 339,268" fill="none" stroke="#1b1b1b" stroke-width="2.6" marker-end="url(#m-filled-1b1b1b)" stroke-linejoin="round"/>
+<rect x="128.5484375" y="212" width="202.903125" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="230.0" y="231" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">POST /api/negotiate</text>
+<rect x="122.9453125" y="237" width="214.109375" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="230.0" y="256" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">{variantSku, message}</text>
+<text x="40" y="275" font-size="20" font-weight="700" fill="#555555" text-anchor="start">1</text>
+<polyline points="340,368 559,368" fill="none" stroke="#2B5A63" stroke-width="2.6" marker-end="url(#m-filled-2B5A63)" stroke-linejoin="round"/>
+<rect x="386.8765625" y="337" width="126.246875" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="450.0" y="356" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">load variant</text>
+<text x="40" y="375" font-size="20" font-weight="700" fill="#555555" text-anchor="start">2</text>
+<polyline points="560,468 341,468" fill="none" stroke="#2B5A63" stroke-width="2.6" stroke-dasharray="9 6" marker-end="url(#m-open-2B5A63)" stroke-linejoin="round"/>
+<rect x="389.653125" y="412" width="120.69375" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="450.0" y="431" font-size="20" font-weight="400" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">price, stock,</text>
+<rect x="375.20625" y="437" width="149.5875" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="450.0" y="456" font-size="20" font-weight="400" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">marginFloorPct</text>
+<text x="40" y="475" font-size="20" font-weight="700" fill="#555555" text-anchor="start">3</text>
+<polyline points="340,568 759,568" fill="none" stroke="#5b4b8a" stroke-width="2.6" marker-end="url(#m-filled-5b4b8a)" stroke-linejoin="round"/>
+<rect x="415.7203125" y="512" width="268.559375" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="550.0" y="531" font-size="20" font-weight="700" fill="#5b4b8a" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">ask(message, price, stock)</text>
+<rect x="447.4015625" y="537" width="205.196875" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="550.0" y="556" font-size="20" font-weight="400" fill="#5b4b8a" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">the floor is never sent</text>
+<text x="40" y="575" font-size="20" font-weight="700" fill="#555555" text-anchor="start">4</text>
+<polyline points="760,668 341,668" fill="none" stroke="#5b4b8a" stroke-width="2.6" stroke-dasharray="9 6" marker-end="url(#m-open-5b4b8a)" stroke-linejoin="round"/>
+<rect x="425.4328125" y="637" width="249.134375" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="550.0" y="656" font-size="20" font-weight="400" fill="#5b4b8a" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">proposedDiscountPct = 25</text>
+<text x="40" y="675" font-size="20" font-weight="700" fill="#555555" text-anchor="start">5</text>
+<polyline points="340,768 959,768" fill="none" stroke="#2e7d46" stroke-width="2.6" marker-end="url(#m-filled-2e7d46)" stroke-linejoin="round"/>
+<rect x="516.86875" y="737" width="266.2625" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="650.0" y="756" font-size="20" font-weight="700" fill="#2e7d46" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">clamp(25, marginFloorPct)</text>
+<text x="40" y="775" font-size="20" font-weight="700" fill="#555555" text-anchor="start">6</text>
+<polyline points="960,868 341,868" fill="none" stroke="#2e7d46" stroke-width="2.6" stroke-dasharray="9 6" marker-end="url(#m-open-2e7d46)" stroke-linejoin="round"/>
+<rect x="527.1015625" y="837" width="245.796875" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="650.0" y="856" font-size="20" font-weight="400" fill="#2e7d46" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">validatedDiscountPct = 15</text>
+<text x="40" y="875" font-size="20" font-weight="700" fill="#555555" text-anchor="start">7</text>
+<polyline points="340,993 559,993" fill="none" stroke="#2B5A63" stroke-width="2.6" marker-end="url(#m-filled-2B5A63)" stroke-linejoin="round"/>
+<rect x="380.740625" y="912" width="138.51875" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="450.0" y="931" font-size="20" font-weight="700" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">save session</text>
+<rect x="387.4046875" y="937" width="125.190625" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="450.0" y="956" font-size="20" font-weight="400" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">proposed 25</text>
+<rect x="389.0734375" y="962" width="121.853125" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="450.0" y="981" font-size="20" font-weight="400" fill="#2B5A63" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">validated 15</text>
+<text x="40" y="1000" font-size="20" font-weight="700" fill="#555555" text-anchor="start">8</text>
+<polyline points="340,1098 121,1098" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-dasharray="9 6" marker-end="url(#m-open-1b1b1b)" stroke-linejoin="round"/>
+<rect x="170.103125" y="1042" width="119.79375" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="230.0" y="1061" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">reply + offer</text>
+<rect x="186.49375" y="1067" width="87.0125" height="25" rx="4" fill="#ffffff" stroke="#ffffff" stroke-width="0"/>
+<text x="230.0" y="1086" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">15 % off</text>
+<text x="40" y="1105" font-size="20" font-weight="700" fill="#555555" text-anchor="start">9</text>
+<rect x="40" y="1150" width="1020" height="56" rx="12" fill="#f4f4f4" stroke="#d0d0d0" stroke-width="2"/>
+<text x="550" y="1187" font-size="22" font-weight="700" fill="#1b1b1b" text-anchor="middle">Stored: proposed 25 and validated 15, always separately</text></svg>

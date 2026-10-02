@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 950" width="1100" height="950" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="UML use-case diagram for staff and admin: Staff authenticates, reviews negotiation transcripts and manages the catalog; Admin inherits all of that and additionally sets margin floors, manages users and views the audit log. Catalog and user changes include recording an audit entry."><title>Use cases — staff and admin side</title><defs><marker id="m-gen-333333" viewBox="0 0 20 20" refX="19" refY="10" markerWidth="20" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1,1 L19,10 L1,19 z" fill="#ffffff" stroke="#333333" stroke-width="2"/></marker><marker id="m-open-555555" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1,1 L13,7 L1,13" fill="none" stroke="#555555" stroke-width="2"/></marker></defs><rect width="1100" height="950" fill="#ffffff"/><text x="40" y="54" font-size="30" font-weight="700" fill="#2B5A63" text-anchor="start">Use cases — staff and admin</text>
+<text x="40" y="90" font-size="22" font-weight="400" fill="#555555" text-anchor="start">Admin is a Staff member with extra rights</text>
+<rect x="180" y="168" width="650" height="660" rx="14" fill="none" stroke="#2B5A63" stroke-width="2.6"/>
+<text x="200" y="204" font-size="22" font-weight="700" fill="#2B5A63" text-anchor="start">Ak&amp;Ven admin panel</text>
+<ellipse cx="330" cy="290" rx="125" ry="46" fill="#e3eef0" stroke="#2B5A63" stroke-width="2.4"/>
+<text x="330" y="297" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Authenticate</text>
+<ellipse cx="330" cy="430" rx="125" ry="46" fill="#e3eef0" stroke="#2B5A63" stroke-width="2.4"/>
+<text x="330" y="423" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Review Negotiation</text>
+<text x="330" y="447" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Transcripts</text>
+<ellipse cx="330" cy="590" rx="125" ry="46" fill="#e3eef0" stroke="#2B5A63" stroke-width="2.4"/>
+<text x="330" y="597" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Manage Catalog</text>
+<ellipse cx="330" cy="750" rx="125" ry="46" fill="#ffffff" stroke="#2B5A63" stroke-width="2.4"/>
+<text x="330" y="757" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Record Audit Entry</text>
+<ellipse cx="690" cy="430" rx="125" ry="46" fill="#e3eef0" stroke="#2B5A63" stroke-width="2.4"/>
+<text x="690" y="437" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">View Audit Log</text>
+<ellipse cx="690" cy="590" rx="125" ry="46" fill="#e3f1e7" stroke="#2e7d46" stroke-width="2.4"/>
+<text x="690" y="583" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Set Margin Floor</text>
+<text x="690" y="607" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">(Admin only)</text>
+<ellipse cx="690" cy="750" rx="125" ry="46" fill="#e3eef0" stroke="#2B5A63" stroke-width="2.4"/>
+<text x="690" y="757" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Manage Users</text>
+<polyline points="564.0,590.0 458.0,590.0" fill="none" stroke="#555555" stroke-width="2.4" stroke-dasharray="9 6" marker-end="url(#m-open-555555)" stroke-linejoin="round"/>
+<text x="511.0" y="580.0" font-size="20" font-weight="400" fill="#555555" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">«extend»</text>
+<polyline points="330.0,637.0 330.0,701.0" fill="none" stroke="#555555" stroke-width="2.4" stroke-dasharray="9 6" marker-end="url(#m-open-555555)" stroke-linejoin="round"/>
+<text x="342.0" y="676.0" font-size="20" font-weight="400" fill="#555555" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">«include»</text>
+<polyline points="564.0,750.0 458.0,750.0" fill="none" stroke="#555555" stroke-width="2.4" stroke-dasharray="9 6" marker-end="url(#m-open-555555)" stroke-linejoin="round"/>
+<text x="511.0" y="740.0" font-size="20" font-weight="400" fill="#555555" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">«include»</text>
+<ellipse cx="92" cy="380" rx="13" ry="13" fill="#ffffff" stroke="#1b1b1b" stroke-width="2.6"/>
+<polyline points="92,393 92,438" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="68,412 116,412" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="92,438 72,472" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="92,438 112,472" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="92" y="502" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="middle">Staff</text>
+<polyline points="116,412 158,412" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="158,290 158,590" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="158,290 204,290" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="158,430 204,430" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="158,590 204,590" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="968" cy="520" rx="13" ry="13" fill="#ffffff" stroke="#1b1b1b" stroke-width="2.6"/>
+<polyline points="968,533 968,578" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="944,552 992,552" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="968,578 948,612" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="968,578 988,612" fill="none" stroke="#1b1b1b" stroke-width="2.6" stroke-linejoin="round"/>
+<text x="968" y="642" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="middle">Admin</text>
+<polyline points="944,552 862,552" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="862,430 862,750" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="862,430 816,430" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="862,590 816,590" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="862,750 816,750" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="968,505 968,140 92,140 92,364" fill="none" stroke="#333333" stroke-width="2.4" marker-end="url(#m-gen-333333)" stroke-linejoin="round"/>
+<text x="540" y="130" font-size="20" font-weight="400" font-style="italic" fill="#555555" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="7" stroke-linejoin="round">inherits</text>
+<polyline points="40,874 1060,874" fill="none" stroke="#d0d0d0" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="40,908 100,908" fill="none" stroke="#333333" stroke-width="2.4" stroke-linejoin="round"/>
+<text x="112" y="915" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">association</text>
+<polyline points="270,908 340,908" fill="none" stroke="#555555" stroke-width="2.4" stroke-dasharray="9 6" marker-end="url(#m-open-555555)" stroke-linejoin="round"/>
+<text x="352" y="915" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">«include» / «extend»</text>
+<polyline points="650,908 710,908" fill="none" stroke="#333333" stroke-width="2.4" marker-end="url(#m-gen-333333)" stroke-linejoin="round"/>
+<text x="724" y="915" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="start">generalization</text></svg>

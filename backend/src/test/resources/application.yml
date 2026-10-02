@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:akven-test;MODE=PostgreSQL
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false   # pgvector/pgcrypto in V1 are Postgres-only; the smoke test just needs the context to load
+
+# Test's own application.yml replaces (not merges with) the main one on the test
+# classpath, so JwtService's required properties need an explicit value here too.
+akven:
+  jwt:
+    secret: test-only-secret-key-not-for-production-use-1234567890
+    expiration-minutes: 60
+  cors:
+    allowed-origins: http://localhost:5173
+  media:
+    dir: ${java.io.tmpdir}/akven-test-media

@@ -1,0 +1,52 @@
+# Minimal CI now; grows into the Milestone 3 requirement (CI/CD running,
+# >80% test coverage on the model layer) as the negotiation module lands.
+stages:
+  - test
+
+backend-test:
+  stage: test
+  image: maven:3.9-eclipse-temurin-21
+  cache:
+    key:
+      files:
+        - backend/pom.xml
+    paths:
+      - .m2/repository
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  script:
+    - cd backend
+    # `verify` = tests + the JaCoCo gate (fails below 80% line coverage).
+    - mvn $MAVEN_OPTS -B verify
+    - |
+      awk -F, 'NR>1 {m+=$8; c+=$9} END {printf "Line coverage: %.1f%%\n", 100*c/(m+c)}' target/site/jacoco/jacoco.csv
+  coverage: '/Line coverage: (\d+\.\d+)%/'
+  artifacts:
+    when: always
+    paths:
+      - backend/target/site/jacoco/
+    reports:
+      junit:
+        - backend/target/surefire-reports/TEST-*.xml
+  rules:
+    - changes:
+        - backend/**/*
+
+frontend-test:
+  stage: test
+  image: node:22
+  cache:
+    key:
+      files:
+        - frontend/package-lock.json
+    paths:
+      - .npm
+  script:
+    - cd frontend
+    - npm ci --cache ../.npm --prefer-offline
+    - npx tsc --noEmit
+    - npm test
+    - npm run build
+  rules:
+    - changes:
+        - frontend/**/*

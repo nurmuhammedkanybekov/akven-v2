@@ -1,0 +1,13 @@
+# Used only by PostgresIntegrationTest (profile "pg"): the real database, the real migrations
+# (including demo seed) and Hibernate schema validation, which H2 tests deliberately skip.
+spring:
+  datasource:
+    url: ${AKVEN_PG_URL}
+    username: ${AKVEN_PG_USER:akven}
+    password: ${AKVEN_PG_PASSWORD:akven}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/seed
