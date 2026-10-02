@@ -206,3 +206,27 @@ jobs:
       - name: Show the backend log on failure
         if: failure()
         run: cat app.log
+
+  docker-compose-smoke:
+    name: Docker demo starts and serves the shop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the demo
+        run: docker compose up -d --build
+      - name: Wait for the shop and check that the API answers through it
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS http://localhost:8081/api/products > products.json 2>/dev/null; then echo "up after ${i}s"; break; fi
+            sleep 2
+          done
+          test -s products.json
+          curl -fsS http://localhost:8081/ | grep -q '<div id="root">'
+          curl -fsS http://localhost:8081/products/does-not-exist | grep -q '<div id="root">'   # a deep link still gets the app
+          curl -fsS http://localhost:8081/actuator/health 2>/dev/null | grep -q UP || true
+      - name: Show the logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Stop
+        if: always()
+        run: docker compose down -v

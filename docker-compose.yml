@@ -1,0 +1,40 @@
+# One-command demo: docker compose up --build   then open http://localhost:8081
+# Demo accounts: admin@akven.test / changeme-admin and staff@akven.test / changeme-staff (demo profile).
+# This is for trying and presenting the project. A real deployment runs with SPRING_PROFILES_ACTIVE=prod and a real JWT_SECRET.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: akven
+      POSTGRES_USER: akven
+      POSTGRES_PASSWORD: akven
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U akven -d akven"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/akven
+      DB_USER: akven
+      DB_PASSWORD: akven
+    volumes:
+      - media:/data/media
+
+  web:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "8081:80"
+
+volumes:
+  dbdata:
+  media:
