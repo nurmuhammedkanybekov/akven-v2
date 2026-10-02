@@ -1,6 +1,6 @@
 # Ak&Ven — Architecture
 
-See [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) for the system diagram this document describes, [`diagrams/02-negotiation-validation-path.svg`](./diagrams/02-negotiation-validation-path.svg) for the Policy Validator trust boundary, [`diagrams/03-sequence-negotiation-turn.svg`](./diagrams/03-sequence-negotiation-turn.svg) for one negotiation turn, and [`diagrams/04-er-data-model.svg`](./diagrams/04-er-data-model.svg) for the data model.
+See [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) for the system diagram this document describes, [`diagrams/02-negotiation-validation-path.svg`](./diagrams/02-negotiation-validation-path.svg) for the Policy Validator trust boundary, [`diagrams/03-sequence-negotiation-turn.svg`](./diagrams/03-sequence-negotiation-turn.svg) for one negotiation turn, and [`diagrams/04b-er-core.svg`](./diagrams/04b-er-core.svg) (core tables) and [`diagrams/04-er-data-model.svg`](./diagrams/04-er-data-model.svg) (full schema, migrations V1 to V10) for the data model.
 
 ## Why this shape
 
