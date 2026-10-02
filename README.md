@@ -176,6 +176,16 @@ the margin floor before it is stored or shown, the reply the customer reads is a
 numbers, and both the proposal and the validated value are kept. Customers only get the validated value. To show both
 side by side in a demo, start the backend with `AKVEN_DEMO_EXPOSE_PROPOSAL=true`. Try asking for "50% off" on any product.
 
+**The assistant (rules or a language model).** By default a deterministic rule-based assistant answers. To use a real
+model, set `NEGOTIATION_PROVIDER=llm` and `LLM_API_KEY` (copy `.env.example` to `.env`, which git ignores; Docker reads
+it). It talks to any OpenAI-compatible API: Google Gemini by default, or free and local with Ollama
+(`LLM_BASE_URL=http://localhost:11434/v1`, `LLM_MODEL=llama3.2`, no key). The model is never told the margin floor or
+cost price; it gets product facts retrieved from the catalog (fabric, care, origin ...) and the customer's message
+fenced as data. It must write placeholders instead of numbers: a reply that states any price, percentage or number
+(digits or words, apart from the customer's own quantity) is replaced by a safe template, the discount is clamped by
+the `PolicyValidator`, and if the model is down, slow or returns garbage the rule-based assistant answers instead.
+The transcript records which assistant answered (`llm`, `rules`, `rules-fallback`).
+
 **Safety rules built into checkout:** the server decides every price (a negotiated price applies only if it is that
 customer's, for that item, recent, unused, and never below the margin floor); the last pair can only be sold once
 (rows are locked while stock is checked); pressing pay twice cannot pay twice (idempotency key); an order is only
