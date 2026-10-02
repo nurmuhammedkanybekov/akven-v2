@@ -72,7 +72,7 @@ Grouped by the module each maps to in the architecture (Catalog & Orders, Negoti
 | NFR-7 | Maintainability | Every admin-facing mutation is auditable after the fact via the audit log (FR-13), without needing to inspect application logs. |
 | NFR-8 | Testability | The Policy Validator and negotiation-policy logic are unit-testable independent of the LLM call, since they are the component the Milestone 3 coverage bar (>80% on the model layer) applies to. |
 | NFR-9 | Portability | The frontend is a single installable PWA serving both customer and admin roles through gated routes, not two separate applications. |
-| NFR-10 | Operability | The backend builds and tests automatically in CI on every push (GitLab CI), per `.gitlab-ci.yml`. |
+| NFR-10 | Operability | The backend and frontend build and test automatically in CI on every push (GitLab CI per `.gitlab-ci.yml`; the same checks also run on GitHub Actions). |
 | NFR-11 | Usability / Portability | The customer-facing storefront (UC-1–UC-4) is responsive across three breakpoints — phone, tablet, and laptop/desktop — and behaves equivalently whether accessed as a mobile-browser tab or as the installed PWA in standalone display mode (same layout and functionality; only the browser chrome vs. OS status-bar framing differs). The admin/staff panel (UC-6–UC-9) is optimized primarily for laptop/desktop use, with a supported tablet layout for on-the-floor checks at Dordoi Bazaar; a dedicated phone-optimized admin layout is out of scope this semester — admin routes remain reachable on a phone through the shared responsive PWA, just without a bespoke small-screen design pass. |
 
 ## 6. Constraints
@@ -91,9 +91,12 @@ Grouped by the module each maps to in the architecture (Catalog & Orders, Negoti
 
 ## 8. Status
 
+Implementation status of every requirement, with the tests that show it, is in [`traceability.md`](traceability.md).
+
+
 - [x] Actors and use cases identified
 - [x] Functional and non-functional requirements drafted
 - [x] Multi-device scope clarified (NFR-11: phone web + installed PWA, tablet, laptop for the storefront; laptop-primary + tablet for admin)
 - [ ] Reviewed with Prof. Guettala
 - [x] Use-case diagram (drawn directly from §3.1 — verified against this document, no gaps found)
-- [ ] Wireframes for the 5 key screens across the full breakpoint matrix (catalog, product/cart, checkout, negotiation chat — phone browser + installed PWA, tablet, laptop; admin dashboard — laptop + tablet)
+- [x] Wireframes for the 5 key screens across the full breakpoint matrix (catalog, product/cart, checkout, negotiation chat — phone browser + installed PWA, tablet, laptop; admin dashboard — laptop + tablet)

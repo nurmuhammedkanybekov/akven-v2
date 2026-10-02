@@ -132,7 +132,7 @@ violation, margin-invariant violation, duplicate email by case, and
       scheme pre-declared so "Authorize" works the moment real tokens exist
 - [x] Use-case diagram, wireframes (full device matrix), requirement analysis (incl. NFR-11)
 
-**Milestone 2 (due 20 Oct) — in progress:**
+**Milestone 2 (due 20 Oct) — built; not yet pushed to GitLab (see [`progress.md`](progress.md)):**
 
 - [x] Real authentication: `POST /api/auth/register`, `/login`, `/me`, backed by a real
       `JwtAuthenticationFilter` and a Spring Security `UserDetailsService` — see Security below
