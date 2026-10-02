@@ -1,7 +1,5 @@
 package com.akven.thesis.negotiation;
 
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -13,7 +11,6 @@ import java.util.regex.Pattern;
  * bundles earns a better price. It agrees to explicit asks without looking at any limit, on purpose: that is what
  * lets the tests and the defence demo show the PolicyValidator catching an over-generous assistant.
  */
-@Component
 public class RuleBasedNegotiator implements Negotiator {
 
     private static final Pattern PERCENT = Pattern.compile("(\\d{1,3}(?:[.,]\\d{1,2})?)\\s*(?:%|percent|per cent)", Pattern.CASE_INSENSITIVE);

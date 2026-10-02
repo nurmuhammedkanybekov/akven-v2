@@ -205,6 +205,13 @@ violation, margin-invariant violation, duplicate email by case, and
       `/api/admin/negotiations`. Offers feed checkout through `negotiationSessionId`, where they are re-checked
       and clamped again. An offer remembers the number of pairs it was negotiated for (V10) and only applies to an
       order of at least that many, so a 10-pair price cannot be used on one pair. The Milestone 3 LLM replaces only `Negotiator`.
+- [x] Language-model assistant (Milestone 3, first part). `LlmNegotiator` behind `FallbackNegotiator`, chosen by
+      `NEGOTIATION_PROVIDER`. Provider-agnostic HTTP client (OpenAI-compatible chat API: Gemini, Ollama, Groq ...).
+      Retrieval step `ProductKnowledge` selects the catalog facts most relevant to the question. Defences: the model
+      never sees cost or floor; the customer's text is fenced as data; replies containing numbers are replaced; the
+      discount is clamped; any failure falls back to the rules. Tested with a fake provider server and a
+      full-flow test where the assistant offers 80% (capped at the floor). Verified once against the live Gemini API,
+      including a prompt-injection attempt. Still to do: embedding-based retrieval with pgvector.
 - [ ] `requirement-analysis.md` / use-case diagram updated for the Home screen and
       Men/Women/Kids/Bundles taxonomy that comes with locking in that design direction
 

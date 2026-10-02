@@ -25,6 +25,10 @@ services:
       DB_URL: jdbc:postgresql://db:5432/akven
       DB_USER: akven
       DB_PASSWORD: akven
+      NEGOTIATION_PROVIDER: ${NEGOTIATION_PROVIDER:-rule}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.5-flash-lite}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai}
     volumes:
       - media:/data/media
 

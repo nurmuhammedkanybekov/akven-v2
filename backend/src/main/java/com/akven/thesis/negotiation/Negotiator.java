@@ -13,8 +13,13 @@ public interface Negotiator {
      * @param discountPct   the discount the assistant wants to give, in percent. May be anything, including too much.
      * @param replyTemplate what to say. It may contain {pct} and {price}, which are filled in with the VALIDATED
      *                      discount and price, so the customer never reads a number the policy did not approve.
+     * @param source        which assistant produced it ("rules", "llm", "rules-fallback"), kept in the transcript.
      */
-    record Proposal(BigDecimal discountPct, String replyTemplate) {}
+    record Proposal(BigDecimal discountPct, String replyTemplate, String source) {
+        public Proposal(BigDecimal discountPct, String replyTemplate) {
+            this(discountPct, replyTemplate, "rules");
+        }
+    }
 
     Proposal propose(NegotiationContext context);
 }

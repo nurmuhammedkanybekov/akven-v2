@@ -36,6 +36,7 @@ public class NegotiationService {
     static final String NO_DISCOUNT_REPLY = "I cannot go below the list price on this one, {price} a pair. A bigger order or a bundle may open up a better price.";
 
     private final Negotiator negotiator;
+    private final ProductKnowledge knowledge;
     private final PolicyValidator policy;
     private final VariantRepository variants;
     private final UserRepository users;
@@ -45,11 +46,12 @@ public class NegotiationService {
     private final Duration offerTtl;
     private final boolean exposeProposal;
 
-    public NegotiationService(Negotiator negotiator, PolicyValidator policy, VariantRepository variants, UserRepository users,
+    public NegotiationService(Negotiator negotiator, ProductKnowledge knowledge, PolicyValidator policy, VariantRepository variants, UserRepository users,
                               NegotiationSessionRepository sessions, NegotiationRateLimiter limiter, AuditService audit,
                               @Value("${akven.negotiation.offer-ttl-hours:24}") long offerTtlHours,
                               @Value("${akven.demo.expose-proposal:false}") boolean exposeProposal) {
         this.negotiator = negotiator;
+        this.knowledge = knowledge;
         this.policy = policy;
         this.variants = variants;
         this.users = users;
@@ -72,7 +74,8 @@ public class NegotiationService {
         BigDecimal list = variant.getPrice();
 
         Negotiator.Proposal proposal = negotiator.propose(new NegotiationContext(
-                variant.getProduct().getName(), label(variant), list, quantity, request.message()));
+                variant.getProduct().getName(), label(variant), list, quantity, request.message(),
+                knowledge.retrieve(variant.getProduct(), variant, request.message(), 4)));
         BigDecimal proposed = proposal.discountPct() == null ? BigDecimal.ZERO : proposal.discountPct().max(BigDecimal.ZERO);
         BigDecimal validated = policy.clamp(proposed, variant);
         BigDecimal offer = list.multiply(BigDecimal.valueOf(100).subtract(validated)).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
@@ -83,11 +86,11 @@ public class NegotiationService {
         String reply = fill(template, validated, offer);
 
         NegotiationSession session = new NegotiationSession(customer, variant, quantity);
-        session.recordOutcome("Customer: " + request.message().strip() + "\nAssistant (as proposed): " + proposal.replyTemplate()
+        session.recordOutcome("Customer: " + request.message().strip() + "\nAssistant [" + proposal.source() + "] (as proposed): " + proposal.replyTemplate()
                 + "\nAssistant (as sent): " + reply, proposed, validated);
         sessions.saveAndFlush(session);
         audit.record(customerEmail, "NEGOTIATION", "NEGOTIATION_SESSION", session.getId(), null,
-                Map.of("sku", variant.getSku(), "quantity", quantity, "proposedPct", proposed, "validatedPct", validated));
+                Map.of("sku", variant.getSku(), "quantity", quantity, "assistant", proposal.source(), "proposedPct", proposed, "validatedPct", validated));
 
         return new NegotiateResponse(session.getId(), reply, validated, list, offer,
                 session.getCreatedAt() == null ? null : session.getCreatedAt().plus(offerTtl), exposeProposal ? proposed : null);
