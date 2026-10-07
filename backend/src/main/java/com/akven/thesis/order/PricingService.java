@@ -24,7 +24,12 @@ import java.util.UUID;
 @Service
 public class PricingService {
 
-    public record PricedLine(BigDecimal listPrice, BigDecimal discountPct, BigDecimal unitPrice, UUID sessionId) {}
+    /**
+     * @param tierDiscountPct what the collection tier offered for this line
+     * @param capped true when the sock's own limit cut the discount down
+     */
+    public record PricedLine(BigDecimal listPrice, BigDecimal discountPct, BigDecimal unitPrice, UUID sessionId,
+                             BigDecimal tierDiscountPct, DiscountSource source, boolean capped) {}
 
     private final NegotiationSessionRepository sessions;
     private final OrderItemRepository orderItems;
@@ -39,11 +44,17 @@ public class PricingService {
         this.offerTtl = Duration.ofHours(offerTtlHours);
     }
 
-    /** @throws BusinessRuleException when an offer was given but cannot be honoured (the message is customer-readable). */
-    public PricedLine price(Variant variant, UUID negotiationSessionId, User customer, int quantity) {
-        BigDecimal list = variant.getPrice();
+    /**
+     * The line gets the bigger of two discounts, the collection tier or a negotiated offer, and that one still passes
+     * the PolicyValidator, so neither the ladder nor the assistant can go below the sock's margin floor.
+     *
+     * @param tierDiscountPct the collection tier the whole cart reached (see CollectionPricing); zero for none
+     * @throws BusinessRuleException when an offer was given but cannot be honoured (the message is customer-readable).
+     */
+    public PricedLine price(Variant variant, UUID negotiationSessionId, User customer, int quantity, BigDecimal tierDiscountPct) {
+        BigDecimal tier = tierDiscountPct == null || tierDiscountPct.signum() < 0 ? BigDecimal.ZERO : tierDiscountPct;
         if (negotiationSessionId == null) {
-            return new PricedLine(list, BigDecimal.ZERO, list, null);
+            return decide(variant, tier, BigDecimal.ZERO, null);
         }
         if (customer == null) {
             throw new BusinessRuleException("Sign in to use your negotiated price.");
@@ -62,8 +73,18 @@ public class PricingService {
         if (orderItems.existsByNegotiationSessionId(session.getId())) {
             throw new BusinessRuleException("That offer has already been used.");
         }
-        BigDecimal pct = policyValidator.clamp(session.getValidatedDiscountPct(), variant);
+        BigDecimal negotiated = session.getValidatedDiscountPct() == null ? BigDecimal.ZERO : session.getValidatedDiscountPct();
+        return decide(variant, tier, negotiated, session.getId());
+    }
+
+    private PricedLine decide(Variant variant, BigDecimal tier, BigDecimal negotiated, UUID sessionId) {
+        BigDecimal list = variant.getPrice();
+        boolean offerWins = negotiated.compareTo(tier) > 0;
+        BigDecimal wanted = offerWins ? negotiated : tier;
+        BigDecimal pct = policyValidator.clamp(wanted, variant);
+        DiscountSource source = pct.signum() == 0 ? DiscountSource.NONE : offerWins ? DiscountSource.NEGOTIATED : DiscountSource.TIER;
         BigDecimal unit = list.multiply(BigDecimal.valueOf(100).subtract(pct)).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        return new PricedLine(list, pct, unit, session.getId());
+        // The offer stays linked even when the tier was better: it was presented at checkout and is used up with this order.
+        return new PricedLine(list, pct, unit, sessionId, tier, source, pct.compareTo(wanted) < 0);
     }
 }

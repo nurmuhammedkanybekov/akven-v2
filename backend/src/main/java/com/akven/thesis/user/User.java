@@ -38,6 +38,10 @@ public class User extends AuditableEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    /** Set by an owner: this customer may order from the lower trusted minimum. */
+    @Column(nullable = false)
+    private boolean trusted = false;
+
     protected User() {
         // JPA
     }
@@ -52,6 +56,8 @@ public class User extends AuditableEntity {
     public String getEmail() { return email; }
     public Role getRole() { return role; }
     public boolean isActive() { return active; }
+    public boolean isTrusted() { return trusted; }
+    public void setTrusted(boolean trusted) { this.trusted = trusted; }
 
     /**
      * Needed only by UserDetailsServiceImpl so Spring Security can verify a login attempt.

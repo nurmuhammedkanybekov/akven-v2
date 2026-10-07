@@ -4,6 +4,8 @@ import com.akven.thesis.catalog.Variant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -58,6 +60,9 @@ public class OrderItem {
     @Column(length = 500) private String imageUrl;
     @Column(nullable = false) private BigDecimal listPrice = BigDecimal.ZERO;
     @Column(nullable = false) private BigDecimal discountPct = BigDecimal.ZERO;
+    @Column(nullable = false) private BigDecimal tierDiscountPct = BigDecimal.ZERO;
+    @Enumerated(EnumType.STRING) @Column(nullable = false, length = 16) private DiscountSource discountSource = DiscountSource.NONE;
+    @Column(nullable = false) private boolean discountCapped = false;
 
     /** The negotiated offer this line used, if any. Cleared when the order is cancelled. */
     private UUID negotiationSessionId;
@@ -88,6 +93,13 @@ public class OrderItem {
         this.imageUrl = imageUrl;
     }
 
+    /** Why this line costs what it costs: which rule gave the discount, and whether the sock's limit cut it down. */
+    void recordReason(BigDecimal tierDiscountPct, DiscountSource source, boolean capped) {
+        this.tierDiscountPct = tierDiscountPct;
+        this.discountSource = source;
+        this.discountCapped = capped;
+    }
+
     public BigDecimal lineTotal() {
         return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
@@ -96,6 +108,9 @@ public class OrderItem {
         this.negotiationSessionId = null;
     }
 
+    public BigDecimal getTierDiscountPct() { return tierDiscountPct; }
+    public DiscountSource getDiscountSource() { return discountSource; }
+    public boolean isDiscountCapped() { return discountCapped; }
     public UUID getId() { return id; }
     public Order getOrder() { return order; }
     public Variant getVariant() { return variant; }

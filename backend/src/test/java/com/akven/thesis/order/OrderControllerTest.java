@@ -235,7 +235,7 @@ class OrderControllerTest extends IntegrationTest {
         Variant v = data.variant(5);
         String me = tokenForEmail(email(), Role.CUSTOMER);
         checkout(me, key(), body(v.getSku(), 0)).andExpect(status().isBadRequest()).andExpect(jsonPath("$.errors").exists());
-        checkout(me, key(), body(v.getSku(), 100)).andExpect(status().isBadRequest());
+        checkout(me, key(), body(v.getSku(), 1000)).andExpect(status().isBadRequest());   // one line holds at most 999 units
         checkout(me, key(), Map.of("items", List.of(), "fulfillment", Map.of("method", "PICKUP", "contactName", "A", "contactPhone", "+996700000000"),
                 "payment", Map.of("method", "APPLE_PAY", "token", OK))).andExpect(status().isBadRequest());
         checkout(me, null, body(v.getSku(), 1)).andExpect(status().isBadRequest()).andExpect(jsonPath("$.detail").value("Missing or invalid Idempotency-Key header."));
