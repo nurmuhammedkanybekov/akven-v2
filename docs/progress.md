@@ -34,8 +34,9 @@ Delivered ahead of the date, and well beyond the 30 to 50 percent asked for.
 | Contacts and pickup | Done: owners enter contacts (links built and checked by the server) and the Dordoi stall in the admin API. A paid pickup order gets a six-digit code; staff hand it over only with the code and the end of the contact phone, once |
 | Stock status and countries | Done: customers see in stock, only a few left (threshold set by the owners), coming in N days, or sold out. Staff record incoming stock, its arrival date and the case size. Deliveries go to Kyrgyzstan, Kazakhstan, Uzbekistan or Russia |
 | Size chart | Done: one chart with foot length, Korean mm, local, EU and US sizes, led by EU and US in English and by local sizes in Russian and Kyrgyz, plus a finder from shoe size to sock size. Demo values still need checking against the packaging |
+| Dashboard and comparison | Done: the owners' negotiation dashboard (per day, limits, conversion, best sellers, discount sources), "why this price" on every offer and order line, and a rule-based against AI comparison on 16 simulated customers. The AI side uses scripted answers, labelled in every report, until a recorded live run replaces them |
 | Remaining gaps | Creating staff and admin accounts from the admin (UC-9), a single audit-log screen, the visual redesign of the shop, real product photos and content |
-| Evaluation of the negotiator | Method still to be agreed with the supervisor (margin-safety test suite, simulated customers, or a small user study) |
+| Evaluation of the negotiator | A simulated-customer comparison is built (`/api/admin/negotiations/evaluation`). Still to agree with the supervisor: whether to add a recorded live-model run and a small user study |
 
 ## Milestone 4: thesis draft (due 22 November)
 

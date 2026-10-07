@@ -16,5 +16,7 @@ public interface NegotiationSessionRepository extends JpaRepository<NegotiationS
     /** UC-7 — Staff/Admin reviewing transcripts, proposed vs. validated discount, across all customers. */
     List<NegotiationSession> findAllByOrderByCreatedAtDesc();
 
+    List<NegotiationSession> findByCreatedAtGreaterThanEqual(java.time.Instant since);
+
     Page<NegotiationSession> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }
