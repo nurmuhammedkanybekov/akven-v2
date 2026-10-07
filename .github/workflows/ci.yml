@@ -9,6 +9,7 @@ jobs:
   # Fast feedback: unit + MockMvc tests on H2 (same as `mvn test` locally).
   backend-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 25   # a hung download fails within minutes instead of holding the run for hours
     defaults:
       run:
         working-directory: backend
@@ -34,6 +35,7 @@ jobs:
   # Frontend: types, unit tests (including the WCAG contrast check of the design tokens) and a production build.
   frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 25   # a hung download fails within minutes instead of holding the run for hours
     defaults:
       run:
         working-directory: frontend
@@ -53,6 +55,7 @@ jobs:
   # role rules on a real server, jsonb audit rows, database CHECK constraints.
   backend-postgres-it:
     runs-on: ubuntu-latest
+    timeout-minutes: 25   # a hung download fails within minutes instead of holding the run for hours
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -84,6 +87,7 @@ jobs:
   # pgcrypto's crypt() is accepted by Spring's BCryptPasswordEncoder.
   backend-postgres-smoke:
     runs-on: ubuntu-latest
+    timeout-minutes: 25   # a hung download fails within minutes instead of holding the run for hours
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -145,6 +149,7 @@ jobs:
   # Sign in, add a section, add a product with colours, upload a photo, see it in the shop, remove and restore it.
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 25   # a hung download fails within minutes instead of holding the run for hours
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -210,6 +215,7 @@ jobs:
   docker-compose-smoke:
     name: Docker demo starts and serves the shop
     runs-on: ubuntu-latest
+    timeout-minutes: 25   # a hung download fails within minutes instead of holding the run for hours
     steps:
       - uses: actions/checkout@v4
       - name: Build and start the demo
