@@ -1,6 +1,7 @@
 package com.akven.thesis.order;
 
 import com.akven.thesis.payment.PaymentMethod;
+import com.akven.thesis.shop.ShopDtos.PickupPointView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -75,7 +76,14 @@ public final class OrderDtos {
     /** The payment reference is shown shortened: enough for a support call, not the whole token of the provider. */
     public record PaymentView(String method, String reference) {}
 
+    /** code is shown to the customer only: at the stall the customer says it, staff do not read it off a screen. */
+    public record PickupView(String code, PickupPointView point) {}
+
     public record OrderView(UUID id, String reference, OrderStatus status, BigDecimal total, Instant createdAt,
                             Instant paidAt, Instant fulfilledAt, Instant cancelledAt, FulfillmentView fulfillment,
-                            PaymentView payment, List<OrderItemView> items, String customerEmail) {}
+                            PaymentView payment, List<OrderItemView> items, String customerEmail, PickupView pickup) {}
+
+    /** Handing over at the stall: the code and the last four digits of the contact phone. */
+    public record HandoverRequest(@NotBlank @Pattern(regexp = "[0-9]{6}", message = "six digits") String code,
+                                  @NotBlank @Pattern(regexp = "[0-9]{4}", message = "four digits") String phoneEnd) {}
 }

@@ -33,9 +33,13 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET`, `PUT /api/admin/pricing/policy` | Minimum order, trusted minimum, and paid orders after which a customer counts as trusted (ADMIN) |
 | `GET`, `POST /api/admin/pricing/tiers`, `PUT`, `DELETE /api/admin/pricing/tiers/{id}` | The price ladder; one step per number of pairs, 0 to 90% (ADMIN) |
 | `PUT /api/admin/customers/{id}/trusted` | Mark a customer as trusted `{trusted}` (ADMIN) |
+| `GET /api/shop/info` | Public: active contacts (with links built by the server) and pickup points (market, section, passage, container, hours) |
+| `GET`, `POST /api/admin/shop/contacts`, `PUT`, `DELETE /api/admin/shop/contacts/{id}` | Instagram, Telegram, WhatsApp, phone and email; each value is checked against its kind (ADMIN) |
+| `GET`, `POST /api/admin/shop/pickup-points`, `PUT /api/admin/shop/pickup-points/{id}` | Where orders are collected (ADMIN) |
+| `POST /api/admin/orders/handover` | At the stall: `{code, phoneEnd}` hands over a paid pickup order; a wrong code and a wrong phone give the same 404 (STAFF / ADMIN) |
 | `POST /api/negotiate` | Chat message `{variantSku, message, quantity?}` → validated offer `{sessionId, reply, validatedDiscountPct, offerPrice}` (signed in; 20 messages per 10 minutes, then 429). Pass `sessionId` as `negotiationSessionId` in the bag |
 | `GET /api/admin/negotiations`, `GET /api/admin/negotiations/{id}` | Proposed against validated discount and the transcript (STAFF / ADMIN) |
-| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock) |
+| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer |
 | `GET /api/orders`, `GET /api/orders/{id}`, `POST /api/orders/{id}/cancel` | The customer's own orders |
 | `/api/admin/**` | Catalog management: products, variants, sections and cuts, photo upload, retire and restore (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
 | `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |

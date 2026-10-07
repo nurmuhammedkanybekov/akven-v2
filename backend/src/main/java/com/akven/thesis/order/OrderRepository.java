@@ -13,6 +13,10 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID>, JpaSpecificationExecutor<Order> {
 
+    boolean existsByPickupCodeAndStatus(String pickupCode, OrderStatus status);
+
+    java.util.Optional<Order> findByPickupCodeAndStatus(String pickupCode, OrderStatus status);
+
     long countByCustomerIdAndStatusIn(UUID customerId, java.util.Collection<OrderStatus> statuses);
 
 

@@ -17,6 +17,7 @@ import com.akven.thesis.payment.PaymentResult;
 import com.akven.thesis.payment.PaymentService;
 import com.akven.thesis.payment.PaymentUnavailableException;
 import com.akven.thesis.pricing.CollectionPricing;
+import com.akven.thesis.shop.ShopInfoService;
 import com.akven.thesis.user.User;
 import com.akven.thesis.user.UserRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -64,9 +65,12 @@ public class OrderService {
     private final PaymentService payments;
     private final AuditService audit;
     private final CollectionPricing collections;
+    private final ShopInfoService shopInfo;
+    private final PickupCodes pickupCodes;
 
     public OrderService(OrderRepository orders, VariantRepository variants, UserRepository users, PricingService pricing,
-                        PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections) {
+                        PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections,
+                        ShopInfoService shopInfo, PickupCodes pickupCodes) {
         this.orders = orders;
         this.variants = variants;
         this.users = users;
@@ -75,6 +79,8 @@ public class OrderService {
         this.audit = audit;
         this.images = images;
         this.collections = collections;
+        this.shopInfo = shopInfo;
+        this.pickupCodes = pickupCodes;
     }
 
     private final ProductImageRepository images;
@@ -124,6 +130,9 @@ public class OrderService {
         FulfillmentInputs f = new FulfillmentInputs(request);
         Order order = new Order(customer, idempotencyKey);
         order.setFulfillment(f.method, f.name, f.phone, f.address, f.note);
+        if (f.method == FulfillmentMethod.PICKUP) {
+            shopInfo.defaultPickupPoint().ifPresent(order::collectAt);
+        }
         Map<String, String> cover = coverImages(locked);
         for (Variant v : locked) {
             int qty = quantities.get(v.getSku());
@@ -171,6 +180,9 @@ public class OrderService {
         }
 
         order.markPaid(method.name(), result.reference());
+        if (order.getFulfillmentMethod() == FulfillmentMethod.PICKUP) {
+            order.givePickupCode(pickupCodes.next());
+        }
         for (OrderItem item : order.getItems()) {
             item.getVariant().commitSale(item.getQuantity());
         }
@@ -235,6 +247,22 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public OrderView get(UUID orderId) {
         return OrderMapper.toView(orders.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found.")), true);
+    }
+
+    /**
+     * At the stall: the customer says the pickup code and the last four digits of their phone. A wrong code and a wrong
+     * phone give the same answer, so neither can be guessed separately.
+     */
+    @Transactional
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public OrderView handOver(String actorEmail, String code, String phoneEnd) {
+        Order o = orders.findByPickupCodeAndStatus(code, OrderStatus.PAID)
+                .filter(x -> x.getContactPhone() != null && x.getContactPhone().replaceAll("[^0-9]", "").endsWith(phoneEnd))
+                .orElseThrow(() -> new NotFoundException("No order waiting for pickup matches this code and phone number."));
+        o.fulfil();
+        orders.save(o);
+        audit.record(actorEmail, "ORDER_HANDED_OVER", "ORDER", o.getId(), Map.of("status", "PAID"), snapshot(o));
+        return OrderMapper.toView(o, true);
     }
 
     @Transactional
