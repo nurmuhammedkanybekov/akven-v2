@@ -33,6 +33,9 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET`, `PUT /api/admin/pricing/policy` | Minimum order, trusted minimum, and paid orders after which a customer counts as trusted (ADMIN) |
 | `GET`, `POST /api/admin/pricing/tiers`, `PUT`, `DELETE /api/admin/pricing/tiers/{id}` | The price ladder; one step per number of pairs, 0 to 90% (ADMIN) |
 | `PUT /api/admin/customers/{id}/trusted` | Mark a customer as trusted `{trusted}` (ADMIN) |
+| `GET /api/sizes?lang=en\|ru\|ky` | Public size chart: every row has foot length, Korean mm, local (RU / KG), EU and US sizes; `columns` says which lead for the language (EU and US for English, local sizes for Russian and Kyrgyz) |
+| `GET /api/sizes/find?system=FOOT_CM\|KR_MM\|LOCAL\|EU&size=…` | Public: the sock size(s) for a shoe size; two at a boundary |
+| `POST /api/admin/sizes`, `PUT`, `DELETE /api/admin/sizes/{id}` | Edit the size chart (ADMIN) |
 | `GET /api/shop/info` | Public: active contacts (with links built by the server) and pickup points (market, section, passage, container, hours) |
 | `GET`, `POST /api/admin/shop/contacts`, `PUT`, `DELETE /api/admin/shop/contacts/{id}` | Instagram, Telegram, WhatsApp, phone and email; each value is checked against its kind (ADMIN) |
 | `GET`, `POST /api/admin/shop/pickup-points`, `PUT /api/admin/shop/pickup-points/{id}` | Where orders are collected (ADMIN) |
