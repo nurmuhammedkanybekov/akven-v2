@@ -1,7 +1,9 @@
 package com.akven.thesis.order;
 
 import com.akven.thesis.common.PageResponse;
+import com.akven.thesis.order.OrderDtos.HandoverRequest;
 import com.akven.thesis.order.OrderDtos.OrderView;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,11 @@ public class AdminOrderController {
     @GetMapping("/{id}")
     public OrderView get(@PathVariable UUID id) {
         return service.get(id);
+    }
+
+    @PostMapping("/handover")
+    public OrderView handOver(Authentication auth, @Valid @RequestBody HandoverRequest request) {
+        return service.handOver(auth.getName(), request.code(), request.phoneEnd());
     }
 
     @PostMapping("/{id}/fulfil")

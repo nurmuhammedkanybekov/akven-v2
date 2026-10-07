@@ -4,6 +4,8 @@ import com.akven.thesis.order.OrderDtos.FulfillmentView;
 import com.akven.thesis.order.OrderDtos.OrderItemView;
 import com.akven.thesis.order.OrderDtos.OrderView;
 import com.akven.thesis.order.OrderDtos.PaymentView;
+import com.akven.thesis.order.OrderDtos.PickupView;
+import com.akven.thesis.shop.ShopDtos.PickupPointView;
 
 final class OrderMapper {
 
@@ -19,7 +21,10 @@ final class OrderMapper {
                 o.getItems().stream().map(i -> new OrderItemView(i.getSku(), i.getProductName(), i.getProductSlug(), i.getVariantLabel(),
                         i.getColorHex(), i.getImageUrl(), i.getQuantity(), i.getListPrice(), i.getDiscountPct(), i.getUnitPrice(), i.lineTotal(),
                         i.getDiscountSource())).toList(),
-                withCustomer ? o.getCustomer().getEmail() : null);
+                withCustomer ? o.getCustomer().getEmail() : null,
+                o.getFulfillmentMethod() != FulfillmentMethod.PICKUP ? null
+                        : new PickupView(withCustomer ? null : o.getPickupCode(),
+                                o.getPickupPoint() == null ? null : PickupPointView.of(o.getPickupPoint())));
     }
 
     private static String shorten(String reference) {

@@ -2,12 +2,14 @@ package com.akven.thesis.order;
 
 import com.akven.thesis.common.AuditableEntity;
 import com.akven.thesis.common.ConflictException;
+import com.akven.thesis.shop.PickupPoint;
 import com.akven.thesis.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -66,6 +68,13 @@ public class Order extends AuditableEntity {
     @Column(length = 64)
     private String idempotencyKey;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pickup_point_id")
+    private PickupPoint pickupPoint;
+
+    @Column(length = 6)
+    private String pickupCode;
+
     private Instant paidAt;
     private Instant fulfilledAt;
     private Instant cancelledAt;
@@ -90,6 +99,16 @@ public class Order extends AuditableEntity {
         this.contactPhone = contactPhone;
         this.deliveryAddress = deliveryAddress;
         this.note = note;
+    }
+
+    /** Where a pickup order will be collected. */
+    public void collectAt(PickupPoint point) {
+        this.pickupPoint = point;
+    }
+
+    /** The six digits the customer shows at the stall; given once the order is paid. */
+    public void givePickupCode(String code) {
+        this.pickupCode = code;
     }
 
     /** PENDING -> PAID, only with the provider's reference for a confirmed payment. */
@@ -138,6 +157,8 @@ public class Order extends AuditableEntity {
     public String getDeliveryAddress() { return deliveryAddress; }
     public String getNote() { return note; }
     public String getIdempotencyKey() { return idempotencyKey; }
+    public PickupPoint getPickupPoint() { return pickupPoint; }
+    public String getPickupCode() { return pickupCode; }
     public Instant getPaidAt() { return paidAt; }
     public Instant getFulfilledAt() { return fulfilledAt; }
     public Instant getCancelledAt() { return cancelledAt; }
