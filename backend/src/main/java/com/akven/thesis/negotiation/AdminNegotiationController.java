@@ -12,9 +12,25 @@ import java.util.UUID;
 public class AdminNegotiationController {
 
     private final NegotiationService service;
+    private final NegotiationStatsService stats;
+    private final NegotiationEvaluation evaluation;
 
-    public AdminNegotiationController(NegotiationService service) {
+    public AdminNegotiationController(NegotiationService service, NegotiationStatsService stats, NegotiationEvaluation evaluation) {
         this.service = service;
+        this.stats = stats;
+        this.evaluation = evaluation;
+    }
+
+    /** The owners' dashboard over the last {@code days} days. */
+    @GetMapping("/stats")
+    public NegotiationStats stats(@RequestParam(defaultValue = "30") int days) {
+        return stats.stats(days);
+    }
+
+    /** Rule-based assistant against scripted AI answers on the same customers, both through the PolicyValidator. */
+    @GetMapping("/evaluation")
+    public NegotiationEvaluation.Report evaluation() {
+        return evaluation.run();
     }
 
     @GetMapping

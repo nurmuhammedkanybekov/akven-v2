@@ -48,7 +48,7 @@ public class CatalogService {
     private final CollectionPricing collections;
 
     /** Dates such as "arrives in 12 days" are counted in the shop's own time zone. */
-    static final ZoneId SHOP_ZONE = ZoneId.of("Asia/Bishkek");
+    public static final ZoneId SHOP_ZONE = ZoneId.of("Asia/Bishkek");
 
     public CatalogService(ProductRepository productRepository, VariantRepository variantRepository,
                           ProductImageRepository imageRepository, CatalogTermRepository termRepository,

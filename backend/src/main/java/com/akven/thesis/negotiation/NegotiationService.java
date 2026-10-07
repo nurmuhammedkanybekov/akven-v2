@@ -8,6 +8,7 @@ import com.akven.thesis.common.NotFoundException;
 import com.akven.thesis.common.PageResponse;
 import com.akven.thesis.negotiation.NegotiationDtos.NegotiateRequest;
 import com.akven.thesis.negotiation.NegotiationDtos.NegotiateResponse;
+import com.akven.thesis.negotiation.NegotiationDtos.PriceOutcome;
 import com.akven.thesis.negotiation.NegotiationDtos.SessionView;
 import com.akven.thesis.user.User;
 import com.akven.thesis.user.UserRepository;
@@ -92,8 +93,10 @@ public class NegotiationService {
         audit.record(customerEmail, "NEGOTIATION", "NEGOTIATION_SESSION", session.getId(), null,
                 Map.of("sku", variant.getSku(), "quantity", quantity, "assistant", proposal.source(), "proposedPct", proposed, "validatedPct", validated));
 
+        PriceOutcome outcome = validated.signum() == 0 ? PriceOutcome.LIST_PRICE
+                : validated.compareTo(proposed) < 0 ? PriceOutcome.LIMITED_BY_SHOP : PriceOutcome.AS_OFFERED;
         return new NegotiateResponse(session.getId(), reply, validated, list, offer,
-                session.getCreatedAt() == null ? null : session.getCreatedAt().plus(offerTtl), exposeProposal ? proposed : null);
+                session.getCreatedAt() == null ? null : session.getCreatedAt().plus(offerTtl), exposeProposal ? proposed : null, outcome);
     }
 
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
