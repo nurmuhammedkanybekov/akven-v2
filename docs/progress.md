@@ -32,6 +32,7 @@ Delivered ahead of the date, and well beyond the 30 to 50 percent asked for.
 | Real language model with retrieval | Model connected and tested live. Retrieval is keyword-based; vector search over product embeddings (pgvector) is the next step |
 | Collection pricing | Done: the order minimum counts pairs across the whole cart (mixing socks is allowed, a pack counts all its pairs), trusted customers have a lower minimum, the price ladder lowers the price per pair, and each order line records which rule set its price. Owners change all of it in the admin API, every change is audited, and the database refuses impossible values |
 | Contacts and pickup | Done: owners enter contacts (links built and checked by the server) and the Dordoi stall in the admin API. A paid pickup order gets a six-digit code; staff hand it over only with the code and the end of the contact phone, once |
+| Stock status and countries | Done: customers see in stock, only a few left (threshold set by the owners), coming in N days, or sold out. Staff record incoming stock, its arrival date and the case size. Deliveries go to Kyrgyzstan, Kazakhstan, Uzbekistan or Russia |
 | Remaining gaps | Creating staff and admin accounts from the admin (UC-9), a single audit-log screen, the visual redesign of the shop, real product photos and content |
 | Evaluation of the negotiator | Method still to be agreed with the supervisor (margin-safety test suite, simulated customers, or a small user study) |
 

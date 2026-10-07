@@ -69,7 +69,8 @@ public class PricingAdminService {
         }
         ShopPolicy policy = policies.findById(ShopPolicy.ID).orElseGet(ShopPolicy::defaults);
         PolicyView before = PolicyView.of(policy);
-        policy.update(r.minOrderPairs(), r.trustedMinOrderPairs(), r.trustedAfterOrders());
+        int fewLeft = r.fewLeftThreshold() == null ? policy.getFewLeftThreshold() : r.fewLeftThreshold();
+        policy.update(r.minOrderPairs(), r.trustedMinOrderPairs(), r.trustedAfterOrders(), fewLeft);
         PolicyView after = PolicyView.of(policies.saveAndFlush(policy));
         audit.record(actorEmail, "PRICING_POLICY_UPDATED", "SHOP_POLICY", POLICY_AUDIT_ID, before, after);
         return after;

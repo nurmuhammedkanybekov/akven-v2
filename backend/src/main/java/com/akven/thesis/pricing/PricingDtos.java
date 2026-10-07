@@ -19,12 +19,14 @@ public final class PricingDtos {
 
     public record PolicyRequest(@NotNull @Min(1) @Max(10000) Integer minOrderPairs,
                                 @NotNull @Min(1) @Max(10000) Integer trustedMinOrderPairs,
-                                @NotNull @Min(1) @Max(1000) Integer trustedAfterOrders) {}
+                                @NotNull @Min(1) @Max(1000) Integer trustedAfterOrders,
+                                @Min(0) @Max(10000) Integer fewLeftThreshold) {}
 
-    public record PolicyView(int minOrderPairs, int trustedMinOrderPairs, int trustedAfterOrders) {
+    /** fewLeftThreshold: the shop says "only N left" at or below this many units. */
+    public record PolicyView(int minOrderPairs, int trustedMinOrderPairs, int trustedAfterOrders, int fewLeftThreshold) {
 
         static PolicyView of(ShopPolicy p) {
-            return new PolicyView(p.getMinOrderPairs(), p.getTrustedMinOrderPairs(), p.getTrustedAfterOrders());
+            return new PolicyView(p.getMinOrderPairs(), p.getTrustedMinOrderPairs(), p.getTrustedAfterOrders(), p.getFewLeftThreshold());
         }
     }
 

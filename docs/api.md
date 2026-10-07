@@ -27,7 +27,7 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET /api/products` | Catalog: filters (category, section, cut, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
 | `GET /api/products/facets` | Counts per category / section / cut for the current filters |
 | `GET /api/catalog/terms` | The owners' sections and cuts (for menus and filters) |
-| `GET /api/products/{slug}` | Product detail with variants and images |
+| `GET /api/products/{slug}` | Product detail with variants and images. Each variant has `stockStatus` (`IN_STOCK`, `FEW_LEFT`, `COMING_SOON`, `SOLD_OUT`), `restockInDays` while coming soon, and `casePairs` |
 | `POST /api/cart/quote` | Today's prices and availability for a cart (public; negotiated prices only for their owner). Also returns `collection`: total pairs, the minimum that applies, the reached tier, the next tier (`pairsToGo`), and a message when the cart is below the minimum |
 | `GET /api/pricing` | Public: the minimum order in pairs and the price ladder `[{minPairs, discountPct}]` |
 | `GET`, `PUT /api/admin/pricing/policy` | Minimum order, trusted minimum, and paid orders after which a customer counts as trusted (ADMIN) |
@@ -36,10 +36,11 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET /api/shop/info` | Public: active contacts (with links built by the server) and pickup points (market, section, passage, container, hours) |
 | `GET`, `POST /api/admin/shop/contacts`, `PUT`, `DELETE /api/admin/shop/contacts/{id}` | Instagram, Telegram, WhatsApp, phone and email; each value is checked against its kind (ADMIN) |
 | `GET`, `POST /api/admin/shop/pickup-points`, `PUT /api/admin/shop/pickup-points/{id}` | Where orders are collected (ADMIN) |
+| `PUT /api/admin/variants/{id}/supply` | `{casePairs, incomingQty, restockEta}`: what is on the way and when; no past dates (STAFF / ADMIN) |
 | `POST /api/admin/orders/handover` | At the stall: `{code, phoneEnd}` hands over a paid pickup order; a wrong code and a wrong phone give the same 404 (STAFF / ADMIN) |
 | `POST /api/negotiate` | Chat message `{variantSku, message, quantity?}` → validated offer `{sessionId, reply, validatedDiscountPct, offerPrice}` (signed in; 20 messages per 10 minutes, then 429). Pass `sessionId` as `negotiationSessionId` in the bag |
 | `GET /api/admin/negotiations`, `GET /api/admin/negotiations/{id}` | Proposed against validated discount and the transcript (STAFF / ADMIN) |
-| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer |
+| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer. Deliveries take `fulfillment.country` (`KG`, `KZ`, `UZ`, `RU`; `KG` when left out) |
 | `GET /api/orders`, `GET /api/orders/{id}`, `POST /api/orders/{id}/cancel` | The customer's own orders |
 | `/api/admin/**` | Catalog management: products, variants, sections and cuts, photo upload, retire and restore (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
 | `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |

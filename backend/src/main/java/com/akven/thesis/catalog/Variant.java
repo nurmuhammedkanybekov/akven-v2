@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -75,6 +76,13 @@ public class Variant extends AuditableEntity {
     /** Database-generated (stock_qty - reserved_qty) — read-only from the app side. */
     @Column(insertable = false, updatable = false)
     private Integer availableQty;
+
+    @Column(nullable = false)
+    private Integer incomingQty = 0;
+
+    private LocalDate restockEta;
+
+    private Integer casePairs;
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
@@ -150,6 +158,25 @@ public class Variant extends AuditableEntity {
 
     public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }
 
+    /** What is on the way, when it arrives, and how many pairs make one wholesale case. */
+    public void updateSupply(Integer casePairs, int incomingQty, LocalDate restockEta) {
+        this.casePairs = casePairs;
+        this.incomingQty = incomingQty;
+        this.restockEta = restockEta;
+    }
+
+    /**
+     * FEW_LEFT at or below the threshold; when nothing is left, COMING_SOON only if stock is on the way with a date
+     * that has not passed (a missed date says nothing true, so it reads as sold out).
+     */
+    public StockStatus stockStatus(int fewLeftThreshold, LocalDate today) {
+        int left = available();
+        if (left > 0) {
+            return left <= fewLeftThreshold ? StockStatus.FEW_LEFT : StockStatus.IN_STOCK;
+        }
+        return incomingQty > 0 && restockEta != null && !restockEta.isBefore(today) ? StockStatus.COMING_SOON : StockStatus.SOLD_OUT;
+    }
+
     /** Computed here rather than read from the generated column, so it is correct on H2 and Postgres alike. */
     public int available() {
         return stockQty - reservedQty;
@@ -160,6 +187,9 @@ public class Variant extends AuditableEntity {
     public String getColor() { return color; }
     public String getColorHex() { return colorHex; }
     public Integer getPackSize() { return packSize; }
+    public Integer getCasePairs() { return casePairs; }
+    public int getIncomingQty() { return incomingQty; }
+    public LocalDate getRestockEta() { return restockEta; }
     public Product getProduct() { return product; }
     public String getSku() { return sku; }
     public BigDecimal getPrice() { return price; }

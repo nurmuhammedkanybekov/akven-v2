@@ -9,6 +9,7 @@ import com.akven.thesis.catalog.CatalogViews.TermInfo;
 import com.akven.thesis.catalog.CatalogViews.TermsView;
 import com.akven.thesis.common.NotFoundException;
 import com.akven.thesis.common.PageResponse;
+import com.akven.thesis.pricing.CollectionPricing;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -22,6 +23,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -42,10 +45,15 @@ public class CatalogService {
     private final ProductImageRepository imageRepository;
     private final CatalogTermRepository termRepository;
     private final EntityManager entityManager;
+    private final CollectionPricing collections;
+
+    /** Dates such as "arrives in 12 days" are counted in the shop's own time zone. */
+    static final ZoneId SHOP_ZONE = ZoneId.of("Asia/Bishkek");
 
     public CatalogService(ProductRepository productRepository, VariantRepository variantRepository,
                           ProductImageRepository imageRepository, CatalogTermRepository termRepository,
-                          EntityManager entityManager) {
+                          EntityManager entityManager, CollectionPricing collections) {
+        this.collections = collections;
         this.termRepository = termRepository;
         this.productRepository = productRepository;
         this.variantRepository = variantRepository;
@@ -135,6 +143,7 @@ public class CatalogService {
                 .orElseThrow(() -> new NotFoundException("Product not found: " + slug));
         return ProductDetail.of(product,
                 variantRepository.findByProductIdAndActiveTrueOrderByPackSizeAscSizeAscColorAsc(product.getId()),
-                imageRepository.findByProductIdOrderByPositionAsc(product.getId()));
+                imageRepository.findByProductIdOrderByPositionAsc(product.getId()),
+                collections.policy().getFewLeftThreshold(), LocalDate.now(SHOP_ZONE));
     }
 }

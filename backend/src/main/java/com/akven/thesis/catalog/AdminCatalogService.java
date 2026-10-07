@@ -254,6 +254,24 @@ public class AdminCatalogService {
         return AdminVariantView.of(variant);
     }
 
+    /** Supply: incoming stock, its arrival date, and the case size. STAFF may do this; it changes no price. */
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public AdminVariantView updateSupply(String actor, UUID variantId, SupplyRequest r) {
+        Variant variant = requireVariant(variantId);
+        requireCurrentVersion(variant, r.version());
+        if (r.restockEta() != null && r.restockEta().isBefore(java.time.LocalDate.now(CatalogService.SHOP_ZONE))) {
+            throw new BusinessRuleException("The arrival date cannot be in the past.");
+        }
+        if (r.restockEta() != null && r.incomingQty() == 0) {
+            throw new BusinessRuleException("Enter how many are on the way, or leave the arrival date empty.");
+        }
+        Map<String, Object> before = snapshot(variant);
+        variant.updateSupply(r.casePairs(), r.incomingQty(), r.restockEta());
+        variantRepository.saveAndFlush(variant);
+        auditService.record(actor, "VARIANT_SUPPLY_UPDATED", VARIANT, variantId, before, snapshot(variant));
+        return AdminVariantView.of(variant);
+    }
+
     /** FR-11: the only way to change costPrice or marginFloorPct, and ADMIN only. */
     @PreAuthorize("hasRole('ADMIN')")
     public AdminVariantView updatePricingPolicy(String actor, UUID variantId, PricingPolicyRequest r) {
@@ -367,6 +385,9 @@ public class AdminCatalogService {
         m.put("costPrice", v.getCostPrice());
         m.put("marginFloorPct", v.getMarginFloorPct());
         m.put("stockQty", v.getStockQty());
+        m.put("casePairs", v.getCasePairs());
+        m.put("incomingQty", v.getIncomingQty());
+        m.put("restockEta", v.getRestockEta() == null ? null : v.getRestockEta().toString());
         m.put("active", v.isActive());
         return m;
     }
