@@ -6,9 +6,12 @@ import com.akven.thesis.catalog.Variant;
 import com.akven.thesis.catalog.VariantRepository;
 import com.akven.thesis.common.BusinessRuleException;
 import com.akven.thesis.order.OrderDtos.CartItem;
+import com.akven.thesis.order.OrderDtos.CollectionView;
 import com.akven.thesis.order.OrderDtos.LineProblem;
+import com.akven.thesis.order.OrderDtos.NextTierView;
 import com.akven.thesis.order.OrderDtos.Quote;
 import com.akven.thesis.order.OrderDtos.QuoteLine;
+import com.akven.thesis.pricing.CollectionPricing;
 import com.akven.thesis.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,11 +38,13 @@ public class CartService {
     private final VariantRepository variants;
     private final ProductImageRepository images;
     private final PricingService pricing;
+    private final CollectionPricing collections;
 
-    public CartService(VariantRepository variants, ProductImageRepository images, PricingService pricing) {
+    public CartService(VariantRepository variants, ProductImageRepository images, PricingService pricing, CollectionPricing collections) {
         this.variants = variants;
         this.images = images;
         this.pricing = pricing;
+        this.collections = collections;
     }
 
     /** customer is null for a visitor who is not signed in: listed prices only, no negotiated offers. */
@@ -50,6 +56,14 @@ public class CartService {
         if (!productIds.isEmpty()) {
             for (ProductImage i : images.findByProductIdInOrderByPositionAsc(productIds)) cover.putIfAbsent(i.getProductId(), i.getUrl());
         }
+
+        // The collection counts every line that can still be bought, so the tier shown matches what checkout will give.
+        Map<Variant, Integer> buyable = new LinkedHashMap<>();
+        for (CartItem item : items) {
+            Variant v = bySku.get(item.sku());
+            if (v != null && v.isActive() && v.getProduct().isActive()) buyable.merge(v, item.quantity(), Integer::sum);
+        }
+        CollectionPricing.Collection collection = collections.evaluate(buyable, customer);
 
         List<QuoteLine> lines = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
@@ -63,14 +77,16 @@ public class CartService {
                 continue;
             }
             BigDecimal list = v.getPrice();
-            BigDecimal pct = BigDecimal.ZERO, unit = list;
+            PricingService.PricedLine plain = pricing.price(v, null, customer, item.quantity(), collection.tierDiscountPct());
+            BigDecimal pct = plain.discountPct(), unit = plain.unitPrice();
             String note = null;
             try {
-                PricingService.PricedLine priced = pricing.price(v, item.negotiationSessionId(), customer, item.quantity());
+                PricingService.PricedLine priced = pricing.price(v, item.negotiationSessionId(), customer, item.quantity(),
+                        collection.tierDiscountPct());
                 pct = priced.discountPct();
                 unit = priced.unitPrice();
             } catch (BusinessRuleException e) {
-                note = e.getMessage();                  // the offer cannot be honoured: show the normal price and say why
+                note = e.getMessage();                  // the offer cannot be honoured: show the collection price and say why
             }
             int available = Math.max(0, v.available());
             LineProblem problem = available == 0 ? LineProblem.SOLD_OUT : available < item.quantity() ? LineProblem.NOT_ENOUGH_STOCK : LineProblem.NONE;
@@ -82,7 +98,12 @@ public class CartService {
             lines.add(new QuoteLine(v.getSku(), v.getProduct().getSlug(), v.getProduct().getName(), label(v), v.getColorHex(),
                     cover.get(v.getProduct().getId()), item.quantity(), list, pct, unit, lineTotal, available, problem, note));
         }
-        return new Quote(lines, total, canCheckout);
+        if (collection.belowMinimum()) canCheckout = false;
+        CollectionPricing.NextTier next = collection.next();
+        CollectionView view = new CollectionView(collection.totalPairs(), collection.minimumPairs(), collection.tierDiscountPct(),
+                next == null ? null : new NextTierView(next.minPairs(), next.discountPct(), next.pairsToGo()),
+                collection.belowMinimum() ? collection.minimumMessage() : null);
+        return new Quote(lines, total, canCheckout, view);
     }
 
     /** "Navy, M, 3 pairs" */

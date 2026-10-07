@@ -13,6 +13,9 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID>, JpaSpecificationExecutor<Order> {
 
+    long countByCustomerIdAndStatusIn(UUID customerId, java.util.Collection<OrderStatus> statuses);
+
+
     List<Order> findByCustomerIdOrderByCreatedAtDesc(UUID customerId);
 
     List<Order> findByStatus(OrderStatus status);

@@ -341,4 +341,18 @@ class PostgresIntegrationTest {
         return call("POST", "/api/auth/login", null,
                 "{\"email\":\"" + email + "\",\"password\":\"" + password + "\"}").get("token").asText();
     }
+
+    @Test
+    void theDatabaseItselfRefusesImpossiblePricing() {
+        // One policy row, starting with no minimum; the demo seed brings an example ladder.
+        assertThat(jdbc.queryForObject("select min_order_pairs from shop_policy where id = 1", Integer.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("select count(*) from price_tier", Integer.class)).isPositive();
+        assertThatThrownBy(() -> jdbc.update("insert into shop_policy (id) values (2)")).isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update("update shop_policy set trusted_min_order_pairs = 50 where id = 1"))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update("insert into price_tier (min_pairs, discount_pct) values (7, 95)"))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update("insert into price_tier (min_pairs, discount_pct) values (20, 1)"))
+                .as("one step per number of pairs").isInstanceOf(DataIntegrityViolationException.class);
+    }
 }

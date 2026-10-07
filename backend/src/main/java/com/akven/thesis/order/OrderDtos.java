@@ -27,7 +27,7 @@ public final class OrderDtos {
     // ---- requests ---------------------------------------------------------------------------
 
     public record CartItem(@NotBlank @Size(max = 64) String sku,
-                           @NotNull @Min(1) @Max(99) Integer quantity,
+                           @NotNull @Min(1) @Max(999) Integer quantity,
                            UUID negotiationSessionId) {}
 
     public record QuoteRequest(@NotEmpty @Size(max = 50) List<@Valid CartItem> items) {}
@@ -53,13 +53,22 @@ public final class OrderDtos {
                             String imageUrl, int quantity, BigDecimal listPrice, BigDecimal discountPct, BigDecimal unitPrice,
                             BigDecimal lineTotal, int availableQty, LineProblem problem, String note) {}
 
-    public record Quote(List<QuoteLine> lines, BigDecimal total, boolean canCheckout) {}
+    /** The next step of the price ladder: "add pairsToGo more pairs to save discountPct". */
+    public record NextTierView(int minPairs, BigDecimal discountPct, int pairsToGo) {}
+
+    /**
+     * The cart seen as one collection. minimumMessage is set only when the cart is below the owners' minimum.
+     */
+    public record CollectionView(int totalPairs, int minimumPairs, BigDecimal tierDiscountPct, NextTierView nextTier,
+                                 String minimumMessage) {}
+
+    public record Quote(List<QuoteLine> lines, BigDecimal total, boolean canCheckout, CollectionView collection) {}
 
     // ---- orders -----------------------------------------------------------------------------
 
     public record OrderItemView(String sku, String productName, String productSlug, String variantLabel, String colorHex,
                                 String imageUrl, int quantity, BigDecimal listPrice, BigDecimal discountPct,
-                                BigDecimal unitPrice, BigDecimal lineTotal) {}
+                                BigDecimal unitPrice, BigDecimal lineTotal, DiscountSource discountSource) {}
 
     public record FulfillmentView(FulfillmentMethod method, String contactName, String contactPhone, String address, String note) {}
 

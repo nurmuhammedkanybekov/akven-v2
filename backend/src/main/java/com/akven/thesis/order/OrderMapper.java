@@ -17,7 +17,8 @@ final class OrderMapper {
                 new FulfillmentView(o.getFulfillmentMethod(), o.getContactName(), o.getContactPhone(), o.getDeliveryAddress(), o.getNote()),
                 o.getPaymentRef() == null ? null : new PaymentView(o.getPaymentMethod(), shorten(o.getPaymentRef())),
                 o.getItems().stream().map(i -> new OrderItemView(i.getSku(), i.getProductName(), i.getProductSlug(), i.getVariantLabel(),
-                        i.getColorHex(), i.getImageUrl(), i.getQuantity(), i.getListPrice(), i.getDiscountPct(), i.getUnitPrice(), i.lineTotal())).toList(),
+                        i.getColorHex(), i.getImageUrl(), i.getQuantity(), i.getListPrice(), i.getDiscountPct(), i.getUnitPrice(), i.lineTotal(),
+                        i.getDiscountSource())).toList(),
                 withCustomer ? o.getCustomer().getEmail() : null);
     }
 

@@ -28,7 +28,11 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET /api/products/facets` | Counts per category / section / cut for the current filters |
 | `GET /api/catalog/terms` | The owners' sections and cuts (for menus and filters) |
 | `GET /api/products/{slug}` | Product detail with variants and images |
-| `POST /api/cart/quote` | Today's prices and availability for a cart (public; negotiated prices only for their owner) |
+| `POST /api/cart/quote` | Today's prices and availability for a cart (public; negotiated prices only for their owner). Also returns `collection`: total pairs, the minimum that applies, the reached tier, the next tier (`pairsToGo`), and a message when the cart is below the minimum |
+| `GET /api/pricing` | Public: the minimum order in pairs and the price ladder `[{minPairs, discountPct}]` |
+| `GET`, `PUT /api/admin/pricing/policy` | Minimum order, trusted minimum, and paid orders after which a customer counts as trusted (ADMIN) |
+| `GET`, `POST /api/admin/pricing/tiers`, `PUT`, `DELETE /api/admin/pricing/tiers/{id}` | The price ladder; one step per number of pairs, 0 to 90% (ADMIN) |
+| `PUT /api/admin/customers/{id}/trusted` | Mark a customer as trusted `{trusted}` (ADMIN) |
 | `POST /api/negotiate` | Chat message `{variantSku, message, quantity?}` → validated offer `{sessionId, reply, validatedDiscountPct, offerPrice}` (signed in; 20 messages per 10 minutes, then 429). Pass `sessionId` as `negotiationSessionId` in the bag |
 | `GET /api/admin/negotiations`, `GET /api/admin/negotiations/{id}` | Proposed against validated discount and the transcript (STAFF / ADMIN) |
 | `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock) |

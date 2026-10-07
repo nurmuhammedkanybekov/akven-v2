@@ -16,6 +16,7 @@ import com.akven.thesis.payment.PaymentRequest;
 import com.akven.thesis.payment.PaymentResult;
 import com.akven.thesis.payment.PaymentService;
 import com.akven.thesis.payment.PaymentUnavailableException;
+import com.akven.thesis.pricing.CollectionPricing;
 import com.akven.thesis.user.User;
 import com.akven.thesis.user.UserRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -62,9 +63,10 @@ public class OrderService {
     private final PricingService pricing;
     private final PaymentService payments;
     private final AuditService audit;
+    private final CollectionPricing collections;
 
     public OrderService(OrderRepository orders, VariantRepository variants, UserRepository users, PricingService pricing,
-                        PaymentService payments, AuditService audit, ProductImageRepository images) {
+                        PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections) {
         this.orders = orders;
         this.variants = variants;
         this.users = users;
@@ -72,6 +74,7 @@ public class OrderService {
         this.payments = payments;
         this.audit = audit;
         this.images = images;
+        this.collections = collections;
     }
 
     private final ProductImageRepository images;
@@ -110,6 +113,14 @@ public class OrderService {
             throw new BusinessRuleException("Some items are no longer in the shop: " + String.join(", ", missing) + ".");
         }
 
+        // The cart is one collection: the minimum and the price tier count pairs across all lines.
+        Map<Variant, Integer> byVariant = new LinkedHashMap<>();
+        for (Variant v : locked) byVariant.put(v, quantities.get(v.getSku()));
+        CollectionPricing.Collection collection = collections.evaluate(byVariant, customer);
+        if (collection.belowMinimum()) {
+            throw new BusinessRuleException(collection.minimumMessage());
+        }
+
         FulfillmentInputs f = new FulfillmentInputs(request);
         Order order = new Order(customer, idempotencyKey);
         order.setFulfillment(f.method, f.name, f.phone, f.address, f.note);
@@ -126,9 +137,11 @@ public class OrderService {
             if (v.available() < qty) {
                 throw new ConflictException("Only " + v.available() + " left of " + name + ".");
             }
-            PricingService.PricedLine priced = pricing.price(v, offers.get(v.getSku()), customer, qty);
-            order.addItem(new OrderItem(order, v, qty, priced.listPrice(), priced.discountPct(), priced.unitPrice(), priced.sessionId(),
-                    name, v.getProduct().getSlug(), CartService.label(v), cover.get(v.getProduct().getId().toString())));
+            PricingService.PricedLine priced = pricing.price(v, offers.get(v.getSku()), customer, qty, collection.tierDiscountPct());
+            OrderItem line = new OrderItem(order, v, qty, priced.listPrice(), priced.discountPct(), priced.unitPrice(), priced.sessionId(),
+                    name, v.getProduct().getSlug(), CartService.label(v), cover.get(v.getProduct().getId().toString()));
+            line.recordReason(priced.tierDiscountPct(), priced.source(), priced.capped());
+            order.addItem(line);
             v.reserve(qty);
         }
         if (order.getTotal().signum() <= 0) {

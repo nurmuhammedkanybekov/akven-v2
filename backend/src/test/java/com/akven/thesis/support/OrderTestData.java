@@ -39,6 +39,15 @@ public class OrderTestData {
         return variants.saveAndFlush(v);
     }
 
+    /** A sock sold as a pack: one unit holds {@code pairs} pairs. Price 10.00 per pack, biggest discount 15%. */
+    public Variant pack(int pairs, int stock) {
+        String id = UUID.randomUUID().toString().substring(0, 8);
+        Product p = products.save(new Product("order-it-" + id, "Order Test Pack " + id, Category.MEN, null, null, "OrderIt", "d", "cotton"));
+        Variant v = new Variant(p, "OP-" + id.toUpperCase(), "M", "Navy", pairs, new BigDecimal("10.00"), new BigDecimal("4.00"), new BigDecimal("15.00"));
+        v.setStockQty(stock);
+        return variants.saveAndFlush(v);
+    }
+
     public Variant reload(Variant v) {
         return variants.findById(v.getId()).orElseThrow();
     }
