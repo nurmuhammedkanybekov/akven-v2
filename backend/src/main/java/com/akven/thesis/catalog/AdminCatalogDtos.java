@@ -79,6 +79,16 @@ public final class AdminCatalogDtos {
             @NotNull Boolean active,
             Integer version) {}
 
+    /**
+     * STAFF and ADMIN: what is on the way and when it arrives, and how many pairs make one wholesale case.
+     * An arrival date needs incoming stock, and the date cannot be in the past.
+     */
+    public record SupplyRequest(
+            @Positive @jakarta.validation.constraints.Max(100000) Integer casePairs,
+            @NotNull @PositiveOrZero Integer incomingQty,
+            java.time.LocalDate restockEta,
+            Integer version) {}
+
     /** ADMIN only: the two values the negotiation guardrail is built on (FR-11). */
     public record PricingPolicyRequest(
             @NotNull @PositiveOrZero BigDecimal costPrice,
@@ -140,11 +150,13 @@ public final class AdminCatalogDtos {
     public record AdminVariantView(UUID id, String sku, String size, String color, String colorHex, Integer packSize,
                                    BigDecimal price, BigDecimal costPrice, BigDecimal marginFloorPct,
                                    int stockQty, int reservedQty, int availableQty,
-                                   boolean active, Integer version) {
+                                   boolean active, Integer version, Integer casePairs, int incomingQty,
+                                   java.time.LocalDate restockEta) {
         static AdminVariantView of(Variant v) {
             return new AdminVariantView(v.getId(), v.getSku(), v.getSize(), v.getColor(), v.getColorHex(),
                     v.getPackSize(), v.getPrice(), v.getCostPrice(), v.getMarginFloorPct(),
-                    v.getStockQty(), v.getReservedQty(), v.available(), v.isActive(), v.getVersion());
+                    v.getStockQty(), v.getReservedQty(), v.available(), v.isActive(), v.getVersion(),
+                    v.getCasePairs(), v.getIncomingQty(), v.getRestockEta());
         }
     }
 

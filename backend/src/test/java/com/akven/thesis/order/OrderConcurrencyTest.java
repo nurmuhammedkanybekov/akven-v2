@@ -37,7 +37,7 @@ class OrderConcurrencyTest extends IntegrationTest {
     private CheckoutRequest cart(int qty, String... skus) {
         List<CartItem> items = new ArrayList<>();
         for (String sku : skus) items.add(new CartItem(sku, qty, null));
-        return new CheckoutRequest(items, new FulfillmentInput(FulfillmentMethod.PICKUP, "Racer", "+996 700 000 000", null, null),
+        return new CheckoutRequest(items, new FulfillmentInput(FulfillmentMethod.PICKUP, "Racer", "+996 700 000 000", null, null, null),
                 new PaymentInput(PaymentMethod.APPLE_PAY, "sim_apple_abcdef123456"));
     }
 

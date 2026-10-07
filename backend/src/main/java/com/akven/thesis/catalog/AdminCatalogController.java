@@ -96,6 +96,11 @@ public class AdminCatalogController {
         return service.updateVariant(auth.getName(), id, body);
     }
 
+    @PutMapping("/variants/{id}/supply")
+    public AdminVariantView updateSupply(Authentication auth, @PathVariable UUID id, @Valid @RequestBody SupplyRequest body) {
+        return service.updateSupply(auth.getName(), id, body);
+    }
+
     @PutMapping("/variants/{id}/pricing-policy")
     public AdminVariantView updatePricingPolicy(Authentication auth, @PathVariable UUID id,
                                                 @Valid @RequestBody PricingPolicyRequest body) {

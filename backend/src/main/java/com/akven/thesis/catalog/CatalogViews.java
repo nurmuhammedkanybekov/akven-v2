@@ -1,6 +1,8 @@
 package com.akven.thesis.catalog;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -41,11 +43,15 @@ public final class CatalogViews {
 
     public record Facets(Map<Category, Long> category, List<FacetOption> section, List<FacetOption> cut) {}
 
-    public record VariantView(String sku, String size, String color, String colorHex, Integer packSize,
-                              BigDecimal price, int availableQty) {
-        static VariantView of(Variant v) {
-            return new VariantView(v.getSku(), v.getSize(), v.getColor(), v.getColorHex(), v.getPackSize(),
-                    v.getPrice(), Math.max(0, v.available()));
+    /** restockInDays is set only while COMING_SOON: "arrives in about N days". */
+    public record VariantView(String sku, String size, String color, String colorHex, Integer packSize, Integer casePairs,
+                              BigDecimal price, int availableQty, StockStatus stockStatus, LocalDate restockEta, Integer restockInDays) {
+        static VariantView of(Variant v, int fewLeftThreshold, LocalDate today) {
+            StockStatus status = v.stockStatus(fewLeftThreshold, today);
+            boolean coming = status == StockStatus.COMING_SOON;
+            return new VariantView(v.getSku(), v.getSize(), v.getColor(), v.getColorHex(), v.getPackSize(), v.getCasePairs(),
+                    v.getPrice(), Math.max(0, v.available()), status, coming ? v.getRestockEta() : null,
+                    coming ? (int) ChronoUnit.DAYS.between(today, v.getRestockEta()) : null);
         }
     }
 
@@ -69,12 +75,12 @@ public final class CatalogViews {
                                 String collection, String description, String fabricComposition,
                                 String quality, String care, String origin,
                                 List<ImageView> images, List<VariantView> variants) {
-        static ProductDetail of(Product p, List<Variant> sellableVariants, List<ProductImage> images) {
+        static ProductDetail of(Product p, List<Variant> sellableVariants, List<ProductImage> images, int fewLeftThreshold, LocalDate today) {
             return new ProductDetail(p.getSlug(), p.getName(), p.getCategory(), TermView.of(p.getSection()),
                     TermView.of(p.getCut()), p.getCollection(), p.getDescription(), p.getFabricComposition(),
                     p.getQuality(), p.getCare(), p.getOrigin(),
                     images.stream().map(ImageView::of).toList(),
-                    sellableVariants.stream().map(VariantView::of).toList());
+                    sellableVariants.stream().map(v -> VariantView.of(v, fewLeftThreshold, today)).toList());
         }
     }
 }

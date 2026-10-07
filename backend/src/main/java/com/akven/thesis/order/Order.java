@@ -65,6 +65,10 @@ public class Order extends AuditableEntity {
     @Column(length = 300) private String deliveryAddress;
     @Column(length = 500) private String note;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 2)
+    private Country deliveryCountry;
+
     @Column(length = 64)
     private String idempotencyKey;
 
@@ -93,8 +97,10 @@ public class Order extends AuditableEntity {
         total = total.add(item.lineTotal());
     }
 
-    public void setFulfillment(FulfillmentMethod method, String contactName, String contactPhone, String deliveryAddress, String note) {
+    public void setFulfillment(FulfillmentMethod method, String contactName, String contactPhone, String deliveryAddress, String note,
+                               Country deliveryCountry) {
         this.fulfillmentMethod = method;
+        this.deliveryCountry = method == FulfillmentMethod.DELIVERY ? deliveryCountry : null;
         this.contactName = contactName;
         this.contactPhone = contactPhone;
         this.deliveryAddress = deliveryAddress;
@@ -156,6 +162,7 @@ public class Order extends AuditableEntity {
     public String getContactPhone() { return contactPhone; }
     public String getDeliveryAddress() { return deliveryAddress; }
     public String getNote() { return note; }
+    public Country getDeliveryCountry() { return deliveryCountry; }
     public String getIdempotencyKey() { return idempotencyKey; }
     public PickupPoint getPickupPoint() { return pickupPoint; }
     public String getPickupCode() { return pickupCode; }

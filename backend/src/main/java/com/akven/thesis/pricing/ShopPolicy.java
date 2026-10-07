@@ -25,6 +25,9 @@ public class ShopPolicy extends AuditableEntity {
     @Column(nullable = false)
     private Integer trustedAfterOrders = 3;
 
+    @Column(nullable = false)
+    private Integer fewLeftThreshold = 5;
+
     protected ShopPolicy() {
         // JPA
     }
@@ -34,13 +37,15 @@ public class ShopPolicy extends AuditableEntity {
         return new ShopPolicy();
     }
 
-    void update(int minOrderPairs, int trustedMinOrderPairs, int trustedAfterOrders) {
+    void update(int minOrderPairs, int trustedMinOrderPairs, int trustedAfterOrders, int fewLeftThreshold) {
         this.minOrderPairs = minOrderPairs;
         this.trustedMinOrderPairs = trustedMinOrderPairs;
         this.trustedAfterOrders = trustedAfterOrders;
+        this.fewLeftThreshold = fewLeftThreshold;
     }
 
     public int getMinOrderPairs() { return minOrderPairs; }
     public int getTrustedMinOrderPairs() { return trustedMinOrderPairs; }
     public int getTrustedAfterOrders() { return trustedAfterOrders; }
+    public int getFewLeftThreshold() { return fewLeftThreshold; }
 }

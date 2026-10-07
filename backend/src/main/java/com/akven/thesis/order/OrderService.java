@@ -129,7 +129,7 @@ public class OrderService {
 
         FulfillmentInputs f = new FulfillmentInputs(request);
         Order order = new Order(customer, idempotencyKey);
-        order.setFulfillment(f.method, f.name, f.phone, f.address, f.note);
+        order.setFulfillment(f.method, f.name, f.phone, f.address, f.note, f.country);
         if (f.method == FulfillmentMethod.PICKUP) {
             shopInfo.defaultPickupPoint().ifPresent(order::collectAt);
         }
@@ -338,6 +338,7 @@ public class OrderService {
     private static final class FulfillmentInputs {
         final FulfillmentMethod method;
         final String name, phone, address, note;
+        final Country country;
 
         FulfillmentInputs(CheckoutRequest r) {
             method = r.fulfillment().method();
@@ -345,6 +346,8 @@ public class OrderService {
             phone = r.fulfillment().contactPhone().trim();
             address = method == FulfillmentMethod.DELIVERY ? r.fulfillment().address().trim() : null;
             note = r.fulfillment().note() == null || r.fulfillment().note().isBlank() ? null : r.fulfillment().note().trim();
+            // Most deliveries stay in Kyrgyzstan; the shop also sends to Kazakhstan, Uzbekistan and Russia.
+            country = method != FulfillmentMethod.DELIVERY ? null : r.fulfillment().country() == null ? Country.KG : r.fulfillment().country();
         }
     }
 }

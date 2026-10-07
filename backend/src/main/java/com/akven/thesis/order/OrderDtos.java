@@ -37,7 +37,8 @@ public final class OrderDtos {
                                    @NotBlank @Size(max = 120) String contactName,
                                    @NotBlank @Pattern(regexp = "[0-9+()\\-\\s]{6,40}", message = "enter a phone number") String contactPhone,
                                    @Size(max = 300) String address,
-                                   @Size(max = 500) String note) {}
+                                   @Size(max = 500) String note,
+                                   Country country) {}
 
     /** The wallet token only. There is deliberately no field for a card number. */
     public record PaymentInput(@NotNull PaymentMethod method, @NotBlank @Size(max = 128) String token) {}
@@ -71,7 +72,8 @@ public final class OrderDtos {
                                 String imageUrl, int quantity, BigDecimal listPrice, BigDecimal discountPct,
                                 BigDecimal unitPrice, BigDecimal lineTotal, DiscountSource discountSource) {}
 
-    public record FulfillmentView(FulfillmentMethod method, String contactName, String contactPhone, String address, String note) {}
+    public record FulfillmentView(FulfillmentMethod method, String contactName, String contactPhone, String address, String note,
+                                  Country country) {}
 
     /** The payment reference is shown shortened: enough for a support call, not the whole token of the provider. */
     public record PaymentView(String method, String reference) {}
