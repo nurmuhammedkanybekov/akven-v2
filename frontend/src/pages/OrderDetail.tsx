@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { cancelMyOrder, getMyOrder } from "../api/endpoints";
+import type { OrderView } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
@@ -9,6 +10,8 @@ import { OrderStatusBadge } from "../components/OrderStatusBadge";
 import { ProductImage } from "../components/ProductImage";
 import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/en";
 import { formatDateTime, formatPrice } from "../lib/format";
 import { NotFoundPage } from "./NotFound";
 
@@ -16,6 +19,7 @@ export function OrderDetailPage() {
   const { id = "" } = useParams();
   const justPaid = Boolean((useLocation().state as { justPaid?: boolean } | null)?.justPaid);
   const toast = useToast();
+  const { t } = useT();
   const order = useAsync(() => getMyOrder(id), [id]);
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -45,6 +49,8 @@ export function OrderDetailPage() {
         <OrderStatusBadge status={o.status} />
       </header>
 
+      {o.pickup?.code && o.status === "PAID" && <PickupCode code={o.pickup.code} point={o.pickup.point} />}
+
       <div className="av-cart">
         <ul className="av-cartlines">
           {o.items.map((i) => (
@@ -64,6 +70,7 @@ export function OrderDetailPage() {
           <dl className="av-specs">
             <div><dt className="av-eyebrow">Total</dt><dd className="av-price av-price--lg">{formatPrice(o.total)}</dd></div>
             <div><dt className="av-eyebrow">{o.fulfillment.method === "PICKUP" ? "Pick up" : "Delivery"}</dt><dd>{o.fulfillment.contactName}, {o.fulfillment.contactPhone}{o.fulfillment.address ? <><br />{o.fulfillment.address}</> : null}</dd></div>
+            {o.fulfillment.country && <div><dt className="av-eyebrow">{t("order.country")}</dt><dd>{t(`country.${o.fulfillment.country}` as MessageKey)}</dd></div>}
             {o.fulfillment.note && <div><dt className="av-eyebrow">Note</dt><dd>{o.fulfillment.note}</dd></div>}
             {o.payment && <div><dt className="av-eyebrow">Paid with</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}
             {o.fulfilledAt && <div><dt className="av-eyebrow">Completed</dt><dd>{formatDateTime(o.fulfilledAt)}</dd></div>}
@@ -78,5 +85,26 @@ export function OrderDetailPage() {
         <p>{o.status === "PAID" ? "Your payment will be returned and the socks go back on the shelf." : "The socks go back on the shelf."} You can place a new order any time.</p>
       </Dialog>
     </div>
+  );
+}
+
+/** The six digits to say at the stall, large enough to read across a counter, with where to collect. */
+function PickupCode({ code, point }: { code: string; point: NonNullable<OrderView["pickup"]>["point"] }) {
+  const { t } = useT();
+  return (
+    <section className="av-deep av-pickup" aria-label={t("order.pickupTitle")}>
+      <div className="av-stack">
+        <span className="av-eyebrow">{t("order.pickupTitle")}</span>
+        <strong className="av-pickup__code av-num" aria-label={code.split("").join(" ")}>{code.slice(0, 3)} {code.slice(3)}</strong>
+        <p>{t("order.pickupLead")}</p>
+      </div>
+      {point && (
+        <div className="av-stack">
+          <span className="av-eyebrow">{t("order.pickupAt")}</span>
+          <p>{[point.market, point.section, point.passage && `${t("visit.passage")} ${point.passage}`, `${t("visit.container")} ${point.container}`].filter(Boolean).join(", ")}</p>
+          {point.hours && <p>{point.hours}</p>}
+        </div>
+      )}
+    </section>
   );
 }

@@ -23,7 +23,8 @@ interface CartState {
 }
 
 const KEY = "akven-cart-v1";
-export const MAX_PER_LINE = 99;
+/** The same limit the server applies to one line: enough for a 100-pair collection or a wholesale order. */
+export const MAX_PER_LINE = 999;
 const CartContext = createContext<CartState | null>(null);
 
 function isLine(x: unknown): x is CartLine {

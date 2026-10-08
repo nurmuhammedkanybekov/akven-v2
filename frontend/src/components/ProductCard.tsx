@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { ProductSummary } from "../api/types";
 import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/en";
 import { productMeta } from "../lib/labels";
 import { Badge } from "./Badge";
 import { Price } from "./Price";
@@ -21,7 +22,7 @@ export function ProductCard({ product, to, tint }: { product: ProductSummary; to
       </div>
       <div className="av-card__meta">
         <span className="av-card__name">{product.name}</span>
-        <span className="av-small">{productMeta(product)}</span>
+        <span className="av-small">{productMeta(product, t(`nav.${product.category.toLowerCase()}` as MessageKey))}</span>
         <span className="av-card__foot">
           <Price amount={product.minPrice} from={product.variantCount > 1} />
           {product.colors.length > 1 && (

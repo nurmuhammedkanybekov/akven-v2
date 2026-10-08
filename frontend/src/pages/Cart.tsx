@@ -8,7 +8,9 @@ import { Button } from "../components/Button";
 import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
 import { QuantityStepper } from "../components/QuantityStepper";
+import { useT } from "../i18n/I18n";
 import { formatPrice } from "../lib/format";
+import type { CollectionView } from "../api/types";
 
 /** The bag: what is in it, at today's prices, with honest notes about anything that changed. */
 export function CartPage() {
@@ -41,13 +43,14 @@ export function CartPage() {
         </ul>
 
         <aside className="av-summary" aria-label="Order summary">
+          {quote?.collection && <CollectionProgress c={quote.collection} />}
           <h2>Summary</h2>
           <dl className="av-totals">
             <div><dt>Subtotal</dt><dd className="av-price">{formatPrice(total)}</dd></div>
             <div><dt>Delivery</dt><dd className="av-small">Chosen at checkout</dd></div>
             <div className="av-totals__grand"><dt>Total</dt><dd className="av-price av-price--lg">{formatPrice(total)}</dd></div>
           </dl>
-          {quote && !quote.canCheckout && <Alert tone="danger">Some items need your attention before you can check out.</Alert>}
+          {quote && !quote.canCheckout && !quote.collection?.minimumMessage && <Alert tone="danger">Some items need your attention before you can check out.</Alert>}
           {quote?.canCheckout && !offline
             ? <Button to="/checkout" size="lg" block>Check out</Button>
             : <Button size="lg" block disabled>Check out</Button>}
@@ -58,8 +61,31 @@ export function CartPage() {
   );
 }
 
+/**
+ * The bag seen as one collection: how many pairs so far, the minimum, the step reached and how far the next one is.
+ * Every number comes from the server's quote, so it matches what checkout will charge.
+ */
+function CollectionProgress({ c }: { c: CollectionView }) {
+  const { t } = useT();
+  const target = c.minimumMessage ? c.minimumPairs : c.nextTier?.minPairs;
+  const pct = target ? Math.min(100, Math.round((c.totalPairs / target) * 100)) : 100;
+  return (
+    <section className="av-collection" aria-label={t("bag.collection")}>
+      <div className="av-collection__head">
+        <span className="av-eyebrow">{t("bag.collection")}</span>
+        <strong className="av-num">{t("bag.pairs", { n: c.totalPairs })}</strong>
+      </div>
+      {target && <div className="av-collection__bar" aria-hidden="true"><i style={{ width: `${pct}%` }} /></div>}
+      {c.minimumMessage && <p className="av-small">{t("bag.min", { n: c.minimumPairs })}</p>}
+      {!c.minimumMessage && c.tierDiscountPct > 0 && <p className="av-small av-price__save">{t("bag.tier", { pct: Number(c.tierDiscountPct) })}</p>}
+      {!c.minimumMessage && c.nextTier && <p className="av-small">{t("bag.next", { n: c.nextTier.pairsToGo, pct: Number(c.nextTier.discountPct) })}</p>}
+    </section>
+  );
+}
+
 function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading: boolean }) {
   const cart = useCart();
+  const { t } = useT();
   const problem = q && q.problem !== "NONE";
   const unitPrice = q?.unitPrice ?? line.unitPrice;
   const max = q ? Math.max(1, Math.min(MAX_PER_LINE, q.availableQty)) : MAX_PER_LINE;
@@ -74,7 +100,7 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
           {line.colorHex && <span className="av-dot" style={{ background: line.colorHex }} />} {line.variantLabel}
         </span>
         <Price amount={unitPrice} was={q?.discountPct ? q.listPrice ?? undefined : undefined} />
-        {q?.discountPct ? <span className="av-small av-price__save">Your negotiated price: {q.discountPct}% off</span> : null}
+        {q?.discountPct ? <span className="av-small av-price__save">{line.negotiationSessionId ? t("bag.negotiated", { pct: q.discountPct }) : t("bag.collectionPrice", { pct: q.discountPct })}</span> : null}
         {priceChanged && <span className="av-small">Price is now {formatPrice(q!.unitPrice!)} (it was {formatPrice(line.unitPrice)} when you added it).</span>}
         {q?.note && <span className={problem ? "av-error" : "av-small"}>{q.note}</span>}
         {q?.problem === "NOT_ENOUGH_STOCK" && q.availableQty > 0 && (

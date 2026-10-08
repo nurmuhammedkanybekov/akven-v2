@@ -13,6 +13,9 @@ import { LoginPage } from "./pages/Login";
 import { NotFoundPage } from "./pages/NotFound";
 import { ProductPage } from "./pages/Product";
 import { RegisterPage } from "./pages/Register";
+import { SizesPage } from "./pages/Sizes";
+import { VisitPage } from "./pages/Visit";
+import { WholesalePage } from "./pages/Wholesale";
 
 // Rarely used screens (admin, checkout, order history, style guide) load on demand, so the shop opens faster.
 const AdminLayout = lazy(() => import("./admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
@@ -44,6 +47,9 @@ export default function App() {
               <Route path="kids" element={<CatalogPage category="KIDS" />} />
               <Route path="bundles" element={<CatalogPage category="BUNDLES" />} />
               <Route path="products/:slug" element={<ProductPage />} />
+              <Route path="visit" element={<VisitPage />} />
+              <Route path="sizes" element={<SizesPage />} />
+              <Route path="wholesale" element={<WholesalePage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="cart" element={<CartPage />} />
