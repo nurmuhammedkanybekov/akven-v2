@@ -24,6 +24,11 @@ const AdminNegotiations = lazy(() => import("./admin/AdminNegotiations").then((m
 const AdminOrders = lazy(() => import("./admin/AdminOrders").then((m) => ({ default: m.AdminOrders })));
 const AdminProducts = lazy(() => import("./admin/AdminProducts").then((m) => ({ default: m.AdminProducts })));
 const AdminTerms = lazy(() => import("./admin/AdminTerms").then((m) => ({ default: m.AdminTerms })));
+const AdminDashboard = lazy(() => import("./admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard })));
+const AdminHandover = lazy(() => import("./admin/AdminHandover").then((m) => ({ default: m.AdminHandover })));
+const AdminPricing = lazy(() => import("./admin/AdminPricing").then((m) => ({ default: m.AdminPricing })));
+const AdminShopInfo = lazy(() => import("./admin/AdminShopInfo").then((m) => ({ default: m.AdminShopInfo })));
+const AdminSizes = lazy(() => import("./admin/AdminSizes").then((m) => ({ default: m.AdminSizes })));
 const ProductEditor = lazy(() => import("./admin/ProductEditor").then((m) => ({ default: m.ProductEditor })));
 const CheckoutPage = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.CheckoutPage })));
 const OrderDetailPage = lazy(() => import("./pages/OrderDetail").then((m) => ({ default: m.OrderDetailPage })));
@@ -67,6 +72,11 @@ export default function App() {
               <Route path="negotiations" element={<AdminNegotiations />} />
               <Route path="orders/:id" element={<AdminOrderDetail />} />
               <Route path="sections" element={<AdminTerms />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="handover" element={<AdminHandover />} />
+              <Route path="pricing" element={<AdminPricing />} />
+              <Route path="shop" element={<AdminShopInfo />} />
+              <Route path="sizes" element={<AdminSizes />} />
             </Route>
           </Routes>
           </Suspense>

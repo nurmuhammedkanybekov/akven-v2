@@ -30,6 +30,11 @@ export function AdminLayout() {
           <NavLink to="/admin/orders">Orders</NavLink>
           <NavLink to="/admin/negotiations">Negotiations</NavLink>
           <NavLink to="/admin/sections">Sections and cuts</NavLink>
+          <NavLink to="/admin/dashboard">Dashboard</NavLink>
+          <NavLink to="/admin/handover">Hand over an order</NavLink>
+          {isAdmin && <NavLink to="/admin/pricing">Pricing</NavLink>}
+          {isAdmin && <NavLink to="/admin/shop">Contacts and the stall</NavLink>}
+          {isAdmin && <NavLink to="/admin/sizes">Size chart</NavLink>}
           <Link to="/" target="_blank" rel="noreferrer">View the shop</Link>
         </nav>
         <div className="av-admin__who">

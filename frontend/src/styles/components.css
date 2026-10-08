@@ -365,3 +365,16 @@
 .av-chat__turn { display: grid; gap: var(--space-3); justify-items: start; }
 .av-chat__form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3); }
 .av-transcript { white-space: pre-wrap; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: var(--text-small); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-4); margin: 0; }
+
+/* ---- admin dashboard ---- */
+.av-tiles4 { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 900px) { .av-tiles4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.av-tiles4 li { display: grid; gap: 2px; padding: var(--space-4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.av-tiles4 strong { font-size: 1.875rem; font-weight: 700; letter-spacing: -0.02em; }
+.av-chart { position: relative; }
+.av-chart svg { width: 100%; height: auto; }
+.av-chart__axis { stroke: var(--line-strong); stroke-width: 1; }
+.av-chart__tick { fill: var(--ink-3); font: 11px var(--font-sans); font-variant-numeric: tabular-nums; }
+.av-chart__bar { fill: var(--ink-2); }
+.av-chart__bar.is-hover { fill: var(--ink); }
+.av-chart__tip { display: grid; gap: 2px; margin-top: var(--space-2); padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--paper); font-size: var(--text-small); }
