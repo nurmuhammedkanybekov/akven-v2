@@ -55,10 +55,10 @@ Copy `.env.example` to `.env` for local values; git ignores `.env`, and secrets 
 
 | What | Command | Notes |
 |---|---|---|
-| Backend, in-memory database | `cd backend && mvn verify` | About 140 tests against H2 (no Postgres needed), plus a coverage check that fails the build below 80% line coverage. Report: `backend/target/site/jacoco/index.html` |
+| Backend, in-memory database | `cd backend && mvn verify` | About 165 tests against H2 (no Postgres needed), plus a coverage check that fails the build below 80% line coverage. Report: `backend/target/site/jacoco/index.html` |
 | Backend, real PostgreSQL | `AKVEN_PG_URL=jdbc:postgresql://localhost:5432/akven_it mvn test -Dtest=PostgresIntegrationTest` | Needs an **empty** database. Checks Flyway, schema validation, database constraints, and the last-pair and double-click races over real HTTP |
-| Frontend | `cd frontend && npx tsc --noEmit && npm test && npm run build` | Type check, about 90 component and logic tests, production build |
-| Whole system in a browser | `cd frontend && npm run e2e` | Needs the backend running on a fresh demo database. Walks the owner's and the customer's journeys in a real browser and runs accessibility rules on the main pages |
+| Frontend | `cd frontend && npx tsc --noEmit && npm test && npm run build` | Type check, about 110 component and logic tests (including contrast and translation checks), production build |
+| Whole system in a browser | `cd frontend && npm run e2e` | Needs the backend running on a fresh demo database. Walks the owner's, the staff's and the customer's journeys in a real browser, switches the site to Russian and Kyrgyz, and runs accessibility rules on every public page and owner screen |
 
 Current backend line coverage is about 97% overall, and about 97% on the entity classes (the model layer).
 
@@ -70,7 +70,9 @@ and the Docker start-up check; it exists so changes can be proven before they re
 
 ## Database
 
-Flyway runs the migrations in `backend/src/main/resources/db/migration` (V1 to V10); the demo data lives apart in
-`db/seed` and is only loaded by the demo profile. Never edit a migration that has been applied; add a new one. The
-data model is drawn in [`diagrams/04b-er-core.svg`](diagrams/04b-er-core.svg) (core) and
+Flyway runs the migrations in `backend/src/main/resources/db/migration`; the demo data lives apart in `db/seed`
+(including the example price ladder, the stall and the example size chart) and is only loaded by the demo profile. Never edit a migration that has been applied; add a new one. The data model up to V10 is drawn in [`diagrams/04b-er-core.svg`](diagrams/04b-er-core.svg) (core) and
 [`diagrams/04-er-data-model.svg`](diagrams/04-er-data-model.svg) (full schema).
+
+The diagrams do not yet show the tables added for Milestone 3 (`shop_policy`, `price_tier`, `shop_contact`,
+`pickup_point`, `size_chart_row`) or the new columns on `variant`, `customer_order` and `order_item`.
