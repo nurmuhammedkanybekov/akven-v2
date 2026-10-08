@@ -43,6 +43,7 @@ What other answers mean:
 | `Your branch is ahead of 'origin/nurmss' by N commits` | You have commits that are not on GitHub yet: `git push origin nurmss` |
 | `Changes not staged for commit` or `Untracked files` | You changed files on the laptop. Keep them with `git add -A && git commit -m "…"`, or throw them away with `git restore .` (careful: this cannot be undone) |
 | `have diverged` | Both sides have new commits. Run `git pull origin nurmss` and follow what it says, or ask before going further |
+| `Your branch is up to date with 'gitlab/nurmss'` | The branch follows GitLab, not GitHub, so "up to date" says nothing about the newest work. Run `git pull origin nurmss`, then `git branch --set-upstream-to=origin/nurmss nurmss` once, and run `git status` again |
 
 To be completely sure, compare the newest commit on the laptop with the newest commit on GitHub. These two commands
 must print the same commit id:
@@ -84,6 +85,11 @@ Then open http://localhost:8081 and check:
 - the admin (`admin@akven.test` / `changeme-admin`) has Dashboard, Pricing, Contacts and the stall, and Size chart.
 
 If all three are there, the laptop runs the latest version.
+
+The backend log tells the same story: at start it prints `Successfully applied N migrations … now at version vN`.
+The number must match the newest `V…` file in `backend/src/main/resources/db/migration` and `db/seed` (17 at the
+time of writing). A smaller number means the build used older code. If the browser still shows the old pages after
+that, hard-refresh it (Cmd+Shift+R), because the installed app keeps its files in a cache.
 
 ## 3. Publish to GitLab
 
