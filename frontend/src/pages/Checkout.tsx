@@ -2,7 +2,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { checkout } from "../api/endpoints";
-import type { FulfillmentMethod, PaymentMethod } from "../api/types";
+import type { Country, FulfillmentMethod, PaymentMethod } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { useCart } from "../cart/CartContext";
 import { useQuote } from "../cart/useQuote";
@@ -10,6 +10,8 @@ import { Alert, Skeleton } from "../components/Alert";
 import { Button } from "../components/Button";
 import { Input, Textarea } from "../components/Field";
 import { WalletSheet } from "../components/WalletSheet";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/en";
 import { formatPrice } from "../lib/format";
 import { newId } from "../lib/ids";
 import { newWalletToken } from "../lib/wallet";
@@ -28,6 +30,8 @@ export function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [method, setMethod] = useState<FulfillmentMethod>("PICKUP");
   const [address, setAddress] = useState("");
+  const [country, setCountry] = useState<Country>("KG");
+  const { t } = useT();
   const [note, setNote] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +64,8 @@ export function CheckoutPage() {
     try {
       const order = await checkout({
         items: cart.lines.map((l) => ({ sku: l.sku, quantity: l.quantity, negotiationSessionId: l.negotiationSessionId })),
-        fulfillment: { method, contactName: name.trim(), contactPhone: phone.trim(), address: method === "DELIVERY" ? address.trim() : null, note: note.trim() || null },
+        fulfillment: { method, contactName: name.trim(), contactPhone: phone.trim(), address: method === "DELIVERY" ? address.trim() : null, note: note.trim() || null,
+          country: method === "DELIVERY" ? country : null },
         payment: { method: payment, token: newWalletToken(payment, declined) },
       }, attemptKey.current);
       setPlaced(true);
@@ -98,6 +103,14 @@ export function CheckoutPage() {
               <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "DELIVERY"} onChange={() => setMethod("DELIVERY")} /><span><strong>Delivery</strong><br /><span className="av-small">We bring it to you</span></span></label>
             </div>
           </fieldset>
+          {method === "DELIVERY" && (
+            <label className="av-field">
+              <span className="av-label">{t("order.country")}</span>
+              <select className="av-select" value={country} onChange={(e) => setCountry(e.target.value as Country)}>
+                {(["KG", "KZ", "UZ", "RU"] as const).map((c) => <option key={c} value={c}>{t(`country.${c}` as MessageKey)}</option>)}
+              </select>
+            </label>
+          )}
           {method === "DELIVERY" && <Textarea label="Delivery address" rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
           <Textarea label="Note (optional)" rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
 

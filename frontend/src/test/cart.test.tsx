@@ -26,10 +26,10 @@ describe("the bag", () => {
     expect(api.count).toBe(6);
   });
 
-  it("removes a line when its quantity drops below one, and caps at 99", () => {
+  it("removes a line when its quantity drops below one, and caps at the per-line limit", () => {
     mount();
     act(() => api.add(sock("A"), 3));
-    act(() => api.setQuantity("A", 500));
+    act(() => api.setQuantity("A", 5000));
     expect(api.lines[0].quantity).toBe(MAX_PER_LINE);
     act(() => api.setQuantity("A", 0));
     expect(api.lines).toHaveLength(0);

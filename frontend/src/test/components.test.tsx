@@ -76,6 +76,14 @@ describe("Stock and price wording", () => {
     rerender(<StockBadge available={0} />);
     expect(screen.getByText("Sold out")).toBeInTheDocument();
   });
+  it("follows the server: the owners' threshold, and stock that is on the way", () => {
+    const { rerender } = render(<StockBadge available={8} status="FEW_LEFT" />);
+    expect(screen.getByText("Only 8 left")).toBeInTheDocument();
+    rerender(<StockBadge available={0} status="COMING_SOON" restockInDays={12} />);
+    expect(screen.getByText("Arrives in about 12 days")).toBeInTheDocument();
+    rerender(<StockBadge available={0} status="COMING_SOON" restockInDays={0} />);
+    expect(screen.getByText("Arrives today")).toBeInTheDocument();
+  });
   it("tells screen readers the original price, not just a strikethrough", () => {
     render(<Price amount={12} was={15} />);
     expect(screen.getByText("(was $15.00)")).toBeInTheDocument();

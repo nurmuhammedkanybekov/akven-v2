@@ -162,3 +162,48 @@
 .av-whole { display: grid; gap: var(--space-6); padding-top: var(--space-7); border-top: 1px solid var(--line-strong); }
 @media (min-width: 900px) { .av-whole { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); align-items: end; } }
 .av-whole__actions { display: grid; gap: var(--space-3); }
+
+/* ---------- product page additions ---------- */
+.av-pdp__title { font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem); }
+.av-pdp__ladder { font-size: var(--text-small); color: var(--ink-2); }
+.av-pdp__ladder .av-num { color: var(--accent-ink); font-weight: 600; }
+.av-finder { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); padding: var(--space-3) var(--space-4); }
+.av-finder summary { cursor: pointer; font-weight: 600; font-size: 0.9375rem; }
+.av-finder[open] { display: grid; gap: var(--space-3); }
+.av-finder__form { display: grid; gap: var(--space-3); grid-template-columns: minmax(0, 1fr); align-items: end; }
+@media (min-width: 520px) { .av-finder__form { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) auto; } }
+.av-finder__result { font-weight: 600; color: var(--validated); }
+
+/* ---------- bag: the collection ---------- */
+.av-collection { display: grid; gap: var(--space-2); padding-bottom: var(--space-4); border-bottom: 1px solid var(--line); }
+.av-collection__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
+.av-collection__bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.av-collection__bar i { display: block; height: 100%; background: var(--accent); transition: width 0.5s var(--ease); }
+
+/* ---------- visit, sizes, wholesale ---------- */
+.av-visit { display: grid; gap: var(--space-6); }
+.av-visit__card { display: grid; gap: var(--space-6); }
+@media (min-width: 900px) { .av-visit__card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+.av-visit__address { display: grid; gap: 2px; font-style: normal; font-size: 1.125rem; color: var(--on-black); }
+.av-visit__container { font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem); font-weight: 700; letter-spacing: -0.02em; color: var(--accent); }
+.av-visit__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); counter-reset: s; }
+.av-visit__steps li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); align-items: center; padding: var(--space-4); border: 1px solid color-mix(in srgb, var(--on-black) 14%, transparent); border-radius: var(--radius-md); color: var(--on-black); }
+.av-visit__steps svg { color: var(--accent); }
+.av-visit__directions { grid-column: 1 / -1; }
+.av-visit__grid { display: grid; gap: var(--space-7); }
+@media (min-width: 900px) { .av-visit__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.av-visit__delivery { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); color: var(--ink-2); }
+.av-visit__delivery svg { color: var(--accent-ink); }
+.av-contacts { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+.av-contacts a { display: grid; gap: 2px; padding: var(--space-4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); text-decoration: none; }
+.av-contacts a:hover { border-color: var(--accent); }
+.av-sizes__table tbody th { font: 600 0.9375rem/1.4 var(--font-sans); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.av-sizes__table th.is-lead, .av-sizes__table td.is-lead { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.av-help--static > li > div { display: grid; justify-items: center; text-align: center; gap: var(--space-2); padding: var(--space-5) var(--space-3); height: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.av-whole__panel { display: grid; gap: var(--space-4); }
+.av-whole__panel h2 { color: var(--on-black); }
+
+/* ---------- order: pickup code ---------- */
+.av-pickup { display: grid; gap: var(--space-6); margin-block: var(--space-5); }
+@media (min-width: 720px) { .av-pickup { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; } }
+.av-pickup__code { font-size: clamp(2.5rem, 2rem + 3vw, 4rem); font-weight: 700; letter-spacing: 0.06em; color: var(--accent); line-height: 1; }
