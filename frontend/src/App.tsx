@@ -4,6 +4,7 @@ import { AuthProvider } from "./auth/AuthContext";
 import { CartProvider } from "./cart/CartContext";
 import { RequireAuth } from "./components/RequireAuth";
 import { ToastProvider } from "./components/Toast";
+import { I18nProvider } from "./i18n/I18n";
 import { ShopLayout } from "./layouts/ShopLayout";
 import { CartPage } from "./pages/Cart";
 import { CatalogPage } from "./pages/Catalog";
@@ -29,6 +30,7 @@ const StyleGuide = lazy(() => import("./pages/StyleGuide").then((m) => ({ defaul
 export default function App() {
   return (
     <BrowserRouter>
+      <I18nProvider>
       <AuthProvider>
         <ToastProvider>
           <CartProvider>
@@ -65,6 +67,7 @@ export default function App() {
           </CartProvider>
         </ToastProvider>
       </AuthProvider>
+      </I18nProvider>
     </BrowserRouter>
   );
 }

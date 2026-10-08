@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useT } from "../i18n/I18n";
 import { MoonIcon, SunIcon } from "./icons";
 
 export type Theme = "light" | "dark";
@@ -23,9 +24,9 @@ export function useTheme() {
 }
 
 export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
-  const next = theme === "dark" ? "light" : "dark";
+  const { t } = useT();
   return (
-    <button type="button" className="av-icon-btn" onClick={onToggle} aria-label={`Switch to ${next} theme`}>
+    <button type="button" className="av-icon-btn" onClick={onToggle} aria-label={theme === "dark" ? t("theme.toLight") : t("theme.toDark")}>
       {theme === "dark" ? <SunIcon /> : <MoonIcon />}
     </button>
   );

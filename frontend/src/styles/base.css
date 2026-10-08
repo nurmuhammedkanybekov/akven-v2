@@ -19,28 +19,32 @@ h1, h2, h3, h4, p { margin: 0; }
 
 h1, h2, h3, .av-display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
   text-wrap: balance;
 }
-.av-display { font-size: var(--text-display); line-height: 0.98; letter-spacing: -0.02em; }
+.av-display { font-size: var(--text-display); line-height: 1.02; letter-spacing: -0.035em; }
+.av-display em, h1 em, h2 em { font-style: normal; color: var(--accent-ink); }
 h1 { font-size: var(--text-h1); }
 h2 { font-size: var(--text-h2); }
 h3 { font-size: var(--text-h3); line-height: 1.15; }
-.av-lead { font-size: 1.125rem; color: var(--ink-2); max-width: 56ch; }
+.av-lead { font-size: 1.125rem; color: var(--ink-2); max-width: 56ch; text-wrap: pretty; }
 .av-small { font-size: var(--text-small); color: var(--ink-2); }
 .av-muted { color: var(--ink-3); }
 
-/* Small mono label: section eyebrows, SKUs, meta. */
+/* Small spaced label in gold: section eyebrows. */
 .av-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--accent-ink);
 }
+
+/* Prices, quantities and codes line up in columns. */
+.av-num { font-variant-numeric: tabular-nums; }
 
 .av-container {
   width: 100%;

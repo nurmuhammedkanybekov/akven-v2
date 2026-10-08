@@ -1,9 +1,8 @@
 /*
- * Ak&Ven design tokens. Direction: premium minimal, in the brand's own colours:
- * white, ink-black and gold (the shop sign is gold letters on black).
- * Warm-white paper, ink-black type and buttons, hairline borders, generous space.
- * Gold is the only accent and is used sparingly (where attention should go, never decoration).
- * The lilac of the printed business card lives on as the negotiator's colour (--ai).
+ * Ak&Ven design tokens. Direction: navy and gold, elite and modern, Bombas-clear.
+ * Ivory paper keeps the shop calm; navy carries the brand moments (top bar, hero, quality panel, footer);
+ * gold is for detail and savings, never decoration. Kyrgyz ornaments appear only where they mean something.
+ * One typeface, Onest, with Cyrillic for Russian and Kyrgyz (ң ө ү).
  *
  * THIS FILE IS THE SOURCE OF TRUTH. src/test/contrast.test.ts reads it and fails the build if any
  * text/background pair drops below WCAG AA, in both themes. Change a colour here, not in components.
@@ -13,11 +12,11 @@
 
 :root {
   /* ---- typography: swap a font here and the whole site follows ---- */
-  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Onest", system-ui, sans-serif;   /* numbers use Onest with tabular figures */
 
-  --text-display: clamp(3rem, 1.6rem + 6vw, 6.5rem);
+  --text-display: clamp(2.6rem, 1.4rem + 5.4vw, 5.4rem);
   --text-h1: clamp(2.5rem, 1.6rem + 3.6vw, 4.25rem);
   --text-h2: clamp(1.875rem, 1.4rem + 2vw, 3rem);
   --text-h3: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
@@ -36,11 +35,11 @@
   --space-8: 4.5rem;
   --space-9: 7rem;
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
 
-  --container: 1200px;
+  --container: 1280px;
   --gutter: 1rem;
 
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -48,39 +47,51 @@
   --dur: 250ms;
 
   /* ---- light theme (default) ---- */
-  --paper: #fcfbf8;          /* page background */
+  --paper: #f7f4ee;          /* page background: ivory */
   --surface: #ffffff;        /* cards, inputs */
-  --surface-2: #f5f2eb;      /* tinted blocks, image backdrops */
-  --line: #e8e3d8;           /* hairlines */
-  --line-strong: #cfc8ba;    /* input borders, dividers that must be seen */
+  --surface-2: #efe9dc;      /* tinted blocks, image backdrops */
+  --line: #e4dfd3;           /* hairlines */
+  --line-strong: #c9bfab;    /* input borders, dividers that must be seen */
 
-  --ink: #16130f;            /* primary text, primary buttons */
-  --ink-2: #4a453d;          /* secondary text */
-  --ink-3: #6b6458;          /* tertiary text, placeholders (still AA on paper) */
-  --on-ink: #fcfbf8;         /* text on an ink button */
+  --ink: #121a2c;            /* primary text and primary buttons: navy ink */
+  --ink-2: #465068;          /* secondary text */
+  --ink-3: #5f6678;          /* tertiary text, placeholders (still AA on every surface) */
+  --on-ink: #f7f4ee;         /* text on an ink button */
 
-  --accent: #c9a24b;         /* gold: fills and small highlights */
-  --accent-ink: #7a5c14;     /* gold as TEXT on light surfaces */
-  --on-accent: #16130f;
+  --accent: #cba862;         /* gold: fills, the hero button, small highlights */
+  --accent-ink: #7e5f1e;     /* gold as TEXT on light surfaces: eyebrows, savings */
+  --on-accent: #121a2c;
 
   --success: #276a3c;
   --success-bg: #e8f2eb;
   --danger: #b3261e;
   --danger-bg: #fbeae8;
+  --warning: #8a5a14;        /* "only a few left" */
+  --warning-bg: #f6ead2;
   --ai: #5b4b8a;             /* the negotiator's proposal: untrusted, model-made */
   --ai-bg: #efecf5;
   --validated: #276a3c;      /* the policy-checked price: trusted, the only one that counts */
   --validated-bg: #e8f2eb;
 
-  --focus: #16130f;
+  --focus: #24365e;
 
-  /* Always-dark surfaces (hero banners, the shop-sign look). Unlike --ink these do NOT flip in dark theme. */
-  --black: #100e0b;
-  --on-black: #f4efe6;
-  --on-black-2: #c9c1b2;
+  /* Always-navy surfaces (top bar, hero, quality panel, footer). Unlike --ink these do NOT flip in dark theme. */
+  --black: #16223d;
+  --black-deep: #0f1930;
+  --black-glow: #24365e;
+  --on-black: #f6f1e6;
+  --on-black-2: #c7cbd6;
 
-  --shadow-1: 0 1px 2px rgba(22, 19, 15, 0.06);
-  --shadow-2: 0 12px 32px -12px rgba(22, 19, 15, 0.18);
+  /* Soft backdrops behind product photos, one per card in turn: mist, oat, blush, sage, lilac, sand. */
+  --tint-1: #e3e7ef;
+  --tint-2: #efe6d2;
+  --tint-3: #ebddd5;
+  --tint-4: #e0e6df;
+  --tint-5: #e7e2ec;
+  --tint-6: #efe9dc;
+
+  --shadow-1: 0 1px 2px rgba(18, 26, 44, 0.06);
+  --shadow-2: 0 18px 40px -18px rgba(18, 26, 44, 0.28);
 
   color-scheme: light;
 }
@@ -94,68 +105,98 @@
 
 /* ---- dark theme: follows the system unless the user picked a theme explicitly ---- */
 :root[data-theme="dark"] {
-  --paper: #100e0b;
-  --surface: #1a1713;
-  --surface-2: #221e19;
-  --line: #2f2a23;
-  --line-strong: #453e34;
+  --paper: #0d1424;
+  --surface: #141d33;
+  --surface-2: #1b2540;
+  --line: #1f2a44;
+  --line-strong: #3a4766;
 
-  --ink: #f4efe6;
-  --ink-2: #c9c1b2;
-  --ink-3: #9c9484;
-  --on-ink: #100e0b;
+  --ink: #ece6d8;
+  --ink-2: #bdbab2;
+  --ink-3: #9a9fae;
+  --on-ink: #0d1424;
 
-  --accent: #d9b45f;
-  --accent-ink: #d9b45f;
-  --on-accent: #16130f;
+  --accent: #d4b373;
+  --accent-ink: #d4b373;
+  --on-accent: #121a2c;
 
   --success: #6cc18a;
   --success-bg: #16281d;
   --danger: #f2877f;
   --danger-bg: #2d1816;
+  --warning: #e3be7a;
+  --warning-bg: #33280f;
   --ai: #b9a9e8;
   --ai-bg: #231e33;
   --validated: #6cc18a;
   --validated-bg: #16281d;
 
-  --focus: #f4efe6;
+  --focus: #d4b373;
+
+  --black: #111b31;
+  --black-deep: #0a1120;
+  --black-glow: #1e2d4f;
+  --on-black: #f1ece2;
+  --on-black-2: #c3c7d2;
+
+  --tint-1: #18233a;
+  --tint-2: #262418;
+  --tint-3: #2a2120;
+  --tint-4: #172521;
+  --tint-5: #211f33;
+  --tint-6: #1d2232;
 
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+  --shadow-2: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
 
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #100e0b;
-    --surface: #1a1713;
-    --surface-2: #221e19;
-    --line: #2f2a23;
-    --line-strong: #453e34;
+    --paper: #0d1424;
+    --surface: #141d33;
+    --surface-2: #1b2540;
+    --line: #1f2a44;
+    --line-strong: #3a4766;
 
-    --ink: #f4efe6;
-    --ink-2: #c9c1b2;
-    --ink-3: #9c9484;
-    --on-ink: #100e0b;
+    --ink: #ece6d8;
+    --ink-2: #bdbab2;
+    --ink-3: #9a9fae;
+    --on-ink: #0d1424;
 
-    --accent: #d9b45f;
-    --accent-ink: #d9b45f;
-    --on-accent: #16130f;
+    --accent: #d4b373;
+    --accent-ink: #d4b373;
+    --on-accent: #121a2c;
 
     --success: #6cc18a;
     --success-bg: #16281d;
     --danger: #f2877f;
     --danger-bg: #2d1816;
+    --warning: #e3be7a;
+    --warning-bg: #33280f;
     --ai: #b9a9e8;
     --ai-bg: #231e33;
     --validated: #6cc18a;
     --validated-bg: #16281d;
 
-    --focus: #f4efe6;
+    --focus: #d4b373;
+
+    --black: #111b31;
+    --black-deep: #0a1120;
+    --black-glow: #1e2d4f;
+    --on-black: #f1ece2;
+    --on-black-2: #c3c7d2;
+
+    --tint-1: #18233a;
+    --tint-2: #262418;
+    --tint-3: #2a2120;
+    --tint-4: #172521;
+    --tint-5: #211f33;
+    --tint-6: #1d2232;
 
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-2: 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+    --shadow-2: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
 
     color-scheme: dark;
   }
