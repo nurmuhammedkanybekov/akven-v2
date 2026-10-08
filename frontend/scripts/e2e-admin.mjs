@@ -200,7 +200,7 @@ try {
 
   // ---------------------------------------------------------------- the customer's journey
   await step("the public pages pass the accessibility rules", async () => {
-    for (const [url, heading] of [["/", null], ["/shop", null], ["/login", "Sign in"]]) {
+    for (const [url, heading] of [["/", null], ["/shop", null], ["/login", "Sign in"], ["/visit", "Find us at Dordoi"], ["/sizes", "Find your sock size"], ["/wholesale", "For shops, teams and businesses"]]) {
       await page.goto(`${BASE}${url}`);
       if (heading) await page.getByRole("heading", { name: heading }).waitFor();
       else await page.locator("main h1, main h2").first().waitFor();
@@ -336,6 +336,42 @@ try {
     await page.getByRole("link", { name: /AV-/ }).filter({ hasText: "Completed" }).first().click();
     await page.getByText("Completed", { exact: true }).first().waitFor();
     assert.equal(await page.getByRole("button", { name: "Cancel this order" }).count(), 0);
+  });
+
+  await step("the site speaks Russian and Kyrgyz, and remembers the choice", async () => {
+    await page.goto(`${BASE}/`);
+    await page.getByRole("button", { name: "Русский" }).first().click();
+    await page.getByRole("heading", { level: 1, name: /Корейское качество/ }).waitFor();
+    await page.reload();
+    await page.getByRole("heading", { level: 1, name: /Корейское качество/ }).waitFor();
+    await a11y("the home page in Russian");
+    await page.getByRole("button", { name: "Кыргызча" }).first().click();
+    await page.getByRole("heading", { level: 1, name: /корей сапаты/ }).waitFor();
+    await page.getByRole("button", { name: "English" }).first().click();
+    await page.getByRole("heading", { level: 1, name: /Korean quality/ }).waitFor();
+  });
+  await step("the owners' screens open and pass the accessibility rules; staff cannot change prices", async () => {
+    await page.goto(`${BASE}/orders`);
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.goto(`${BASE}/login`);
+    await page.getByLabel("Email").fill("admin@akven.test");
+    await page.getByLabel("Password").fill("changeme-admin");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/admin`);
+    for (const [link, heading] of [["Dashboard", "Dashboard"], ["Pricing", "Pricing"], ["Contacts and the stall", "Contacts and the stall"], ["Size chart", "Size chart"], ["Hand over an order", "Hand over an order"]]) {
+      await page.getByRole("link", { name: link, exact: true }).click();
+      await page.getByRole("heading", { level: 1, name: heading }).waitFor();
+      await a11y(`admin ${heading.toLowerCase()}`);
+    }
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.goto(`${BASE}/login`);
+    await page.getByLabel("Email").fill("staff@akven.test");
+    await page.getByLabel("Password").fill("changeme-staff");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/admin`);
+    assert.equal(await page.getByRole("link", { name: "Pricing", exact: true }).count(), 0);
+    await page.goto(`${BASE}/admin/pricing`);
+    await page.getByText("Only the owners can change this").waitFor();
   });
 
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);

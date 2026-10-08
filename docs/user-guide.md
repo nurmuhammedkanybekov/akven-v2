@@ -14,11 +14,22 @@ Sign in at `/login`; staff are sent to the admin at `/admin`. Nothing here needs
 | See who changed what (admins) | The product's page, History |
 | Handle orders: see what is waiting, mark it completed, or cancel and refund | Orders |
 | Read what the assistant offered customers, next to what the policy allowed | Negotiations |
+| Record stock **on the way**, its arrival date and the **pairs in a wholesale case** (the shop then says "arrives in about N days") | The product's page, each colour and size |
+| See offers per day, how often the limit stepped in, offers that became orders, best sellers, and the **rule-based against AI comparison** | Dashboard |
+| **Hand over a pickup order** at the stall: the customer says the six-digit code and the last four digits of their phone | Hand over an order |
+| Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, and the **price ladder** (owners) | Pricing |
+| Enter **Instagram, Telegram, WhatsApp, phone and email**, and the stall (market, passage, container, opening hours) (owners) | Contacts and the stall |
+| Edit the **size chart** (owners) | Size chart |
 
-Staff can do everything except create colours and sizes or change the cost price and the discount limit; those are
-admin-only because they drive the pricing guardrail. Until a product has photos the shop shows a branded placeholder.
+Staff can do everything except create colours and sizes, change the cost price and the discount limit, and change
+pricing, contacts or the size chart; those are admin-only because they decide what the shop charges and says. Until a product has photos the shop shows a branded placeholder.
 
 ## For customers
+
+The shop speaks English, Russian and Kyrgyz (EN · РУС · КЫР in the top bar, or in the menu on a phone) and remembers
+the choice on the device. Collections are mixed freely: the minimum order and the price ladder count pairs across
+the whole bag, and the bag says how many more pairs reach the next step. `/visit` explains how to find container
+70-E at Dordoi, `/sizes` has the size chart and a size finder, and `/wholesale` explains packs and cases.
 
 1. **Bag.** "Add to bag" on any product. The bag lives in the browser: no account needed, it survives a reload, works
    offline and is shared between tabs. It remembers which item and how many; prices are always asked from the server.
@@ -29,7 +40,8 @@ admin-only because they drive the pricing guardrail. Until a product has photos 
    pick-up or delivery, and pays with Apple Pay or Google Pay. In this project the wallet is **simulated**: it returns a
    one-time token, never a card number, and no money moves. A switch in the sheet makes the "bank" decline, to show a
    failed payment. A real payment provider would sit behind the same `PaymentProvider` interface.
-4. **Order.** A confirmation page, then the order under "Your orders". A customer can cancel while the order is paid
+4. **Order.** A confirmation page, then the order under "Your orders". A paid pickup order shows a six-digit pickup
+   code to say at the stall. A customer can cancel while the order is paid
    and not yet completed: the payment is refunded and the socks go back on the shelf.
 
 ## The assistant and why it cannot lose money

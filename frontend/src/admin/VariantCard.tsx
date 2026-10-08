@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ApiError } from "../api/client";
-import { adminUpdatePricing, adminUpdateVariant } from "../api/endpoints";
+import { adminUpdatePricing, adminUpdateSupply, adminUpdateVariant } from "../api/endpoints";
 import type { AdminVariant } from "../api/types";
 import { Alert } from "../components/Alert";
 import { Badge } from "../components/Badge";
@@ -23,7 +23,11 @@ export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVaria
   const [floor, setFloor] = useState(String(variant.marginFloorPct));
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [busy, setBusy] = useState<"listing" | "pricing" | null>(null);
+  const [busy, setBusy] = useState<"listing" | "pricing" | "supply" | null>(null);
+  const [incoming, setIncoming] = useState(String(variant.incomingQty ?? 0));
+  const [eta, setEta] = useState(variant.restockEta ?? "");
+  const [casePairs, setCasePairs] = useState(variant.casePairs?.toString() ?? "");
+  const supplyDirty = incoming !== String(v.incomingQty ?? 0) || eta !== (v.restockEta ?? "") || casePairs !== (v.casePairs?.toString() ?? "");
 
   const listingDirty = color.name !== (v.color ?? "") || color.hex !== v.colorHex || price !== String(v.price) || stock !== String(v.stockQty)
     || size !== (v.size ?? "") || pack !== (v.packSize?.toString() ?? "");
@@ -47,6 +51,13 @@ export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVaria
     try {
       const saved = await adminUpdateVariant(v.id, { size: v.size, color: v.color, colorHex: v.colorHex, packSize: v.packSize, price: v.price, stockQty: v.stockQty, active, version: v.version });
       setV(saved); onSaved(saved); toast(active ? "Shown in the shop" : "Hidden from the shop");
+    } catch (e) { fail(e); } finally { setBusy(null); }
+  }
+  async function saveSupply() {
+    setBusy("supply"); setError(null); setFieldErrors({});
+    try {
+      const saved = await adminUpdateSupply(v.id, { casePairs: casePairs.trim() ? Number(casePairs) : null, incomingQty: Number(incoming) || 0, restockEta: eta || null, version: v.version });
+      setV(saved); onSaved(saved); toast("Incoming stock saved");
     } catch (e) { fail(e); } finally { setBusy(null); }
   }
   async function savePricing() {
@@ -75,6 +86,14 @@ export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVaria
       <div className="av-row av-between">
         <Switch checked={v.active} onChange={(a) => void saveActive(a)} label="Shown in the shop" />
         <Button size="sm" loading={busy === "listing"} disabled={!listingDirty} onClick={saveListing}>Save changes</Button>
+      </div>
+      <div className="av-variantcard__pricing">
+        <div className="av-formgrid av-formgrid--4">
+          <Input label="On the way" type="number" min={0} step={1} value={incoming} error={fieldErrors.incomingQty} hint="Units ordered from the factory." onChange={(e) => setIncoming(e.target.value)} />
+          <Input label="Arrives on" type="date" value={eta} error={fieldErrors.restockEta} hint={'The shop says "arrives in about N days".'} onChange={(e) => setEta(e.target.value)} />
+          <Input label="Pairs in a case" type="number" min={1} value={casePairs} error={fieldErrors.casePairs} hint="For wholesale, e.g. 200 or 250." onChange={(e) => setCasePairs(e.target.value)} />
+          <div className="av-field"><span className="av-label">&nbsp;</span><Button size="sm" variant="secondary" loading={busy === "supply"} disabled={!supplyDirty} onClick={saveSupply}>Save incoming stock</Button></div>
+        </div>
       </div>
       {isAdmin && (
         <div className="av-variantcard__pricing">

@@ -30,7 +30,6 @@ export const en = {
   "foot.about": "Korean-made socks under our own certified label. Sold at Dordoi Bazaar in Bishkek and online.",
   "foot.shop": "Shop",
   "foot.help": "Help",
-  "foot.brand": "AK&VEN",
   "foot.all": "All socks",
   "foot.sizes": "Size guide",
   "foot.visit": "Visit the shop",
