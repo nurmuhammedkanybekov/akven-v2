@@ -89,7 +89,7 @@ export function CatalogPage({ category }: { category?: Category }) {
       )}
       {products.data && products.data.items.length > 0 && (
         <div className="av-grid-products" style={{ opacity: products.loading ? 0.6 : 1 }}>
-          {products.data.items.map((p) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} />)}
+          {products.data.items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={(i % 6) + 1} />)}
         </div>
       )}
       {products.data && <Pagination page={products.data.page} totalPages={products.data.totalPages} onPage={(p) => set("page", p === 0 ? null : String(p))} />}

@@ -3,6 +3,8 @@ import type {
   AdminProduct, AdminTerm, AdminVariant, AuditEntry, AuthResponse, Facets, PageResponse, ProductDetail,
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
   CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote, NegotiateResponse, NegotiationSessionView,
+  PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
+  SizeSystem, NegotiationStats, EvaluationReport,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -90,3 +92,47 @@ export const adminUpdateTerm = (id: string, body: { name: string; description: s
 export const adminReorderTerms = (kind: TermKind, ids: string[]) =>
   api<AdminTerm[]>("/api/admin/terms/reorder", { method: "POST", body: { kind, ids } });
 export const adminDeleteTerm = (id: string) => api<void>(`/api/admin/terms/${id}`, { method: "DELETE" });
+
+// ---- pricing (public ladder; owners change it) ----
+export const getPricing = (signal?: AbortSignal) => api<PublicPricing>("/api/pricing", { signal });
+export const adminGetPolicy = () => api<PricingPolicy>("/api/admin/pricing/policy");
+export const adminUpdatePolicy = (body: PricingPolicy) => api<PricingPolicy>("/api/admin/pricing/policy", { method: "PUT", body });
+export const adminListTiers = () => api<PriceTier[]>("/api/admin/pricing/tiers");
+export const adminCreateTier = (body: { minPairs: number; discountPct: number }) => api<PriceTier>("/api/admin/pricing/tiers", { method: "POST", body });
+export const adminUpdateTier = (id: string, body: { minPairs: number; discountPct: number }) =>
+  api<PriceTier>(`/api/admin/pricing/tiers/${id}`, { method: "PUT", body });
+export const adminDeleteTier = (id: string) => api<void>(`/api/admin/pricing/tiers/${id}`, { method: "DELETE" });
+
+// ---- shop info: contacts and the stall ----
+export const getShopInfo = (signal?: AbortSignal) => api<ShopInfo>("/api/shop/info", { signal });
+export interface ContactInput { kind: ContactKind; label: string | null; value: string; position: number; active: boolean }
+export const adminListContacts = () => api<ShopContact[]>("/api/admin/shop/contacts");
+export const adminCreateContact = (body: ContactInput) => api<ShopContact>("/api/admin/shop/contacts", { method: "POST", body });
+export const adminUpdateContact = (id: string, body: ContactInput) => api<ShopContact>(`/api/admin/shop/contacts/${id}`, { method: "PUT", body });
+export const adminDeleteContact = (id: string) => api<void>(`/api/admin/shop/contacts/${id}`, { method: "DELETE" });
+export type PickupPointInput = Omit<PickupPoint, "id">;
+export const adminListPickupPoints = () => api<PickupPoint[]>("/api/admin/shop/pickup-points");
+export const adminCreatePickupPoint = (body: PickupPointInput) => api<PickupPoint>("/api/admin/shop/pickup-points", { method: "POST", body });
+export const adminUpdatePickupPoint = (id: string, body: PickupPointInput) =>
+  api<PickupPoint>(`/api/admin/shop/pickup-points/${id}`, { method: "PUT", body });
+export const adminHandOver = (code: string, phoneEnd: string) =>
+  api<OrderView>("/api/admin/orders/handover", { method: "POST", body: { code, phoneEnd } });
+
+// ---- sizes ----
+export const getSizeChart = (lang: string, signal?: AbortSignal) => api<SizeChart>(`/api/sizes${qs({ lang })}`, { signal });
+export const findSize = (system: SizeSystem, size: number) => api<SizeMatch>(`/api/sizes/find${qs({ system, size })}`);
+export type SizeRowInput = {
+  label: string; footCmMin: number; footCmMax: number; krMmMin: number; krMmMax: number; localMin: number; localMax: number;
+  euMin: number; euMax: number; usLabel: string; position: number;
+};
+export const adminCreateSize = (body: SizeRowInput) => api<SizeRow>("/api/admin/sizes", { method: "POST", body });
+export const adminUpdateSize = (id: string, body: SizeRowInput) => api<SizeRow>(`/api/admin/sizes/${id}`, { method: "PUT", body });
+export const adminDeleteSize = (id: string) => api<void>(`/api/admin/sizes/${id}`, { method: "DELETE" });
+
+// ---- stock on the way ----
+export const adminUpdateSupply = (id: string, body: { casePairs: number | null; incomingQty: number; restockEta: string | null; version?: number }) =>
+  api<AdminVariant>(`/api/admin/variants/${id}/supply`, { method: "PUT", body });
+
+// ---- owners' dashboard ----
+export const adminNegotiationStats = (days: number) => api<NegotiationStats>(`/api/admin/negotiations/stats${qs({ days })}`);
+export const adminEvaluation = () => api<EvaluationReport>("/api/admin/negotiations/evaluation");

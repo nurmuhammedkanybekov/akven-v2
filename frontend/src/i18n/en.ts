@@ -1,0 +1,161 @@
+/**
+ * English: the main language and the source of every key. Russian and Kyrgyz (ru.ts, ky.ts) translate these keys;
+ * anything they leave out shows in English. Keep labels that tests look for (e.g. "Add to bag") stable.
+ */
+export const en = {
+  "lang.label": "Language",
+  "skip": "Skip to content",
+
+  // announcement bar and navigation
+  "ann.text": "Pick up at Dordoi Bazaar, container 70-E · Delivery to Kyrgyzstan, Kazakhstan, Uzbekistan and Russia",
+  "nav.main": "Main",
+  "ann.short": "Pickup at Dordoi · 70-E · Delivery to 4 countries",
+  "nav.men": "Men",
+  "nav.women": "Women",
+  "nav.kids": "Kids",
+  "nav.bundles": "Bundles",
+  "nav.wholesale": "Wholesale",
+  "nav.visit": "Visit us",
+  "nav.search": "Browse and search",
+  "nav.signin": "Sign in",
+  "nav.orders": "Your orders",
+  "nav.admin": "Open the admin",
+  "nav.bag": "Bag, {n} items",
+  "nav.open": "Open menu",
+  "nav.close": "Close menu",
+  "theme.toLight": "Switch to light theme",
+  "theme.toDark": "Switch to dark theme",
+
+  // footer
+  "foot.about": "Korean-made socks under our own certified label. Sold at Dordoi Bazaar in Bishkek and online.",
+  "foot.shop": "Shop",
+  "foot.help": "Help",
+  "foot.brand": "AK&VEN",
+  "foot.all": "All socks",
+  "foot.sizes": "Size guide",
+  "foot.visit": "Visit the shop",
+  "foot.pickup": "Pickup and delivery",
+  "foot.wholesale": "Wholesale",
+  "foot.follow": "Find us",
+  "foot.address": "Dordoi Bazaar, Bishkek",
+  "foot.legal": "Prices in US dollars. Discounts and sizes in this demo are examples.",
+  "visit.passage": "passage",
+  "visit.container": "container",
+
+  // home: hero
+  "hero.eyebrow": "Made in Korea · Sold in Bishkek",
+  "hero.title1": "Korean quality,",
+  "hero.title2": "in every pair.",
+  "hero.lead": "Knitted by one of Korea's leading sock factories, under a brand certified in Korea. Soft, durable socks for every day, in collections from {n} pairs.",
+  "hero.leadOne": "Knitted by one of Korea's leading sock factories, under a brand certified in Korea. Soft, durable socks for every day.",
+  "hero.women": "Shop women",
+  "hero.men": "Shop men",
+  "hero.photo": "Photo: a full-width photo goes here",
+
+  // home: trust strip
+  "trust.made": "Made in Korea",
+  "trust.madeS": "By one of the country's leading sock factories",
+  "trust.cert": "Certified brand",
+  "trust.certS": "AK&VEN holds an official certificate in Korea",
+  "trust.ladder": "Mix any socks",
+  "trust.ladderS": "The more pairs, the lower the price",
+  "trust.ask": "Ask for your price",
+  "trust.askS": "A fair offer, checked by the shop",
+
+  // home: categories and heights
+  "tiles.eyebrow": "Browse",
+  "tiles.title": "Find your pair",
+  "tile.MEN": "Crew, ankle and dress socks",
+  "tile.WOMEN": "Ankle, knee-high and no-show",
+  "tile.KIDS": "Small sizes, bright colours",
+  "tile.BUNDLES": "Family and winter packs",
+  "height.eyebrow": "Find your fit",
+  "height.title": "Shop by height",
+  "height.all": "All",
+  "cut.no-show": "No-show",
+  "cut.ankle": "Ankle",
+  "cut.crew": "Crew",
+  "cut.mid-long": "Mid-long",
+  "cut.knee-high": "Knee-high",
+  "card.soldOut": "Sold out",
+  "card.colours": "{n} colours",
+
+  // home: collection
+  "best.eyebrow": "The collection",
+  "best.title": "Best sellers and new pairs",
+  "best.all": "See all socks",
+  "best.error": "We could not load the shelf right now. Please try again in a moment.",
+  "best.empty": "New socks are on their way. Check back soon.",
+
+  // home: ladder
+  "ladder.eyebrow": "Collections",
+  "ladder.title": "Buy more, pay less",
+  "ladder.lead": "Like in Korean shops, the price per pair drops as your collection grows. Mix any socks: three pairs for father, three for mother, four for the kids.",
+  "ladder.min": "From {n} pairs",
+  "ladder.any": "Any number of pairs",
+  "ladder.base": "Shop price",
+  "ladder.off": "{pct}% off every pair",
+  "ladder.minNote": "Orders start at {n} pairs, counted across all socks in your bag.",
+  "ladder.cta": "Start your collection",
+  "ladder.wholesale": "Cartons and cases: price on request",
+
+  // home: ask for your price
+  "ask.eyebrow": "Only at AK&VEN",
+  "ask.title": "Ask for your price",
+  "ask.1": "Tell us what you need and how many pairs.",
+  "ask.2": "Our assistant makes an offer. The shop checks it against its own limit, so it is always a price we can stand behind.",
+  "ask.3": "Your price is kept for 24 hours. Add it to your bag whenever you are ready.",
+  "ask.you": "I need ten pairs for the family. What can you do?",
+  "ask.shop": "Ten pairs, of course. For you, a better price.",
+  "ask.asking": "Shop price",
+  "ask.yours": "Your price",
+  "ask.checked": "Checked by the shop · valid 24 hours",
+  "ask.example": "Example",
+
+  // home: quality
+  "quality.eyebrow": "Quality",
+  "quality.title": "Certified in Korea",
+  "quality.lead": "AK&VEN socks are knitted in Korea by one of the country's leading sock factories, and our brand holds an official Korean certificate. The details below come from the certificate itself.",
+  "quality.factory": "Factory",
+  "quality.factoryV": "[factory name]",
+  "quality.cert": "Certificate",
+  "quality.certV": "[name and number]",
+  "quality.issued": "Issued by",
+  "quality.issuedV": "[organisation, year]",
+  "quality.materials": "Materials",
+  "quality.materialsV": "[e.g. combed cotton, merino wool]",
+  "quality.photo": "Photo: the certificate",
+
+  // home: story
+  "story.eyebrow": "From Korea to Bishkek",
+  "story.title": "A family business at Dordoi",
+  "story.lead": "This text is a placeholder. The real story, in the family's own words, goes here.",
+  "story.started": "Started",
+  "story.startedV": "[year]",
+  "story.made": "Made in",
+  "story.madeV": "Korea",
+  "story.sold": "Sold at",
+  "story.soldV": "Dordoi Bazaar, Bishkek",
+  "story.run": "Run by",
+  "story.runV": "The family behind AK&VEN",
+  "story.photo": "Photo: the shop at Dordoi",
+  "story.cta": "Visit the shop",
+
+  // home: help
+  "help.delivery": "Pickup and delivery",
+  "help.deliveryS": "Dordoi Bazaar, or delivery to four countries",
+  "help.sizes": "Size guide",
+  "help.sizesS": "From your shoe size",
+  "help.visit": "Visit the shop",
+  "help.visitS": "Container 70-E, passage 8",
+  "help.contact": "Write to us",
+  "help.contactS": "Instagram, Telegram, WhatsApp",
+
+  // home: wholesale
+  "whole.eyebrow": "Wholesale",
+  "whole.title": "For shops, teams and businesses",
+  "whole.lead": "Packs of 10 or 12 pairs and cases of about 200 to 250, in one colour or mixed. Wholesale prices depend on the order and are given on request.",
+  "whole.cta": "Ask for wholesale prices",
+} as const;
+
+export type MessageKey = keyof typeof en;
