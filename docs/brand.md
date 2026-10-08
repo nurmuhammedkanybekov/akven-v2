@@ -1,8 +1,9 @@
 # Ak&Ven brand and design system
 
-Premium minimal, in the shop's own colours: white, ink-black and gold (the sign above the container at Dordoi is
-gold letters on black). The living reference is the style-guide page of the frontend (`npm run dev`); screenshots
-of it are in [`docs/design/`](design/) and double as thesis figures.
+Elite and modern, in navy and gold: ivory pages keep the shop calm, navy carries the brand moments (the top bar, the
+hero, the quality panel, the footer) and gold is kept for detail and savings. Two Kyrgyz ornaments appear only where
+they mean something. The living reference is the style-guide page of the frontend (`/styleguide` with `npm run dev`);
+screenshots are in [`docs/design/`](design/) and double as thesis figures.
 
 ## The mark
 
@@ -26,22 +27,37 @@ takes its colour from the surrounding text colour.
 
 | Token | Light | Dark | Used for |
 |---|---|---|---|
-| `--paper` / `--surface` / `--surface-2` | warm white, white, stone | ink-black family | page, cards, tinted blocks |
-| `--ink`, `--ink-2`, `--ink-3` | near-black, warm greys | cream, warm greys | text and primary buttons |
-| `--accent` | gold `#C9A24B` | `#D9B45F` | the single accent: highlights, the accent button |
-| `--accent-ink` | dark gold `#7A5C14` | gold | gold used as text |
-| `--ai` | lilac-purple | light lilac | the negotiator's proposal (the lilac of the printed business card) |
+| `--paper` / `--surface` / `--surface-2` | ivory `#F7F4EE`, white, sand | deep navy family | page, cards, tinted blocks |
+| `--ink`, `--ink-2`, `--ink-3` | navy ink `#121A2C`, slate greys | cream, warm greys | text and primary buttons |
+| `--accent` | gold `#CBA862` | `#D4B373` | the gold button, highlights, ornaments |
+| `--accent-ink` | dark gold `#7E5F1E` | gold | gold used as text: eyebrows, savings |
+| `--black`, `--black-deep`, `--on-black` | navy `#16223D`, `#0F1930`, cream | same | the top bar, hero, quality panel and footer, navy in both themes |
+| `--tint-1` to `--tint-6` | mist, oat, blush, sage, lilac, sand | dark versions | soft backdrops behind product photos, one per card in turn |
+| `--warning` | amber | light amber | "only a few left" |
+| `--ai` | lilac-purple | light lilac | the negotiator's proposal |
 | `--validated` | green | light green | the policy-checked price, the only one that counts |
-| `--black`, `--on-black` | always `#100E0B`, cream | same | banners that stay dark in both themes |
 
 Every text and background pair is checked against WCAG AA by `frontend/src/test/contrast.test.ts` in both themes.
 Changing a colour is done in `src/styles/tokens.css` only.
 
 ## Type
 
-Instrument Serif for headings and brand voice, IBM Plex Sans for interface text, IBM Plex Mono for prices, SKUs and
-small labels. All fonts are self-hosted (the app works offline). Fonts are tokens (`--font-display`, `--font-sans`,
-`--font-mono`): swapping one changes the whole site.
+One family, **Onest**, self-hosted with its Latin and Cyrillic files, so Russian and Kyrgyz (ң ө ү) render in the
+same face as English. Headings use weight 600 with tight tracking, body text 400, the hero lead 300. Prices and
+quantities use tabular figures so they line up. Fonts are tokens (`--font-display`, `--font-sans`, `--font-mono`).
+
+## Ornaments
+
+- **Oimo band**, a chain of rhombuses: the shelf the hero socks stand on, and the top edge of the footer.
+- **Kochkor muyuz**, ram's horns: the divider before the family's story, and the footer rule.
+
+Both are in `frontend/src/brand/Ornaments.tsx` and take their colour from the surrounding text. Until real photos
+exist, drawn socks (`SockArt.tsx`) stand in for product photography; image URLs are data in the database.
+
+## Motion
+
+Sections slide in as they scroll into view, the hero text rises on load and the socks rise onto their shelf. Motion
+never fades text, so it keeps full contrast at every moment, and all of it stops for visitors who ask for less motion.
 
 ## Regenerating assets (from `frontend/`)
 
@@ -54,9 +70,6 @@ small labels. All fonts are self-hosted (the app works offline). Fonts are token
 
 ## Open questions
 
-- Logo v1 is a faithful clean-up of the sign; a further refinement pass (stroke weights, the hook's terminal) is possible
-  once the owners have reacted to it.
+- The family is designing a refined logo; when it arrives, `npm run logo` regenerates every logo file and component.
 - Currency: prices are displayed in USD for now. The database has no currency column yet.
-- Languages: the shop's customers also read Russian and Kyrgyz. The headline font (Instrument Serif) has no Cyrillic
-  glyphs; IBM Plex Sans does. Adding Cyrillic means choosing a serif with Cyrillic support for headings.
-- Real product photography replaces the generated illustrations when available; image URLs are data in the database.
+- Real product photography and the photo of the certificate replace the drawn placeholders when available.
