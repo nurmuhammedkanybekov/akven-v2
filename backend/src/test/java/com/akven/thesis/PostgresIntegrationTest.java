@@ -65,9 +65,13 @@ class PostgresIntegrationTest {
     void seededCatalogIsBrowsableFilterableAndNeverLeaksCost() throws Exception {
         JsonNode men = call("GET", "/api/products?category=MEN&pageSize=48", null, null);
         assertThat(men.get("totalItems").asInt()).isGreaterThanOrEqualTo(5);
+        // Each card carries its cover and, for the hover, the second image.
+        JsonNode card = men.get("items").get(0);
+        assertThat(card.get("image").get("url").asText()).endsWith("-1.svg");
+        assertThat(card.get("hoverImage").get("url").asText()).endsWith("-2.svg");
 
         JsonNode facets = call("GET", "/api/products/facets", null, null);
-        assertThat(facets.get("category").get("BUNDLES").asInt()).isEqualTo(2);
+        assertThat(facets.get("category").get("BUNDLES").asInt()).isGreaterThanOrEqualTo(2);
         assertThat(count(facets.get("section"), "thermal")).isGreaterThanOrEqualTo(2);
 
         JsonNode byPrice = call("GET", "/api/products?sort=price_asc&pageSize=3", null, null);

@@ -25,6 +25,8 @@ export interface ProductSummary {
   inStock: boolean;
   variantCount: number;
   image: ImageView | null;
+  /** The second image, shown when the card is hovered. */
+  hoverImage?: ImageView | null;
   colors: string[];
 }
 
