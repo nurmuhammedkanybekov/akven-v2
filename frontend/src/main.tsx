@@ -12,6 +12,7 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/components.css";
 import "./styles/shop.css";
+import "./styles/home.css";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

@@ -73,7 +73,7 @@ try {
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL(`${BASE}/admin`);
     await page.getByRole("heading", { name: "Products" }).waitFor();
-    await page.getByText("Merino Dress Sock").first().waitFor();
+    await page.getByText("Bazaar Family Pack").first().waitFor();
     await shot("admin-products", { fullPage: false });
   });
 
@@ -341,14 +341,27 @@ try {
   await step("the site speaks Russian and Kyrgyz, and remembers the choice", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("button", { name: "Русский" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Корейское качество/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Корейские носки/ }).waitFor();
     await page.reload();
-    await page.getByRole("heading", { level: 1, name: /Корейское качество/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Корейские носки/ }).waitFor();
     await a11y("the home page in Russian");
     await page.getByRole("button", { name: "Кыргызча" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /корей сапаты/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Корей байпактары/ }).waitFor();
     await page.getByRole("button", { name: "English" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Korean quality/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Korean socks/ }).waitFor();
+  });
+
+  await step("the home page's fitting, collection box and gift calendar work", async () => {
+    await page.goto(`${BASE}/`);
+    await page.getByRole("radio", { name: "Knee-high" }).check();
+    await page.getByRole("link", { name: "Shop knee-high socks" }).waitFor();
+    await page.getByRole("button", { name: "Empty the box" }).click();
+    for (let i = 0; i < 20; i++) await page.getByRole("button", { name: "Add Argyle to the box" }).click();
+    await page.getByText("−3% on every pair").waitFor();
+    await page.getByRole("heading", { name: "Socks for every holiday" }).waitFor();
+    await page.getByRole("button", { name: "Women" }).first().click();
+    await page.locator(".av-shelf .av-card").first().waitFor();
+    await a11y("the home page after using it");
   });
   await step("the owners' screens open and pass the accessibility rules; staff cannot change prices", async () => {
     await page.goto(`${BASE}/orders`);

@@ -30,9 +30,9 @@ describe("languages", () => {
 
   it("switches language, fills in numbers, sets the page language and remembers the choice", async () => {
     render(<I18nProvider><LanguageSwitch /><Hello /></I18nProvider>);
-    expect(screen.getByText("in every pair. · Add 4 more pairs to save 5% on every pair.")).toBeInTheDocument();
+    expect(screen.getByText("straight from container 70-E. · Add 4 more pairs to save 5% on every pair.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Кыргызча" }));
-    expect(screen.getByText(/корей сапаты\./)).toBeInTheDocument();
+    expect(screen.getByText(/түз эле 70-Е контейнеринен\./)).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("ky");
     expect(localStorage.getItem("akven-lang")).toBe("ky");
     expect(screen.getByRole("button", { name: "Кыргызча" })).toHaveAttribute("aria-pressed", "true");
@@ -41,7 +41,7 @@ describe("languages", () => {
   it("opens in the remembered language", () => {
     localStorage.setItem("akven-lang", "ru");
     render(<I18nProvider><Hello /></I18nProvider>);
-    expect(screen.getByText(/в каждой паре\./)).toBeInTheDocument();
+    expect(screen.getByText(/прямо из контейнера 70-Е\./)).toBeInTheDocument();
     act(() => undefined);
   });
 });
