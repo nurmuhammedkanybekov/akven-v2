@@ -51,12 +51,40 @@ quantities use tabular figures so they line up. Fonts are tokens (`--font-displa
 - **Oimo band**, a chain of rhombuses: the shelf the hero socks stand on, and the top edge of the footer.
 - **Kochkor muyuz**, ram's horns: the divider before the family's story, and the footer rule.
 
-Both are in `frontend/src/brand/Ornaments.tsx` and take their colour from the surrounding text. Until real photos
-exist, drawn socks (`SockArt.tsx`) stand in for product photography; image URLs are data in the database.
+- **The oimo band knitted into a sock**: the Heritage line's pattern, drawn on the socks themselves.
+
+The two page ornaments are in `frontend/src/brand/Ornaments.tsx` and take their colour from the surrounding text.
+
+## The drawn sock
+
+Until real photos exist, drawn socks stand in for product photography. One drawing (`src/brand/sockDrawing.ts`)
+serves both the shop (`SockArt.tsx`) and the product images (`npm run art`), so a sock looks the same in the hero, on a
+card and on its page. It has knit texture, a ribbed cuff, a contrast heel and toe and soft shading, five heights
+(no-show to knee-high, all drawn on the same leg so they line up), fifteen patterns (rib, pinstripe, stripes,
+argyle, dots, hearts, snowflakes, oimo, bear, dino, compression, sparkle, ...) and extras: five toes, a grip sole, a
+lace frill, brushed yarn. Every product has two images: the sock, and the pair (or the open gift box). The second
+image shows when a card is hovered. Image URLs are data in the database, so photographs replace the drawings one by
+one.
+
+## The home page
+
+Built around the family's real stall, container 70-E at Dordoi, so it could not belong to another shop:
+
+| Scene | What it shows |
+|---|---|
+| Container 70-E | The steel doors swing open on a rail of socks that sway, and lean away when the pointer passes |
+| The band | Every kind of sock the stall carries, moving slowly; it stops on hover |
+| The shelf | The newest socks, switchable between men, women, kids and gift boxes without leaving the page |
+| The fitting | A leg with a ruler; pick a height and the sock is pulled up to it |
+| The box | Tap socks into a box and watch the step reached on the real price ladder (`/api/pricing`) |
+| The calculator | "Ask for your price" the Dordoi way: the seller types the price and the shop's stamp checks it |
+| The gift calendar | Days to 23 February, 8 March, Nooruz, the first day of school and New Year, with the gift boxes |
+| The way to 70-E | A drawn route from the city to Dordoi-Junhai, passage 8, container 70-E |
 
 ## Motion
 
-Sections slide in as they scroll into view, the hero text rises on load and the socks rise onto their shelf. Motion
+Sections slide in as they scroll into view, the container doors open on load, the socks sway, the road draws
+itself and the calculator types. Motion
 never fades text, so it keeps full contrast at every moment, and all of it stops for visitors who ask for less motion.
 
 ## Regenerating assets (from `frontend/`)

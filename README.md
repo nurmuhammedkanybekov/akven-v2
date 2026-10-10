@@ -26,6 +26,11 @@ tricked, confused or simply wrong cannot change what the customer pays.
 **For customers**
 
 - A storefront in **English, Russian and Kyrgyz**, light and dark, on phone, tablet and laptop.
+- A home page built around the real stall, **container 70-E**: its doors open on a rail of swaying socks, a fitting
+  shows each sock height on a leg, a box shows the collection price as socks drop in, a bazaar calculator tells how
+  "ask for your price" works, a gift calendar counts down to the holidays, and a drawn route leads to the stall.
+- About 40 demo products: business and argyle, five-toe, compression, brushed home socks with grip, children's
+  character socks, the oimo ornament line, and gift boxes for 23 February, 8 March, Nooruz, New Year and school.
 - **Collections:** mix any socks. The minimum order and the price ladder count pairs across the whole bag, and the
   bag says how many more pairs reach the next step ("add 4 more pairs to save 5%").
 - **Honest stock:** in stock, only a few left, arrives in about N days, or sold out.
@@ -48,7 +53,7 @@ tricked, confused or simply wrong cannot change what the customer pays.
 - Prices are decided only on the server; stock cannot be oversold; a checkout cannot charge twice.
 - Login lockout, three roles (customer, staff, owner), an audit log of every change, and database constraints that
   refuse impossible values even if the application is bypassed.
-- About 165 backend tests with 97% line coverage (the build fails below 80%), 10 more on real PostgreSQL, about 110
+- About 165 backend tests with 97% line coverage (the build fails below 80%), 10 more on real PostgreSQL, about 115
   frontend tests, and a browser test of the full journey in three languages that also runs accessibility rules.
 
 What is not built, on purpose: a real payment provider (the wallet is simulated, no money moves), email and SMS, and
