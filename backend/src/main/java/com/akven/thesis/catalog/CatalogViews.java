@@ -58,8 +58,8 @@ public final class CatalogViews {
     /** Card in the catalog grid. minPrice is the cheapest sellable variant ("from 6.50"). */
     public record ProductSummary(String slug, String name, Category category, TermView section, TermView cut,
                                  String collection, BigDecimal minPrice, boolean inStock, int variantCount,
-                                 ImageView image, List<String> colors) {
-        static ProductSummary of(Product p, List<Variant> sellableVariants, ImageView cover) {
+                                 ImageView image, ImageView hoverImage, List<String> colors) {
+        static ProductSummary of(Product p, List<Variant> sellableVariants, ImageView cover, ImageView hover) {
             BigDecimal min = sellableVariants.stream().map(Variant::getPrice)
                     .min(BigDecimal::compareTo).orElse(null);
             boolean inStock = sellableVariants.stream().anyMatch(v -> v.available() > 0);
@@ -67,7 +67,7 @@ public final class CatalogViews {
             List<String> colors = sellableVariants.stream().map(Variant::getColorHex)
                     .filter(java.util.Objects::nonNull).distinct().limit(6).toList();
             return new ProductSummary(p.getSlug(), p.getName(), p.getCategory(), TermView.of(p.getSection()),
-                    TermView.of(p.getCut()), p.getCollection(), min, inStock, sellableVariants.size(), cover, colors);
+                    TermView.of(p.getCut()), p.getCollection(), min, inStock, sellableVariants.size(), cover, hover, colors);
         }
     }
 

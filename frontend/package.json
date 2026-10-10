@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "logo": "node scripts/generate-logo.mjs",
-    "art": "node scripts/generate-product-art.mjs",
+    "art": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-product-art.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "screenshots": "node scripts/screenshots.mjs",
     "e2e": "node scripts/e2e-admin.mjs"

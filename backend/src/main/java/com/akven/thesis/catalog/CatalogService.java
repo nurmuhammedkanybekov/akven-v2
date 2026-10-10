@@ -77,14 +77,20 @@ public class CatalogService {
                 : variantRepository.findByProductIdInAndActiveTrue(ids).stream()
                         .collect(Collectors.groupingBy(v -> v.getProduct().getId()));
 
-        Map<UUID, ImageView> covers = new HashMap<>();
+        // The first image is the card's cover, the second (if any) shows on hover.
+        Map<UUID, List<ImageView>> imagesByProduct = new HashMap<>();
         if (!ids.isEmpty()) {
-            imageRepository.findByProductIdInOrderByPositionAsc(ids)
-                    .forEach(i -> covers.putIfAbsent(i.getProductId(), ImageView.of(i)));
+            imageRepository.findByProductIdInOrderByPositionAsc(ids).forEach(i -> {
+                List<ImageView> list = imagesByProduct.computeIfAbsent(i.getProductId(), k -> new java.util.ArrayList<>());
+                if (list.size() < 2) list.add(ImageView.of(i));
+            });
         }
 
-        return PageResponse.of(products,
-                p -> ProductSummary.of(p, variantsByProduct.getOrDefault(p.getId(), List.of()), covers.get(p.getId())));
+        return PageResponse.of(products, p -> {
+            List<ImageView> images = imagesByProduct.getOrDefault(p.getId(), List.of());
+            return ProductSummary.of(p, variantsByProduct.getOrDefault(p.getId(), List.of()),
+                    images.isEmpty() ? null : images.get(0), images.size() < 2 ? null : images.get(1));
+        });
     }
 
     /**

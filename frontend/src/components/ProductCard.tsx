@@ -18,6 +18,9 @@ export function ProductCard({ product, to, tint }: { product: ProductSummary; to
     <Link className={`av-card${soldOut ? " av-card--soldout" : ""}`} to={to}>
       <div className="av-card__media" style={tint ? { background: `var(--tint-${tint})` } : undefined}>
         <ProductImage image={product.image} />
+        {product.hoverImage && (
+          <img className="av-card__hover" src={product.hoverImage.url} alt="" width={800} height={1000} loading="lazy" decoding="async" />
+        )}
         {soldOut && <span className="av-card__badge"><Badge tone="danger">{t("card.soldOut")}</Badge></span>}
       </div>
       <div className="av-card__meta">
