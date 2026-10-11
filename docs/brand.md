@@ -1,4 +1,4 @@
-# Ak&Ven brand and design system
+# AKVEN brand and design system
 
 Elite and modern, in navy and gold: ivory pages keep the shop calm, navy carries the brand moments (the top bar, the
 hero, the quality panel, the footer) and gold is kept for detail and savings. Two Kyrgyz ornaments appear only where
@@ -7,21 +7,27 @@ screenshots are in [`docs/design/`](design/) and double as thesis figures.
 
 ## The mark
 
-Akyl and Venera's initials around a heart that is also an ampersand. The mark was rebuilt from the physical sign:
-the silhouette was extracted from a photo and redrawn as smooth tapering strokes (heart with a swan-neck hook on the
-left and a flame-tipped curl on the right), so it is clean vector at any size. The letters AK and VEN are set in
-Jost Medium with wide tracking and converted to outlines, so **the logo needs no font anywhere**.
+**AKVEN** is Akyl and Venera's names on one label. The mark joins their initials: the A and the V share their middle
+stroke, like one knitted stitch, and a thread runs from the A's crossbar into the V. That thread is the "and" of the
+old Ak&Ven name, kept in the drawing instead of the spelling. A pointed apex above, a pointed vertex below, one thick
+shared stroke and thin outer arms; where the thread crosses the shared stroke a small gap lets it pass over.
+
+The mark is built from a few numbers (`frontend/src/brand/mark.ts`), not traced from a picture, so it stays crisp at
+16 px, on a sign and on a knitting machine: one colour, no gradients needed, no hairlines thinner than the thread. The
+name AKVEN is set in Marcellus (Roman capitals) with wide spacing and converted to outlines, so **the logo needs no
+font anywhere**.
 
 | File (`frontend/public/brand/`) | Use |
 |---|---|
-| `logo-gold-metallic.svg` | Large placements on black: hero, packaging, signage |
-| `logo-gold.svg` | Flat gold, on white or black |
-| `logo-ink.svg` / `logo-white.svg` | One-colour uses: print, stamps, emails, light or dark backgrounds |
-| `mark-*.svg` | The heart alone: app icon, avatar, favicon, watermark |
+| `logo-*.svg` | Mark and name on one line: the header, documents, receipts |
+| `logo-stacked-*.svg` | Mark above the name and "PREMIUM SOCKS": packaging, labels, signage, the footer |
+| `mark-*.svg` | The AV alone: app icon, favicon, sock labels, a wax seal |
+| `*-gold-metallic` | Brushed gold for large placements on navy or black |
+| `*-gold`, `*-ink`, `*-white` | One colour: print, embroidery, knitting, stamps |
 
-Rules: keep the clear space of at least the height of the letter "A" around the logo; never stretch, outline or
-recolour it outside gold, ink and white; minimum width 80 px on screen. In the app use the `<Logo>` component, which
-takes its colour from the surrounding text colour.
+Rules: keep clear space of at least the height of the A's crossbar around the logo; never stretch, outline or
+recolour it outside gold, ink and white; minimum width 80 px on screen for the lockup, 16 px for the mark. In the app
+use the `<Logo>` component (`variant="full" | "stacked" | "mark"`), which takes its colour from the surrounding text.
 
 ## Colour
 
@@ -42,9 +48,15 @@ Changing a colour is done in `src/styles/tokens.css` only.
 
 ## Type
 
-One family, **Onest**, self-hosted with its Latin and Cyrillic files, so Russian and Kyrgyz (ң ө ү) render in the
-same face as English. Headings use weight 600 with tight tracking, body text 400, the hero lead 300. Prices and
-quantities use tabular figures so they line up. Fonts are tokens (`--font-display`, `--font-sans`, `--font-mono`).
+Two families, both self-hosted with Latin, Cyrillic and Cyrillic Extended, so Russian and Kyrgyz (ң ө ү) render in the
+same faces as English:
+
+- **Cormorant Garamond** for headings: a refined serif, set large, with its italic in gold for emphasis
+  ("Korean socks *for the whole family*"). Numbers use lining figures so "70-E" and prices stand straight.
+- **Onest** for everything else: text, buttons, forms, prices (tabular figures so they line up).
+
+Buttons are pills with small spaced capitals; on hover a second colour sweeps in from the left and the label changes
+colour with it, so it keeps its contrast throughout. Fonts are tokens (`--font-display`, `--font-sans`, `--font-mono`).
 
 ## Ornaments
 
@@ -72,14 +84,16 @@ Built around the family's real stall, container 70-E at Dordoi, so it could not 
 
 | Scene | What it shows |
 |---|---|
-| Container 70-E | The steel doors swing open on a rail of socks that sway, and lean away when the pointer passes |
+| Container 70-E | The steel doors, embossed with the mark, swing open on a rail of socks that sway and lean away when the pointer passes; the container's number is stencilled on a plate on the frame |
+| Three ways to shop | Why the shop is online: families, shops (wholesale) and companies (gift boxes), each with its own path |
+| The family planner | Add each person, their shoe size and pairs; the sock size comes from the size chart and the price step from the ladder; the list can be sent in WhatsApp or Telegram |
 | The band | Every kind of sock the stall carries, moving slowly; it stops on hover |
 | The shelf | The newest socks, switchable between men, women, kids and gift boxes without leaving the page |
 | The fitting | A leg with a ruler; pick a height and the sock is pulled up to it |
 | The box | Tap socks into a box and watch the step reached on the real price ladder (`/api/pricing`) |
 | The calculator | "Ask for your price" the Dordoi way: the seller types the price and the shop's stamp checks it |
 | The gift calendar | Days to 23 February, 8 March, Nooruz, the first day of school and New Year, with the gift boxes |
-| The way to 70-E | A drawn route from the city to Dordoi-Junhai, passage 8, container 70-E |
+| The way to 70-E | A drawn route from the city to Dordoi-Junhai, passage 8, container 70-E, and every contact as a card that lights up in its channel's colour |
 
 ## Motion
 
