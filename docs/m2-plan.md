@@ -35,7 +35,7 @@ Bundles have a category but no section or cut. API: `GET /api/products?category=
 - **Architecture:** thin controllers, service layer, explicit response DTOs, one error format (RFC 7807 problem details), OpenAPI kept accurate.
 - **Testing:** unit + full-flow MockMvc tests, Testcontainers Postgres for the critical paths, JaCoCo with a coverage gate (goal above 80% on the model layer).
 - **UI:** real design tokens from the locked direction, three breakpoints, accessible (keyboard, contrast, labels), fast (image sizes, lazy loading), installable PWA with offline cart.
-- **Brand and content:** realistic product names, descriptions, fabric details and photography placeholders for the Ak&Ven house label; negotiate chat with a bazaar tone.
+- **Brand and content:** realistic product names, descriptions, fabric details and photography placeholders for the AKVEN house label; negotiate chat with a bazaar tone.
 
 ## Open questions
 

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2315 1502" width="2315" height="1502" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Full entity-relationship diagram of the Ak&amp;Ven PostgreSQL schema: 10 tables grouped into Identity, Catalog, Orders and AI/Negotiation, with crow's-foot relationships."><title>Data model (full) — entity-relationship diagram</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2315 1502" width="2315" height="1502" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Full entity-relationship diagram of the AKVEN PostgreSQL schema: 10 tables grouped into Identity, Catalog, Orders and AI/Negotiation, with crow's-foot relationships."><title>Data model (full) — entity-relationship diagram</title>
 <rect width="2315" height="1502" fill="#ffffff"/>
 <rect x="22.0" y="22.0" width="477.3" height="738.0" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
 <rect x="595.3" y="22.0" width="477.3" height="616.0" rx="14" fill="#efeaf7" stroke="#a596cf" stroke-width="2"/>
@@ -626,5 +626,5 @@
 <text x="298.9" y="1432.0" font-size="19" fill="#55524a">≥ 1</text>
 <text x="26.0" y="1458.0" font-size="19" font-weight="700" fill="#1d1d1b">variant</text>
 <text x="98.3" y="1458.0" font-size="19" fill="#55524a">stock_qty ≥ reserved_qty</text>
-<text x="1444.0" y="1405.0" font-size="21" text-anchor="middle" font-style="italic" fill="#55524a">Figure 4 (appendix). Full Ak&amp;Ven data model after Flyway migrations V1–V10, crow's-foot notation (PostgreSQL 16 + pgvector).</text>
+<text x="1444.0" y="1405.0" font-size="21" text-anchor="middle" font-style="italic" fill="#55524a">Figure 4 (appendix). Full AKVEN data model after Flyway migrations V1–V10, crow's-foot notation (PostgreSQL 16 + pgvector).</text>
 </svg>

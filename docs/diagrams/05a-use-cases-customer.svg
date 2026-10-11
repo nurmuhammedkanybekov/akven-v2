@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1300" width="1100" height="1300" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="UML use-case diagram for the customer: Browse Catalog, Manage Cart, Negotiate Price, Checkout and Authenticate, with the AI Negotiation Agent and the Payment Provider as system actors."><title>Use cases — customer side</title><defs><marker id="m-open-555555" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1,1 L13,7 L1,13" fill="none" stroke="#555555" stroke-width="2"/></marker></defs><rect width="1100" height="1300" fill="#ffffff"/><text x="40" y="54" font-size="30" font-weight="700" fill="#2B5A63" text-anchor="start">Use cases — the customer</text>
 <text x="40" y="90" font-size="22" font-weight="400" fill="#555555" text-anchor="start">Negotiation and checkout call on two external system actors</text>
 <rect x="180" y="130" width="650" height="1030" rx="14" fill="none" stroke="#2B5A63" stroke-width="2.6"/>
-<text x="200" y="166" font-size="22" font-weight="700" fill="#2B5A63" text-anchor="start">Ak&amp;Ven storefront</text>
+<text x="200" y="166" font-size="22" font-weight="700" fill="#2B5A63" text-anchor="start">AKVEN storefront</text>
 <ellipse cx="330" cy="270" rx="125" ry="46" fill="#e3eef0" stroke="#2B5A63" stroke-width="2.4"/>
 <text x="330" y="277" font-size="20" font-weight="400" fill="#1b1b1b" text-anchor="middle">Authenticate</text>
 <ellipse cx="330" cy="390" rx="125" ry="46" fill="#e3eef0" stroke="#2B5A63" stroke-width="2.4"/>

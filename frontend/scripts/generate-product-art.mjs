@@ -8,10 +8,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { MARK, markMarkup } from "../src/brand/mark.ts";
 import { SOCK_COLOURS as C, sockBounds, sockMarkup } from "../src/brand/sockDrawing.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const mark = JSON.parse(fs.readFileSync(path.join(root, "brand/mark-path.json"), "utf8"));
 
 const W = 800, H = 1000;
 
@@ -31,7 +31,7 @@ function frame(tint, body, { floor = 870 } = {}) {
   <rect width="${W}" height="${H}" fill="url(#light)"/>
   <ellipse cx="400" cy="${floor}" rx="260" ry="20" fill="#000" fill-opacity=".08"/>
   ${body}
-  <g transform="translate(722 934) scale(${(44 / mark.h).toFixed(4)})" fill="#b08d57" fill-opacity=".55" fill-rule="evenodd"><path d="${mark.d}"/></g>
+  <g transform="translate(716 936) scale(${(40 / MARK.h).toFixed(4)})" opacity=".55">${markMarkup("#b08d57", "wm")}</g>
 </svg>
 `;
 }
@@ -61,7 +61,7 @@ function box(slug, { colour, ribbon, emblem, socks }) {
   <rect x="140" y="612" width="520" height="56" fill="url(#bx)"/>
   <circle cx="400" cy="640" r="62" fill="${ribbon}" stroke="#fff" stroke-opacity=".5" stroke-width="3"/>
   <g transform="translate(400 640)" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${EMBLEMS[emblem]}</g>
-  <g transform="translate(400 790) scale(${(54 / mark.h).toFixed(4)}) translate(${-mark.w / 2} ${-mark.h / 2})" fill="${ribbon}" fill-opacity=".85" fill-rule="evenodd"><path d="${mark.d}"/></g>`;
+  <g transform="translate(400 790) scale(${(58 / MARK.h).toFixed(4)}) translate(${-MARK.w / 2} ${-MARK.h / 2})" opacity=".9">${markMarkup(ribbon, "bx" + slug)}</g>`;
 }
 
 const EMBLEMS = {

@@ -1,10 +1,10 @@
-# Ak&Ven — Architecture
+# AKVEN — Architecture
 
 See [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) for the system diagram this document describes, [`diagrams/02-negotiation-validation-path.svg`](./diagrams/02-negotiation-validation-path.svg) for the Policy Validator trust boundary, [`diagrams/03-sequence-negotiation-turn.svg`](./diagrams/03-sequence-negotiation-turn.svg) for one negotiation turn, and [`diagrams/04b-er-core.svg`](./diagrams/04b-er-core.svg) (core tables) and [`diagrams/04-er-data-model.svg`](./diagrams/04-er-data-model.svg) (full schema, migrations V1 to V10) for the data model.
 
 ## Why this shape
 
-Ak&Ven is one brand (Korean-made socks, sold at Dordoi Bazaar and — this
+AKVEN is one brand (Korean-made socks, sold at Dordoi Bazaar and — this
 thesis — online) with a small, fixed catalog, built by one developer on an
 8-week runway to Milestone 3. The architecture is deliberately sized for
 that, not for the multi-tenant, plugin-driven scale of the open-source
@@ -167,7 +167,7 @@ violation, margin-invariant violation, duplicate email by case, and
 - [x] Cart & checkout, simulated Apple Pay / Google Pay tokenization, inventory holds
 - [x] Negotiation endpoint with a rule-based stand-in behind the same contract the real
       LLM will use in Milestone 3 — `PolicyValidator` already proven correct either way
-- [x] Ak&Ven design system (`docs/brand.md`): logo rebuilt from the shop sign as clean vector,
+- [x] AKVEN design system (`docs/brand.md`): logo rebuilt from the shop sign as clean vector,
       tokens for a light and a dark theme with an automated WCAG contrast test, accessible
       components (buttons, fields, chips, product card, the negotiation offer that shows
       proposed versus validated price), a living style guide, generated product illustrations,
@@ -222,7 +222,7 @@ violation, margin-invariant violation, duplicate email by case, and
 ## Security
 
 See the full checklist (negotiator safety, auth/access, payments, operational)
-in the Ak&Ven Architecture reference doc maintained alongside the thesis
+in the AKVEN Architecture reference doc maintained alongside the thesis
 plan. Summary of what's already reflected in this codebase:
 
 - Passwords are never stored in plaintext — `passwordHash` (bcrypt, via the

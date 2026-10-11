@@ -27,8 +27,8 @@ public class OpenApiConfig {
         final String bearerScheme = "bearerAuth";
         return new OpenAPI()
                 .info(new Info()
-                        .title("Ak&Ven API")
-                        .description("Catalog, negotiation, orders, and admin API for the Ak&Ven thesis project. "
+                        .title("AKVEN API")
+                        .description("Catalog, negotiation, orders, and admin API for the AKVEN thesis project. "
                                 + "Public endpoints: GET /api/products/**. Everything else requires a bearer token; "
                                 + "/api/admin/** additionally requires STAFF or ADMIN.")
                         .version("v0.1 (Milestone 1 skeleton)")

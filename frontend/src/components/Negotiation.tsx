@@ -6,7 +6,7 @@ import { CheckIcon } from "./icons";
 export function ChatBubble({ from, children }: { from: "customer" | "seller"; children: ReactNode }) {
   return (
     <div className={`av-bubble av-bubble--${from}`}>
-      {from === "seller" && <span className="av-eyebrow av-bubble__who">Ak&amp;Ven assistant</span>}
+      {from === "seller" && <span className="av-eyebrow av-bubble__who">AKVEN assistant</span>}
       {children}
     </div>
   );

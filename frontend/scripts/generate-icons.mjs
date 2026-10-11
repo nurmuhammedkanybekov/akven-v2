@@ -1,5 +1,5 @@
 /**
- * Renders the PWA / favicon PNGs from the vector mark: metallic gold heart on ink.
+ * Renders the PWA / favicon PNGs from the vector mark: the metallic gold AV on navy.
  * "maskable" icons keep the mark inside the central safe zone so Android can crop them to any shape.
  * Run: npm run icons
  */
@@ -9,15 +9,16 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const mark = JSON.parse(fs.readFileSync(path.join(root, "brand/mark-path.json"), "utf8"));
-const INK = "#100e0b";
+import { MARK, markMarkup } from "../src/brand/mark.ts";
+
+const INK = "#0f1930";
 
 const svg = (size, fraction) => {
-  const h = size * fraction, w = h * (mark.w / mark.h);
+  const h = size * fraction * 0.86, w = h * (MARK.w / MARK.h);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ebd596"/><stop offset=".5" stop-color="#c9a24b"/><stop offset="1" stop-color="#9c7a2d"/></linearGradient></defs>
     <rect width="${size}" height="${size}" fill="${INK}"/>
-    <g transform="translate(${(size - w) / 2} ${(size - h) / 2 + size * 0.01}) scale(${h / mark.h})" fill="url(#g)" fill-rule="evenodd"><path d="${mark.d}"/></g></svg>`;
+    <g transform="translate(${(size - w) / 2} ${(size - h) / 2}) scale(${h / MARK.h}) translate(1 -1)">${markMarkup("url(#g)", "i")}</g></svg>`;
 };
 
 const targets = [
