@@ -75,12 +75,12 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
             <nav className="av-nav" aria-label={t("nav.main")}>
               {NAV.map((n) => <NavLink key={n.to} to={n.to}>{t(n.key)}</NavLink>)}
             </nav>
-            <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={24} /></Link>
+            <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={32} /></Link>
             <div className="av-header__actions">
-              {extra}
-              <Link className="av-icon-btn av-hide-sm" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>
+              {extra && <span className="av-hide-phone">{extra}</span>}
+              <Link className="av-icon-btn av-hide-md" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>
               <Link className="av-icon-btn" to="/shop" aria-label={t("nav.search")}><SearchIcon /></Link>
-              <Link className="av-icon-btn av-hide-sm" to="/saved" aria-label={t("nav.saved", { n: savedCount })}>
+              <Link className="av-icon-btn av-hide-md" to="/saved" aria-label={t("nav.saved", { n: savedCount })}>
                 <HeartIcon />
                 {savedCount > 0 && <span className="av-icon-btn__count" aria-hidden="true">{savedCount}</span>}
               </Link>
