@@ -1,8 +1,14 @@
 # How the shop is used
 
-## For the owners (Admin and Staff)
+## For the shop team (owners, staff and the super admin)
 
-Sign in at `/login`; staff are sent to the admin at `/admin`. Nothing here needs a developer.
+Sign in at `/login`; the team is sent to the admin at `/admin`. The admin speaks English, Russian and Kyrgyz (switch at
+the bottom of the menu) and the menu is grouped by who uses it: **Shop** (everyone), **Owners** and **System**.
+Nothing here needs a developer.
+
+There are three roles. **Staff** (a helper at the stall) handle products, stock, orders and the hand-over. **Owners**
+(Akylbek and Venera) can also change prices, contacts, the size chart and trusted customers. The **super admin** (Nur,
+who runs the system) can do everything an owner can, plus the accounts, the AI assistant and the audit log.
 
 | Task | Where |
 |---|---|
@@ -20,9 +26,19 @@ Sign in at `/login`; staff are sent to the admin at `/admin`. Nothing here needs
 | Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, and the **price ladder** (owners) | Pricing |
 | Enter **Instagram, Telegram, WhatsApp, phone and email**, and the stall (market, passage, container, opening hours) (owners) | Contacts and the stall |
 | Edit the **size chart** (owners) | Size chart |
+| Find a customer by email and mark them as **trusted** (they may order from the lower minimum) (owners) | Customers |
+| Add an owner or a staff account, change a role, **disable** an account (it is signed out at once) or **set a new password** (super admin) | Accounts |
+| Choose who answers the price chat, the **AI assistant** or the built-in rules; see whether the AI has its key and how often each answered; **try a message** without storing it; run the **comparison against the live AI** (super admin) | AI assistant |
+| Read the **audit log**: every change, who made it, and the values before and after (super admin) | Audit log |
 
 Staff can do everything except create colours and sizes, change the cost price and the discount limit, and change
-pricing, contacts or the size chart; those are admin-only because they decide what the shop charges and says. Until a product has photos the shop shows a branded placeholder.
+pricing, contacts, customers or the size chart; those are for the owners because they decide what the shop charges
+and says.
+
+**The shop's real contacts and the super admin account** are set once on the server, in the `.env` file next to
+`docker-compose.yml` (never in the code; see `.env.example`): `SHOP_CONTACTS` lists the contacts in the order they
+appear on the site, and `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD` create the super admin on the first start. After
+that the owners change contacts in the admin; the list in `.env` is applied again only when it changes. Until a product has photos the shop shows a branded placeholder.
 
 ## For customers
 
@@ -33,7 +49,8 @@ the whole bag, and the bag says how many more pairs reach the next step. `/visit
 
 1. **Bag.** "Add to bag" on any product. The bag lives in the browser: no account needed, it survives a reload, works
    offline and is shared between tabs. It remembers which item and how many; prices are always asked from the server.
-2. **Negotiating.** Signed-in customers can chat on a product page ("Want a better price?"). The assistant replies and
+2. **Negotiating.** Signed-in customers can chat on a product page ("Want a better price?"), in their own language. It
+   is a real conversation: the assistant remembers what was said and offered, answers questions about the sock, and
    may offer a discount; "Add to bag at this price" puts exactly that offer in the bag. An offer is for one item, for
    at least the number of pairs it was negotiated for, and lasts 24 hours.
 3. **Checkout.** Signing in (or creating an account) is needed here. The customer gives a name and phone, chooses
@@ -54,9 +71,12 @@ what was allowed.
 - The assistant is never told the cost price or the margin floor.
 - Its reply is a template filled with the validated numbers. A reply that states any price, percentage or number of its
   own (in digits or in words) is replaced by a safe sentence.
-- By default a deterministic rule-based assistant answers. With `NEGOTIATION_PROVIDER=llm` a language model answers,
-  using product facts from the catalog; if it is down, slow or returns something unusable, the rule-based assistant
-  answers instead. The transcript records which one answered.
+- By default a deterministic rule-based assistant answers. With `NEGOTIATION_PROVIDER=llm`, or when the super admin
+  switches it on in the admin, a language model answers, in the customer's language, using product facts and the
+  shop's public price ladder; if it is down, busy, slow or returns something unusable, the rule-based assistant answers
+  instead. Every turn records which one answered.
+- The number check works in English, Russian and Kyrgyz (digits, number words, percent and money words), so the model
+  cannot slip a price past the shop in any of the three languages.
 - Customers only ever see the validated discount. For a demonstration, `AKVEN_DEMO_EXPOSE_PROPOSAL=true` shows the
   raw proposal next to it, so you can ask for "50% off" and watch the cap work.
 

@@ -23,7 +23,7 @@ Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 ## The project in short
 
-AKVEN is my family's brand of Korean-made socks. My parents, Akyl and Venera, have traded at Dordoi Bazaar in
+AKVEN is my family's brand of Korean-made socks. My parents, Akylbek and Venera, have traded at Dordoi Bazaar in
 Bishkek, Kyrgyzstan, since the early 2000s and have sold socks there since 2018, from container 70-E. At the bazaar
 nobody pays the label price: customers bargain, buy for the whole family, and shops from the regions buy by the case.
 
@@ -33,7 +33,7 @@ online:
 - **Families** plan one set for everyone (sizes, number of pairs) and collect it at the container in minutes, or have
   it delivered to Kyrgyzstan, Kazakhstan, Uzbekistan or Russia.
 - **The more pairs, the lower the price.** Any socks can be mixed, and the whole bag counts towards the next step.
-- **Customers can ask for their price** in a chat with an assistant, as they would at the stall.
+- **Customers can ask for their price** in a chat with an assistant, in English, Russian or Kyrgyz, as they would at the stall.
 - **Shops and companies** send wholesale and gift-box requests straight to the owners' WhatsApp, Telegram or email.
 
 ## The problem and the idea
@@ -60,7 +60,8 @@ flowchart LR
 
 So the guarantee does not depend on how well the model behaves: a model that is tricked, confused or wrong cannot
 change what the customer pays. The evaluation compares a rule-based and a language-model negotiator on the same
-simulated customers.
+simulated customers; the AI answers in the report are a recorded run of a live model (Gemini), and the
+super admin can repeat that run at any time.
 
 ## What the shop does
 
@@ -83,7 +84,8 @@ simulated customers.
   to save 5%" hints in the bag.
 - **The family planner:** add each person and their shoe size; the sock size comes from the size chart, and the list
   can be sent to the shop in a message.
-- **Ask for your price:** a negotiation chat on every product page, with the reason for each price.
+- **Ask for your price:** a negotiation chat on every product page, in the customer's language. It remembers the
+  conversation, answers questions about the sock, and shows the reason for each price.
 - **Honest stock:** in stock, only a few left, arrives in about N days, or sold out.
 - **Size guide** in the sizes each customer knows (EU and US in English, local sizes in Russian and Kyrgyz), with a
   shoe-size finder and how to measure.
@@ -92,16 +94,18 @@ simulated customers.
   request form that opens in WhatsApp, Telegram or email, already written.
 - Saved socks, recently viewed, "complete the set", and checkout with a simulated Apple Pay or Google Pay wallet.
 
-**For the owners and staff (the admin)**
+**For the shop team (the admin, in English, Russian and Kyrgyz)**
 
 - Products, sections, cuts, colours, sizes, photos, stock on the way and wholesale case sizes.
 - Orders, and a hand-over screen for the stall (pickup code plus the end of the customer's phone number).
 - A dashboard: offers per day, how often the limit stepped in, offers that became orders, best sellers.
 - The rule-based against AI comparison, for the evaluation chapter.
 - Owners only: the minimum order, the price ladder, trusted customers, contacts, the stall and the size chart.
+- Super admin only: the team's accounts (add, disable, new password), which assistant answers the chat (the AI or the
+  rules), a test box and the live comparison, and the full audit log.
 
 **Not built, on purpose:** a real payment provider (the wallet is simulated; no money moves), email and SMS
-notifications, and a live language model in production (it is optional and off by default).
+notifications. The language model is optional: without a key the built-in rules answer.
 
 ![Wholesale and company gifts](docs/design/readme-wholesale.jpg)
 
@@ -114,11 +118,12 @@ docker compose up --build
 ```
 
 Then open **http://localhost:8081**. The first build takes a few minutes. The backend log ends with
-`Successfully applied 20 migrations … now at version v20` when everything is up.
+`Successfully applied 22 migrations … now at version v22` when everything is up.
 
 | Demo account | Email | Password | Can do |
 |---|---|---|---|
-| Owner | `admin@akven.test` | `changeme-admin` | Everything, including prices, contacts and the size chart |
+| Super admin | `superadmin@akven.test` | `changeme-super` | Everything an owner can, plus accounts, the AI assistant and the audit log |
+| Owner | `admin@akven.test` | `changeme-admin` | Everything in the shop, including prices, contacts and the size chart |
 | Staff | `staff@akven.test` | `changeme-staff` | Products, stock and orders, but not prices |
 | Customer | Create one with "Sign in" → "Create an account" | | Shop, check out, see orders |
 
@@ -131,7 +136,11 @@ These accounts exist only in demo mode. A short tour:
 4. **Fill the bag** with 20 pairs of mixed socks to reach the first collection step, then pay for a pickup order with
    the simulated wallet to get a pickup code.
 5. **Open the admin** at http://localhost:8081/admin as the owner. Hand the order over with its code, change the
-   price ladder, and look at the negotiation dashboard and the comparison.
+   price ladder, and look at the negotiation dashboard and the comparison. Switch the admin to Russian or Kyrgyz at the
+   bottom of the menu.
+6. **Sign in as the super admin** to add a staff account, read the audit log, and try the AI assistant. To let a real
+   model answer, put `LLM_API_KEY=…` in a `.env` file next to `docker-compose.yml` (see `.env.example`), restart, and
+   switch it on under AI assistant.
 
 To start again from a clean database: `docker compose down -v`, then `docker compose up --build`. If the browser
 still shows an older version, hard-refresh it (Cmd+Shift+R on a Mac).
@@ -155,8 +164,8 @@ flowchart LR
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the admin. English, Russian and Kyrgyz |
 | API | Spring Boot 3.3, Java 17. JWT with three roles (customer, staff, owner). One error format (RFC 7807). OpenAPI at `/swagger-ui/index.html` |
-| Data | PostgreSQL 16 with pgvector. 20 Flyway migrations; demo data only in the demo profile |
-| Assistant | A `Negotiator` interface with two implementations: rule-based (default), and a language model through any OpenAI-compatible API, with automatic fallback to the rules |
+| Data | PostgreSQL 16 with pgvector. 22 Flyway migrations; demo data only in the demo profile |
+| Assistant | A `Negotiator` interface with two implementations: rule-based, and a language model (Gemini by default, any OpenAI-compatible API) that holds a conversation in three languages, with automatic fallback to the rules. The super admin switches between them at run time |
 | Delivery | Docker Compose. CI on GitLab (`.gitlab-ci.yml`) and GitHub Actions (six jobs) |
 
 The layers, the data model and the safety mechanism are described in [`docs/architecture.md`](docs/architecture.md).
@@ -168,18 +177,20 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 164 tests, **97% line coverage**; the build fails below 80% |
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 195 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 10 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 118 tests, including colour-contrast and translation checks |
-| End to end, in a real browser | `cd frontend && npm run e2e` | 23 steps: the owner's and the customer's whole journey in three languages, with accessibility rules on every page |
+| Frontend | `cd frontend && npm test && npm run build` | 123 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| End to end, in a real browser | `cd frontend && npm run e2e` | 24 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:
 
 - No price ever goes below the owners' limit, whatever the assistant proposes.
 - Prices are decided only on the server; the browser's numbers are never trusted.
 - The last pair is sold once, even when two people pay at the same moment, and a double click never charges twice.
-- Login lockout after repeated failures, three roles, an audit log of every change, and database constraints that
-  refuse impossible values even if the application is bypassed.
+- The AI cannot state a price of its own in English, Russian or Kyrgyz; a reply that tries is replaced.
+- Login lockout after repeated failures, four roles, a disabled account or a new password ends its sessions at once,
+  an audit log of every change, and database constraints that refuse impossible values even if the application is
+  bypassed.
 
 ## Status
 
@@ -191,7 +202,7 @@ Safety properties that the tests demonstrate:
 | M4: thesis draft | 22 November | In progress |
 
 Open points: real product photos, the certificate and story texts, a native speaker's check of the Russian and
-Kyrgyz texts, account management for staff from the admin, and an agreed plan for the live-model evaluation. Details
+Kyrgyz texts, and whether to add a small user study to the recorded live-model evaluation. Details
 are in [`docs/progress.md`](docs/progress.md); every requirement, where it is implemented and which test shows it, is
 in [`docs/traceability.md`](docs/traceability.md).
 
@@ -207,7 +218,8 @@ in [`docs/traceability.md`](docs/traceability.md).
 | [`docs/development.md`](docs/development.md) | Running, settings, tests, CI, database |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Branches, checking a laptop is up to date, publishing to GitLab |
 | [`docs/api.md`](docs/api.md) | The API endpoints and error codes |
-| [`docs/diagrams/`](docs/diagrams/README.md) | Thesis figures: architecture, validation path, negotiation sequence, data model, use cases |
+| [`docs/evaluation/`](docs/evaluation/) | The recorded live run of the AI assistant on the 16 simulated customers |
+| [`docs/diagrams/`](docs/diagrams/README.md) | Thesis figures: architecture, validation path, negotiation sequence, data model (generated from the database), use cases |
 | [`docs/wireframes.svg`](docs/wireframes.svg) | Wireframes of the key screens on phone, tablet and laptop |
 | [`docs/brand.md`](docs/brand.md) | Logo, colours, type, ornaments, motion; screenshots in [`docs/design/`](docs/design/) |
 

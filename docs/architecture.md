@@ -48,8 +48,10 @@ visible evidence for the defense.
 |---|---|
 | `Product` / `Variant` | A sock style and its sellable SKUs (size, color, pack size), with `marginFloorPct` per variant |
 | `Order` / `OrderItem` | What was actually sold, at the validator-checked `agreedPrice` |
-| `NegotiationSession` | One chat: `proposedDiscountPct` (LLM, untrusted) vs `validatedDiscountPct` (enforced) |
-| `User` | `CUSTOMER` / `STAFF` / `ADMIN`, same table, role-gated access |
+| `NegotiationSession` | One conversation about one item: the latest `proposedDiscountPct` (LLM, untrusted) vs `validatedDiscountPct` (enforced), and `offeredAt`, from which the offer's 24 hours count |
+| `NegotiationTurn` | Every message and answer of a conversation, with the assistant that answered (`llm`, `rules`, `rules-fallback`), the language and both numbers; the database refuses a turn whose allowed discount is larger than the proposal |
+| `User` | `CUSTOMER` / `STAFF` / `ADMIN` (owner) / `SUPER_ADMIN`, same table, role-gated access |
+| `AppSetting` | Small runtime settings the super admin changes without a restart (which assistant answers); never secrets |
 | `AuditLogEntry` | One row per admin mutation |
 
 ### Schema design decisions worth calling out at the defense
@@ -260,6 +262,22 @@ plan. Summary of what's already reflected in this codebase:
   `PasswordEncoder` bean — Spring Boot auto-configures the
   `DaoAuthenticationProvider` from those two, so login never compares
   passwords by hand.
+- **Four roles, one hierarchy (Milestone 3).** `SUPER_ADMIN > ADMIN` is a
+  Spring `RoleHierarchy`, so every owner rule (`hasRole('ADMIN')`) admits
+  the super admin without being rewritten, both on URLs and on service
+  methods. Accounts, the assistant switch and the audit log are
+  `SUPER_ADMIN` only; no API call can create, change or disable a super
+  admin, so the system can never be left without one.
+- **Sessions end when the account says so.** The filter reads the account
+  on every request: the role comes from the database, not from the token,
+  and a token is refused once its account is disabled or its password was
+  reset after the token was issued (`credentials_changed_at`). One indexed
+  lookup per request is the price of being able to end a session.
+- **Real contacts and the first super admin come from the environment**
+  (`SHOP_CONTACTS`, `SUPER_ADMIN_*` in an ignored `.env`), so phone numbers
+  and passwords are never in the repository. The language model's key is
+  never stored in the database, shown in the admin or logged; the admin only
+  sees whether a key is set.
 - Verified with a real `mvn test` run (see `AuthControllerTest`) exercising
   the actual register → login → protected-route flow against the H2 test
   profile, not just reviewed by eye.
