@@ -185,7 +185,7 @@ export interface PublicPricing { minOrderPairs: number; tiers: Array<{ minPairs:
 export interface PricingPolicy { minOrderPairs: number; trustedMinOrderPairs: number; trustedAfterOrders: number; fewLeftThreshold: number }
 export interface PriceTier { id: string; minPairs: number; discountPct: number }
 
-export type ContactKind = "INSTAGRAM" | "TELEGRAM" | "WHATSAPP" | "PHONE" | "EMAIL";
+export type ContactKind = "INSTAGRAM" | "TELEGRAM" | "WHATSAPP" | "PHONE" | "EMAIL" | "FACEBOOK";
 export interface ShopContact { id: string; kind: ContactKind; label: string | null; value: string; url: string; position: number; active: boolean }
 export interface PickupPoint {
   id: string; name: string; market: string; section: string | null; passage: string | null; container: string;

@@ -63,6 +63,10 @@ class ShopInfoTest extends IntegrationTest {
                 .andExpect(jsonPath("$.url").value("https://wa.me/996700123456"));
         contact(admin, "EMAIL", "shop@akven.kg").andExpect(jsonPath("$.url").value("mailto:shop@akven.kg"));
         contact(admin, "PHONE", "+996700123456").andExpect(jsonPath("$.url").value("tel:+996700123456"));
+        // A pasted page address is reduced to the page name, and the link is rebuilt by the server.
+        contact(admin, "FACEBOOK", "https://www.facebook.com/akven.socks/").andExpect(status().isCreated())
+                .andExpect(jsonPath("$.value").value("akven.socks"))
+                .andExpect(jsonPath("$.url").value("https://facebook.com/akven.socks"));
     }
 
     @Test
