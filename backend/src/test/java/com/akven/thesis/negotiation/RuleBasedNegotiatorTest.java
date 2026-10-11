@@ -3,6 +3,7 @@ package com.akven.thesis.negotiation;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,5 +46,30 @@ class RuleBasedNegotiatorTest {
         Negotiator.Proposal p = ask("hi", 1);
         assertThat(p.discountPct()).isEqualByComparingTo("0");
         assertThat(p.replyTemplate()).contains("{price}");
+    }
+
+    @Test
+    void russianAndKyrgyzAreUnderstoodAndAnsweredInKind() {
+        NegotiationContext ru = new NegotiationContext("Wool Crew", "", new BigDecimal("10.00"), 1, "Скидка 20 процентов?", List.of(), "ru", List.of(), List.of());
+        Negotiator.Proposal p = negotiator.propose(ru);
+        assertThat(p.discountPct()).isEqualByComparingTo("20");
+        assertThat(p.replyTemplate()).startsWith("Договорились").contains("Wool Crew");
+        NegotiationContext ky = new NegotiationContext("Wool Crew", "", new BigDecimal("10.00"), 10, "Арзаныраак болобу?", List.of(), "ky", List.of(), List.of());
+        Negotiator.Proposal k = negotiator.propose(ky);
+        assertThat(k.discountPct()).isEqualByComparingTo("14");
+        assertThat(k.replyTemplate()).contains("10 жуп");
+        assertThat(negotiator.propose(new NegotiationContext("x", "", BigDecimal.TEN, 1, "Оптом можно?", List.of(), "ru", List.of(), List.of())).discountPct())
+                .isEqualByComparingTo("3");
+    }
+
+    @Test
+    void russianPairsFollowTheNumber() {
+        assertThat(Replies.pairs(1, "ru")).isEqualTo("1 пару");
+        assertThat(Replies.pairs(3, "ru")).isEqualTo("3 пары");
+        assertThat(Replies.pairs(12, "ru")).isEqualTo("12 пар");
+        assertThat(Replies.pairs(22, "ru")).isEqualTo("22 пары");
+        assertThat(Replies.pairs(1, "en")).isEqualTo("1 pair");
+        assertThat(Replies.language("kg")).isEqualTo("ky");
+        assertThat(Replies.language(null)).isEqualTo("en");
     }
 }

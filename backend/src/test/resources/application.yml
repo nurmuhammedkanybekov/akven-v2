@@ -19,3 +19,5 @@ akven:
     allowed-origins: http://localhost:5173
   media:
     dir: ${java.io.tmpdir}/akven-test-media
+  llm:
+    evaluation-pause-ms: 0

@@ -364,7 +364,7 @@ class OrderControllerTest extends IntegrationTest {
         Variant v = data.variant(5);
         String mail = email();
         NegotiationSession offer = data.offer(data.customer(mail), v, "10.00", "10.00");
-        jdbc.update("update negotiation_session set created_at = dateadd('DAY', -3, created_at) where id = ?", offer.getId());
+        jdbc.update("update negotiation_session set created_at = dateadd('DAY', -3, created_at), offered_at = dateadd('DAY', -3, offered_at) where id = ?", offer.getId());
         checkout(tokenForEmail(mail, Role.CUSTOMER), key(), body(List.of(line(v.getSku(), 1, offer.getId())), OK))
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.detail").value("That offer has expired. Ask for a new price."));
     }

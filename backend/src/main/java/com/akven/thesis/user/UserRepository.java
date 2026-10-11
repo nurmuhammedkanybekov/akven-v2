@@ -12,4 +12,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     /** UC-9 — Admin listing staff/admin accounts by role. */
     List<User> findByRole(Role role);
+
+    /** The shop team's accounts (everything but customers), for the accounts screen. */
+    List<User> findByRoleInOrderByRoleDescEmailAsc(java.util.Collection<Role> roles);
+
+    /** Customers whose email contains the search text, for marking trusted customers. */
+    org.springframework.data.domain.Page<User> findByRoleAndEmailContainingIgnoreCaseOrderByEmailAsc(Role role, String text, org.springframework.data.domain.Pageable page);
+
+    boolean existsByRole(Role role);
 }

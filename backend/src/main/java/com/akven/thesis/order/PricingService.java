@@ -64,7 +64,7 @@ public class PricingService {
         if (!session.getCustomer().getId().equals(customer.getId()) || !session.getVariant().getId().equals(variant.getId())) {
             throw new BusinessRuleException("That offer is not for this item.");
         }
-        if (session.getCreatedAt() != null && session.getCreatedAt().isBefore(Instant.now().minus(offerTtl))) {
+        if (session.getOfferedAt() != null && session.getOfferedAt().isBefore(Instant.now().minus(offerTtl))) {
             throw new BusinessRuleException("That offer has expired. Ask for a new price.");
         }
         if (quantity < session.getQuantity()) {

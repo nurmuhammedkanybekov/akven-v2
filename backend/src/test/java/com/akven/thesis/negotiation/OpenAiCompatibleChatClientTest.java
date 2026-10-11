@@ -22,6 +22,7 @@ class OpenAiCompatibleChatClientTest {
     private final AtomicReference<String> body = new AtomicReference<>();
     private final AtomicReference<String> path = new AtomicReference<>();
     private volatile int status = 200;
+    private final java.util.concurrent.atomic.AtomicInteger busyAnswers = new java.util.concurrent.atomic.AtomicInteger();
     private volatile String reply = "{\"choices\":[{\"message\":{\"content\":\"{\\\"discountPct\\\":5,\\\"reply\\\":\\\"hi\\\"}\"}}]}";
 
     @BeforeEach
@@ -32,6 +33,12 @@ class OpenAiCompatibleChatClientTest {
             path.set(ex.getRequestURI().getPath());
             body.set(new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
             byte[] out = reply.getBytes(StandardCharsets.UTF_8);
+            if (busyAnswers.getAndUpdate(n -> Math.max(0, n - 1)) > 0) {
+                ex.getResponseHeaders().add("Retry-After", "0");
+                ex.sendResponseHeaders(429, -1);
+                ex.close();
+                return;
+            }
             ex.sendResponseHeaders(status, out.length);
             ex.getResponseBody().write(out);
             ex.close();
@@ -80,5 +87,13 @@ class OpenAiCompatibleChatClientTest {
         server.removeContext("/");
         server.createContext("/", ex -> { try { Thread.sleep(1500); } catch (InterruptedException ignored) { } ex.close(); });
         assertThatThrownBy(() -> client("k", Duration.ofMillis(300)).complete("s", "u")).isInstanceOf(IOException.class);
+    }
+
+    @Test
+    void aBusyProviderIsAskedOnceMoreAndThenGivenUpOn() throws Exception {
+        busyAnswers.set(1);
+        assertThat(client("k", Duration.ofSeconds(5)).complete("s", "u")).contains("discountPct");
+        busyAnswers.set(2);
+        assertThatThrownBy(() -> client("k", Duration.ofSeconds(5)).complete("s", "u")).isInstanceOf(IOException.class).hasMessageContaining("429");
     }
 }
