@@ -1,11 +1,11 @@
-# Ak&Ven
+# AKVEN
 
 **Bachelor's thesis · ELTE IK · Autumn 2026**
 Nurmuhammed Kanybekov, supervised by Prof. Walid Guettala
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
-Ak&Ven is my family's brand of Korean-made socks, sold from container 70-E at Dordoi Bazaar in Bishkek, Kyrgyzstan.
+AKVEN is my family's brand of Korean-made socks, sold from container 70-E at Dordoi Bazaar in Bishkek, Kyrgyzstan.
 At the bazaar nobody pays the label price: customers bargain, buy for the whole family, and shops buy by the case.
 This project is the brand's online shop. It keeps those habits instead of replacing them with a fixed price tag:
 customers build collections from any socks, the price per pair drops as the collection grows, and an assistant
@@ -26,6 +26,10 @@ tricked, confused or simply wrong cannot change what the customer pays.
 **For customers**
 
 - A storefront in **English, Russian and Kyrgyz**, light and dark, on phone, tablet and laptop.
+- **Three reasons to order online:** families plan a set for everyone (sizes from the chart, the price step for the
+  whole set) and collect it at 70-E in minutes or have it delivered; shops order by the pack and the case; companies
+  order gift boxes. Requests and bags can be sent to the shop in WhatsApp, Telegram or email, already written.
+- Saved socks (the heart), recently viewed, and "complete the set" on every product page.
 - A home page built around the real stall, **container 70-E**: its doors open on a rail of swaying socks, a fitting
   shows each sock height on a leg, a box shows the collection price as socks drop in, a bazaar calculator tells how
   "ask for your price" works, a gift calendar counts down to the holidays, and a drawn route leads to the stall.
@@ -53,7 +57,7 @@ tricked, confused or simply wrong cannot change what the customer pays.
 - Prices are decided only on the server; stock cannot be oversold; a checkout cannot charge twice.
 - Login lockout, three roles (customer, staff, owner), an audit log of every change, and database constraints that
   refuse impossible values even if the application is bypassed.
-- About 165 backend tests with 97% line coverage (the build fails below 80%), 10 more on real PostgreSQL, about 115
+- About 165 backend tests with 97% line coverage (the build fails below 80%), 10 more on real PostgreSQL, about 120
   frontend tests, and a browser test of the full journey in three languages that also runs accessibility rules.
 
 What is not built, on purpose: a real payment provider (the wallet is simulated, no money moves), email and SMS, and
