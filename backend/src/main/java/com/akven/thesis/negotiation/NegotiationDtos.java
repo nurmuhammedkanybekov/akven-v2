@@ -16,6 +16,7 @@ public final class NegotiationDtos {
     private NegotiationDtos() {}
 
     /**
+     * currency is how the customer reads prices (USD, or KGS for som at the owners' rate); the offer itself is in USD.
      * sessionId continues an earlier conversation about the same item (the assistant then sees what was said); language
      * is en, ru or ky, and the assistant answers in it.
      */
@@ -23,10 +24,11 @@ public final class NegotiationDtos {
                                    @NotBlank @Size(max = 500) String message,
                                    @Min(1) @Max(999) Integer quantity,
                                    UUID sessionId,
-                                   @Pattern(regexp = "en|ru|ky") String language) {
+                                   @Pattern(regexp = "en|ru|ky") String language,
+                                   @Pattern(regexp = "USD|KGS") String currency) {
 
         public NegotiateRequest(String variantSku, String message, Integer quantity) {
-            this(variantSku, message, quantity, null, null);
+            this(variantSku, message, quantity, null, null, null);
         }
     }
 

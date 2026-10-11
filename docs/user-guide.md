@@ -23,8 +23,8 @@ who runs the system) can do everything an owner can, plus the accounts, the AI a
 | Record stock **on the way**, its arrival date and the **pairs in a wholesale case** (the shop then says "arrives in about N days") | The product's page, each colour and size |
 | See offers per day, how often the limit stepped in, offers that became orders, best sellers, and the **rule-based against AI comparison** | Dashboard |
 | **Hand over a pickup order** at the stall: the customer says the six-digit code and the last four digits of their phone | Hand over an order |
-| Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, and the **price ladder** (owners) | Pricing |
-| Enter **Instagram, Telegram, WhatsApp, phone and email**, and the stall (market, passage, container, opening hours) (owners) | Contacts and the stall |
+| Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, the **price ladder**, and the **som rate** (som for one dollar, and how som prices are rounded) (owners) | Pricing |
+| Enter **WhatsApp, phone, Telegram, Instagram, email and Facebook**, and the stall: market, passage, container, and the **opening hours** (opening and closing time, and the days it is open) (owners) | Contacts and the stall |
 | Edit the **size chart** (owners) | Size chart |
 | Find a customer by email and mark them as **trusted** (they may order from the lower minimum) (owners) | Customers |
 | Add an owner or a staff account, change a role, **disable** an account (it is signed out at once) or **set a new password** (super admin) | Accounts |
@@ -42,8 +42,11 @@ that the owners change contacts in the admin; the list in `.env` is applied agai
 
 ## For customers
 
-The shop speaks English, Russian and Kyrgyz (EN · РУС · КЫР in the top bar, or in the menu on a phone) and remembers
-the choice on the device. Collections are mixed freely: the minimum order and the price ladder count pairs across
+The shop speaks English, Russian and Kyrgyz (EN · РУС · КЫР in the top bar, or in the menu on a phone) and shows prices
+in US dollars or Kyrgyz som ($ · СОМ; som by default in Russian and Kyrgyz). Both choices are remembered on the
+device. Prices are kept in dollars, which is what the wallet charges; som are worked out with the owners' rate and
+rounding, and checkout says what the wallet will charge in dollars. Every sock card has a **Quick view** to choose
+and add a sock without leaving the shelf. Collections are mixed freely: the minimum order and the price ladder count pairs across
 the whole bag, and the bag says how many more pairs reach the next step. `/visit` explains how to find container
 70-E at Dordoi, `/sizes` has the size chart and a size finder, and `/wholesale` explains packs and cases.
 

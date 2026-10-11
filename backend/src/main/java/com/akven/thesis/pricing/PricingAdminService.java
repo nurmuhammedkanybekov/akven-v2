@@ -51,8 +51,10 @@ public class PricingAdminService {
     /** What every visitor may see. */
     @Transactional(readOnly = true)
     public PublicPricing publicPricing() {
-        return new PublicPricing(collections.policy().getMinOrderPairs(),
-                collections.ladder().stream().map(t -> new PublicTier(t.getMinPairs(), t.getDiscountPct())).toList());
+        ShopPolicy policy = collections.policy();
+        return new PublicPricing(policy.getMinOrderPairs(),
+                collections.ladder().stream().map(t -> new PublicTier(t.getMinPairs(), t.getDiscountPct())).toList(),
+                policy.getSomPerUsd(), policy.getSomRounding());
     }
 
     @Transactional(readOnly = true)
@@ -71,6 +73,11 @@ public class PricingAdminService {
         PolicyView before = PolicyView.of(policy);
         int fewLeft = r.fewLeftThreshold() == null ? policy.getFewLeftThreshold() : r.fewLeftThreshold();
         policy.update(r.minOrderPairs(), r.trustedMinOrderPairs(), r.trustedAfterOrders(), fewLeft);
+        if (r.somRounding() != null && !java.util.Set.of(1, 5, 10, 50, 100).contains(r.somRounding())) {
+            throw new BusinessRuleException("Som prices can be rounded to 1, 5, 10, 50 or 100 som.");
+        }
+        policy.updateSom(r.somPerUsd() == null ? policy.getSomPerUsd() : r.somPerUsd(),
+                r.somRounding() == null ? policy.getSomRounding() : r.somRounding());
         PolicyView after = PolicyView.of(policies.saveAndFlush(policy));
         audit.record(actorEmail, "PRICING_POLICY_UPDATED", "SHOP_POLICY", POLICY_AUDIT_ID, before, after);
         return after;

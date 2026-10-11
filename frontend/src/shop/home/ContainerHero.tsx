@@ -2,7 +2,9 @@ import { useRef } from "react";
 import { Logo } from "../../brand/Logo";
 import { SOCK_COLOURS as C, SockArt, type SockSpec } from "../../brand/SockArt";
 import { Button } from "../../components/Button";
+import { OpenNow } from "../../components/OpenNow";
 import { useT } from "../../i18n/I18n";
+import { useShopInfo } from "../useShopInfo";
 
 /** What hangs on the rail inside container 70-E: one of each kind the stall sells. */
 const RAIL: SockSpec[] = [
@@ -22,6 +24,7 @@ const RAIL: SockSpec[] = [
  */
 export function ContainerHero({ minPairs }: { minPairs: number }) {
   const { t } = useT();
+  const stall = useShopInfo()?.pickupPoints[0];
   const rail = useRef<HTMLDivElement>(null);
   const last = useRef<{ x: number; t: number } | null>(null);
   const settle = useRef<number>();
@@ -44,6 +47,7 @@ export function ContainerHero({ minPairs }: { minPairs: number }) {
       <div className="av-container av-hero2__grid">
         <div className="av-hero2__copy">
           <span className="av-hero2__tag"><i aria-hidden="true" />{t("hero.where")}</span>
+          {stall && <OpenNow point={stall} className="av-hero2__open" />}
           <h1 id="hero-title" className="av-hero2__title">
             <span>{t("hero.title1")}</span>
             <em>{t("hero.title2")}</em>
@@ -82,6 +86,7 @@ export function ContainerHero({ minPairs }: { minPairs: number }) {
           <div className="av-stage__floor" />
         </div>
       </div>
+      <a className="av-hero2__more" href="#paths-title" aria-label={t("hero.more")}><span aria-hidden="true" /></a>
     </section>
   );
 }

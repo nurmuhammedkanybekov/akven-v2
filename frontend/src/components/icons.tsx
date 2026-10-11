@@ -29,4 +29,6 @@ export const TruckIcon = () => <Icon><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7" /><
 export const RulerIcon = () => <Icon><path d="m3 15 12-12 6 6-12 12Z" /><path d="m8 10 2 2M11 7l2 2M5 13l2 2" /></Icon>;
 export const StoreIcon = () => <Icon><path d="M4 10 5.5 5h13L20 10M4 10h16v10H4zM10 20v-5h4v5" /></Icon>;
 export const HeartIcon = () => <Icon><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z" /></Icon>;
+export const ClockIcon = () => <Icon><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></Icon>;
+export const CopyIcon = () => <Icon><rect x="8" y="8" width="11" height="12" rx="1.5" /><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15" /></Icon>;
 export const PinIcon = () => <Icon><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" /><circle cx="12" cy="10" r="2.4" /></Icon>;

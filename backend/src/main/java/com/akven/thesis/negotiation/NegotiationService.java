@@ -112,7 +112,7 @@ public class NegotiationService {
         BigDecimal validated = policy.clamp(proposed, variant);
         BigDecimal offer = list.multiply(BigDecimal.valueOf(100).subtract(validated)).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
 
-        String reply = fill(template(proposal, proposed, validated, language), validated, offer);
+        String reply = fill(template(proposal, proposed, validated, language), validated, money(offer, request.currency(), language));
 
         String lines = "Customer: " + message + "\nAssistant [" + proposal.source() + "] (as proposed): " + proposal.replyTemplate()
                 + "\nAssistant (as sent): " + reply;
@@ -203,7 +203,18 @@ public class NegotiationService {
     }
 
     static String fill(String template, BigDecimal pct, BigDecimal price) {
-        return template.replace("{pct}", pct.stripTrailingZeros().toPlainString()).replace("{price}", "$" + price.toPlainString());
+        return fill(template, pct, "$" + price.toPlainString());
+    }
+
+    static String fill(String template, BigDecimal pct, String price) {
+        return template.replace("{pct}", pct.stripTrailingZeros().toPlainString()).replace("{price}", price);
+    }
+
+    /** "$7.13", or in som at the owners' rate: "620 som" / "620 сом", with a space between thousands. */
+    private String money(BigDecimal usd, String currency, String language) {
+        if (!"KGS".equals(currency)) return "$" + usd.toPlainString();
+        String som = String.format(java.util.Locale.ROOT, "%,d", collections.policy().toSom(usd)).replace(',', '\u00a0');
+        return som + (Replies.EN.equals(language) ? " som" : " сом");
     }
 
     static String label(Variant v) {

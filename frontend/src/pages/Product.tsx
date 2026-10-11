@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MAX_PER_LINE, useCart } from "../cart/CartContext";
 import { QuantityStepper } from "../components/QuantityStepper";
 import { useToast } from "../components/Toast";
 import { getProduct, listProducts } from "../api/endpoints";
 import { ApiError } from "../api/client";
-import type { ProductDetail, VariantView } from "../api/types";
+import type { ProductDetail } from "../api/types";
 import { Skeleton } from "../components/Alert";
 import { StockBadge } from "../components/Badge";
 import { Button } from "../components/Button";
@@ -21,6 +21,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
 import { usePricing } from "../shop/useShopInfo";
+import { useVariantChoice } from "../shop/useVariantChoice";
 import { CATEGORY_PATH, productMeta } from "../lib/labels";
 import { NotFoundPage } from "./NotFound";
 
@@ -46,35 +47,15 @@ function ProductView({ product }: { product: ProductDetail }) {
   const minPrice = product.variants.length ? Math.min(...product.variants.map((v) => v.price)) : null;
   useEffect(() => { rememberViewed({ slug: product.slug, name: product.name, image: product.images[0]?.url ?? null, price: minPrice }); }, [product.slug, product.name, product.images, minPrice]);
   const variants = product.variants;
-  const [sku, setSku] = useState(() => (variants.find((v) => v.availableQty > 0) ?? variants[0])?.sku);
+  const { current, colors, sizes, packs, pick, label } = useVariantChoice(product);
   const [imageIndex, setImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const cart = useCart();
   const toast = useToast();
-  const current: VariantView | undefined = variants.find((v) => v.sku === sku);
-
-  const colors = useMemo(() => {
-    const seen = new Map<string, VariantView>();
-    for (const v of variants) { const key = `${v.color ?? ""}|${v.colorHex ?? ""}`; if (!seen.has(key)) seen.set(key, v); }
-    return [...seen.values()];
-  }, [variants]);
-  const sameColor = variants.filter((v) => v.color === current?.color && v.colorHex === current?.colorHex);
-  const sizes = [...new Set(sameColor.map((v) => v.size).filter((s): s is string => !!s))];
-  const packs = [...new Set(sameColor.filter((v) => v.size === current?.size).map((v) => v.packSize).filter((p): p is number => p !== null))];
-
-  /** Picking one option keeps the others where possible, so changing colour does not reset the size. */
-  function pick(change: Partial<Pick<VariantView, "color" | "colorHex" | "size" | "packSize">>) {
-    const want = { color: current?.color, colorHex: current?.colorHex, size: current?.size, packSize: current?.packSize, ...change };
-    const score = (v: VariantView) => (v.color === want.color ? 4 : 0) + (v.colorHex === want.colorHex ? 4 : 0) + (v.size === want.size ? 2 : 0) + (v.packSize === want.packSize ? 1 : 0);
-    const best = [...variants].filter((v) => Object.entries(change).every(([k, val]) => v[k as keyof VariantView] === val))
-      .sort((a, b) => score(b) - score(a))[0];
-    if (best) setSku(best.sku);
-  }
 
   const image = product.images[imageIndex];
   const details: Array<[MessageKey, string | null]> = [["pdp.fabric", product.fabricComposition], ["pdp.quality", product.quality], ["pdp.madeIn", product.origin], ["pdp.care", product.care]];
   const steps = pricing?.tiers ?? [];
-  const label = (v: VariantView) => [v.color, v.size, v.packSize && v.packSize > 1 ? t("pdp.pairsN", { n: v.packSize }) : null].filter(Boolean).join(", ") || null;
 
   return (
     <div className="av-container av-page">

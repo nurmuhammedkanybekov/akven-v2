@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { ProductSummary } from "../api/types";
 import { useT } from "../i18n/I18n";
@@ -8,16 +9,19 @@ import { productMeta } from "../lib/labels";
 import { Badge } from "./Badge";
 import { Price } from "./Price";
 import { ProductImage } from "./ProductImage";
+import { QuickView } from "./QuickView";
 
 /**
  * Catalog grid card: photo on a soft tint, colour dots, honest sold-out state. The whole card is one link.
- * tint (1-6) varies the backdrop from card to card, the way Bombas lays out its shelves.
+ * tint (1-6) varies the backdrop from card to card, the way Bombas lays out its shelves. "Quick view" opens the
+ * sock in a panel to choose and add it without leaving the shelf.
  */
 export function ProductCard({ product, to, tint }: { product: ProductSummary; to: string; tint?: number }) {
   const { t } = useT();
   const saved = useSaved();
   const soldOut = !product.inStock;
   const isSaved = saved.has(product.slug);
+  const [quick, setQuick] = useState(false);
   return (
     <div className="av-card-wrap">
     <Link className={`av-card${soldOut ? " av-card--soldout" : ""}`} to={to}>
@@ -46,6 +50,14 @@ export function ProductCard({ product, to, tint }: { product: ProductSummary; to
       onClick={() => saved.toggle({ slug: product.slug, name: product.name, image: product.image?.url ?? null, price: product.minPrice })}>
       <HeartIcon />
     </button>
+    {!soldOut && (
+      <div className="av-quick-layer">
+        <button type="button" className="av-quick" onClick={() => setQuick(true)} aria-label={t("qv.open", { name: product.name })}>
+          {t("qv.button")}
+        </button>
+      </div>
+    )}
+    {quick && <QuickView slug={product.slug} name={product.name} open onClose={() => setQuick(false)} />}
     </div>
   );
 }

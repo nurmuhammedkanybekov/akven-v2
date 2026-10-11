@@ -11,11 +11,12 @@ import { QuantityStepper } from "../components/QuantityStepper";
 import { useT } from "../i18n/I18n";
 import { withMessage } from "../components/Contacts";
 import { useShopInfo } from "../shop/useShopInfo";
-import { formatPrice } from "../lib/format";
+import { useMoney } from "../shop/useMoney";
 import type { CollectionView } from "../api/types";
 
 /** The bag: what is in it, at today's prices, with honest notes about anything that changed. */
 export function CartPage() {
+  const { money } = useMoney();
   const cart = useCart();
   const { session } = useAuth();
   const { quote, loading, offline } = useQuote(cart.lines, session?.email ?? null);
@@ -37,7 +38,7 @@ export function CartPage() {
   const fallbackTotal = cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
   const total = quote ? quote.total : fallbackTotal;
   // The bag written out, for customers who would rather order by message: nothing is sent until they press send.
-  const message = [t("cart.msgHello"), ...cart.lines.map((l) => `• ${l.productName} (${l.variantLabel}) × ${l.quantity}`), t("cart.msgTotal", { total: formatPrice(total) })].join("\n");
+  const message = [t("cart.msgHello"), ...cart.lines.map((l) => `• ${l.productName} (${l.variantLabel}) × ${l.quantity}`), t("cart.msgTotal", { total: money(total) })].join("\n");
 
   return (
     <div className="av-container av-page">
@@ -53,9 +54,9 @@ export function CartPage() {
           {quote?.collection && <CollectionProgress c={quote.collection} />}
           <h2>{t("cart.summary")}</h2>
           <dl className="av-totals">
-            <div><dt>{t("cart.subtotal")}</dt><dd className="av-price">{formatPrice(total)}</dd></div>
+            <div><dt>{t("cart.subtotal")}</dt><dd className="av-price">{money(total)}</dd></div>
             <div><dt>{t("cart.delivery")}</dt><dd className="av-small">{t("cart.deliveryS")}</dd></div>
-            <div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{formatPrice(total)}</dd></div>
+            <div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(total)}</dd></div>
           </dl>
           {quote && !quote.canCheckout && !quote.collection?.minimumMessage && <Alert tone="danger">{t("cart.attention")}</Alert>}
           {quote?.canCheckout && !offline
@@ -103,6 +104,7 @@ function CollectionProgress({ c }: { c: CollectionView }) {
 }
 
 function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading: boolean }) {
+  const { money } = useMoney();
   const cart = useCart();
   const { t } = useT();
   const problem = q && q.problem !== "NONE";
@@ -120,7 +122,7 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
         </span>
         <Price amount={unitPrice} was={q?.discountPct ? q.listPrice ?? undefined : undefined} />
         {q?.discountPct ? <span className="av-small av-price__save">{line.negotiationSessionId ? t("bag.negotiated", { pct: q.discountPct }) : t("bag.collectionPrice", { pct: q.discountPct })}</span> : null}
-        {priceChanged && <span className="av-small">Price is now {formatPrice(q!.unitPrice!)} (it was {formatPrice(line.unitPrice)} when you added it).</span>}
+        {priceChanged && <span className="av-small">Price is now {money(q!.unitPrice!)} (it was {money(line.unitPrice)} when you added it).</span>}
         {q?.note && <span className={problem ? "av-error" : "av-small"}>{q.note}</span>}
         {q?.problem === "NOT_ENOUGH_STOCK" && q.availableQty > 0 && (
           <Button size="sm" variant="secondary" onClick={() => cart.setQuantity(line.sku, q.availableQty)}>Change to {q.availableQty}</Button>
@@ -131,7 +133,7 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
         <QuantityStepper value={line.quantity} min={1} max={max} label={`Quantity of ${line.productName}`} onChange={(n) => cart.setQuantity(line.sku, n)} />
         <Button size="sm" variant="ghost" aria-label={`Remove ${line.productName} from the bag`} onClick={() => cart.remove(line.sku)}>Remove</Button>
       </div>
-      <div className="av-cartline__total av-price">{q?.lineTotal != null ? formatPrice(q.lineTotal) : formatPrice(line.unitPrice * line.quantity)}</div>
+      <div className="av-cartline__total av-price">{q?.lineTotal != null ? money(q.lineTotal) : money(line.unitPrice * line.quantity)}</div>
     </li>
   );
 }

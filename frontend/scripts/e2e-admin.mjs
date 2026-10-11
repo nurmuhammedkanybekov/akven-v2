@@ -420,6 +420,27 @@ try {
     await page.getByRole("button", { name: "English" }).click();
   });
 
+  await step("quick view adds a sock without leaving the shelf, prices switch to som, and the visit page shows today's hours", async () => {
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.goto(`${BASE}/men`);
+    const card = page.locator(".av-card-wrap").first();
+    await card.hover();
+    await card.getByRole("button", { name: /^Quick view/ }).click();
+    const dialog = page.locator("dialog.av-qv");
+    await dialog.getByRole("button", { name: "Add to bag" }).click();
+    await dialog.waitFor({ state: "hidden" });
+    await page.getByRole("link", { name: /Bag, \d+ items?/ }).waitFor();
+    await page.getByRole("button", { name: "Kyrgyz som" }).click();
+    await page.locator(".av-card .av-price").first().filter({ hasText: /\d som$/ }).waitFor();
+    await a11y("the catalog in som");
+    await page.getByRole("button", { name: "US dollars" }).click();
+    await page.goto(`${BASE}/visit`);
+    await page.getByText("Every day").waitFor();
+    await page.getByText(/8:00–16:00/).first().waitFor();
+    await page.locator(".av-open").waitFor();
+    await a11y("the visit page");
+  });
+
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);
   console.log("\nAll steps passed. Screenshots in docs/design/.");
 } catch (e) {

@@ -20,13 +20,17 @@ public final class PricingDtos {
     public record PolicyRequest(@NotNull @Min(1) @Max(10000) Integer minOrderPairs,
                                 @NotNull @Min(1) @Max(10000) Integer trustedMinOrderPairs,
                                 @NotNull @Min(1) @Max(1000) Integer trustedAfterOrders,
-                                @Min(0) @Max(10000) Integer fewLeftThreshold) {}
+                                @Min(0) @Max(10000) Integer fewLeftThreshold,
+                                @DecimalMin(value = "0.01") @DecimalMax(value = "100000") BigDecimal somPerUsd,
+                                Integer somRounding) {}
 
     /** fewLeftThreshold: the shop says "only N left" at or below this many units. */
-    public record PolicyView(int minOrderPairs, int trustedMinOrderPairs, int trustedAfterOrders, int fewLeftThreshold) {
+    public record PolicyView(int minOrderPairs, int trustedMinOrderPairs, int trustedAfterOrders, int fewLeftThreshold,
+                             BigDecimal somPerUsd, int somRounding) {
 
         static PolicyView of(ShopPolicy p) {
-            return new PolicyView(p.getMinOrderPairs(), p.getTrustedMinOrderPairs(), p.getTrustedAfterOrders(), p.getFewLeftThreshold());
+            return new PolicyView(p.getMinOrderPairs(), p.getTrustedMinOrderPairs(), p.getTrustedAfterOrders(), p.getFewLeftThreshold(),
+                    p.getSomPerUsd(), p.getSomRounding());
         }
     }
 
@@ -42,7 +46,8 @@ public final class PricingDtos {
 
     public record PublicTier(int minPairs, BigDecimal discountPct) {}
 
-    public record PublicPricing(int minOrderPairs, List<PublicTier> tiers) {}
+    /** somPerUsd and somRounding let the shop show every price in som exactly as the server would round it. */
+    public record PublicPricing(int minOrderPairs, List<PublicTier> tiers, BigDecimal somPerUsd, int somRounding) {}
 
     public record TrustRequest(@NotNull Boolean trusted) {}
 

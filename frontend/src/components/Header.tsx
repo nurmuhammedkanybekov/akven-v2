@@ -4,6 +4,7 @@ import { Logo } from "../brand/Logo";
 import { LanguageSwitch, useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
 import { BagIcon, CloseIcon, HeartIcon, MenuIcon, PinIcon, SearchIcon, UserIcon } from "./icons";
+import { CurrencySwitch } from "../shop/useMoney";
 
 const NAV: Array<{ to: string; key: MessageKey }> = [
   { to: "/men", key: "nav.men" },
@@ -62,7 +63,11 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
       <div className="av-ann">
         <div className="av-container av-ann__bar">
           <p className="av-ann__text" key={msg}>{t(MESSAGES[msg])}</p>
-          <LanguageSwitch className="av-ann__langs" />
+          <div className="av-ann__langs">
+            <CurrencySwitch />
+            <span className="av-ann__sep" aria-hidden="true" />
+            <LanguageSwitch />
+          </div>
         </div>
       </div>
       <header ref={headerRef} className={`av-header${scrolled ? " is-scrolled" : ""}`}>
@@ -100,7 +105,10 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
           ))}
           <NavLink to="/saved" style={{ "--i": NAV.length } as React.CSSProperties}>{t("nav.savedTitle")}</NavLink>
         </div>
-        <LanguageSwitch className="av-mobile-nav__langs" />
+        <div className="av-mobile-nav__langs">
+          <LanguageSwitch />
+          <CurrencySwitch />
+        </div>
       </nav>
     </>
   );

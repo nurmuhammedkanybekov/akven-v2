@@ -25,6 +25,7 @@ services:
       DB_URL: jdbc:postgresql://db:5432/akven
       DB_USER: akven
       DB_PASSWORD: akven
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8081}
       NEGOTIATION_PROVIDER: ${NEGOTIATION_PROVIDER:-rule}
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_MODEL: ${LLM_MODEL:-gemini-3.5-flash-lite}

@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.time.LocalTime;
 import java.util.UUID;
 
 /** Where customers collect their orders, e.g. Dordoi Bazaar, Dordoi-Junhai, passage 8, container 70-E. */
@@ -26,6 +27,11 @@ public class PickupPoint extends AuditableEntity {
     @Column(nullable = false, length = 80) private String city = "Bishkek";
     @Column(length = 200) private String hours;
     @Column(length = 1000) private String directions;
+    /** When the stall opens and closes, Bishkek time; both empty until the owners set them. */
+    @Column(name = "opens_at") private LocalTime opensAt;
+    @Column(name = "closes_at") private LocalTime closesAt;
+    /** A bit per day it is open: Monday = 1 ... Sunday = 64; 127 is every day. */
+    @Column(name = "open_days", nullable = false) private short openDays = 127;
     @Column(nullable = false) private Integer position = 0;
     @Column(name = "is_active", nullable = false) private boolean active = true;
 
@@ -61,6 +67,15 @@ public class PickupPoint extends AuditableEntity {
     public String getCity() { return city; }
     public String getHours() { return hours; }
     public String getDirections() { return directions; }
+    public LocalTime getOpensAt() { return opensAt; }
+    public LocalTime getClosesAt() { return closesAt; }
+    public int getOpenDays() { return openDays; }
+
+    void setOpeningHours(LocalTime opensAt, LocalTime closesAt, int openDays) {
+        this.opensAt = opensAt;
+        this.closesAt = closesAt;
+        this.openDays = (short) openDays;
+    }
     public int getPosition() { return position; }
     public boolean isActive() { return active; }
 }
