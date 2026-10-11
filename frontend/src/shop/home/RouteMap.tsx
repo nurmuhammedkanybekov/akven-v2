@@ -12,7 +12,7 @@ const OURS = { row: 3, col: 6 };
  * The way to the stall as a drawn route: from the city to Dordoi, into Dordoi-Junhai, down passage 8 to container
  * 70-E. The road draws itself when the panel scrolls into view. Words come from the stall entered in the admin.
  */
-export function RouteMap() {
+export function RouteMap({ onVisitPage = false }: { onVisitPage?: boolean }) {
   const { t } = useT();
   const info = useShopInfo();
   const stall = info?.pickupPoints[0];
@@ -25,17 +25,17 @@ export function RouteMap() {
         <div className="av-deep av-route">
           <div className="av-stack">
             <span className="av-eyebrow av-orn">{t("visit.eyebrow")}</span>
-            <h2 id="route-title">{t("route.title", { container })}</h2>
+            <h2 id="route-title">{t("route.title", { container: container.replace(/-/g, "\u2011") })}</h2>
             <p>{t("route.lead")}</p>
             <ol className="av-route__steps">
               <li>{t("visit.how1")}</li>
               <li>{t("visit.how2", { passage })}</li>
               <li>{t("visit.how3", { container })}</li>
             </ol>
-            <div className="av-row">
+            {!onVisitPage && <div className="av-row">
               <Button to="/visit" variant="accent">{t("story.cta")}</Button>
               <Button to="/visit#pickup" variant="secondary" className="av-btn--onnavy">{t("help.delivery")}</Button>
-            </div>
+            </div>}
           </div>
 
           <figure className="av-route__map" aria-hidden="true">

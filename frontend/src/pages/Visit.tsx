@@ -1,6 +1,6 @@
 import { useT } from "../i18n/I18n";
 import { Button } from "../components/Button";
-import { PinIcon, StoreIcon, TruckIcon } from "../components/icons";
+import { TruckIcon } from "../components/icons";
 import { RouteMap } from "../shop/home/RouteMap";
 import { useShopInfo } from "../shop/useShopInfo";
 
@@ -43,16 +43,11 @@ export function VisitPage() {
               </div>
             )}
           </div>
-          <ol className="av-visit__steps">
-            <li><StoreIcon /><span>{t("visit.how1")}</span></li>
-            <li><PinIcon /><span>{t("visit.how2", { passage: point?.passage ?? "8" })}</span></li>
-            <li><StoreIcon /><span>{t("visit.how3", { container: point?.container ?? "70-E" })}</span></li>
-          </ol>
           {point?.directions && <p className="av-visit__directions">{point.directions}</p>}
         </div>
       </section>
 
-      <RouteMap />
+      <RouteMap onVisitPage />
 
       <section id="pickup" className="av-container av-block av-visit__grid">
         <div className="av-stack">
