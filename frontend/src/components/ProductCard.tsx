@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import type { ProductSummary } from "../api/types";
 import { useT } from "../i18n/I18n";
+import { useSaved } from "../shop/useSaved";
+import { HeartIcon } from "./icons";
 import type { MessageKey } from "../i18n/en";
 import { productMeta } from "../lib/labels";
 import { Badge } from "./Badge";
@@ -13,8 +15,11 @@ import { ProductImage } from "./ProductImage";
  */
 export function ProductCard({ product, to, tint }: { product: ProductSummary; to: string; tint?: number }) {
   const { t } = useT();
+  const saved = useSaved();
   const soldOut = !product.inStock;
+  const isSaved = saved.has(product.slug);
   return (
+    <div className="av-card-wrap">
     <Link className={`av-card${soldOut ? " av-card--soldout" : ""}`} to={to}>
       <div className="av-card__media" style={tint ? { background: `var(--tint-${tint})` } : undefined}>
         <ProductImage image={product.image} />
@@ -36,5 +41,11 @@ export function ProductCard({ product, to, tint }: { product: ProductSummary; to
         </span>
       </div>
     </Link>
+    <button type="button" className={`av-save${isSaved ? " is-on" : ""}`} aria-pressed={isSaved}
+      aria-label={t(isSaved ? "save.remove" : "save.add", { name: product.name })}
+      onClick={() => saved.toggle({ slug: product.slug, name: product.name, image: product.image?.url ?? null, price: product.minPrice })}>
+      <HeartIcon />
+    </button>
+    </div>
   );
 }

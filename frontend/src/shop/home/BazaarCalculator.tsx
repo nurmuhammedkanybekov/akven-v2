@@ -78,7 +78,7 @@ export function BazaarCalculator() {
             <p className={`av-say av-say--shop${s.bubble >= 3 ? " is-on" : ""}`}>{t("ask.shop")}</p>
           </div>
           <div className="av-calc" aria-hidden="true">
-            <div className="av-calc__top"><span>AK&amp;VEN</span><i /></div>
+            <div className="av-calc__top"><span>AKVEN</span><i /></div>
             <div className={`av-calc__lcd${s.bubble >= 3 ? " is-offer" : ""}`}>
               <small>{s.bubble >= 3 ? t("ask.yours") : t("ask.asking")}</small>
               <span className="av-calc__digits">{s.show || "0"}</span>

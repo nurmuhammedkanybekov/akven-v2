@@ -1,4 +1,5 @@
-import { NavLink, useSearchParams } from "react-router-dom";
+import { Fragment } from "react";
+import { Link, NavLink, useSearchParams } from "react-router-dom";
 import { getFacets, listProducts, type CatalogQuery } from "../api/endpoints";
 import type { Category, FacetOption } from "../api/types";
 import { Skeleton } from "../components/Alert";
@@ -7,16 +8,53 @@ import { Chip } from "../components/Chip";
 import { Select } from "../components/Field";
 import { Pagination } from "../components/Pagination";
 import { ProductCard } from "../components/ProductCard";
+import { SOCK_COLOURS as C, SockArt, type SockSpec } from "../brand/SockArt";
 import { useAsync } from "../hooks/useAsync";
-import { CATEGORIES, CATEGORY_LABEL, CATEGORY_PATH } from "../lib/labels";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/en";
+import { CATEGORIES, CATEGORY_PATH } from "../lib/labels";
+import { usePricing } from "../shop/useShopInfo";
 
-const SORTS: Array<[string, string]> = [["newest", "Newest"], ["name", "Name"], ["price_asc", "Price: low to high"], ["price_desc", "Price: high to low"]];
+const SORTS: Array<[string, MessageKey]> = [["newest", "shop.sortNew"], ["name", "shop.sortName"], ["price_asc", "shop.sortLow"], ["price_desc", "shop.sortHigh"]];
+
+/** The socks drawn in each banner: what that shelf is about at a glance. */
+const BANNER: Record<Category | "ALL", SockSpec[]> = {
+  ALL: [
+    { cut: "crew", main: C.navy, accent: C.gold, pattern: "argyle", second: C.cream },
+    { cut: "knee-high", main: C.cream, accent: C.navy, pattern: "oimo", second: C.gold },
+    { cut: "ankle", main: C.pink, accent: C.red, pattern: "hearts" },
+  ],
+  MEN: [
+    { cut: "crew", main: C.navy, accent: C.navy, pattern: "rib", heel: false },
+    { cut: "crew", main: C.navy, accent: C.gold, pattern: "argyle", second: C.cream },
+    { cut: "mid-long", main: C.black, accent: C.mustard, pattern: "compression" },
+  ],
+  WOMEN: [
+    { cut: "ankle", main: C.white, accent: C.rose, lace: true, second: "#ffffff" },
+    { cut: "crew", main: C.pink, accent: C.red, pattern: "hearts" },
+    { cut: "knee-high", main: C.cream, accent: C.navy, pattern: "oimo", second: C.gold },
+  ],
+  KIDS: [
+    { cut: "crew", main: C.beige, accent: C.brown, pattern: "bear", second: C.cream },
+    { cut: "ankle", main: C.mint, accent: C.forest, pattern: "dino", second: C.white },
+    { cut: "knee-high", main: C.navy, accent: C.white, pattern: "stripes", heel: false },
+  ],
+  BUNDLES: [
+    { cut: "crew", main: C.red, accent: C.white, pattern: "snow" },
+    { cut: "crew", main: C.cream, accent: C.brick, pattern: "oimo", second: C.gold },
+    { cut: "ankle", main: C.black, accent: C.gold, pattern: "sparkle", second: "#ffffff" },
+  ],
+};
 
 /**
  * The shop window: audience tabs, the owners' own sections and cuts as filter chips with live counts, stock and
  * sort. Every filter lives in the URL, so a filtered view can be bookmarked, shared and reached with Back.
  */
 export function CatalogPage({ category }: { category?: Category }) {
+  const { t } = useT();
+  const pricing = usePricing();
+  const firstStep = [...(pricing?.tiers ?? [])].sort((a, b) => a.minPairs - b.minPairs)[0];
+  const key = category ?? "ALL";
   const [params, setParams] = useSearchParams();
   const section = params.get("section") ?? undefined;
   const cut = params.get("cut") ?? undefined;
@@ -41,8 +79,8 @@ export function CatalogPage({ category }: { category?: Category }) {
 
   const options = (key: "section" | "cut", list: FacetOption[] | undefined, current?: string) =>
     list && list.length > 0 && (
-      <div className="av-filter-group" role="group" aria-label={key === "section" ? "Sections" : "Cuts"}>
-        <span className="av-eyebrow">{key === "section" ? "Section" : "Cut"}</span>
+      <div className="av-filter-group" role="group" aria-label={key === "section" ? t("shop.sections") : t("shop.cuts")}>
+        <span className="av-eyebrow">{key === "section" ? t("shop.section") : t("shop.cut")}</span>
         <div className="av-row">
           {list.map((o) => <Chip key={o.slug} label={o.name} count={o.count} pressed={current === o.slug} onToggle={() => toggle(key, o.slug, current)} />)}
         </div>
@@ -50,17 +88,25 @@ export function CatalogPage({ category }: { category?: Category }) {
     );
 
   return (
-    <div className="av-container av-page">
-      <header className="av-page__head">
-        <span className="av-eyebrow">{category ? "Shop" : "Shop"}</span>
-        <h1>{category ? CATEGORY_LABEL[category] : "All socks"}</h1>
-        {total !== undefined && <p className="av-small" aria-live="polite">{total} {total === 1 ? "product" : "products"}</p>}
-      </header>
-
-      <nav className="av-tabs" aria-label="Audience">
-        <NavLink to="/shop" end>All{facets.data ? <span className="av-chip__count"> {Object.values(facets.data.category).reduce((a, b) => a + b, 0)}</span> : null}</NavLink>
+    <>
+    <section className={`av-shophead av-shophead--${key.toLowerCase()}`} aria-labelledby="shop-title">
+      <div className="av-container av-shophead__inner">
+        <div className="av-stack">
+          <span className="av-eyebrow av-orn">{t("shop.eyebrow")}</span>
+          <h1 id="shop-title">{t(`shop.title.${key}` as MessageKey)}</h1>
+          <p className="av-shophead__lead">{t(`shop.lead.${key}` as MessageKey)}</p>
+          {total !== undefined && <p className="av-small" aria-live="polite">{t(total === 1 ? "shop.count1" : "shop.count", { n: total })}</p>}
+        </div>
+        <div className="av-shophead__art" aria-hidden="true">
+          {BANNER[key].map((sp, i) => <SockArt key={i} {...sp} style={{ "--k": i } as React.CSSProperties} />)}
+        </div>
+      </div>
+    </section>
+    <div className="av-container av-page av-page--shop">
+      <nav className="av-tabs" aria-label={t("shop.audience")}>
+        <NavLink to="/shop" end>{t("height.all")}{facets.data ? <span className="av-chip__count"> {Object.values(facets.data.category).reduce((a, b) => a + b, 0)}</span> : null}</NavLink>
         {CATEGORIES.map((c) => (
-          <NavLink key={c} to={CATEGORY_PATH[c]}>{CATEGORY_LABEL[c]}{facets.data ? <span className="av-chip__count"> {facets.data.category[c]}</span> : null}</NavLink>
+          <NavLink key={c} to={CATEGORY_PATH[c]}>{t(`nav.${c.toLowerCase()}` as MessageKey)}{facets.data ? <span className="av-chip__count"> {facets.data.category[c]}</span> : null}</NavLink>
         ))}
       </nav>
 
@@ -68,31 +114,44 @@ export function CatalogPage({ category }: { category?: Category }) {
         {options("section", facets.data?.section, section)}
         {options("cut", facets.data?.cut, cut)}
         <div className="av-filters__row">
-          <Chip label="In stock only" pressed={inStock} onToggle={() => set("inStock", inStock ? null : "1")} />
+          <Chip label={t("shop.inStock")} pressed={inStock} onToggle={() => set("inStock", inStock ? null : "1")} />
           <div className="av-filters__sort">
-            <Select label="Sort by" value={sort} onChange={(e) => set("sort", e.target.value === "newest" ? null : e.target.value)}>
-              {SORTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            <Select label={t("shop.sort")} value={sort} onChange={(e) => set("sort", e.target.value === "newest" ? null : e.target.value)}>
+              {SORTS.map(([v, l]) => <option key={v} value={v}>{t(l)}</option>)}
             </Select>
           </div>
-          {anyFilter && <Button variant="ghost" size="sm" onClick={() => setParams(new URLSearchParams())}>Clear filters</Button>}
+          {anyFilter && <Button variant="ghost" size="sm" onClick={() => setParams(new URLSearchParams())}>{t("shop.clear")}</Button>}
         </div>
       </div>
 
       {products.loading && !products.data && <div className="av-grid-products">{[0, 1, 2, 3, 4, 5, 6, 7].map((i) => <Skeleton key={i} height={360} />)}</div>}
-      {products.error && <p className="av-lead">We could not load the catalog. Please try again in a moment.</p>}
+      {products.error && <p className="av-lead">{t("shop.error")}</p>}
       {products.data && products.data.items.length === 0 && (
         <div className="av-empty">
-          <h2>Nothing matches yet</h2>
-          <p className="av-lead">{anyFilter ? "Try removing a filter." : "New socks are on their way."}</p>
-          {anyFilter && <Button variant="secondary" onClick={() => setParams(new URLSearchParams())}>Clear filters</Button>}
+          <h2>{t("shop.none")}</h2>
+          <p className="av-lead">{anyFilter ? t("shop.noneFilter") : t("best.empty")}</p>
+          {anyFilter && <Button variant="secondary" onClick={() => setParams(new URLSearchParams())}>{t("shop.clear")}</Button>}
         </div>
       )}
       {products.data && products.data.items.length > 0 && (
         <div className="av-grid-products" style={{ opacity: products.loading ? 0.6 : 1 }}>
-          {products.data.items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={(i % 6) + 1} />)}
+          {products.data.items.map((p, i) => (
+            <Fragment key={p.slug}>
+              {i === 4 && page === 0 && firstStep && (
+                <Link to="/#family" className="av-promo">
+                  <span className="av-eyebrow">{t("ladder.eyebrow")}</span>
+                  <strong>{t("shop.promo", { n: firstStep.minPairs, pct: Number(firstStep.discountPct) })}</strong>
+                  <span>{t("shop.promoS")}</span>
+                  <span className="av-promo__go">{t("paths.familyGo")} →</span>
+                </Link>
+              )}
+              <ProductCard product={p} to={`/products/${p.slug}`} tint={(i % 6) + 1} />
+            </Fragment>
+          ))}
         </div>
       )}
       {products.data && <Pagination page={products.data.page} totalPages={products.data.totalPages} onPage={(p) => set("page", p === 0 ? null : String(p))} />}
     </div>
+    </>
   );
 }

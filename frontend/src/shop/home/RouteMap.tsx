@@ -1,4 +1,5 @@
 import { Button } from "../../components/Button";
+import { ContactCards } from "../../components/Contacts";
 import { useT } from "../../i18n/I18n";
 import { useShopInfo } from "../useShopInfo";
 
@@ -66,6 +67,11 @@ export function RouteMap() {
               </g>
             </svg>
           </figure>
+        </div>
+        <div id="contact" className="av-route__contacts">
+          <h3>{t("contact.title")}</h3>
+          <p className="av-small">{t("visit.contactLead")}</p>
+          <ContactCards contacts={info?.contacts ?? []} />
         </div>
       </div>
     </section>
