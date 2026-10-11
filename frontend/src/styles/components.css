@@ -166,9 +166,9 @@
 .av-header.is-scrolled { border-bottom-color: var(--line); box-shadow: 0 10px 30px -24px rgba(15, 25, 48, 0.45); }
 .av-header__bar { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; min-height: 72px; gap: var(--space-3); transition: min-height var(--dur) var(--ease); }
 .av-header.is-scrolled .av-header__bar { min-height: 60px; }
-.av-header__logo { color: var(--ink); justify-self: center; grid-column: 2; grid-row: 1; }
-.av-nav { display: none; gap: clamp(var(--space-3), 1.6vw, var(--space-5)); grid-column: 1; grid-row: 1; }
-.av-nav a { position: relative; text-decoration: none; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 26px 0; white-space: nowrap; }
+.av-header__logo { color: var(--ink); justify-self: center; grid-column: 2; grid-row: 1; padding-inline: var(--space-4); }
+.av-nav { display: none; gap: clamp(var(--space-3), 1.4vw, var(--space-5)); grid-column: 1; grid-row: 1; min-width: 0; overflow: hidden; }
+.av-nav a { position: relative; text-decoration: none; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; padding: 26px 0; white-space: nowrap; }
 .av-nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 18px; height: 1.5px; background: var(--accent); transform: scaleX(0); transform-origin: right; transition: transform 0.35s var(--ease); }
 .av-nav a:hover::after, .av-nav a[aria-current="page"]::after { transform: scaleX(1); transform-origin: left; }
 .av-header__actions { display: flex; align-items: center; justify-content: flex-end; gap: 2px; grid-column: 3; grid-row: 1; }
