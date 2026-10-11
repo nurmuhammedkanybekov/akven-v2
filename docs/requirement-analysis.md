@@ -1,10 +1,10 @@
-# Ak&Ven — Requirement Analysis
+# AKVEN — Requirement Analysis
 
 **Milestone 1 deliverable.** Companion to [`architecture.md`](./architecture.md) and [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) — this document defines *what* the system must do; the architecture doc defines *how*. The use-case diagram and wireframes (next Milestone 1 deliverables) are drawn directly from the use cases listed here.
 
 ## 1. Purpose and scope
 
-Ak&Ven sells Korean-made socks under its own label, currently through Dordoi Bazaar in Bishkek, where price negotiation is the normal way customers buy. This thesis builds a web platform for the brand centered on an AI sales agent that negotiates price and bundles the way bazaar customers already expect, instead of a static storefront with fixed prices.
+AKVEN sells Korean-made socks under its own label, currently through Dordoi Bazaar in Bishkek, where price negotiation is the normal way customers buy. This thesis builds a web platform for the brand centered on an AI sales agent that negotiates price and bundles the way bazaar customers already expect, instead of a static storefront with fixed prices.
 
 This document covers the **AI-first MVP** scope agreed for the thesis semester — the negotiator and the commerce flow it sits inside. It excludes the deferred future-work items listed in §3.2.
 

@@ -24,7 +24,7 @@ export function AdminLayout() {
     <div className="av-admin">
       <a className="av-skip-link" href="#admin-main">Skip to content</a>
       <aside className="av-admin__side">
-        <Link to="/admin" aria-label="Ak&Ven admin"><Logo height={22} /></Link>
+        <Link to="/admin" aria-label="AKVEN admin"><Logo height={22} /></Link>
         <nav className="av-admin__nav" aria-label="Admin">
           <NavLink to="/admin" end>Products</NavLink>
           <NavLink to="/admin/orders">Orders</NavLink>

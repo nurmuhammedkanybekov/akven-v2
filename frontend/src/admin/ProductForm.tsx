@@ -40,7 +40,7 @@ export function ProductForm({ initial, sections, cuts, createTerm, fieldErrors, 
   return (
     <form className="av-card-form" onSubmit={submit} noValidate aria-label="Product details">
       <h2 className="av-formtitle">Details</h2>
-      <Input label="Name" value={v.name} error={fieldErrors.name} placeholder="e.g. Ak&Ven Mid-Long Socks" required
+      <Input label="Name" value={v.name} error={fieldErrors.name} placeholder="e.g. AKVEN Mid-Long Socks" required
              onChange={(e) => { set("name", e.target.value); onNameChange?.(e.target.value); }} />
 
       <fieldset className="av-option">

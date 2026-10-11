@@ -1,76 +1,88 @@
 /**
- * Builds the Ak&Ven logo files from two sources of truth:
- *   - brand/mark-path.json   the heart-ampersand mark (filled outline, vectorised and cleaned from the shop sign)
- *   - Jost Medium            the wide-tracked capitals AK and VEN, converted to outlines here so the
- *                            finished logo needs no font anywhere (web, print, signage, favicon)
- * Output: public/brand/*.svg (gold, ink, white) and src/brand/logo.generated.ts (used by the React <Logo>).
+ * Builds the AKVEN logo files from two sources of truth:
+ *   - src/brand/mark.ts     the AV mark (geometry, not a tracing)
+ *   - Marcellus             Roman capitals for AKVEN and the tagline, converted to outlines here so the finished
+ *                           logo needs no font anywhere (web, print, signage, sock labels, favicon)
+ * Output: public/brand/*.svg in gold, ink, white and metallic gold, in three lockups (horizontal, stacked, mark),
+ * and src/brand/logo.generated.ts for the React <Logo>.
  * Run: npm run logo
  */
 import opentype from "opentype.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { MARK, markMarkup } from "../src/brand/mark.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const mark = JSON.parse(fs.readFileSync(path.join(root, "brand/mark-path.json"), "utf8"));
-const fontBuffer = fs.readFileSync(path.join(root, "node_modules/@fontsource/jost/files/jost-latin-500-normal.woff"));
-const font = opentype.parse(fontBuffer.buffer.slice(fontBuffer.byteOffset, fontBuffer.byteOffset + fontBuffer.byteLength));
+const buf = fs.readFileSync(path.join(root, "node_modules/@fontsource/marcellus/files/marcellus-latin-400-normal.woff"));
+const font = opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
 
-const SIZE = 200;                                   // font size used for layout; everything is relative
+const SIZE = 100;
 const CAP = (font.tables.os2.sCapHeight / font.unitsPerEm) * SIZE;
-const TRACK = 0.11;                                  // letter-spacing in em: wide, airy, premium
-const GAP_LEFT = 0.46 * CAP, GAP_RIGHT = 0.40 * CAP; // breathing room around the mark
-const MARK_H = 1.72 * CAP;                           // the mark rises above the capitals like the shop sign
-const MARK_DROP = 0.10 * CAP;                        // and dips slightly below the baseline
+const f = (n) => +n.toFixed(2);
 
-function glyphs(text, x) {
-  const p = font.getPath(text, x, 0, SIZE, { letterSpacing: TRACK, kerning: true });
+/** Text as outlines with the baseline at y = 0, starting at x = 0. Tracking is added between letters only. */
+function outline(text, size, tracking) {
+  const p = font.getPath(text, 0, 0, size, { letterSpacing: tracking, kerning: true });
   const bb = p.getBoundingBox();
-  return { path: p, x1: bb.x1, x2: bb.x2 };
+  return { d: p.toPathData(2), x1: bb.x1, x2: bb.x2, y1: bb.y1, y2: bb.y2 };
 }
 
-const ak = glyphs("AK", 0);
-const markScale = MARK_H / mark.h;
-const markW = mark.w * markScale;
-const markX = ak.x2 + GAP_LEFT;
-const ven = glyphs("VEN", markX + markW + GAP_RIGHT);
-const markY = MARK_DROP - MARK_H;                    // top of mark (y grows downward; baseline is y = 0)
+const word = outline("AKVEN", SIZE, 0.26);
+const tag = outline("PREMIUM SOCKS", SIZE * 0.24, 0.62);
 
-const letterD = ak.path.toPathData(1) + " " + ven.path.toPathData(1);
-const markD = mark.d;                                // in its own units, placed with a transform
-const markTransform = `translate(${markX.toFixed(1)} ${markY.toFixed(1)}) scale(${markScale.toFixed(5)})`;
+// Horizontal: the mark a little taller than the capitals, centred on them.
+const hMarkH = CAP * 1.42, hScale = hMarkH / MARK.h, hMarkW = MARK.w * hScale;
+const hGap = CAP * 0.5;
+const hMarkY = -CAP / 2 - hMarkH / 2;
+const horizontal = {
+  viewBox: `0 ${f(hMarkY)} ${f(hMarkW + hGap + (word.x2 - word.x1))} ${f(hMarkH)}`,
+  mark: `translate(0 ${f(hMarkY)}) scale(${hScale.toFixed(5)}) translate(${-(-1)} ${-1})`,
+  word: `translate(${f(hMarkW + hGap - word.x1)} 0)`,
+};
+horizontal.aspect = +(+horizontal.viewBox.split(" ")[2] / hMarkH).toFixed(4);
 
-const pad = 0;
-const minX = ak.x1 - pad, maxX = ven.x2 + pad;
-const minY = markY - pad, maxY = MARK_DROP + pad;
-const vbW = +(maxX - minX).toFixed(1), vbH = +(maxY - minY).toFixed(1);
-const viewBox = `${minX.toFixed(1)} ${minY.toFixed(1)} ${vbW} ${vbH}`;
+// Stacked: the mark above, the name, then the tagline. Everything centred on one axis.
+const sWordW = word.x2 - word.x1, sTagW = tag.x2 - tag.x1;
+const sW = Math.max(sWordW, sTagW);
+const sMarkH = CAP * 2.6, sScale = sMarkH / MARK.h, sMarkW = MARK.w * sScale;
+const sWordBase = sMarkH + CAP * 0.62 + CAP;
+const sTagBase = sWordBase + CAP * 0.78;
+const stacked = {
+  viewBox: `0 0 ${f(sW)} ${f(sTagBase + 2)}`,
+  mark: `translate(${f((sW - sMarkW) / 2)} 0) scale(${sScale.toFixed(5)}) translate(1 -1)`,
+  word: `translate(${f((sW - sWordW) / 2 - word.x1)} ${f(sWordBase)})`,
+  tag: `translate(${f((sW - sTagW) / 2 - tag.x1)} ${f(sTagBase)})`,
+};
+stacked.aspect = +(sW / (sTagBase + 2)).toFixed(4);
 
-const GOLD = "#C9A24B", INK = "#16130F", WHITE = "#FFFFFF";
-const svg = (fill, defs = "") => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" role="img" aria-label="Ak&amp;Ven">${defs}<g fill="${fill}" fill-rule="evenodd"><path d="${letterD}"/><path transform="${markTransform}" d="${markD}"/></g></svg>\n`;
-const markSvg = (fill, defs = "") => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${mark.w} ${mark.h}" role="img" aria-label="Ak&amp;Ven mark">${defs}<path fill="${fill}" fill-rule="evenodd" d="${markD}"/></svg>\n`;
-const gradient = `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EBD596"/><stop offset=".5" stop-color="#C9A24B"/><stop offset="1" stop-color="#9C7A2D"/></linearGradient></defs>`;
-
+const GOLD = "#B8913F", INK = "#14110D", WHITE = "#FFFFFF";
+const gradient = `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EDD79C"/><stop offset=".5" stop-color="#C9A24B"/><stop offset="1" stop-color="#9A772B"/></linearGradient></defs>`;
+const wrap = (vb, body, defs = "") => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" role="img" aria-label="AKVEN">${defs}${body}</svg>\n`;
+const files = {
+  logo: (fill, id) => wrap(horizontal.viewBox,
+    `<g transform="${horizontal.mark}">${markMarkup(fill, id)}</g><path transform="${horizontal.word}" fill="${fill}" d="${word.d}"/>`),
+  "logo-stacked": (fill, id) => wrap(stacked.viewBox,
+    `<g transform="${stacked.mark}">${markMarkup(fill, id)}</g><path transform="${stacked.word}" fill="${fill}" d="${word.d}"/><path transform="${stacked.tag}" fill="${fill}" d="${tag.d}"/>`),
+  mark: (fill, id) => wrap(MARK.viewBox, markMarkup(fill, id)),
+};
 const out = path.join(root, "public/brand");
 fs.mkdirSync(out, { recursive: true });
-fs.writeFileSync(path.join(out, "logo-gold.svg"), svg(GOLD));
-fs.writeFileSync(path.join(out, "logo-gold-metallic.svg"), svg("url(#g)", gradient));
-fs.writeFileSync(path.join(out, "logo-ink.svg"), svg(INK));
-fs.writeFileSync(path.join(out, "logo-white.svg"), svg(WHITE));
-fs.writeFileSync(path.join(out, "mark-gold.svg"), markSvg(GOLD));
-fs.writeFileSync(path.join(out, "mark-gold-metallic.svg"), markSvg("url(#g)", gradient));
-fs.writeFileSync(path.join(out, "mark-ink.svg"), markSvg(INK));
-fs.writeFileSync(path.join(out, "mark-white.svg"), markSvg(WHITE));
+for (const old of fs.readdirSync(out)) fs.rmSync(path.join(out, old));
+for (const [name, make] of Object.entries(files)) {
+  fs.writeFileSync(path.join(out, `${name}-gold.svg`), make(GOLD, "a"));
+  fs.writeFileSync(path.join(out, `${name}-ink.svg`), make(INK, "a"));
+  fs.writeFileSync(path.join(out, `${name}-white.svg`), make(WHITE, "a"));
+  fs.writeFileSync(path.join(out, `${name}-gold-metallic.svg`), make("url(#g)", "a").replace('role="img" aria-label="AKVEN">', `role="img" aria-label="AKVEN">${gradient}`));
+}
 
 fs.writeFileSync(path.join(root, "src/brand/logo.generated.ts"),
 `// GENERATED by scripts/generate-logo.mjs. Do not edit by hand; run \`npm run logo\`.
 export const LOGO = {
-  viewBox: ${JSON.stringify(viewBox)},
-  aspect: ${(vbW / vbH).toFixed(4)},
-  letters: ${JSON.stringify(letterD)},
-  markTransform: ${JSON.stringify(markTransform)},
-  mark: ${JSON.stringify(markD)},
-  markSize: { w: ${mark.w}, h: ${mark.h} },
+  word: ${JSON.stringify(word.d)},
+  tag: ${JSON.stringify(tag.d)},
+  horizontal: ${JSON.stringify(horizontal)},
+  stacked: ${JSON.stringify(stacked)},
 } as const;
 `);
-console.log("logo", viewBox, "aspect", (vbW / vbH).toFixed(3));
+console.log("logo written: horizontal", horizontal.viewBox, "stacked", stacked.viewBox);

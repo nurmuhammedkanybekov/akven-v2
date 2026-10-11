@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.UUID;
 
-/** A sock design/style, e.g. "Ak&Ven Wool Crew". Variants (size/color/pack) hang off this. */
+/** A sock design/style, e.g. "AKVEN Wool Crew". Variants (size/color/pack) hang off this. */
 @Entity
 @Table(name = "product")
 public class Product extends AuditableEntity {

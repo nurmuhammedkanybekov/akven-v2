@@ -8,20 +8,21 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "logo": "node scripts/generate-logo.mjs",
+    "logo": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-logo.mjs",
     "art": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-product-art.mjs",
-    "icons": "node scripts/generate-icons.mjs",
+    "icons": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-icons.mjs",
     "screenshots": "node scripts/screenshots.mjs",
     "e2e": "node scripts/e2e-admin.mjs"
   },
   "dependencies": {
-    "@fontsource/jost": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/onest": "^5.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@fontsource/marcellus": "^5.3.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",

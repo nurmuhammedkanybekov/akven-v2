@@ -1,6 +1,6 @@
 import type { ProductSummary } from "../api/types";
 
-const img = (slug: string, name: string) => ({ url: `/media/products/${slug}-1.svg`, alt: `${name}, Ak&Ven` });
+const img = (slug: string, name: string) => ({ url: `/media/products/${slug}-1.svg`, alt: `${name}, AKVEN` });
 
 /** Sample data in the exact shape of GET /api/products, used by the style guide and the tests. */
 export const SAMPLE_PRODUCTS: ProductSummary[] = [
