@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { Logo } from "../brand/Logo";
 import { LanguageSwitch, useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
-import { BagIcon, CloseIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "./icons";
+import { BagIcon, CloseIcon, HeartIcon, MenuIcon, PinIcon, SearchIcon, UserIcon } from "./icons";
 
 const NAV: Array<{ to: string; key: MessageKey }> = [
   { to: "/men", key: "nav.men" },
@@ -11,7 +11,6 @@ const NAV: Array<{ to: string; key: MessageKey }> = [
   { to: "/kids", key: "nav.kids" },
   { to: "/bundles", key: "nav.bundles" },
   { to: "/wholesale", key: "nav.wholesale" },
-  { to: "/visit", key: "nav.visit" },
 ];
 
 const MESSAGES: MessageKey[] = ["ann.1", "ann.2", "ann.3"];
@@ -79,6 +78,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
             <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={24} /></Link>
             <div className="av-header__actions">
               {extra}
+              <Link className="av-icon-btn av-hide-sm" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>
               <Link className="av-icon-btn" to="/shop" aria-label={t("nav.search")}><SearchIcon /></Link>
               <Link className="av-icon-btn av-hide-sm" to="/saved" aria-label={t("nav.saved", { n: savedCount })}>
                 <HeartIcon />
