@@ -19,6 +19,9 @@ public enum ContactKind {
     },
     EMAIL("[^@\\s]{1,64}@[^@\\s]{1,100}\\.[A-Za-z]{2,24}", "an email address") {
         @Override String link(String v) { return "mailto:" + v; }
+    },
+    FACEBOOK("[A-Za-z0-9.]{5,50}", "a Facebook page name such as akven.socks") {
+        @Override String link(String v) { return "https://facebook.com/" + v; }
     };
 
     private final Pattern pattern;
@@ -35,6 +38,7 @@ public enum ContactKind {
         return switch (this) {
             case WHATSAPP, PHONE -> v.replaceAll("[\\s()\\-]", "");
             case INSTAGRAM, TELEGRAM -> v.startsWith("@") ? v.substring(1) : v;
+            case FACEBOOK -> v.replaceFirst("^(https?://)?(www\\.|m\\.)?facebook\\.com/", "").replaceAll("/+$", "");
             case EMAIL -> v;
         };
     }

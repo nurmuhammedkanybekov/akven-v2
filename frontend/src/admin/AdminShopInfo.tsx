@@ -14,7 +14,7 @@ import { OwnersOnly } from "./OwnersOnly";
 
 const KINDS: Array<[ContactKind, string, string]> = [
   ["INSTAGRAM", "Instagram", "akven.socks"], ["TELEGRAM", "Telegram", "nurmss4"], ["WHATSAPP", "WhatsApp", "+996700123456"],
-  ["PHONE", "Phone", "+996700123456"], ["EMAIL", "Email", "shop@example.com"],
+  ["PHONE", "Phone", "+996700123456"], ["EMAIL", "Email", "shop@example.com"], ["FACEBOOK", "Facebook", "akven.socks"],
 ];
 
 /**
@@ -102,7 +102,7 @@ function ContactRow({ contact, onSave, onDelete }: { contact: ShopContact; onSav
   );
 }
 
-const emptyPoint = (): PickupPointInput => ({ name: "AK&VEN at Dordoi", market: "Dordoi Bazaar", section: "", passage: "", container: "", city: "Bishkek", hours: "", directions: "", position: 0, active: true });
+const emptyPoint = (): PickupPointInput => ({ name: "AKVEN at Dordoi", market: "Dordoi Bazaar", section: "", passage: "", container: "", city: "Bishkek", hours: "", directions: "", position: 0, active: true });
 
 function PickupPoints() {
   const [points, setPoints] = useState<PickupPoint[] | null>(null);
