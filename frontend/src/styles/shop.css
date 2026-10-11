@@ -103,7 +103,8 @@
 /* ---------- visit, sizes, wholesale ---------- */
 .av-visit { display: grid; gap: var(--space-6); }
 .av-visit__card { display: grid; gap: var(--space-6); }
-@media (min-width: 900px) { .av-visit__card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+.av-visit__card > .av-stack { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .av-visit__card > .av-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); } }
 .av-visit__address { display: grid; gap: 2px; font-style: normal; font-size: 1.125rem; color: var(--on-black); }
 .av-visit__container { font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem); font-weight: 700; letter-spacing: -0.02em; color: var(--accent); }
 .av-visit__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); counter-reset: s; }
