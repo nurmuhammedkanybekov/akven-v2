@@ -97,8 +97,9 @@ class NegotiationDashboardTest extends IntegrationTest {
     @Test
     void theComparisonRunsBothAssistantsThroughTheSameLimitAndNeitherEverGoesBelowIt() throws Exception {
         JsonNode report = json(getJson("/api/admin/negotiations/evaluation", tokenFor(Role.ADMIN)).andExpect(status().isOk()));
-        assertThat(report.get("aiSource").asText()).isEqualTo("SCRIPTED");
-        assertThat(report.get("note").asText()).contains("not output of a live model");
+        assertThat(report.get("aiSource").asText()).isEqualTo("RECORDED");
+        assertThat(report.get("note").asText()).contains("recorded live run");
+        assertThat(report.get("rows").get(0).get("aiReply").asText()).isNotBlank();
         assertThat(report.get("rows")).hasSize(16);
         assertThat(report.get("rule").get("aboveLimit").asInt()).isZero();
         assertThat(report.get("ai").get("aboveLimit").asInt()).isZero();

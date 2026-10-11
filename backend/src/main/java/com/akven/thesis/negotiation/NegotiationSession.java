@@ -57,6 +57,10 @@ public class NegotiationSession {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    /** When the latest offer was made. The offer's time limit counts from here (V21; older rows copy created_at). */
+    @Column(name = "offered_at")
+    private Instant offeredAt;
+
     protected NegotiationSession() {
         // JPA
     }
@@ -76,6 +80,13 @@ public class NegotiationSession {
         this.transcript = transcript;
         this.proposedDiscountPct = proposedDiscountPct;
         this.validatedDiscountPct = validatedDiscountPct;
+        this.offeredAt = Instant.now();
+    }
+
+    /** A later message in the same conversation: the transcript grows, and the latest offer replaces the earlier one. */
+    public void recordNextTurn(String transcriptLines, int quantity, BigDecimal proposedDiscountPct, BigDecimal validatedDiscountPct) {
+        recordOutcome(this.transcript == null ? transcriptLines : this.transcript + "\n" + transcriptLines, proposedDiscountPct, validatedDiscountPct);
+        this.quantity = Math.max(1, quantity);
     }
 
     /** Mirrors the DB CHECK in application-layer validation, so a bad write fails fast with a clear message. */
@@ -93,4 +104,6 @@ public class NegotiationSession {
     public BigDecimal getProposedDiscountPct() { return proposedDiscountPct; }
     public BigDecimal getValidatedDiscountPct() { return validatedDiscountPct; }
     public Instant getCreatedAt() { return createdAt; }
+    /** When the latest offer was made; falls back to the start of the conversation. */
+    public Instant getOfferedAt() { return offeredAt != null ? offeredAt : createdAt; }
 }

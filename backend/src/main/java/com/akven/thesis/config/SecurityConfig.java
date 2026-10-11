@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -44,6 +46,15 @@ import java.util.List;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    /**
+     * A super admin can do everything an owner can, so owner-only rules (hasRole('ADMIN')) need no change. Spring
+     * Security applies this both to the URL rules below and to @PreAuthorize on the services.
+     */
+    @Bean
+    static RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy("ROLE_SUPER_ADMIN > ROLE_ADMIN");
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -99,7 +110,7 @@ public class SecurityConfig {
                 // Registration and login must be reachable without a token; everything else
                 // under /api/auth/** (e.g. /api/auth/me) stays behind anyRequest().authenticated().
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/cart/quote").permitAll()
-                .requestMatchers("/api/admin/**").hasAnyRole("STAFF", "ADMIN")
+                .requestMatchers("/api/admin/**").hasAnyRole("STAFF", "ADMIN")   // SUPER_ADMIN through the role hierarchy
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

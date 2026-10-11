@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -42,6 +43,14 @@ public class User extends AuditableEntity {
     @Column(nullable = false)
     private boolean trusted = false;
 
+    /** The name the shop team sees in the admin, such as "Akylbek". Optional. */
+    @Column(name = "display_name", length = 80)
+    private String displayName;
+
+    /** Tokens issued before this moment are refused: set by a password reset and by disabling the account. */
+    @Column(name = "credentials_changed_at")
+    private Instant credentialsChangedAt;
+
     protected User() {
         // JPA
     }
@@ -58,6 +67,22 @@ public class User extends AuditableEntity {
     public boolean isActive() { return active; }
     public boolean isTrusted() { return trusted; }
     public void setTrusted(boolean trusted) { this.trusted = trusted; }
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String displayName) { this.displayName = displayName; }
+    public void setRole(Role role) { this.role = role; }
+    public Instant getCredentialsChangedAt() { return credentialsChangedAt; }
+
+    /** Disabling also ends the sessions the account already has. */
+    public void setActive(boolean active) {
+        if (this.active && !active) this.credentialsChangedAt = Instant.now();
+        this.active = active;
+    }
+
+    /** A new password ends every session signed in with the old one. */
+    public void changePassword(String newHash) {
+        this.passwordHash = newHash;
+        this.credentialsChangedAt = Instant.now();
+    }
 
     /**
      * Needed only by UserDetailsServiceImpl so Spring Security can verify a login attempt.

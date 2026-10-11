@@ -87,4 +87,47 @@ class LlmNegotiatorTest {
         String all = (LlmNegotiator.SYSTEM + answering("{}").userPrompt(CTX)).toLowerCase();
         assertThat(all).doesNotContain("floor").doesNotContain("margin").doesNotContain("cost price");
     }
+
+    // ---- conversation and languages --------------------------------------------------------
+
+    private static final NegotiationContext RU = new NegotiationContext("Wool Crew", "Navy, M", new BigDecimal("10.00"), 5, "А дешевле?",
+            List.of(), "ru", List.of(new NegotiationContext.Turn("Сколько стоят?", "Цена $10.00 за пару.", BigDecimal.ZERO)),
+            List.of("Collection step: from 20 pairs in one order, every pair is 3% cheaper, applied at checkout."));
+
+    @Test
+    void thePromptCarriesTheConversationTheShopTermsAndTheLanguage() {
+        String prompt = answering("{}").userPrompt(RU);
+        assertThat(prompt).contains("Customer: Сколько стоят?").contains("You: Цена $10.00 за пару.").contains("(offer shown: no discount)")
+                .contains("Collection step: from 20 pairs").contains("Reply language: Russian");
+        assertThat(answering("{}").userPrompt(CTX)).contains("(this is the first message)").contains("Reply language: English");
+    }
+
+    @Test
+    void numbersInRussianOrKyrgyzWordsAreCaughtToo() {
+        for (String bad : new String[]{"Скидка двадцать процентов!", "Отдам за сто сомов", "Половина цены, берите", "Пятнадцать для вас"}) {
+            assertThat(LlmNegotiator.isSafe(bad, 1, "ru")).as(bad).isFalse();
+        }
+        for (String bad : new String[]{"Он пайыз арзан", "Жыйырма сомго берем", "Жарым баада"}) {
+            assertThat(LlmNegotiator.isSafe(bad, 1, "ky")).as(bad).isFalse();
+        }
+        assertThat(LlmNegotiator.isSafe("Хороший выбор! Для вас {pct}%, {price} за пару.", 1, "ru")).isTrue();
+        assertThat(LlmNegotiator.isSafe("Семья будет довольна, {price} за пару.", 1, "ru")).as("семья is not семь").isTrue();
+        assertThat(LlmNegotiator.isSafe("Бир аз арзандатып берейин: {pct}%.", 1, "ky")).as("бир is also 'a'").isTrue();
+    }
+
+    @Test
+    void theCustomersOwnQuantityMayBeRepeatedInEveryLanguage() {
+        assertThat(LlmNegotiator.isSafe("Пять пар, отличный выбор! {pct}%.", 5, "ru")).isTrue();
+        assertThat(LlmNegotiator.isSafe("Шесть пар, отличный выбор!", 5, "ru")).isFalse();
+        assertThat(LlmNegotiator.isSafe("Беш жуп, жакшы тандоо! {pct}%.", 5, "ky")).isTrue();
+        assertThat(LlmNegotiator.isSafe("30 пар для магазина, отлично! {pct}%.", 30, "ru")).isTrue();
+        assertThat(LlmNegotiator.isSafe("30 pairs, great!", 30, "en")).isTrue();
+        assertThat(LlmNegotiator.isSafe("30 pairs for 25 pairs' price!", 30, "en")).isFalse();
+        assertThat(LlmNegotiator.isSafe("130 pairs!", 30, "en")).isFalse();
+    }
+
+    @Test
+    void anUnsafeReplyIsReplacedInTheCustomersLanguage() {
+        assertThat(answering("{\"discountPct\": 5, \"reply\": \"Скидка 5%!\"}").propose(RU).replyTemplate()).isEqualTo("Для вас скидка {pct}%: {price} за пару.");
+    }
 }

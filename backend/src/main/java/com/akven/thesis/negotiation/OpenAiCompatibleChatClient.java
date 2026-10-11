@@ -45,11 +45,25 @@ public class OpenAiCompatibleChatClient implements ChatClient {
                 .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(body));
         if (apiKey != null && !apiKey.isBlank()) request.header("Authorization", "Bearer " + apiKey);
         HttpResponse<String> response = http.send(request.build(), HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 429) {
+            // A free plan allows only a few requests a minute. One short wait and a second try usually gets through;
+            // a longer wait is not worth it, because a customer is waiting and the rules can answer instead.
+            Thread.sleep(retryDelayMillis(response));
+            response = http.send(request.build(), HttpResponse.BodyHandlers.ofString());
+        }
         if (response.statusCode() / 100 != 2) {
             throw new IOException("The language model answered with HTTP " + response.statusCode());   // never include the body or the key
         }
         JsonNode content = mapper.readTree(response.body()).path("choices").path(0).path("message").path("content");
         if (!content.isTextual()) throw new IOException("The language model returned no text.");
         return content.asText();
+    }
+
+    /** The provider's Retry-After in seconds, kept between a quarter of a second and two seconds. */
+    static long retryDelayMillis(HttpResponse<?> response) {
+        long seconds = response.headers().firstValue("Retry-After").map(v -> {
+            try { return Long.parseLong(v.strip()); } catch (NumberFormatException e) { return 1L; }
+        }).orElse(1L);
+        return Math.max(250, Math.min(2000, seconds * 1000));
     }
 }

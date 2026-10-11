@@ -19,16 +19,19 @@ import java.util.function.Function;
  * the customer would buy (the final discount reaches their walk-away point), how often the shop's limit had to step in,
  * and, as the safety check, how many final prices are still above the limit (must be zero).
  *
- * The AI side reads answers from a file instead of calling a model, so the demo needs no key and costs nothing. The
- * file says where its answers come from; scripted answers are labelled as such in every report.
+ * The AI side normally reads answers from a file instead of calling a model, so the report needs no key and costs
+ * nothing, and the thesis numbers can be reproduced. The file says where its answers come from (SCRIPTED by hand, or
+ * RECORDED from a live run), and every report carries that label. The super admin can also run the same customers
+ * against the live model (LIVE); a live answer the model cannot give falls back to the rules, as in the shop.
  */
 @Component
 public class NegotiationEvaluation {
 
     static final String SCENARIOS = "negotiation/evaluation-scenarios.json";
 
+    /** aiPct and aiReply are the AI's recorded answer; language is the customer's (en when absent). */
     public record Scenario(String id, String customer, String message, int quantity, BigDecimal listPrice,
-                           BigDecimal marginFloorPct, BigDecimal walkAwayPct, BigDecimal scriptedAiPct) {}
+                           BigDecimal marginFloorPct, BigDecimal walkAwayPct, BigDecimal aiPct, String aiReply, String language) {}
 
     record ScenarioFile(String aiSource, String note, List<Scenario> scenarios) {}
 
@@ -37,7 +40,7 @@ public class NegotiationEvaluation {
 
     /** limitPct is the scenario's own invented limit; the scenarios are examples, not the shop's real numbers. */
     public record Row(String id, String customer, String message, int quantity, BigDecimal listPrice, BigDecimal limitPct,
-                      BigDecimal walkAwayPct, Result rule, Result ai) {}
+                      BigDecimal walkAwayPct, Result rule, Result ai, String aiReply) {}
 
     /** aboveLimit counts final prices above the shop's limit: the safety property, which must stay at zero. */
     public record Summary(BigDecimal averageFinalPct, BigDecimal acceptedPct, int limited, int aboveLimit, BigDecimal revenue) {}
@@ -48,23 +51,69 @@ public class NegotiationEvaluation {
     private final PolicyValidator validator;
     private final Negotiator ruleBased = new RuleBasedNegotiator();
 
-    public NegotiationEvaluation(ObjectMapper json, PolicyValidator validator) {
+    private final long livePauseMillis;
+
+    public NegotiationEvaluation(ObjectMapper json, PolicyValidator validator,
+                                 @org.springframework.beans.factory.annotation.Value("${akven.llm.evaluation-pause-ms:4500}") long livePauseMillis) {
         this.json = json;
         this.validator = validator;
+        this.livePauseMillis = livePauseMillis;
     }
 
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public Report run() {
         ScenarioFile file = load();
-        List<Row> rows = file.scenarios().stream().map(this::play).toList();
+        List<Row> rows = file.scenarios().stream().map(s -> play(s, s.aiPct(), s.aiReply())).toList();
         return new Report(file.aiSource(), file.note(), rows, summarise(rows, Row::rule), summarise(rows, Row::ai));
     }
 
-    private Row play(Scenario s) {
+    /** The same customers against the live model, one question each. Costs one model call per customer. */
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public Report runLive(Negotiator ai, String model) {
+        List<Row> rows = new java.util.ArrayList<>();
+        int fallbacks = 0;
+        for (Scenario s : load().scenarios()) {
+            if (!rows.isEmpty()) pause();   // a free plan allows about fifteen requests a minute
+            Negotiator.Proposal p;
+            try {
+                p = ai.propose(context(s));
+            } catch (RuntimeException e) {
+                p = ruleBased.propose(context(s));
+                fallbacks++;
+            }
+            rows.add(play(s, p.discountPct(), shown(s, p)));
+        }
+        String note = "Live run of " + model + " on " + java.time.LocalDate.now(java.time.ZoneId.of("Asia/Bishkek")) + ", each customer asked once."
+                + (fallbacks == 0 ? "" : " " + fallbacks + " answer(s) could not be had from the model and came from the rules.");
+        return new Report("LIVE", note, rows, summarise(rows, Row::rule), summarise(rows, Row::ai));
+    }
+
+    /** The reply as the customer would read it: through the same choice of words and the same numbers as the chat. */
+    private String shown(Scenario s, Negotiator.Proposal p) {
         Variant sock = new Variant(null, s.id(), null, null, 1, s.listPrice(), BigDecimal.ZERO, s.marginFloorPct());
-        BigDecimal ruleProposal = ruleBased.propose(new NegotiationContext("Socks", "", s.listPrice(), s.quantity(), s.message())).discountPct();
+        BigDecimal proposed = p.discountPct() == null ? BigDecimal.ZERO : p.discountPct().max(BigDecimal.ZERO);
+        BigDecimal pct = validator.clamp(proposed, sock);
+        BigDecimal price = s.listPrice().multiply(BigDecimal.valueOf(100).subtract(pct)).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        return NegotiationService.fill(NegotiationService.template(p, proposed, pct, s.language()), pct, price);
+    }
+
+    private void pause() {
+        try {
+            Thread.sleep(livePauseMillis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private static NegotiationContext context(Scenario s) {
+        return new NegotiationContext("Socks", "", s.listPrice(), s.quantity(), s.message(), List.of(), s.language(), List.of(), List.of());
+    }
+
+    private Row play(Scenario s, BigDecimal aiProposal, String aiReply) {
+        Variant sock = new Variant(null, s.id(), null, null, 1, s.listPrice(), BigDecimal.ZERO, s.marginFloorPct());
+        BigDecimal ruleProposal = ruleBased.propose(context(s)).discountPct();
         return new Row(s.id(), s.customer(), s.message(), s.quantity(), s.listPrice(), s.marginFloorPct(), s.walkAwayPct(),
-                judge(s, sock, ruleProposal), judge(s, sock, s.scriptedAiPct()));
+                judge(s, sock, ruleProposal), judge(s, sock, aiProposal), aiReply);
     }
 
     private Result judge(Scenario s, Variant sock, BigDecimal proposed) {
