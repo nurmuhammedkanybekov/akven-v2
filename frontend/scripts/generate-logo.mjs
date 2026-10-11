@@ -1,6 +1,6 @@
 /**
  * Builds the AKVEN logo files from two sources of truth:
- *   - src/brand/mark.ts     the AV mark (geometry, not a tracing)
+ *   - src/brand/mark.ts     the AV mark, as vectors drawn from the family's chosen design
  *   - Cinzel (name) and Onest (tagline), converted to outlines here so the finished
  *                           logo needs no font anywhere (web, print, signage, sock labels, favicon)
  * Output: public/brand/*.svg in gold, ink, white and metallic gold, in three lockups (horizontal, stacked, mark),

@@ -1,114 +1,199 @@
 # AKVEN
 
-**Bachelor's thesis · ELTE IK · Autumn 2026**
-Nurmuhammed Kanybekov, supervised by Prof. Walid Guettala
+**An online shop for a family sock business, with a price-negotiating assistant that can never give away more than the owners allow.**
+
+Bachelor's thesis · ELTE Faculty of Informatics · 2026
+Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
-AKVEN is my family's brand of Korean-made socks, sold from container 70-E at Dordoi Bazaar in Bishkek, Kyrgyzstan.
-At the bazaar nobody pays the label price: customers bargain, buy for the whole family, and shops buy by the case.
-This project is the brand's online shop. It keeps those habits instead of replacing them with a fixed price tag:
-customers build collections from any socks, the price per pair drops as the collection grows, and an assistant
-negotiates with them, while a small, deterministic piece of code makes sure no discount ever goes below what the
-owners allow.
+![The AKVEN home page: container 70-E at Dordoi Bazaar](docs/design/readme-home.jpg)
 
-## The idea in one paragraph
+## Contents
 
-A language model is good at conversation and not safe to trust with money. So the assistant only **proposes** a
-discount. A plain `PolicyValidator` clamps every proposal to the limit stored for that sock before anything is shown,
-saved or charged, and the same check applies to the collection discount at checkout. The assistant is never told the
-limit or the cost price. What it proposed and what was allowed are both kept for every conversation, and every order
-line records which rule set its price. The guarantee does not depend on how well the model behaves: a model that is
-tricked, confused or simply wrong cannot change what the customer pays.
+1. [The project in short](#the-project-in-short)
+2. [The problem and the idea](#the-problem-and-the-idea)
+3. [What the shop does](#what-the-shop-does)
+4. [Try it in five minutes](#try-it-in-five-minutes)
+5. [How it is built](#how-it-is-built)
+6. [Quality and tests](#quality-and-tests)
+7. [Status](#status)
+8. [Documentation](#documentation)
+9. [Repository layout](#repository-layout)
+
+## The project in short
+
+AKVEN is my family's brand of Korean-made socks. My parents, Akyl and Venera, have traded at Dordoi Bazaar in
+Bishkek, Kyrgyzstan, since the early 2000s and have sold socks there since 2018, from container 70-E. At the bazaar
+nobody pays the label price: customers bargain, buy for the whole family, and shops from the regions buy by the case.
+
+This project is the brand's online shop. It does not replace those habits with a fixed price tag; it brings them
+online:
+
+- **Families** plan one set for everyone (sizes, number of pairs) and collect it at the container in minutes, or have
+  it delivered to Kyrgyzstan, Kazakhstan, Uzbekistan or Russia.
+- **The more pairs, the lower the price.** Any socks can be mixed, and the whole bag counts towards the next step.
+- **Customers can ask for their price** in a chat with an assistant, as they would at the stall.
+- **Shops and companies** send wholesale and gift-box requests straight to the owners' WhatsApp, Telegram or email.
+
+## The problem and the idea
+
+A language model is good at conversation and not safe to trust with money. It can be confused, flattered or simply
+tricked into offering a discount the business cannot afford.
+
+The thesis separates **talking** from **deciding**:
+
+```mermaid
+flowchart LR
+    C[Customer] -- "Can you do 50% off?" --> N[Negotiator<br/>rules or a language model]
+    N -- proposes 50% --> V{PolicyValidator<br/>deterministic}
+    L[(Limit set by the owners<br/>never shown to the model)] --> V
+    V -- "clamped to 22%" --> O[Offer shown, stored and charged]
+    V -. proposal and result both recorded .-> A[(Audit and dashboard)]
+```
+
+- The assistant only **proposes** a discount. It never sees the limit or the cost price.
+- A small `PolicyValidator` **clamps** every proposal to the limit stored for that sock, before anything is shown,
+  saved or charged. The same check applies to the collection discount at checkout.
+- What was proposed and what was allowed are **both recorded** for every conversation, and every order line records
+  which rule set its price.
+
+So the guarantee does not depend on how well the model behaves: a model that is tricked, confused or wrong cannot
+change what the customer pays. The evaluation compares a rule-based and a language-model negotiator on the same
+simulated customers.
 
 ## What the shop does
 
+<table>
+<tr>
+<td width="62%"><img src="docs/design/readme-family.jpg" alt="The family planner"></td>
+<td><img src="docs/design/readme-phone-ky.jpg" alt="The home page on a phone, in Kyrgyz"></td>
+</tr>
+<tr>
+<td><em>The family planner: shoe size to sock size from the shop's own chart, and the price step for the whole set.</em></td>
+<td><em>On a phone, in Kyrgyz.</em></td>
+</tr>
+</table>
+
 **For customers**
 
-- A storefront in **English, Russian and Kyrgyz**, light and dark, on phone, tablet and laptop.
-- **Three reasons to order online:** families plan a set for everyone (sizes from the chart, the price step for the
-  whole set) and collect it at 70-E in minutes or have it delivered; shops order by the pack and the case; companies
-  order gift boxes. Requests and bags can be sent to the shop in WhatsApp, Telegram or email, already written.
-- Saved socks (the heart), recently viewed, and "complete the set" on every product page.
-- A home page built around the real stall, **container 70-E**: its doors open on a rail of swaying socks, a fitting
-  shows each sock height on a leg, a box shows the collection price as socks drop in, a bazaar calculator tells how
-  "ask for your price" works, a gift calendar counts down to the holidays, and a drawn route leads to the stall.
-- About 40 demo products: business and argyle, five-toe, compression, brushed home socks with grip, children's
-  character socks, the oimo ornament line, and gift boxes for 23 February, 8 March, Nooruz, New Year and school.
-- **Collections:** mix any socks. The minimum order and the price ladder count pairs across the whole bag, and the
-  bag says how many more pairs reach the next step ("add 4 more pairs to save 5%").
-- **Honest stock:** in stock, only a few left, arrives in about N days, or sold out.
+- **English, Russian and Kyrgyz**, light and dark, on phone, tablet and laptop. The site can be installed as an app
+  (PWA), and the bag works offline.
+- **Collections:** a minimum order and a price ladder counted in pairs across the whole bag, with "add 4 more pairs
+  to save 5%" hints in the bag.
+- **The family planner:** add each person and their shoe size; the sock size comes from the size chart, and the list
+  can be sent to the shop in a message.
 - **Ask for your price:** a negotiation chat on every product page, with the reason for each price.
+- **Honest stock:** in stock, only a few left, arrives in about N days, or sold out.
 - **Size guide** in the sizes each customer knows (EU and US in English, local sizes in Russian and Kyrgyz), with a
-  shoe-size finder.
-- **Pickup at Dordoi** with a six-digit pickup code, or delivery to Kyrgyzstan, Kazakhstan, Uzbekistan and Russia.
-- Checkout with a simulated Apple Pay and Google Pay wallet, order history and cancellation, a bag that works offline.
+  shoe-size finder and how to measure.
+- **Pickup at Dordoi** with a six-digit pickup code, or delivery to four countries.
+- **Wholesale and company gifts:** packs, cases, gift boxes for 23 February, 8 March, Nooruz and New Year, and a
+  request form that opens in WhatsApp, Telegram or email, already written.
+- Saved socks, recently viewed, "complete the set", and checkout with a simulated Apple Pay or Google Pay wallet.
 
 **For the owners and staff (the admin)**
 
 - Products, sections, cuts, colours, sizes, photos, stock on the way and wholesale case sizes.
 - Orders, and a hand-over screen for the stall (pickup code plus the end of the customer's phone number).
 - A dashboard: offers per day, how often the limit stepped in, offers that became orders, best sellers.
-- A comparison of the rule-based and the AI assistant on the same simulated customers, for the evaluation chapter.
+- The rule-based against AI comparison, for the evaluation chapter.
 - Owners only: the minimum order, the price ladder, trusted customers, contacts, the stall and the size chart.
 
-**Safety and quality**
+**Not built, on purpose:** a real payment provider (the wallet is simulated; no money moves), email and SMS
+notifications, and a live language model in production (it is optional and off by default).
 
-- Prices are decided only on the server; stock cannot be oversold; a checkout cannot charge twice.
-- Login lockout, three roles (customer, staff, owner), an audit log of every change, and database constraints that
-  refuse impossible values even if the application is bypassed.
-- About 165 backend tests with 97% line coverage (the build fails below 80%), 10 more on real PostgreSQL, about 120
-  frontend tests, and a browser test of the full journey in three languages that also runs accessibility rules.
+![Wholesale and company gifts](docs/design/readme-wholesale.jpg)
 
-What is not built, on purpose: a real payment provider (the wallet is simulated, no money moves), email and SMS, and
-a live AI model in production. See [`docs/progress.md`](docs/progress.md) for the state against each milestone and
-[`docs/traceability.md`](docs/traceability.md) for every requirement, its implementation and its test.
+## Try it in five minutes
 
-## Try it
-
-You need Docker (on a Mac, Docker Desktop or Colima).
+You need Docker (on a Mac, Docker Desktop or Colima). From the project folder:
 
 ```bash
 docker compose up --build
 ```
 
-Then open **http://localhost:8081**. The admin is at http://localhost:8081/admin.
+Then open **http://localhost:8081**. The first build takes a few minutes. The backend log ends with
+`Successfully applied 20 migrations … now at version v20` when everything is up.
 
-| Demo account | Email | Password |
-|---|---|---|
-| Owner | `admin@akven.test` | `changeme-admin` |
-| Staff | `staff@akven.test` | `changeme-staff` |
+| Demo account | Email | Password | Can do |
+|---|---|---|---|
+| Owner | `admin@akven.test` | `changeme-admin` | Everything, including prices, contacts and the size chart |
+| Staff | `staff@akven.test` | `changeme-staff` | Products, stock and orders, but not prices |
+| Customer | Create one with "Sign in" → "Create an account" | | Shop, check out, see orders |
 
-These accounts exist only in demo mode. Things to try: switch the language in the top bar; open a product and ask
-the chat for "50% off" to watch the limit work; put 20 pairs of mixed socks in the bag to see the collection price;
-pay for a pickup order to get a pickup code, then hand it over in the admin.
+These accounts exist only in demo mode. A short tour:
 
-To start again from a clean database: `docker compose down -v` and then `docker compose up --build`.
+1. **Switch the language** in the top bar (EN · РУС · КЫР). The whole site follows.
+2. **Plan a family set** on the home page: change a shoe size and watch the sock size and the price step change.
+3. **Ask for a better price.** Sign in as a customer, open any product and type "50% off". The assistant answers, but
+   the offer stays within the limit.
+4. **Fill the bag** with 20 pairs of mixed socks to reach the first collection step, then pay for a pickup order with
+   the simulated wallet to get a pickup code.
+5. **Open the admin** at http://localhost:8081/admin as the owner. Hand the order over with its code, change the
+   price ladder, and look at the negotiation dashboard and the comparison.
 
-Running the backend and frontend separately, the settings and all the tests are in
-[`docs/development.md`](docs/development.md). How to check that a laptop has the latest version and how to publish to
-GitLab is in [`docs/git-workflow.md`](docs/git-workflow.md).
+To start again from a clean database: `docker compose down -v`, then `docker compose up --build`. If the browser
+still shows an older version, hard-refresh it (Cmd+Shift+R on a Mac).
+
+Running the backend and frontend without Docker, the settings and every test command are in
+[`docs/development.md`](docs/development.md). Checking that a laptop has the latest version, and publishing to GitLab,
+are in [`docs/git-workflow.md`](docs/git-workflow.md).
 
 ## How it is built
 
+```mermaid
+flowchart LR
+    B[Browser<br/>React PWA] -- "REST / JSON, JWT" --> S[Spring Boot API]
+    S --> P[PricingService] --> V[PolicyValidator]
+    S --> G[Negotiator<br/>rules · language model]
+    G --> V
+    S --> D[(PostgreSQL 16<br/>Flyway migrations)]
+```
+
 | Layer | Technology |
 |---|---|
-| Client | React 18, TypeScript, Vite; one installable PWA for customers and admin; English, Russian and Kyrgyz |
-| API | Spring Boot 3.3, Java 17; JWT with three roles; Flyway migrations; one error format (RFC 7807); OpenAPI docs at `/swagger-ui/index.html` |
-| Data | PostgreSQL 16 with pgvector |
-| Assistant | `Negotiator` interface with two implementations: rule-based, and a language model through any OpenAI-compatible API |
-| Delivery | Docker Compose; CI on GitLab and GitHub Actions |
+| Client | React 18, TypeScript, Vite. One installable PWA for customers and the admin. English, Russian and Kyrgyz |
+| API | Spring Boot 3.3, Java 17. JWT with three roles (customer, staff, owner). One error format (RFC 7807). OpenAPI at `/swagger-ui/index.html` |
+| Data | PostgreSQL 16 with pgvector. 20 Flyway migrations; demo data only in the demo profile |
+| Assistant | A `Negotiator` interface with two implementations: rule-based (default), and a language model through any OpenAI-compatible API, with automatic fallback to the rules |
+| Delivery | Docker Compose. CI on GitLab (`.gitlab-ci.yml`) and GitHub Actions (six jobs) |
 
-The design, the data model and the safety mechanism are described in [`docs/architecture.md`](docs/architecture.md).
+The layers, the data model and the safety mechanism are described in [`docs/architecture.md`](docs/architecture.md).
+The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/brand.md).
 
-## Repository layout
+![The AKVEN logo: stacked, one line, and the mark alone for sock labels and the app icon](docs/design/readme-logo.jpg)
 
-```
-backend/     Spring Boot application, database migrations (db/migration) and demo data (db/seed), tests
-frontend/    The shop and the admin (React), translations (src/i18n), scripts for icons, screenshots and the browser test
-docs/        Everything written down; see below
-docker-compose.yml, .gitlab-ci.yml, .github/workflows/ci.yml
-```
+## Quality and tests
+
+| Check | Command | Result |
+|---|---|---|
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 164 tests, **97% line coverage**; the build fails below 80% |
+| Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 10 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
+| Frontend | `cd frontend && npm test && npm run build` | 118 tests, including colour-contrast and translation checks |
+| End to end, in a real browser | `cd frontend && npm run e2e` | 23 steps: the owner's and the customer's whole journey in three languages, with accessibility rules on every page |
+
+Safety properties that the tests demonstrate:
+
+- No price ever goes below the owners' limit, whatever the assistant proposes.
+- Prices are decided only on the server; the browser's numbers are never trusted.
+- The last pair is sold once, even when two people pay at the same moment, and a double click never charges twice.
+- Login lockout after repeated failures, three roles, an audit log of every change, and database constraints that
+  refuse impossible values even if the application is bypassed.
+
+## Status
+
+| Milestone | Due | State |
+|---|---|---|
+| M1: requirement analysis, design | 25 September | Done |
+| M2: working prototype | 20 October | Done |
+| M3: final program, CI/CD, over 80% coverage | 10 November | Feature-complete; see the open points below |
+| M4: thesis draft | 22 November | In progress |
+
+Open points: real product photos, the certificate and story texts, a native speaker's check of the Russian and
+Kyrgyz texts, account management for staff from the admin, and an agreed plan for the live-model evaluation. Details
+are in [`docs/progress.md`](docs/progress.md); every requirement, where it is implemented and which test shows it, is
+in [`docs/traceability.md`](docs/traceability.md).
 
 ## Documentation
 
@@ -116,12 +201,26 @@ docker-compose.yml, .gitlab-ci.yml, .github/workflows/ci.yml
 |---|---|
 | [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, use cases, functional and non-functional requirements |
 | [`docs/traceability.md`](docs/traceability.md) | Each requirement: where it is implemented, which test shows it, what is open |
-| [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the Policy Validator and the security notes |
-| [`docs/progress.md`](docs/progress.md) | Status against the supervisor's milestones |
+| [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator and the security notes |
+| [`docs/progress.md`](docs/progress.md) | Status against the milestones |
 | [`docs/user-guide.md`](docs/user-guide.md) | How the owners, the staff and the customers use the shop |
 | [`docs/development.md`](docs/development.md) | Running, settings, tests, CI, database |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Branches, checking a laptop is up to date, publishing to GitLab |
 | [`docs/api.md`](docs/api.md) | The API endpoints and error codes |
 | [`docs/diagrams/`](docs/diagrams/README.md) | Thesis figures: architecture, validation path, negotiation sequence, data model, use cases |
 | [`docs/wireframes.svg`](docs/wireframes.svg) | Wireframes of the key screens on phone, tablet and laptop |
-| [`docs/brand.md`](docs/brand.md) | Logo, colours, type, ornaments; screenshots in [`docs/design/`](docs/design/) |
+| [`docs/brand.md`](docs/brand.md) | Logo, colours, type, ornaments, motion; screenshots in [`docs/design/`](docs/design/) |
+
+## Repository layout
+
+```
+backend/     Spring Boot application
+             src/main/resources/db/migration   schema migrations (always applied)
+             src/main/resources/db/seed        demo data (demo profile only)
+frontend/    The shop and the admin (React + TypeScript)
+             src/i18n      English, Russian and Kyrgyz texts
+             src/brand     the logo and the drawn socks
+             scripts/      logo, icons, product images, screenshots and the end-to-end test
+docs/        Everything written down (see above)
+docker-compose.yml, .gitlab-ci.yml, .github/workflows/ci.yml
+```
