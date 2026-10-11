@@ -387,6 +387,39 @@ try {
     await page.getByText("Only the owners can change this").waitFor();
   });
 
+  await step("the super admin adds a staff account, switches the assistant, reads the audit log, and the admin speaks Kyrgyz", async () => {
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.goto(`${BASE}/login`);
+    await page.getByLabel("Email").fill("superadmin@akven.test");
+    await page.getByLabel("Password").fill("changeme-super");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/admin`);
+    await page.getByRole("link", { name: "Accounts", exact: true }).click();
+    await page.getByRole("heading", { level: 1, name: "Accounts" }).waitFor();
+    const helper = `helper-${Date.now()}@akven.test`;
+    await page.getByLabel("Name").first().fill("Helper");
+    await page.getByLabel("Email").fill(helper);
+    await page.getByLabel("First password").fill("a-good-password");
+    await page.getByRole("button", { name: "Create account" }).click();
+    await page.getByText(helper).first().waitFor();
+    await a11y("admin accounts");
+    await page.getByRole("link", { name: "AI assistant", exact: true }).click();
+    await page.getByRole("heading", { level: 1, name: "AI assistant" }).waitFor();
+    await page.getByRole("button", { name: "Built-in rules" }).click();
+    await page.getByRole("textbox", { name: "Message", exact: true }).fill("50% off please");
+    await page.getByRole("button", { name: "Ask", exact: true }).click();
+    await page.getByText(/allowed \d+%/).waitFor();
+    await a11y("admin ai assistant");
+    await page.getByRole("link", { name: "Audit log", exact: true }).click();
+    await page.getByText("Account created").first().waitFor();
+    await a11y("admin audit log");
+    await page.getByRole("button", { name: "Кыргызча" }).click();
+    await page.getByRole("link", { name: "Аккаунттар", exact: true }).waitFor();
+    await page.getByRole("heading", { level: 1, name: "Өзгөртүүлөр журналы" }).waitFor();
+    await a11y("admin in Kyrgyz");
+    await page.getByRole("button", { name: "English" }).click();
+  });
+
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);
   console.log("\nAll steps passed. Screenshots in docs/design/.");
 } catch (e) {

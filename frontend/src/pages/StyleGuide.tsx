@@ -62,7 +62,7 @@ export function StyleGuide() {
           </div>
         </section>
 
-        <Section id="logo" eyebrow="01 · Brand" title="The mark" lead="A heart that is also an ampersand: Akyl and Venera, and the warmth of a bargain made in person. Drawn from the shop sign, rebuilt as clean vector.">
+        <Section id="logo" eyebrow="01 · Brand" title="The mark" lead="The family's own design: a Roman A and a V joined by a ribbon, Akylbek and Venera on one label. Redrawn as clean vectors, so it prints the same on a sock label, a sign and a phone screen.">
           <div style={{ display: "grid", gap: "var(--space-4)", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
             <div style={{ background: "var(--black)", border: "1px solid var(--line)", color: "var(--accent)", padding: "var(--space-7)", borderRadius: "var(--radius-lg)", display: "grid", placeItems: "center" }}><Logo metallic height={44} /></div>
             <div style={{ background: "var(--surface)", border: "1px solid var(--line)", color: "var(--ink)", padding: "var(--space-7)", borderRadius: "var(--radius-lg)", display: "grid", placeItems: "center" }}><Logo height={44} /></div>

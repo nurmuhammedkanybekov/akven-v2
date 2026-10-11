@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import type { AdminTerm, Category, ProductInput, TermKind } from "../api/types";
 import { Button } from "../components/Button";
 import { Input, Textarea } from "../components/Field";
-import { CATEGORIES, CATEGORY_LABEL } from "../lib/labels";
+import { CATEGORIES, CATEGORY_KEY } from "../lib/labels";
+import { useT } from "../i18n/I18n";
 import { blankToNull } from "./helpers";
 import { TermSelect } from "./TermSelect";
 
@@ -21,6 +22,7 @@ interface Props {
 
 /** The product's details: what it is, where it sits in the shop, and what it is made of. */
 export function ProductForm({ initial, sections, cuts, createTerm, fieldErrors, submitLabel, busy, onSubmit, onNameChange }: Props) {
+  const { t } = useT();
   const [v, setV] = useState(initial);
   const set = <K extends keyof ProductInput>(key: K, value: ProductInput[K]) => setV((cur) => ({ ...cur, [key]: value }));
   const isBundle = v.category === "BUNDLES";
@@ -38,37 +40,37 @@ export function ProductForm({ initial, sections, cuts, createTerm, fieldErrors, 
   }
 
   return (
-    <form className="av-card-form" onSubmit={submit} noValidate aria-label="Product details">
-      <h2 className="av-formtitle">Details</h2>
-      <Input label="Name" value={v.name} error={fieldErrors.name} placeholder="e.g. AKVEN Mid-Long Socks" required
+    <form className="av-card-form" onSubmit={submit} noValidate aria-label={t("a.pf.aria")}>
+      <h2 className="av-formtitle">{t("a.pf.details")}</h2>
+      <Input label={t("a.name")} value={v.name} error={fieldErrors.name} placeholder={t("a.pf.nameEg")} required
              onChange={(e) => { set("name", e.target.value); onNameChange?.(e.target.value); }} />
 
       <fieldset className="av-option">
-        <legend className="av-label">Who is it for?</legend>
-        <div className="av-row" role="group" aria-label="Audience">
-          {CATEGORIES.map((c) => <button key={c} type="button" className="av-chip" aria-pressed={v.category === c} onClick={() => chooseCategory(c)}>{CATEGORY_LABEL[c]}</button>)}
+        <legend className="av-label">{t("a.pf.who")}</legend>
+        <div className="av-row" role="group" aria-label={t("a.pf.audience")}>
+          {CATEGORIES.map((c) => <button key={c} type="button" className="av-chip" aria-pressed={v.category === c} onClick={() => chooseCategory(c)}>{t(CATEGORY_KEY[c])}</button>)}
         </div>
         {fieldErrors.category && <span className="av-error">{fieldErrors.category}</span>}
       </fieldset>
 
       <div className="av-formgrid">
-        <TermSelect label="Section" kind="SECTION" terms={sections} value={v.sectionId} disabled={isBundle} onChange={(id) => set("sectionId", id)} onCreate={createTerm}
-                    hint={isBundle ? "Bundles sit outside the sections." : "For example Classic, Sport, or your own."} />
-        <TermSelect label="Cut" kind="CUT" terms={cuts} value={v.cutId} disabled={isBundle} onChange={(id) => set("cutId", id)} onCreate={createTerm}
-                    hint={isBundle ? "Bundles have no single cut." : "How tall the sock is, for example Crew or Mid-long."} />
+        <TermSelect label={t("a.term.SECTION")} kind="SECTION" terms={sections} value={v.sectionId} disabled={isBundle} onChange={(id) => set("sectionId", id)} onCreate={createTerm}
+                    hint={isBundle ? t("a.pf.sectionBundle") : t("a.pf.sectionHint")} />
+        <TermSelect label={t("a.term.CUT")} kind="CUT" terms={cuts} value={v.cutId} disabled={isBundle} onChange={(id) => set("cutId", id)} onCreate={createTerm}
+                    hint={isBundle ? t("a.pf.cutBundle") : t("a.pf.cutHint")} />
       </div>
 
-      <Input label="Collection (optional)" value={v.collection ?? ""} error={fieldErrors.collection} placeholder="e.g. Winter 2026" onChange={(e) => set("collection", e.target.value)} />
-      <Textarea label="Description" value={v.description ?? ""} error={fieldErrors.description} hint="Shown on the product page. A sentence or two is plenty."
+      <Input label={t("a.pf.collection")} value={v.collection ?? ""} error={fieldErrors.collection} placeholder={t("a.pf.collectionEg")} onChange={(e) => set("collection", e.target.value)} />
+      <Textarea label={t("a.pf.description")} value={v.description ?? ""} error={fieldErrors.description} hint={t("a.pf.descriptionHint")}
                 onChange={(e) => set("description", e.target.value)} />
 
-      <h2 className="av-formtitle">Quality and fabric</h2>
+      <h2 className="av-formtitle">{t("a.pf.qualityTitle")}</h2>
       <div className="av-formgrid">
-        <Input label="Quality" value={v.quality ?? ""} error={fieldErrors.quality} placeholder="e.g. Premium combed cotton" onChange={(e) => set("quality", e.target.value)} />
-        <Input label="Made in" value={v.origin ?? ""} error={fieldErrors.origin} placeholder="e.g. Korea" onChange={(e) => set("origin", e.target.value)} />
+        <Input label={t("a.pf.quality")} value={v.quality ?? ""} error={fieldErrors.quality} placeholder={t("a.pf.qualityEg")} onChange={(e) => set("quality", e.target.value)} />
+        <Input label={t("a.pf.origin")} value={v.origin ?? ""} error={fieldErrors.origin} placeholder={t("a.pf.originEg")} onChange={(e) => set("origin", e.target.value)} />
       </div>
-      <Input label="Fabric" value={v.fabricComposition ?? ""} error={fieldErrors.fabricComposition} placeholder="e.g. 80% cotton, 18% nylon, 2% elastane" onChange={(e) => set("fabricComposition", e.target.value)} />
-      <Textarea label="Care" value={v.care ?? ""} error={fieldErrors.care} placeholder="e.g. Machine wash cold. Do not bleach." rows={2} onChange={(e) => set("care", e.target.value)} />
+      <Input label={t("a.pf.fabric")} value={v.fabricComposition ?? ""} error={fieldErrors.fabricComposition} placeholder={t("a.pf.fabricEg")} onChange={(e) => set("fabricComposition", e.target.value)} />
+      <Textarea label={t("a.pf.care")} value={v.care ?? ""} error={fieldErrors.care} placeholder={t("a.pf.careEg")} rows={2} onChange={(e) => set("care", e.target.value)} />
 
       <div className="av-row"><Button type="submit" loading={busy} disabled={!v.name.trim()}>{submitLabel}</Button></div>
     </form>

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NegotiationChat } from "../components/NegotiationChat";
+import { I18nProvider } from "../i18n/I18n";
 
 const negotiate = vi.fn();
 vi.mock("../api/endpoints", () => ({ negotiate: (...a: unknown[]) => negotiate(...a) }));
@@ -32,10 +33,31 @@ describe("NegotiationChat", () => {
     await userEvent.type(screen.getByLabelText("Your message"), "give me 40% off");
     await userEvent.click(screen.getByRole("button", { name: "Send" }));
     expect(await screen.findByText(/Best I can do/)).toBeInTheDocument();
-    expect(negotiate).toHaveBeenCalledWith("SKU-1", "give me 40% off", 2);
+    expect(negotiate).toHaveBeenCalledWith("SKU-1", "give me 40% off", 2, null, "en");
     expect(screen.queryByText(/Proposed/)).toBeNull(); // the raw proposal is hidden unless the server is in demo mode
     await userEvent.click(screen.getByRole("button", { name: "Add 2 pairs at this price" }));
     expect(onAccept).toHaveBeenCalledWith(offer, 2);
+  });
+
+  it("keeps one conversation going, so the assistant remembers what was said", async () => {
+    negotiate.mockResolvedValue(offer);
+    setup();
+    await userEvent.type(screen.getByLabelText("Your message"), "hello");
+    await userEvent.click(screen.getByRole("button", { name: "Send" }));
+    await screen.findByText(/Best I can do/);
+    await userEvent.type(screen.getByLabelText("Your message"), "and for 10 pairs?");
+    await userEvent.click(screen.getByRole("button", { name: "Send" }));
+    await waitFor(() => expect(negotiate).toHaveBeenLastCalledWith("SKU-1", "and for 10 pairs?", 2, "s1", "en"));
+  });
+
+  it("speaks the customer's language and asks the assistant to answer in it", async () => {
+    localStorage.setItem("akven-lang", "ky");
+    negotiate.mockResolvedValue(offer);
+    render(<MemoryRouter><I18nProvider><NegotiationChat sku="SKU-1" quantity={1} onAccept={vi.fn()} /></I18nProvider></MemoryRouter>);
+    expect(screen.getByRole("heading", { name: "Жакшыраак баа керекпи?" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Арзаныраак болобу?" }));
+    await waitFor(() => expect(negotiate).toHaveBeenCalledWith("SKU-1", "Арзаныраак болобу?", 1, null, "ky"));
+    localStorage.removeItem("akven-lang");
   });
 
   it("shows both numbers when the server runs in demo mode", async () => {

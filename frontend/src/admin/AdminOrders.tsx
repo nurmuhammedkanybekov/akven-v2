@@ -6,10 +6,12 @@ import { OrderStatusBadge } from "../components/OrderStatusBadge";
 import { Pagination } from "../components/Pagination";
 import { useAsync } from "../hooks/useAsync";
 import { formatDateTime, formatPrice } from "../lib/format";
+import { useT } from "../i18n/I18n";
 
-const TABS: Array<[string, string]> = [["PAID", "To fulfil"], ["FULFILLED", "Completed"], ["CANCELLED", "Cancelled"], ["", "All"]];
+const TABS = [["PAID", "a.orders.toFulfil"], ["FULFILLED", "a.orders.completed"], ["CANCELLED", "a.orders.cancelled"], ["", "a.all"]] as const;
 
 export function AdminOrders() {
+  const { t } = useT();
   const [params, setParams] = useSearchParams();
   const status = (params.get("status") ?? "PAID") as OrderStatus | "";
   const page = Math.max(0, Number(params.get("page") ?? 0) || 0);
@@ -18,18 +20,18 @@ export function AdminOrders() {
 
   return (
     <>
-      <header className="av-admin__head"><div><span className="av-eyebrow">Sales</span><h1>Orders</h1></div></header>
-      <div className="av-tabs av-tabs--inline" role="group" aria-label="Show">
-        {TABS.map(([v, l]) => <button key={v || "all"} type="button" className="av-tabbtn" aria-pressed={status === v} onClick={() => set("status", v === "PAID" ? null : v || "")}>{l}</button>)}
+      <header className="av-admin__head"><div><span className="av-eyebrow">{t("a.sales")}</span><h1>{t("a.nav.orders")}</h1></div></header>
+      <div className="av-tabs av-tabs--inline" role="group" aria-label={t("a.show")}>
+        {TABS.map(([v, l]) => <button key={v || "all"} type="button" className="av-tabbtn" aria-pressed={status === v} onClick={() => set("status", v === "PAID" ? null : v || "")}>{t(l)}</button>)}
       </div>
       {list.loading && !list.data && <Skeleton height={200} />}
       {list.error && <Alert tone="danger">{list.error.message}</Alert>}
-      {list.data && list.data.items.length === 0 && <div className="av-empty"><h2>{status === "PAID" ? "Nothing waiting to be fulfilled" : "No orders here"}</h2></div>}
+      {list.data && list.data.items.length === 0 && <div className="av-empty"><h2>{status === "PAID" ? t("a.orders.nothingWaiting") : t("a.orders.none")}</h2></div>}
       {list.data && list.data.items.length > 0 && (
         <div className="av-tablewrap">
           <table className="av-table">
-            <caption className="av-visually-hidden">Orders</caption>
-            <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Items</th><th scope="col">Total</th><th scope="col">Status</th></tr></thead>
+            <caption className="av-visually-hidden">{t("a.nav.orders")}</caption>
+            <thead><tr><th scope="col">{t("a.orders.order")}</th><th scope="col">{t("a.orders.customer")}</th><th scope="col">{t("a.orders.items")}</th><th scope="col">{t("a.orders.total")}</th><th scope="col">{t("a.status")}</th></tr></thead>
             <tbody>
               {list.data.items.map((o) => (
                 <tr key={o.id}>

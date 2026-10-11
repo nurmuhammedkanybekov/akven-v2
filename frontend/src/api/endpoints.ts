@@ -4,7 +4,7 @@ import type {
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
   CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote, NegotiateResponse, NegotiationSessionView,
   PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
-  SizeSystem, NegotiationStats, EvaluationReport,
+  SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -37,8 +37,10 @@ export const adminFulfilOrder = (id: string) => api<OrderView>(`/api/admin/order
 export const adminCancelOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}/cancel`, { method: "POST" });
 
 // ---- negotiation ----
-export const negotiate = (variantSku: string, message: string, quantity: number) =>
-  api<NegotiateResponse>("/api/negotiate", { method: "POST", body: { variantSku, message, quantity } });
+/** sessionId continues the conversation; language is the one the assistant answers in. */
+export const negotiate = (variantSku: string, message: string, quantity: number, sessionId?: string | null, language?: string) =>
+  api<NegotiateResponse>("/api/negotiate", { method: "POST", body: { variantSku, message, quantity, sessionId: sessionId ?? undefined, language } });
+export const adminGetNegotiation = (id: string) => api<NegotiationSessionView>(`/api/admin/negotiations/${id}`);
 export const adminListNegotiations = (p: { page?: number; pageSize?: number }) =>
   api<PageResponse<NegotiationSessionView>>(`/api/admin/negotiations${qs(p)}`);
 
@@ -136,3 +138,24 @@ export const adminUpdateSupply = (id: string, body: { casePairs: number | null; 
 // ---- owners' dashboard ----
 export const adminNegotiationStats = (days: number) => api<NegotiationStats>(`/api/admin/negotiations/stats${qs({ days })}`);
 export const adminEvaluation = () => api<EvaluationReport>("/api/admin/negotiations/evaluation");
+
+// ---- accounts and the audit log (super admin); customers (owners) ----
+export const adminListAccounts = () => api<Account[]>("/api/admin/accounts");
+export const adminCreateAccount = (body: { email: string; displayName: string | null; role: TeamRole; password: string }) =>
+  api<Account>("/api/admin/accounts", { method: "POST", body });
+export const adminUpdateAccount = (id: string, body: { displayName: string | null; role: TeamRole; active: boolean }) =>
+  api<Account>(`/api/admin/accounts/${id}`, { method: "PUT", body });
+export const adminResetPassword = (id: string, password: string) =>
+  api<void>(`/api/admin/accounts/${id}/password`, { method: "PUT", body: { password } });
+export const adminListCustomers = (p: { q?: string; page?: number; pageSize?: number }) =>
+  api<PageResponse<CustomerAccount>>(`/api/admin/customers${qs(p)}`);
+export const adminSetTrusted = (id: string, trusted: boolean) =>
+  api<{ customerId: string; trusted: boolean }>(`/api/admin/customers/${id}/trusted`, { method: "PUT", body: { trusted } });
+export const adminAuditLog = (p: { page?: number; pageSize?: number }) => api<PageResponse<AuditLine>>(`/api/admin/audit${qs(p)}`);
+
+// ---- the assistant (super admin) ----
+export const adminAssistantStatus = () => api<AssistantStatus>("/api/admin/assistant");
+export const adminSetAssistantMode = (mode: AssistantMode) => api<AssistantStatus>("/api/admin/assistant", { method: "PUT", body: { mode } });
+export const adminTryAssistant = (body: { sku: string; message: string; quantity: number; language: string }) =>
+  api<AssistantTry>("/api/admin/assistant/try", { method: "POST", body });
+export const adminLiveEvaluation = () => api<EvaluationReport>("/api/admin/assistant/evaluation", { method: "POST", body: {} });

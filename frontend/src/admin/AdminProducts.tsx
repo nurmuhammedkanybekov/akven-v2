@@ -8,19 +8,21 @@ import { Button } from "../components/Button";
 import { Pagination } from "../components/Pagination";
 import { ProductImage } from "../components/ProductImage";
 import { useAsync } from "../hooks/useAsync";
-import { CATEGORY_LABEL } from "../lib/labels";
+import { CATEGORY_KEY } from "../lib/labels";
 import { formatPrice } from "../lib/format";
+import { useT, type Translate } from "../i18n/I18n";
 
-const STATUSES: Array<[string, string]> = [["active", "In the shop"], ["retired", "Removed"], ["all", "All"]];
+const STATUSES = [["active", "a.status.inShop"], ["retired", "a.status.removed"], ["all", "a.all"]] as const;
 
-function priceRange(p: AdminProduct): string {
+function priceRange(p: AdminProduct, t: Translate): string {
   const prices = p.variants.filter((v) => v.active).map((v) => v.price);
-  if (!prices.length) return "No prices yet";
+  if (!prices.length) return t("a.products.noPrices");
   const min = Math.min(...prices), max = Math.max(...prices);
-  return min === max ? formatPrice(min) : `${formatPrice(min)} to ${formatPrice(max)}`;
+  return min === max ? formatPrice(min) : t("a.products.priceRange", { min: formatPrice(min), max: formatPrice(max) });
 }
 
 export function AdminProducts() {
+  const { t } = useT();
   const [params, setParams] = useSearchParams();
   const status = params.get("status") ?? "active";
   const page = Math.max(0, Number(params.get("page") ?? 0) || 0);
@@ -41,17 +43,17 @@ export function AdminProducts() {
   return (
     <>
       <header className="av-admin__head">
-        <div><span className="av-eyebrow">Catalog</span><h1>Products</h1></div>
-        <Button to="/admin/products/new">Add a product</Button>
+        <div><span className="av-eyebrow">{t("a.catalog")}</span><h1>{t("a.nav.products")}</h1></div>
+        <Button to="/admin/products/new">{t("a.products.add")}</Button>
       </header>
 
       <div className="av-row av-admin__tools">
         <div className="av-field av-admin__search">
-          <label className="av-label" htmlFor="search">Search by name</label>
-          <input id="search" className="av-input" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. Mid-Long" />
+          <label className="av-label" htmlFor="search">{t("a.products.search")}</label>
+          <input id="search" className="av-input" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("a.products.searchEg")} />
         </div>
-        <div className="av-tabs av-tabs--inline" role="group" aria-label="Show">
-          {STATUSES.map(([v, l]) => <button key={v} type="button" className="av-tabbtn" aria-pressed={status === v} onClick={() => setParam("status", v === "active" ? null : v)}>{l}</button>)}
+        <div className="av-tabs av-tabs--inline" role="group" aria-label={t("a.show")}>
+          {STATUSES.map(([v, l]) => <button key={v} type="button" className="av-tabbtn" aria-pressed={status === v} onClick={() => setParam("status", v === "active" ? null : v)}>{t(l)}</button>)}
         </div>
       </div>
 
@@ -59,15 +61,15 @@ export function AdminProducts() {
       {list.error && <p className="av-error">{list.error.message}</p>}
       {list.data && list.data.items.length === 0 && (
         <div className="av-empty">
-          <h2>{urlQ ? "No product matches that name" : status === "retired" ? "Nothing has been removed" : "No products yet"}</h2>
-          {!urlQ && status === "active" && <><p className="av-lead">Add your first product. Photos can come later.</p><Button to="/admin/products/new">Add a product</Button></>}
+          <h2>{urlQ ? t("a.products.noMatch") : status === "retired" ? t("a.products.noneRemoved") : t("a.products.none")}</h2>
+          {!urlQ && status === "active" && <><p className="av-lead">{t("a.products.first")}</p><Button to="/admin/products/new">{t("a.products.add")}</Button></>}
         </div>
       )}
       {list.data && list.data.items.length > 0 && (
         <div className="av-tablewrap">
           <table className="av-table">
-            <caption className="av-visually-hidden">Products</caption>
-            <thead><tr><th scope="col">Product</th><th scope="col">Where it sits</th><th scope="col">Colours and sizes</th><th scope="col">Prices</th><th scope="col">Status</th></tr></thead>
+            <caption className="av-visually-hidden">{t("a.nav.products")}</caption>
+            <thead><tr><th scope="col">{t("a.products.product")}</th><th scope="col">{t("a.products.where")}</th><th scope="col">{t("a.products.options")}</th><th scope="col">{t("a.products.prices")}</th><th scope="col">{t("a.status")}</th></tr></thead>
             <tbody>
               {list.data.items.map((p) => {
                 const active = p.variants.filter((v) => v.active);
@@ -80,10 +82,10 @@ export function AdminProducts() {
                         <span><strong>{p.name}</strong><br /><span className="av-small av-muted">{p.slug}</span></span>
                       </Link>
                     </td>
-                    <td>{CATEGORY_LABEL[p.category]}<br /><span className="av-small av-muted">{[p.section?.name, p.cut?.name].filter(Boolean).join(" · ") || "No section"}</span></td>
-                    <td>{active.length} {active.length === 1 ? "option" : "options"}<br /><span className="av-small av-muted">{stock} in stock</span></td>
-                    <td className="av-price">{priceRange(p)}</td>
-                    <td>{p.active ? <Badge tone="success">In the shop</Badge> : <Badge tone="danger">Removed</Badge>}</td>
+                    <td>{t(CATEGORY_KEY[p.category])}<br /><span className="av-small av-muted">{[p.section?.name, p.cut?.name].filter(Boolean).join(" · ") || t("a.products.noSection")}</span></td>
+                    <td>{t("a.products.optionCount", { n: active.length })}<br /><span className="av-small av-muted">{t("a.products.inStock", { n: stock })}</span></td>
+                    <td className="av-price">{priceRange(p, t)}</td>
+                    <td>{p.active ? <Badge tone="success">{t("a.status.inShop")}</Badge> : <Badge tone="danger">{t("a.status.removed")}</Badge>}</td>
                   </tr>
                 );
               })}

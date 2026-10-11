@@ -1,8 +1,10 @@
+import { adminEn } from "./admin.en";
+
 /**
  * English: the main language and the source of every key. Russian and Kyrgyz (ru.ts, ky.ts) translate these keys;
  * anything they leave out shows in English. Keep labels that tests look for (e.g. "Add to bag") stable.
  */
-export const en = {
+const shop = {
   "lang.label": "Language",
   "skip": "Skip to content",
 
@@ -96,7 +98,7 @@ export const en = {
   // home: story
   "story.eyebrow": "From Korea to Bishkek",
   "story.title": "A family business at Dordoi",
-  "story.lead": "Our family has traded at Dordoi since the early 2000s. In 2018 Akyl and Venera began selling socks: Korean-made, chosen pair by pair, for families, for shops across the region and as gifts. AKVEN is their two names on one label.",
+  "story.lead": "Our family has traded at Dordoi since the early 2000s. In 2018 Akylbek and Venera began selling socks: Korean-made, chosen pair by pair, for families, for shops across the region and as gifts. AKVEN is their two names on one label.",
   "story.started": "Selling socks since",
   "story.startedV": "2018",
   "story.made": "Made in",
@@ -104,7 +106,7 @@ export const en = {
   "story.sold": "Sold at",
   "story.soldV": "Dordoi Bazaar, Bishkek",
   "story.run": "Run by",
-  "story.runV": "Akyl, Venera and their family",
+  "story.runV": "Akylbek, Venera and their family",
   "story.photo": "Photo: the shop at Dordoi",
   "story.cta": "Visit the shop",
 
@@ -433,5 +435,7 @@ export const en = {
   "foot.since": "selling socks since 2018",
   "foot.orders": "Order status",
 } as const;
+
+export const en = { ...shop, ...adminEn } as const;
 
 export type MessageKey = keyof typeof en;
