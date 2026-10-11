@@ -1,6 +1,6 @@
 /** Mirrors the backend's response shapes (CatalogViews.java, AdminCatalogDtos.java). */
 export type Category = "MEN" | "WOMEN" | "KIDS" | "BUNDLES";
-export type Role = "CUSTOMER" | "STAFF" | "ADMIN";
+export type Role = "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN";
 export type TermKind = "SECTION" | "CUT";
 
 export interface ImageView { url: string; alt: string }
@@ -177,6 +177,12 @@ export type PriceOutcome = "AS_OFFERED" | "LIMITED_BY_SHOP" | "LIST_PRICE";
 export interface NegotiationSessionView {
   id: string; customerEmail: string; sku: string; productName: string; proposedDiscountPct: number | null;
   validatedDiscountPct: number | null; clamped: boolean; transcript: string | null; createdAt: string;
+  quantity?: number; turns?: NegotiationTurn[];
+}
+/** One message and answer; assistant is "llm", "rules" or "rules-fallback". */
+export interface NegotiationTurn {
+  position: number; customerMessage: string; reply: string; language: string; assistant: string; quantity: number;
+  proposedDiscountPct: number; validatedDiscountPct: number; createdAt: string;
 }
 
 // ---- pricing, shop info and sizes ----
@@ -213,7 +219,16 @@ export interface EvaluationResult { proposedPct: number; finalPct: number; limit
 export interface EvaluationReport {
   aiSource: string; note: string;
   rows: Array<{ id: string; customer: string; message: string; quantity: number; listPrice: number; limitPct: number;
-                walkAwayPct: number; rule: EvaluationResult; ai: EvaluationResult }>;
+                walkAwayPct: number; rule: EvaluationResult; ai: EvaluationResult; aiReply: string | null }>;
   rule: EvaluationSummary; ai: EvaluationSummary;
 }
 export interface EvaluationSummary { averageFinalPct: number | null; acceptedPct: number | null; limited: number; aboveLimit: number; revenue: number }
+
+// ---- accounts, audit log and the assistant (super admin) ----
+export type TeamRole = "STAFF" | "ADMIN" | "SUPER_ADMIN";
+export interface Account { id: string; email: string; displayName: string | null; role: TeamRole; active: boolean; createdAt: string }
+export interface CustomerAccount { id: string; email: string; trusted: boolean; active: boolean; createdAt: string }
+export interface AuditLine { id: string; at: string; actor: string; action: string; entityType: string; entityId: string; before: string | null; after: string | null }
+export type AssistantMode = "ai" | "rules";
+export interface AssistantStatus { mode: AssistantMode; aiConfigured: boolean; model: string; endpointHost: string | null; answersLast7Days: Record<string, number> }
+export interface AssistantTry { assistant: string; proposedPct: number; validatedPct: number; offerPrice: number; reply: string; millis: number }

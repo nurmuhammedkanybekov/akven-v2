@@ -1,7 +1,8 @@
 import type { MessageKey } from "./en";
+import { adminRu } from "./admin.ru";
 
 /** Russian. A draft to be read by a native speaker before launch; missing keys show in English. */
-export const ru: Partial<Record<MessageKey, string>> = {
+const shop: Partial<Record<MessageKey, string>> = {
   "lang.label": "Язык",
   "skip": "Перейти к содержимому",
 
@@ -86,7 +87,7 @@ export const ru: Partial<Record<MessageKey, string>> = {
 
   "story.eyebrow": "Из Кореи в Бишкек",
   "story.title": "Семейный бизнес на Дордое",
-  "story.lead": "Наша семья торгует на Дордое с начала 2000-х. В 2018 году Акыл и Венера начали продавать носки: корейские, отобранные пара за парой, для семей, для магазинов по всему региону и в подарок. AKVEN — это их два имени на одной этикетке.",
+  "story.lead": "Наша семья торгует на Дордое с начала 2000-х. В 2018 году Акылбек и Венера начали продавать носки: корейские, отобранные пара за парой, для семей, для магазинов по всему региону и в подарок. AKVEN — это их два имени на одной этикетке.",
   "story.started": "Продаём носки с",
   "story.startedV": "2018 года",
   "story.made": "Сделано в",
@@ -94,7 +95,7 @@ export const ru: Partial<Record<MessageKey, string>> = {
   "story.sold": "Где продаётся",
   "story.soldV": "Рынок Дордой, Бишкек",
   "story.run": "Кто ведёт",
-  "story.runV": "Акыл, Венера и их семья",
+  "story.runV": "Акылбек, Венера и их семья",
   "story.photo": "Фото: магазин на Дордое",
   "story.cta": "Как нас найти",
 
@@ -419,3 +420,5 @@ export const ru: Partial<Record<MessageKey, string>> = {
   "foot.since": "продаём носки с 2018 года",
   "foot.orders": "Статус заказа",
 };
+
+export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

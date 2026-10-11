@@ -1,7 +1,8 @@
 import type { MessageKey } from "./en";
+import { adminKy } from "./admin.ky";
 
 /** Kyrgyz. A draft to be read by a native speaker before launch; missing keys show in English. */
-export const ky: Partial<Record<MessageKey, string>> = {
+const shop: Partial<Record<MessageKey, string>> = {
   "lang.label": "Тил",
   "skip": "Мазмунга өтүү",
 
@@ -86,7 +87,7 @@ export const ky: Partial<Record<MessageKey, string>> = {
 
   "story.eyebrow": "Кореядан Бишкекке",
   "story.title": "Дордойдогу үй-бүлөлүк бизнес",
-  "story.lead": "Биздин үй-бүлө 2000-жылдардын башынан бери Дордойдо соода кылат. 2018-жылы Акыл менен Венера байпак сата баштады: корей байпактары, жуп-жубу менен тандалган, үй-бүлөлөргө, аймактагы дүкөндөргө жана белекке. AKVEN — бир этикеткадагы алардын эки аты.",
+  "story.lead": "Биздин үй-бүлө 2000-жылдардын башынан бери Дордойдо соода кылат. 2018-жылы Акылбек менен Венера байпак сата баштады: корей байпактары, жуп-жубу менен тандалган, үй-бүлөлөргө, аймактагы дүкөндөргө жана белекке. AKVEN — бир этикеткадагы алардын эки аты.",
   "story.started": "Байпак сатабыз",
   "story.startedV": "2018-жылдан",
   "story.made": "Кайда жасалган",
@@ -94,7 +95,7 @@ export const ky: Partial<Record<MessageKey, string>> = {
   "story.sold": "Кайда сатылат",
   "story.soldV": "Дордой базары, Бишкек",
   "story.run": "Ким жүргүзөт",
-  "story.runV": "Акыл, Венера жана алардын үй-бүлөсү",
+  "story.runV": "Акылбек, Венера жана алардын үй-бүлөсү",
   "story.photo": "Сүрөт: Дордойдогу дүкөн",
   "story.cta": "Бизди табуу",
 
@@ -419,3 +420,5 @@ export const ky: Partial<Record<MessageKey, string>> = {
   "foot.since": "2018-жылдан бери байпак сатабыз",
   "foot.orders": "Заказдын абалы",
 };
+
+export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

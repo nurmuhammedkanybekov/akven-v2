@@ -1,3 +1,4 @@
+import { translateNow as en } from "../i18n/I18n";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "../api/client";
 import { createVariantWithUniqueSku } from "../admin/createVariant";
@@ -39,7 +40,7 @@ describe("variant drafts", () => {
 
   it("explains what is wrong in plain words", () => {
     const d = { ...emptyDraft(), price: "3", costPrice: "4", stockQty: "1.5" };
-    const { errors, input: built } = draftToInput(d, "Socks");
+    const { errors, input: built } = draftToInput(d, "Socks", en);
     expect(built).toBeUndefined();
     expect(errors.price).toBe("The price cannot be below the cost.");
     expect(errors.stockQty).toBe("Enter a whole number of pairs.");
@@ -47,7 +48,7 @@ describe("variant drafts", () => {
 
   it("builds a clean request and marks an untouched code as auto-made", () => {
     const d = { ...emptyDraft(), color: " Navy ", colorHex: "#1F2A44", size: "M", price: "9.5", costPrice: "4", stockQty: "20" };
-    const r = draftToInput(d, "Ak&Ven Mid-Long Socks");
+    const r = draftToInput(d, "Ak&Ven Mid-Long Socks", en);
     expect(r.errors).toEqual({});
     expect(r.autoSku).toBe(true);
     expect(r.input).toMatchObject({ color: "Navy", size: "M", price: 9.5, costPrice: 4, stockQty: 20, marginFloorPct: 15, packSize: 1, sku: "AVML-NAV-M-1" });

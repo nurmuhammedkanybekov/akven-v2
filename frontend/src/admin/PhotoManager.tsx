@@ -5,6 +5,7 @@ import type { AdminProduct } from "../api/types";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { useToast } from "../components/Toast";
+import { useT } from "../i18n/I18n";
 
 const MAX = 8;
 
@@ -14,6 +15,7 @@ const MAX = 8;
  */
 export function PhotoManager({ product, onChange }: { product: AdminProduct; onChange: (p: AdminProduct) => void }) {
   const toast = useToast();
+  const { t } = useT();
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,13 +26,13 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
     setError(null);
     let current = product;
     for (const [i, file] of files.entries()) {
-      if (current.images.length >= MAX) { setError(`A product can have at most ${MAX} photos.`); break; }
-      setBusy(`Uploading ${i + 1} of ${files.length}…`);
+      if (current.images.length >= MAX) { setError(t("a.ph.max", { n: MAX })); break; }
+      setBusy(t("a.ph.uploading", { i: i + 1, n: files.length }));
       try {
         current = await adminUploadImage(product.id, file, "");
         onChange(current);
       } catch (e) {
-        setError(`${file.name}: ${e instanceof ApiError ? e.message : "upload failed"}`);
+        setError(`${file.name}: ${e instanceof ApiError ? e.message : t("a.ph.failed")}`);
         break;
       }
     }
@@ -39,20 +41,20 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
   }
 
   async function replace(next: Array<{ url: string; alt: string }>, message: string) {
-    setBusy("Saving…"); setError(null);
+    setBusy(t("a.saving")); setError(null);
     try { onChange(await adminReplaceImages(product.id, next)); toast(message); }
-    catch (e) { setError(e instanceof ApiError ? e.message : "Could not save the photos."); }
+    catch (e) { setError(e instanceof ApiError ? e.message : t("a.ph.saveFailed")); }
     finally { setBusy(null); }
   }
   const asList = () => images.map((i) => ({ url: i.url, alt: i.alt }));
   function move(index: number, by: -1 | 1) {
     const list = asList(); const [item] = list.splice(index, 1); list.splice(index + by, 0, item);
-    void replace(list, "Photos rearranged");
+    void replace(list, t("a.ph.moved"));
   }
-  function remove(index: number) { const list = asList(); list.splice(index, 1); void replace(list, "Photo removed"); }
+  function remove(index: number) { const list = asList(); list.splice(index, 1); void replace(list, t("a.ph.removed")); }
   function rename(index: number, alt: string) {
     if (!alt.trim() || alt === images[index].alt) return;
-    const list = asList(); list[index] = { ...list[index], alt: alt.trim() }; void replace(list, "Description saved");
+    const list = asList(); list[index] = { ...list[index], alt: alt.trim() }; void replace(list, t("a.ph.renamed"));
   }
   function drop(e: DragEvent) {
     e.preventDefault(); setOver(false);
@@ -62,8 +64,8 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
 
   return (
     <section className="av-card-form" id="photos" aria-labelledby="photos-h">
-      <h2 className="av-formtitle" id="photos-h">Photos</h2>
-      <p className="av-small">The first photo is the cover in the shop. JPEG, PNG or WebP, up to 5 MB each. Until you add photos, the shop shows a neat placeholder.</p>
+      <h2 className="av-formtitle" id="photos-h">{t("a.ph.title")}</h2>
+      <p className="av-small">{t("a.ph.lead")}</p>
       {error && <Alert tone="danger">{error}</Alert>}
 
       {images.length > 0 && (
@@ -71,13 +73,13 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
           {images.map((img, i) => (
             <li key={img.id} className="av-photo">
               <div className="av-photo__img"><img src={img.url} alt={img.alt} width={160} height={200} /></div>
-              {i === 0 && <span className="av-badge av-badge--accent">Cover</span>}
-              <label className="av-visually-hidden" htmlFor={`alt-${img.id}`}>Description of photo {i + 1}</label>
+              {i === 0 && <span className="av-badge av-badge--accent">{t("a.ph.cover")}</span>}
+              <label className="av-visually-hidden" htmlFor={`alt-${img.id}`}>{t("a.ph.alt", { n: i + 1 })}</label>
               <input id={`alt-${img.id}`} className="av-input" defaultValue={img.alt} onBlur={(e) => rename(i, e.target.value)} />
               <div className="av-row">
-                <Button size="sm" variant="ghost" disabled={i === 0 || !!busy} aria-label={`Move photo ${i + 1} earlier`} onClick={() => move(i, -1)}>←</Button>
-                <Button size="sm" variant="ghost" disabled={i === images.length - 1 || !!busy} aria-label={`Move photo ${i + 1} later`} onClick={() => move(i, 1)}>→</Button>
-                <Button size="sm" variant="ghost" disabled={!!busy} aria-label={`Remove photo ${i + 1}`} onClick={() => remove(i)}>Remove</Button>
+                <Button size="sm" variant="ghost" disabled={i === 0 || !!busy} aria-label={t("a.ph.earlier", { n: i + 1 })} onClick={() => move(i, -1)}>←</Button>
+                <Button size="sm" variant="ghost" disabled={i === images.length - 1 || !!busy} aria-label={t("a.ph.later", { n: i + 1 })} onClick={() => move(i, 1)}>→</Button>
+                <Button size="sm" variant="ghost" disabled={!!busy} aria-label={t("a.ph.removeN", { n: i + 1 })} onClick={() => remove(i)}>{t("a.remove")}</Button>
               </div>
             </li>
           ))}
@@ -86,9 +88,9 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
 
       {images.length < MAX && (
         <div className={`av-drop${over ? " av-drop--over" : ""}`} onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={drop}>
-          <p>Drop photos here, or</p>
-          <Button variant="secondary" loading={!!busy && busy.startsWith("Uploading")} onClick={() => input.current?.click()}>Choose photos</Button>
-          <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-label="Choose photos to upload"
+          <p>{t("a.ph.drop")}</p>
+          <Button variant="secondary" loading={!!busy && busy !== t("a.saving")} onClick={() => input.current?.click()}>{t("a.ph.choose")}</Button>
+          <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-label={t("a.ph.chooseAria")}
                  onChange={(e) => e.target.files && void upload([...e.target.files])} />
           {busy && <p className="av-small" role="status">{busy}</p>}
         </div>

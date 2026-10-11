@@ -8,6 +8,8 @@ interface AuthState {
   session: Session | null;
   isStaff: boolean;
   isAdmin: boolean;
+  /** The person who runs the system: accounts, the AI assistant and the audit log. Can also do everything an owner can. */
+  isSuperAdmin: boolean;
   signIn: (email: string, password: string) => Promise<Session>;
   signUp: (email: string, password: string) => Promise<Session>;
   signOut: () => void;
@@ -57,8 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthState>(() => ({
     session, signIn, signUp, signOut,
-    isStaff: session?.role === "STAFF" || session?.role === "ADMIN",
-    isAdmin: session?.role === "ADMIN",
+    isStaff: session?.role === "STAFF" || session?.role === "ADMIN" || session?.role === "SUPER_ADMIN",
+    isAdmin: session?.role === "ADMIN" || session?.role === "SUPER_ADMIN",
+    isSuperAdmin: session?.role === "SUPER_ADMIN",
   }), [session, signIn, signUp, signOut]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

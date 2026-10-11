@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { useT } from "../i18n/I18n";
 
 export const COLOR_PRESETS: Array<{ name: string; hex: string }> = [
   { name: "Black", hex: "#1F1D1A" }, { name: "White", hex: "#F6F3ED" }, { name: "Grey", hex: "#A3A7AB" },
@@ -13,17 +14,19 @@ interface Props { name: string; hex: string | null; onChange: (next: { name: str
  * Colour name plus a swatch. One click on a preset fills both; the colour wheel and the name stay editable for
  * anything else ("Sage", "Dusty blue"). The hex is what the shop draws as the swatch.
  */
-export function ColorField({ name, hex, onChange, label = "Colour" }: Props) {
+export function ColorField({ name, hex, onChange, label }: Props) {
   const id = useId();
+  const { t } = useT();
+  const what = label ?? t("a.color");
   return (
     <div className="av-colorfield">
       <div className="av-colorfield__row">
-        <input className="av-input" id={`${id}-name`} aria-label={`${label} name`} placeholder="e.g. Navy" value={name}
+        <input className="av-input" id={`${id}-name`} aria-label={t("a.color.name", { what })} placeholder={t("a.color.eg")} value={name}
                onChange={(e) => onChange({ name: e.target.value, hex })} />
-        <input className="av-colorfield__picker" type="color" aria-label={`${label} swatch`} value={hex ?? "#cccccc"}
+        <input className="av-colorfield__picker" type="color" aria-label={t("a.color.swatch", { what })} value={hex ?? "#cccccc"}
                onChange={(e) => onChange({ name, hex: e.target.value.toUpperCase() })} />
       </div>
-      <div className="av-colorfield__presets" role="group" aria-label="Common colours">
+      <div className="av-colorfield__presets" role="group" aria-label={t("a.color.common")}>
         {COLOR_PRESETS.map((p) => (
           <button key={p.hex} type="button" className="av-swatch" title={p.name} aria-label={p.name}
                   aria-pressed={hex?.toUpperCase() === p.hex} style={{ background: p.hex }}

@@ -4,6 +4,7 @@ import { negotiate } from "../api/endpoints";
 import { ApiError } from "../api/client";
 import type { NegotiateResponse } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
+import { useT } from "../i18n/I18n";
 import { Alert } from "./Alert";
 import { Button } from "./Button";
 import { ChatBubble, NegotiationOffer } from "./Negotiation";
@@ -18,30 +19,30 @@ interface Props {
   onAccept: (offer: NegotiateResponse, quantity: number) => void;
 }
 
-const SUGGESTIONS = ["Can I get a better price?", "I'll take 5 pairs, what can you do?", "Could you do 10% off?"];
-
 /**
- * The bargaining chat. Every message goes to the server, which returns an already validated offer. The browser never
- * works out a discount itself. Starting over (a different size or colour) clears the chat, because an offer is for
- * one exact item.
+ * The bargaining chat, in the customer's language. It is one conversation: each message carries the conversation's
+ * id, so the assistant remembers what was said and offered. Every answer comes from the server already validated; the
+ * browser never works out a discount itself. A different size or colour starts over, because an offer is for one item.
  */
 export function NegotiationChat({ sku, quantity, disabled, onAccept }: Props) {
   const { session } = useAuth();
+  const { t, lang } = useT();
   const location = useLocation();
   const [turns, setTurns] = useState<Turn[]>([]);
+  const [conversation, setConversation] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const end = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setTurns([]); setError(null); }, [sku]);
+  useEffect(() => { setTurns([]); setConversation(null); setError(null); }, [sku]);
   useEffect(() => { end.current?.scrollIntoView?.({ block: "nearest" }); }, [turns]);
 
   if (!session) {
     return (
-      <section className="av-chat" aria-label="Negotiate the price">
-        <h2 className="av-chat__title">Want a better price?</h2>
-        <p className="av-small"><Link to={`/login?next=${encodeURIComponent(location.pathname)}`}>Sign in</Link> to chat with our assistant about the price.</p>
+      <section className="av-chat" aria-label={t("chat.aria")}>
+        <h2 className="av-chat__title">{t("chat.title")}</h2>
+        <p className="av-small"><Link to={`/login?next=${encodeURIComponent(location.pathname)}`}>{t("chat.signIn")}</Link> {t("chat.signInLead")}</p>
       </section>
     );
   }
@@ -50,48 +51,50 @@ export function NegotiationChat({ sku, quantity, disabled, onAccept }: Props) {
     const clean = message.trim();
     if (!clean || busy) return;
     setBusy(true); setError(null); setText("");
-    setTurns((t) => [...t, { from: "customer", text: clean }]);
+    setTurns((list) => [...list, { from: "customer", text: clean }]);
     try {
-      const offer = await negotiate(sku, clean, quantity);
-      setTurns((t) => [...t, { from: "seller", text: offer.reply, offer, quantity }]);
+      const offer = await negotiate(sku, clean, quantity, conversation, lang);
+      setConversation(offer.sessionId);
+      setTurns((list) => [...list, { from: "seller", text: offer.reply, offer, quantity }]);
     } catch (e) {
-      setError(e instanceof ApiError && e.status === 429 ? e.message : "The assistant could not answer just now. Please try again.");
+      setError(e instanceof ApiError && e.status === 429 ? e.message : t("chat.failed"));
     } finally { setBusy(false); }
   }
   const submit = (e: FormEvent) => { e.preventDefault(); void send(text); };
-  const lastOffer = [...turns].reverse().find((t): t is Extract<Turn, { from: "seller" }> => t.from === "seller" && t.offer.validatedDiscountPct > 0);
+  const lastOffer = [...turns].reverse().find((x): x is Extract<Turn, { from: "seller" }> => x.from === "seller" && x.offer.validatedDiscountPct > 0);
+  const suggestions = [t("chat.s1"), t("chat.s2"), t("chat.s3")];
 
   return (
-    <section className="av-chat" aria-label="Negotiate the price">
-      <h2 className="av-chat__title">Want a better price?</h2>
-      <div className="av-chat__log" role="log" aria-live="polite" aria-label="Conversation">
-        {turns.length === 0 && <ChatBubble from="seller">Hello! Tell me how many pairs you need or what price you have in mind, and I will see what I can do.</ChatBubble>}
-        {turns.map((t, i) => t.from === "customer"
-          ? <ChatBubble key={i} from="customer">{t.text}</ChatBubble>
+    <section className="av-chat" aria-label={t("chat.aria")}>
+      <h2 className="av-chat__title">{t("chat.title")}</h2>
+      <div className="av-chat__log" role="log" aria-live="polite" aria-label={t("chat.log")}>
+        {turns.length === 0 && <ChatBubble from="seller">{t("chat.hello")}</ChatBubble>}
+        {turns.map((x, i) => x.from === "customer"
+          ? <ChatBubble key={i} from="customer">{x.text}</ChatBubble>
           : (
             <div key={i} className="av-chat__turn">
-              <ChatBubble from="seller">{t.text}</ChatBubble>
-              {t.offer.validatedDiscountPct > 0 && <NegotiationOffer listPrice={t.offer.listPrice} validatedDiscountPct={t.offer.validatedDiscountPct} offerPrice={t.offer.offerPrice} proposedDiscountPct={t.offer.proposedDiscountPct} />}
+              <ChatBubble from="seller">{x.text}</ChatBubble>
+              {x.offer.validatedDiscountPct > 0 && <NegotiationOffer listPrice={x.offer.listPrice} validatedDiscountPct={x.offer.validatedDiscountPct} offerPrice={x.offer.offerPrice} proposedDiscountPct={x.offer.proposedDiscountPct} />}
             </div>
           ))}
-        {busy && <ChatBubble from="seller"><span className="av-muted">Typing…</span></ChatBubble>}
+        {busy && <ChatBubble from="seller"><span className="av-muted">{t("chat.typing")}</span></ChatBubble>}
         <div ref={end} />
       </div>
       {error && <Alert tone="danger">{error}</Alert>}
       {turns.length === 0 && (
-        <div className="av-row" role="group" aria-label="Suggestions">
-          {SUGGESTIONS.map((s) => <button key={s} type="button" className="av-chip" disabled={disabled || busy} onClick={() => void send(s)}>{s}</button>)}
+        <div className="av-row" role="group" aria-label={t("chat.suggestions")}>
+          {suggestions.map((s) => <button key={s} type="button" className="av-chip" disabled={disabled || busy} onClick={() => void send(s)}>{s}</button>)}
         </div>
       )}
       <form className="av-chat__form" onSubmit={submit}>
-        <label className="av-visually-hidden" htmlFor="negotiate-message">Your message</label>
-        <input id="negotiate-message" className="av-input" value={text} maxLength={500} placeholder="Type your message" autoComplete="off"
+        <label className="av-visually-hidden" htmlFor="negotiate-message">{t("chat.message")}</label>
+        <input id="negotiate-message" className="av-input" value={text} maxLength={500} placeholder={t("chat.placeholder")} autoComplete="off"
                disabled={disabled || busy} onChange={(e) => setText(e.target.value)} />
-        <Button type="submit" variant="secondary" disabled={disabled || busy || !text.trim()}>Send</Button>
+        <Button type="submit" variant="secondary" disabled={disabled || busy || !text.trim()}>{t("chat.send")}</Button>
       </form>
       {lastOffer && (
         <Button block variant="accent" disabled={disabled} onClick={() => onAccept(lastOffer.offer, lastOffer.quantity)}>
-          Add {lastOffer.quantity === 1 ? "1 pair" : `${lastOffer.quantity} pairs`} at this price
+          {t("chat.accept", { pairs: t(lastOffer.quantity === 1 ? "chat.onePair" : "chat.nPairs", { n: lastOffer.quantity }) })}
         </Button>
       )}
     </section>

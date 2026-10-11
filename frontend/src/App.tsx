@@ -30,6 +30,10 @@ const AdminHandover = lazy(() => import("./admin/AdminHandover").then((m) => ({ 
 const AdminPricing = lazy(() => import("./admin/AdminPricing").then((m) => ({ default: m.AdminPricing })));
 const AdminShopInfo = lazy(() => import("./admin/AdminShopInfo").then((m) => ({ default: m.AdminShopInfo })));
 const AdminSizes = lazy(() => import("./admin/AdminSizes").then((m) => ({ default: m.AdminSizes })));
+const AdminAccounts = lazy(() => import("./admin/AdminAccounts").then((m) => ({ default: m.AdminAccounts })));
+const AdminAssistant = lazy(() => import("./admin/AdminAssistant").then((m) => ({ default: m.AdminAssistant })));
+const AdminAudit = lazy(() => import("./admin/AdminAudit").then((m) => ({ default: m.AdminAudit })));
+const AdminCustomers = lazy(() => import("./admin/AdminCustomers").then((m) => ({ default: m.AdminCustomers })));
 const ProductEditor = lazy(() => import("./admin/ProductEditor").then((m) => ({ default: m.ProductEditor })));
 const CheckoutPage = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.CheckoutPage })));
 const OrderDetailPage = lazy(() => import("./pages/OrderDetail").then((m) => ({ default: m.OrderDetailPage })));
@@ -79,6 +83,10 @@ export default function App() {
               <Route path="pricing" element={<AdminPricing />} />
               <Route path="shop" element={<AdminShopInfo />} />
               <Route path="sizes" element={<AdminSizes />} />
+              <Route path="customers" element={<AdminCustomers />} />
+              <Route path="accounts" element={<AdminAccounts />} />
+              <Route path="assistant" element={<AdminAssistant />} />
+              <Route path="audit" element={<AdminAudit />} />
             </Route>
           </Routes>
           </Suspense>

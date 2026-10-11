@@ -1,7 +1,7 @@
 /**
  * The AKVEN mark, drawn as vectors from the family's chosen design: a Roman A with a thin left leg and a wide right
  * leg that runs on into the V, a flag serif on the V, and a ribbon that rises from the A's foot, arches over the A
- * and falls into the V: Akyl and Venera, joined. A thin line along the ribbon keeps its folded look in one colour.
+ * and falls into the V: Akylbek and Venera, joined. A thin line along the ribbon keeps its folded look in one colour.
  * Where the ribbon passes over the A, a small gap shows which is in front.
  *
  * Plain TypeScript with no imports: the logo, icon and product image scripts run it under Node as well.

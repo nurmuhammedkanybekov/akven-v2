@@ -3,6 +3,8 @@
  * bodies into ApiError (so forms can show "name: must not be blank" next to the right field), and tells the
  * app when the session is no longer valid (401) so it can send the visitor to the login page.
  */
+import { translateNow } from "../i18n/I18n";
+
 export class ApiError extends Error {
   constructor(public status: number, message: string, public fieldErrors: Record<string, string> = {}) {
     super(message);
@@ -47,7 +49,7 @@ export async function api<T>(path: string, { method = "GET", body, form, signal,
     response = await fetch(path, { method, headers, body: payload, signal });
   } catch (e) {
     if ((e as Error).name === "AbortError") throw e;
-    throw new ApiError(0, "Cannot reach the server. Check your connection and try again.");
+    throw new ApiError(0, translateNow("err.offline"));
   }
 
   if (response.status === 401 && token) onUnauthorized();
@@ -68,9 +70,9 @@ function safeJson(text: string): unknown {
 }
 
 function messageFor(status: number): string {
-  if (status === 401) return "Please sign in.";
-  if (status === 403) return "You do not have permission to do that.";
-  if (status === 404) return "Not found.";
-  if (status === 429) return "Too many attempts. Please wait a few minutes and try again.";
-  return "Something went wrong. Please try again.";
+  if (status === 401) return translateNow("err.401");
+  if (status === 403) return translateNow("err.403");
+  if (status === 404) return translateNow("err.404");
+  if (status === 429) return translateNow("err.429");
+  return translateNow("err.other");
 }

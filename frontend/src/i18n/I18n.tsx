@@ -34,6 +34,10 @@ function initialLang(): Lang {
   return "en";
 }
 
+/** The language chosen on this device, for code outside React (the API client's own messages). */
+let activeLang: Lang = "en";
+export const translateNow: Translate = (key, vars) => translate(activeLang, key, vars);
+
 interface I18nValue { lang: Lang; setLang: (l: Lang) => void; t: Translate }
 
 // Without a provider (single-component tests) everything reads in English.
@@ -41,6 +45,7 @@ const I18nContext = createContext<I18nValue>({ lang: "en", setLang: () => {}, t:
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(initialLang);
+  activeLang = lang;
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
