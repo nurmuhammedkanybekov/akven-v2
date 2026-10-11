@@ -29,7 +29,8 @@ export function BoxBuilder({ minPairs, tiers }: { minPairs: number; tiers: Array
   const reached = [...steps].reverse().find((s) => pairs >= s.minPairs);
   const next = steps.find((s) => pairs < s.minPairs);
   const top = Math.max(steps.at(-1)?.minPairs ?? 0, minPairs, 10);
-  const scale = (n: number) => `${Math.min(100, (n / top) * 100)}%`;
+  // A square-root scale spreads the early steps (10, 20, 30) that families reach, and still fits 100 pairs.
+  const scale = (n: number) => `${(Math.sqrt(Math.min(1, n / top)) * 100).toFixed(1)}%`;
 
   const add = (i: number) => setPicks((p) => (p.length >= MAX ? p : [...p, i]));
 
@@ -66,7 +67,7 @@ export function BoxBuilder({ minPairs, tiers }: { minPairs: number; tiers: Array
                   </span>
                 ))}
               </div>
-              <div className="av-crate__front"><span>AK&amp;VEN</span></div>
+              <div className="av-crate__front"><span>AKVEN</span></div>
             </div>
 
             <div className="av-builder__sum" aria-live="polite">

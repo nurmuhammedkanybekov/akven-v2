@@ -9,6 +9,8 @@ import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
 import { QuantityStepper } from "../components/QuantityStepper";
 import { useT } from "../i18n/I18n";
+import { withMessage } from "../components/Contacts";
+import { useShopInfo } from "../shop/useShopInfo";
 import { formatPrice } from "../lib/format";
 import type { CollectionView } from "../api/types";
 
@@ -17,13 +19,16 @@ export function CartPage() {
   const cart = useCart();
   const { session } = useAuth();
   const { quote, loading, offline } = useQuote(cart.lines, session?.email ?? null);
+  const { t } = useT();
+  const info = useShopInfo();
+  const messengers = (info?.contacts ?? []).filter((c) => c.kind === "WHATSAPP" || c.kind === "TELEGRAM");
 
   if (cart.lines.length === 0) {
     return (
-      <div className="av-container av-page av-empty">
-        <h1>Your bag is empty</h1>
-        <p className="av-lead">Find a pair you like and it will wait for you here.</p>
-        <Button to="/shop">Browse the socks</Button>
+      <div className="av-container av-page av-empty av-empty--bag">
+        <h1>{t("cart.empty")}</h1>
+        <p className="av-lead">{t("cart.emptyS")}</p>
+        <div className="av-row"><Button to="/shop">{t("cart.browse")}</Button><Button to="/saved" variant="secondary">{t("nav.savedTitle")}</Button></div>
       </div>
     );
   }
@@ -31,30 +36,44 @@ export function CartPage() {
   const rows = cart.lines.map((line) => ({ line, q: quote?.lines.find((l) => l.sku === line.sku) }));
   const fallbackTotal = cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
   const total = quote ? quote.total : fallbackTotal;
+  // The bag written out, for customers who would rather order by message: nothing is sent until they press send.
+  const message = [t("cart.msgHello"), ...cart.lines.map((l) => `• ${l.productName} (${l.variantLabel}) × ${l.quantity}`), t("cart.msgTotal", { total: formatPrice(total) })].join("\n");
 
   return (
     <div className="av-container av-page">
-      <header className="av-page__head"><span className="av-eyebrow">Your bag</span><h1>Bag ({cart.count})</h1></header>
-      {offline && <Alert>You appear to be offline. Your bag is saved, and these are the prices from when you added each pair. Reconnect to check out.</Alert>}
+      <header className="av-page__head"><span className="av-eyebrow av-orn">{t("cart.eyebrow")}</span><h1>{t("cart.title", { n: cart.count })}</h1></header>
+      {offline && <Alert>{t("cart.offline")}</Alert>}
 
       <div className="av-cart">
         <ul className="av-cartlines">
           {rows.map(({ line, q }) => <CartRow key={line.sku} line={line} q={q} loading={loading && !q} />)}
         </ul>
 
-        <aside className="av-summary" aria-label="Order summary">
+        <aside className="av-summary" aria-label={t("cart.summaryLabel")}>
           {quote?.collection && <CollectionProgress c={quote.collection} />}
-          <h2>Summary</h2>
+          <h2>{t("cart.summary")}</h2>
           <dl className="av-totals">
-            <div><dt>Subtotal</dt><dd className="av-price">{formatPrice(total)}</dd></div>
-            <div><dt>Delivery</dt><dd className="av-small">Chosen at checkout</dd></div>
-            <div className="av-totals__grand"><dt>Total</dt><dd className="av-price av-price--lg">{formatPrice(total)}</dd></div>
+            <div><dt>{t("cart.subtotal")}</dt><dd className="av-price">{formatPrice(total)}</dd></div>
+            <div><dt>{t("cart.delivery")}</dt><dd className="av-small">{t("cart.deliveryS")}</dd></div>
+            <div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{formatPrice(total)}</dd></div>
           </dl>
-          {quote && !quote.canCheckout && !quote.collection?.minimumMessage && <Alert tone="danger">Some items need your attention before you can check out.</Alert>}
+          {quote && !quote.canCheckout && !quote.collection?.minimumMessage && <Alert tone="danger">{t("cart.attention")}</Alert>}
           {quote?.canCheckout && !offline
-            ? <Button to="/checkout" size="lg" block>Check out</Button>
-            : <Button size="lg" block disabled>Check out</Button>}
-          <Link to="/shop" className="av-small">Continue shopping</Link>
+            ? <Button to="/checkout" size="lg" block>{t("cart.checkout")}</Button>
+            : <Button size="lg" block disabled>{t("cart.checkout")}</Button>}
+          {messengers.length > 0 && (
+            <div className="av-summary__msg">
+              <span className="av-small">{t("cart.orMessage")}</span>
+              <div className="av-row">
+                {messengers.map((c) => (
+                  <Button key={c.id} href={withMessage(c, message)} variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
+                    {c.kind === "WHATSAPP" ? "WhatsApp" : "Telegram"}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+          <Link to="/shop" className="av-small">{t("cart.continue")}</Link>
         </aside>
       </div>
     </div>

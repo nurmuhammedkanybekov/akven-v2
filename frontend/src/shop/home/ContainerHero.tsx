@@ -51,7 +51,7 @@ export function ContainerHero({ minPairs }: { minPairs: number }) {
           <p className="av-hero2__lead">{minPairs > 1 ? t("hero.lead", { n: minPairs }) : t("hero.leadOne")}</p>
           <div className="av-row av-hero2__ctas">
             <Button to="/shop" variant="accent" size="lg" className="av-btn--shine">{t("hero.shop")}</Button>
-            <Button to="/visit" variant="secondary" size="lg" className="av-btn--onnavy">{t("hero.visit")}</Button>
+            <Button to="/#family" variant="secondary" size="lg" className="av-btn--onnavy">{t("hero.family")}</Button>
           </div>
           <dl className="av-hero2__facts">
             <div><dt>{t("hero.fact1")}</dt><dd>{t("hero.fact1v")}</dd></div>
@@ -61,8 +61,9 @@ export function ContainerHero({ minPairs }: { minPairs: number }) {
         </div>
 
         <div className="av-stage" aria-hidden="true" onPointerMove={onMove} onPointerLeave={() => { last.current = null; }}>
-          <div className="av-stage__sign"><Logo height={22} /><span>70-E</span></div>
+          <div className="av-stage__sign"><Logo height={24} /></div>
           <div className="av-box">
+            <span className="av-box__plate">70-E</span>
             <div className="av-box__inside">
               <div className="av-box__rail" />
               <div className="av-box__socks" ref={rail}>
@@ -75,8 +76,8 @@ export function ContainerHero({ minPairs }: { minPairs: number }) {
               </div>
               <div className="av-box__shelf" />
             </div>
-            <div className="av-box__door av-box__door--l"><span className="av-box__bars" /></div>
-            <div className="av-box__door av-box__door--r"><span className="av-box__bars" /><b>70-E</b></div>
+            <div className="av-box__door av-box__door--l"><span className="av-box__bars" /><Logo variant="mark" height="28%" className="av-box__emboss" /></div>
+            <div className="av-box__door av-box__door--r"><span className="av-box__bars" /><Logo variant="mark" height="28%" className="av-box__emboss" /></div>
           </div>
           <div className="av-stage__floor" />
         </div>

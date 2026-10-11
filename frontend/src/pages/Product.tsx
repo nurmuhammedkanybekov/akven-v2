@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MAX_PER_LINE, useCart } from "../cart/CartContext";
 import { QuantityStepper } from "../components/QuantityStepper";
 import { useToast } from "../components/Toast";
-import { getProduct } from "../api/endpoints";
+import { getProduct, listProducts } from "../api/endpoints";
 import { ApiError } from "../api/client";
 import type { ProductDetail, VariantView } from "../api/types";
 import { Skeleton } from "../components/Alert";
@@ -13,6 +13,10 @@ import { NegotiationChat } from "../components/NegotiationChat";
 import { Price } from "../components/Price";
 import { SizeFinder } from "../components/SizeFinder";
 import { ProductImage } from "../components/ProductImage";
+import { ProductCard } from "../components/ProductCard";
+import { HeartIcon, PinIcon, StackIcon, TruckIcon } from "../components/icons";
+import { useSaved } from "../shop/useSaved";
+import { rememberViewed, useViewed } from "../shop/useViewed";
 import { useAsync } from "../hooks/useAsync";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
@@ -37,6 +41,10 @@ function LoadError() {
 function ProductView({ product }: { product: ProductDetail }) {
   const { t } = useT();
   const pricing = usePricing();
+  const saved = useSaved();
+  const isSaved = saved.has(product.slug);
+  const minPrice = product.variants.length ? Math.min(...product.variants.map((v) => v.price)) : null;
+  useEffect(() => { rememberViewed({ slug: product.slug, name: product.name, image: product.images[0]?.url ?? null, price: minPrice }); }, [product.slug, product.name, product.images, minPrice]);
   const variants = product.variants;
   const [sku, setSku] = useState(() => (variants.find((v) => v.availableQty > 0) ?? variants[0])?.sku);
   const [imageIndex, setImageIndex] = useState(0);
@@ -90,7 +98,14 @@ function ProductView({ product }: { product: ProductDetail }) {
 
         <div className="av-pdp__info">
           <span className="av-eyebrow">{productMeta(product, t(`nav.${product.category.toLowerCase()}` as MessageKey))}</span>
-          <h1 className="av-pdp__title">{product.name}</h1>
+          <div className="av-pdp__titlerow">
+            <h1 className="av-pdp__title">{product.name}</h1>
+            <button type="button" className={`av-save av-save--inline${isSaved ? " is-on" : ""}`} aria-pressed={isSaved}
+              aria-label={t(isSaved ? "save.remove" : "save.add", { name: product.name })}
+              onClick={() => saved.toggle({ slug: product.slug, name: product.name, image: product.images[0]?.url ?? null, price: minPrice })}>
+              <HeartIcon />
+            </button>
+          </div>
           {current ? <Price amount={current.price} large /> : <Price amount={null} />}
           {steps.length > 0 && (
             <p className="av-pdp__ladder">
@@ -151,6 +166,11 @@ function ProductView({ product }: { product: ProductDetail }) {
             }}>{current && current.availableQty <= 0 ? t("pdp.soldOut") : t("pdp.add")}</Button>
             {cart.count > 0 && <p className="av-small"><Link to="/cart">{t("pdp.viewBag", { n: cart.count })}</Link></p>}
           </div>
+          <ul className="av-promises">
+            <li><PinIcon /><span>{t("pdp.p1")}</span></li>
+            <li><TruckIcon /><span>{t("pdp.p2")}</span></li>
+            <li><StackIcon /><span>{t("pdp.p3")}</span></li>
+          </ul>
 
           {current && current.availableQty > 0 && (
             <NegotiationChat sku={current.sku} quantity={Math.min(quantity, current.availableQty)} onAccept={(offer, offeredQty) => {
@@ -161,12 +181,64 @@ function ProductView({ product }: { product: ProductDetail }) {
             }} />
           )}
 
-          <dl className="av-specs">
-            {details.filter(([, v]) => v).map(([k, v]) => <div key={k}><dt className="av-eyebrow">{t(k)}</dt><dd>{v}</dd></div>)}
-          </dl>
+          <div className="av-accordion">
+            <details open>
+              <summary>{t("pdp.details")}</summary>
+              <dl className="av-specs">
+                {details.filter(([, v]) => v).map(([k, v]) => <div key={k}><dt className="av-eyebrow">{t(k)}</dt><dd>{v}</dd></div>)}
+              </dl>
+            </details>
+            <details>
+              <summary>{t("pdp.shipping")}</summary>
+              <p>{t("visit.pickup2")} {t("visit.pickup3")}</p>
+              <p>{t("visit.delivery")}</p>
+            </details>
+            <details>
+              <summary>{t("pdp.collections")}</summary>
+              <p>{t("box.lead")}</p>
+            </details>
+          </div>
         </div>
       </div>
+      <MoreLikeThis product={product} />
+      <RecentlyViewed current={product.slug} />
     </div>
+  );
+}
+
+/** More from the same shelf, so a family can fill the set without going back to the catalogue. */
+function MoreLikeThis({ product }: { product: ProductDetail }) {
+  const { t } = useT();
+  const more = useAsync((signal) => listProducts({ category: product.category, pageSize: 5, inStock: true }, signal), [product.category]);
+  const items = (more.data?.items ?? []).filter((p) => p.slug !== product.slug).slice(0, 4);
+  if (items.length === 0) return null;
+  return (
+    <section className="av-block" aria-labelledby="more-title">
+      <header className="av-block__head"><span className="av-eyebrow av-orn">{t("ladder.eyebrow")}</span><h2 id="more-title">{t("pdp.more")}</h2></header>
+      <div className="av-grid-products">{items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={((i + 3) % 6) + 1} />)}</div>
+    </section>
+  );
+}
+
+/** What this visitor looked at before, kept in this browser only. */
+function RecentlyViewed({ current }: { current: string }) {
+  const { t } = useT();
+  const items = useViewed().filter((v) => v.slug !== current).slice(0, 6);
+  if (items.length === 0) return null;
+  return (
+    <section className="av-block" aria-labelledby="recent-title">
+      <h2 id="recent-title" className="av-recent__title">{t("pdp.recent")}</h2>
+      <ul className="av-recent">
+        {items.map((v, i) => (
+          <li key={v.slug}>
+            <Link to={`/products/${v.slug}`}>
+              <span className="av-recent__img" style={{ background: `var(--tint-${(i % 6) + 1})` }}>{v.image && <img src={v.image} alt="" loading="lazy" width={160} height={200} />}</span>
+              <span className="av-recent__name">{v.name}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

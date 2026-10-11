@@ -7,12 +7,14 @@ import type { MessageKey } from "../i18n/en";
 import { BazaarCalculator } from "../shop/home/BazaarCalculator";
 import { BoxBuilder } from "../shop/home/BoxBuilder";
 import { ContainerHero } from "../shop/home/ContainerHero";
+import { FamilyPlanner } from "../shop/home/FamilyPlanner";
 import { GiftCalendar } from "../shop/home/GiftCalendar";
 import { HeightRuler } from "../shop/home/HeightRuler";
 import { Marquee } from "../shop/home/Marquee";
+import { Paths } from "../shop/home/Paths";
 import { RouteMap } from "../shop/home/RouteMap";
 import { Shelf } from "../shop/home/Shelf";
-import { usePricing, useShopInfo } from "../shop/useShopInfo";
+import { usePricing } from "../shop/useShopInfo";
 
 /** A family's worth of socks, for the story until the family's own photo replaces it. */
 const FAMILY: SockSpec[] = [
@@ -24,24 +26,25 @@ const FAMILY: SockSpec[] = [
 ];
 
 /**
- * The home page, built around the family's real stall: container 70-E at Dordoi. Each section shows one thing the
- * shop does differently: a fitting for sock heights, a box that shows the collection price, the bazaar calculator
- * for "ask for your price", the gift calendar, and the way to the stall.
+ * The home page. The online shop is the counter of container 70-E without the trip, for three kinds of customers:
+ * families (a set for everyone, picked up in minutes or delivered), shops (by the case) and companies (gift boxes).
+ * Each section helps one of them: the family planner, the collection box, the fitting for sock heights, the bazaar
+ * calculator for "ask for your price", the gift calendar, and the way to the stall with every contact.
  */
 export function HomePage() {
   const { t } = useT();
   const pricing = usePricing();
-  const info = useShopInfo();
   const min = pricing?.minOrderPairs ?? 1;
-  const writeTo = info?.contacts.filter((c) => c.kind === "TELEGRAM" || c.kind === "WHATSAPP" || c.kind === "INSTAGRAM") ?? [];
 
   return (
     <>
       <ContainerHero minPairs={min} />
       <Marquee />
+      <Paths />
       <Shelf />
-      <HeightRuler />
+      <FamilyPlanner minPairs={min} tiers={pricing?.tiers ?? []} />
       <BoxBuilder minPairs={min} tiers={pricing?.tiers ?? []} />
+      <HeightRuler />
       <BazaarCalculator />
       <GiftCalendar />
 
@@ -84,7 +87,7 @@ export function HomePage() {
             <h2 id="story-title">{t("story.title")}</h2>
             <p className="av-lead">{t("story.lead")}</p>
             <dl className="av-facts av-facts--light">
-              <div><dt>{t("story.started")}</dt><dd className="av-placeholder">{t("story.startedV")}</dd></div>
+              <div><dt>{t("story.started")}</dt><dd>{t("story.startedV")}</dd></div>
               <div><dt>{t("story.made")}</dt><dd>{t("story.madeV")}</dd></div>
               <div><dt>{t("story.sold")}</dt><dd>{t("story.soldV")}</dd></div>
               <div><dt>{t("story.run")}</dt><dd>{t("story.runV")}</dd></div>
@@ -96,22 +99,6 @@ export function HomePage() {
 
       <RouteMap />
 
-      {/* ---- wholesale ---- */}
-      <section id="wholesale" className="av-block" aria-labelledby="whole-title" data-reveal>
-        <div className="av-container av-whole">
-          <div className="av-stack">
-            <span className="av-eyebrow av-orn">{t("whole.eyebrow")}</span>
-            <h2 id="whole-title">{t("whole.title")}</h2>
-            <p className="av-lead">{t("whole.lead")}</p>
-          </div>
-          <div className="av-whole__actions">
-            <Button to="/wholesale" size="lg">{t("whole.cta")}</Button>
-            {writeTo.map((c) => (
-              <Button key={c.id} href={c.url} variant="secondary" target="_blank" rel="noopener noreferrer">{c.label ?? c.kind}</Button>
-            ))}
-          </div>
-        </div>
-      </section>
     </>
   );
 }

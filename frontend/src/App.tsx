@@ -13,6 +13,7 @@ import { LoginPage } from "./pages/Login";
 import { NotFoundPage } from "./pages/NotFound";
 import { ProductPage } from "./pages/Product";
 import { RegisterPage } from "./pages/Register";
+import { SavedPage } from "./pages/Saved";
 import { SizesPage } from "./pages/Sizes";
 import { VisitPage } from "./pages/Visit";
 import { WholesalePage } from "./pages/Wholesale";
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="cart" element={<CartPage />} />
+              <Route path="saved" element={<SavedPage />} />
               <Route path="checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
               <Route path="orders" element={<RequireAuth><OrdersPage /></RequireAuth>} />
               <Route path="orders/:id" element={<RequireAuth><OrderDetailPage /></RequireAuth>} />

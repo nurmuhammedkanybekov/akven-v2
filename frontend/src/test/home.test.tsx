@@ -1,10 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { sockBounds, sockMarkup, sockTop, type SockCut } from "../brand/sockDrawing";
 import { I18nProvider } from "../i18n/I18n";
+import { withMessage } from "../components/Contacts";
 import { BoxBuilder } from "../shop/home/BoxBuilder";
+import { sockSizeFor } from "../shop/home/FamilyPlanner";
+import { resetSavedCache, useSaved } from "../shop/useSaved";
 import { upcomingHolidays } from "../shop/home/GiftCalendar";
 import { HeightRuler } from "../shop/home/HeightRuler";
 
@@ -70,5 +73,47 @@ describe("shop by height", () => {
     expect(screen.getByRole("radio", { name: "Knee-high" })).toBeChecked();
     expect(screen.getByText(/Up to the knee/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Shop knee-high socks" })).toHaveAttribute("href", "/shop?cut=knee-high");
+  });
+});
+
+describe("the family planner", () => {
+  const rows = [
+    { id: "k", label: "Kids", footCm: { min: 15, max: 21 }, krMm: { min: 150, max: 210 }, local: { min: 24, max: 33 }, eu: { min: 25, max: 34 }, us: "" },
+    { id: "w", label: "Women", footCm: { min: 22.5, max: 26 }, krMm: { min: 225, max: 260 }, local: { min: 35, max: 41 }, eu: { min: 36, max: 41 }, us: "" },
+    { id: "m", label: "Men", footCm: { min: 26, max: 29 }, krMm: { min: 260, max: 290 }, local: { min: 41, max: 45 }, eu: { min: 41, max: 46 }, us: "" },
+  ];
+  it("reads the sock size from the shop's chart, and gives a shared size by role", () => {
+    expect(sockSizeFor(rows, 30, "son")?.label).toBe("Kids");
+    expect(sockSizeFor(rows, 41, "dad")?.label).toBe("Men");
+    expect(sockSizeFor(rows, 41, "mom")?.label).toBe("Women");
+    expect(sockSizeFor(rows, 50, "dad")).toBeUndefined();
+  });
+});
+
+describe("ordering by message", () => {
+  const base = { id: "1", label: null, position: 0, active: true };
+  it("writes the message into WhatsApp, Telegram and email links, and leaves the others alone", () => {
+    expect(withMessage({ ...base, kind: "WHATSAPP", value: "+996700123456", url: "https://wa.me/996700123456" }, "Hi & bye"))
+      .toBe("https://wa.me/996700123456?text=Hi%20%26%20bye");
+    expect(withMessage({ ...base, kind: "TELEGRAM", value: "nurmss4", url: "https://t.me/nurmss4" }, "a\nb")).toBe("https://t.me/nurmss4?text=a%0Ab");
+    expect(withMessage({ ...base, kind: "EMAIL", value: "a@b.kg", url: "mailto:a@b.kg" }, "x")).toBe("mailto:a@b.kg?body=x");
+    expect(withMessage({ ...base, kind: "INSTAGRAM", value: "akven.socks", url: "https://instagram.com/akven.socks" }, "x")).toBe("https://instagram.com/akven.socks");
+  });
+});
+
+describe("saved socks", () => {
+  it("toggle in and out, and survive a reload from storage", () => {
+    localStorage.removeItem("akven-saved");
+    resetSavedCache();
+    function Probe() {
+      const s = useSaved();
+      return <button onClick={() => s.toggle({ slug: "argyle-crew", name: "Argyle Crew", image: null, price: 7.5 })}>{s.items.length}</button>;
+    }
+    render(<Probe />);
+    fireEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("button")).toHaveTextContent("1");
+    expect(JSON.parse(localStorage.getItem("akven-saved")!)[0].slug).toBe("argyle-crew");
+    fireEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("button")).toHaveTextContent("0");
   });
 });

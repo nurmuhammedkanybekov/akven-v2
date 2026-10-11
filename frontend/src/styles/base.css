@@ -11,21 +11,24 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-variant-numeric: lining-nums;
 }
 img, svg { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; color: inherit; }
 a { color: inherit; }
 h1, h2, h3, h4, p { margin: 0; }
 
+/* Headings in Cormorant Garamond; emphasis turns to its italic, in gold. */
 h1, h2, h3, .av-display {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.06;
+  letter-spacing: -0.012em;
+  line-height: 1.02;
   text-wrap: balance;
+  font-variant-numeric: lining-nums;
 }
-.av-display { font-size: var(--text-display); line-height: 1.02; letter-spacing: -0.035em; }
-.av-display em, h1 em, h2 em { font-style: normal; color: var(--accent-ink); }
+.av-display { font-size: var(--text-display); line-height: 0.96; letter-spacing: -0.02em; }
+.av-display em, h1 em, h2 em { font-style: italic; font-weight: 500; color: var(--accent-ink); }
 h1 { font-size: var(--text-h1); }
 h2 { font-size: var(--text-h2); }
 h3 { font-size: var(--text-h3); line-height: 1.15; }
@@ -36,9 +39,9 @@ h3 { font-size: var(--text-h3); line-height: 1.15; }
 /* Small spaced label in gold: section eyebrows. */
 .av-eyebrow {
   font-family: var(--font-sans);
-  font-size: var(--text-micro);
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--accent-ink);
 }

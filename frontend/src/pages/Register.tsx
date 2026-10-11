@@ -4,9 +4,12 @@ import { ApiError } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
+import { AuthShell } from "../components/AuthShell";
 import { Input } from "../components/Field";
+import { useT } from "../i18n/I18n";
 
 export function RegisterPage() {
+  const { t } = useT();
   const { session, signUp } = useAuth();
   const navigate = useNavigate();
   const next = new URLSearchParams(useLocation().search).get("next");
@@ -22,26 +25,24 @@ export function RegisterPage() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError(null); setFieldErrors({});
-    if (password.length < 8) { setFieldErrors({ password: "Use at least 8 characters." }); return; }
+    if (password.length < 8) { setFieldErrors({ password: t("auth.short") }); return; }
     setBusy(true);
     try { await signUp(email.trim(), password); navigate(safeNext, { replace: true }); }
     catch (err) {
-      if (err instanceof ApiError && err.status === 409) setError("There is already an account with that email. Try signing in instead.");
+      if (err instanceof ApiError && err.status === 409) setError(t("auth.exists"));
       else { setError((err as Error).message); if (err instanceof ApiError) setFieldErrors(err.fieldErrors); }
     } finally { setBusy(false); }
   }
 
   return (
-    <div className="av-container av-page av-narrow">
-      <header className="av-page__head"><span className="av-eyebrow">New here</span><h1>Create an account</h1>
-        <p className="av-small">You need one to check out, so you can see your orders later.</p></header>
+    <AuthShell eyebrow={t("auth.newHere")} title={t("auth.create")} lead={t("auth.why")}>
       <form className="av-stack" onSubmit={submit} noValidate>
         {error && <Alert tone="danger">{error}</Alert>}
-        <Input label="Email" type="email" autoComplete="email" value={email} error={fieldErrors.email} onChange={(e) => setEmail(e.target.value)} required />
-        <Input label="Password" type="password" autoComplete="new-password" value={password} error={fieldErrors.password} hint="At least 8 characters." onChange={(e) => setPassword(e.target.value)} required />
-        <Button type="submit" size="lg" loading={busy} disabled={!email || !password}>Create account</Button>
-        <p className="av-small">Already have an account? <Link to={`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`}>Sign in</Link></p>
+        <Input label={t("auth.email")} type="email" autoComplete="email" value={email} error={fieldErrors.email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input label={t("auth.password")} type="password" autoComplete="new-password" value={password} error={fieldErrors.password} hint={t("auth.hint")} onChange={(e) => setPassword(e.target.value)} required />
+        <Button type="submit" size="lg" block loading={busy} disabled={!email || !password}>{t("auth.createBtn")}</Button>
+        <p className="av-auth__switch">{t("auth.have")} <Link to={`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`}>{t("auth.signin")}</Link></p>
       </form>
-    </div>
+    </AuthShell>
   );
 }

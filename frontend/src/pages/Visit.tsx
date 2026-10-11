@@ -1,6 +1,7 @@
 import { useT } from "../i18n/I18n";
 import { Button } from "../components/Button";
 import { PinIcon, StoreIcon, TruckIcon } from "../components/icons";
+import { RouteMap } from "../shop/home/RouteMap";
 import { useShopInfo } from "../shop/useShopInfo";
 
 /**
@@ -17,7 +18,7 @@ export function VisitPage() {
     <div className="av-page">
       <section className="av-container av-visit">
         <header className="av-stack">
-          <span className="av-eyebrow">{t("visit.eyebrow")}</span>
+          <span className="av-eyebrow av-orn">{t("visit.eyebrow")}</span>
           <h1>{t("visit.title")}</h1>
           <p className="av-lead">{t("visit.lead")}</p>
         </header>
@@ -51,6 +52,8 @@ export function VisitPage() {
         </div>
       </section>
 
+      <RouteMap />
+
       <section id="pickup" className="av-container av-block av-visit__grid">
         <div className="av-stack">
           <span className="av-eyebrow">{t("visit.pickupTitle")}</span>
@@ -66,23 +69,6 @@ export function VisitPage() {
         </div>
       </section>
 
-      <section id="contact" className="av-container av-block">
-        <div className="av-stack">
-          <span className="av-eyebrow">{t("visit.contactTitle")}</span>
-          <h2>{t("visit.contactLead")}</h2>
-          {info && info.contacts.length === 0 && <p className="av-small">{t("visit.noContacts")}</p>}
-          <ul className="av-contacts">
-            {info?.contacts.map((c) => (
-              <li key={c.id}>
-                <a href={c.url} target={c.url.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
-                  <span className="av-eyebrow">{c.label ?? c.kind}</span>
-                  <strong>{c.kind === "INSTAGRAM" || c.kind === "TELEGRAM" ? `@${c.value}` : c.value}</strong>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
     </div>
   );
 }

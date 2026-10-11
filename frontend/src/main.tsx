@@ -1,13 +1,29 @@
+// Onest for text, with Cyrillic and Cyrillic Extended (the Kyrgyz letters ң, ө, ү live in the extended set).
 import "@fontsource/onest/latin-300.css";
 import "@fontsource/onest/cyrillic-300.css";
+import "@fontsource/onest/cyrillic-ext-300.css";
 import "@fontsource/onest/latin-400.css";
 import "@fontsource/onest/cyrillic-400.css";
+import "@fontsource/onest/cyrillic-ext-400.css";
 import "@fontsource/onest/latin-500.css";
 import "@fontsource/onest/cyrillic-500.css";
+import "@fontsource/onest/cyrillic-ext-500.css";
 import "@fontsource/onest/latin-600.css";
 import "@fontsource/onest/cyrillic-600.css";
+import "@fontsource/onest/cyrillic-ext-600.css";
 import "@fontsource/onest/latin-700.css";
 import "@fontsource/onest/cyrillic-700.css";
+import "@fontsource/onest/cyrillic-ext-700.css";
+// Cormorant Garamond for headings: a refined serif with the same three alphabets.
+import "@fontsource/cormorant-garamond/latin-500.css";
+import "@fontsource/cormorant-garamond/cyrillic-500.css";
+import "@fontsource/cormorant-garamond/cyrillic-ext-500.css";
+import "@fontsource/cormorant-garamond/latin-600.css";
+import "@fontsource/cormorant-garamond/cyrillic-600.css";
+import "@fontsource/cormorant-garamond/cyrillic-ext-600.css";
+import "@fontsource/cormorant-garamond/latin-500-italic.css";
+import "@fontsource/cormorant-garamond/cyrillic-500-italic.css";
+import "@fontsource/cormorant-garamond/cyrillic-ext-500-italic.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/components.css";
