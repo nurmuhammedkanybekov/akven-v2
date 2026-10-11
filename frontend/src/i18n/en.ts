@@ -35,7 +35,7 @@ const shop = {
   "foot.pickup": "Pickup and delivery",
   "foot.wholesale": "Wholesale",
   "foot.follow": "Find us",
-  "foot.legal": "Prices in US dollars. Discounts and sizes in this demo are examples.",
+  "foot.legal": "Prices are set in US dollars and shown in som at the shop's rate. Discounts and sizes in this demo are examples.",
   "visit.passage": "passage",
   "visit.container": "container",
 

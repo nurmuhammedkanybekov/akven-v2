@@ -12,7 +12,7 @@ import { Input, Textarea } from "../components/Field";
 import { WalletSheet } from "../components/WalletSheet";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
-import { formatPrice } from "../lib/format";
+import { useMoney } from "../shop/useMoney";
 import { newId } from "../lib/ids";
 import { newWalletToken } from "../lib/wallet";
 
@@ -21,6 +21,7 @@ import { newWalletToken } from "../lib/wallet";
  * buttons. Each attempt carries a fresh Idempotency-Key, so a double click or a retry can never pay twice.
  */
 export function CheckoutPage() {
+  const { money, shown, usd } = useMoney();
   const cart = useCart();
   const { session } = useAuth();
   const navigate = useNavigate();
@@ -129,12 +130,13 @@ export function CheckoutPage() {
               {(quote?.lines ?? []).map((l) => (
                 <li key={l.sku}>
                   <span>{l.quantity} × {l.productName}<br /><span className="av-small av-muted">{l.variantLabel}{l.discountPct ? ` · ${l.discountPct}% off` : ""}</span></span>
-                  <span className="av-price">{l.lineTotal != null ? formatPrice(l.lineTotal) : "–"}</span>
+                  <span className="av-price">{l.lineTotal != null ? money(l.lineTotal) : "–"}</span>
                 </li>
               ))}
             </ul>
           )}
-          <dl className="av-totals"><div className="av-totals__grand"><dt>Total</dt><dd className="av-price av-price--lg">{formatPrice(total)}</dd></div></dl>
+          <dl className="av-totals"><div className="av-totals__grand"><dt>Total</dt><dd className="av-price av-price--lg">{money(total)}</dd></div></dl>
+          {shown === "KGS" && <p className="av-small av-muted">{t("price.chargedUsd", { usd: usd(total) })}</p>}
         </aside>
       </div>
 

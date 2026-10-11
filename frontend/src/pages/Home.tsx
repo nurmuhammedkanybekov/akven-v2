@@ -13,6 +13,8 @@ import { HeightRuler } from "../shop/home/HeightRuler";
 import { Marquee } from "../shop/home/Marquee";
 import { Paths } from "../shop/home/Paths";
 import { RouteMap } from "../shop/home/RouteMap";
+import { CategoryTiles } from "../shop/home/CategoryTiles";
+import { HowItWorks } from "../shop/home/HowItWorks";
 import { Shelf } from "../shop/home/Shelf";
 import { usePricing } from "../shop/useShopInfo";
 
@@ -41,12 +43,14 @@ export function HomePage() {
       <ContainerHero minPairs={min} />
       <Marquee />
       <Paths />
+      <CategoryTiles />
       <Shelf />
       <FamilyPlanner minPairs={min} tiers={pricing?.tiers ?? []} />
       <BoxBuilder minPairs={min} tiers={pricing?.tiers ?? []} />
       <HeightRuler />
       <BazaarCalculator />
       <GiftCalendar />
+      <HowItWorks />
 
       {/* ---- quality: the certificate ---- */}
       <section className="av-block" aria-labelledby="quality-title" data-reveal>

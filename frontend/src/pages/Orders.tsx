@@ -5,9 +5,11 @@ import { Alert, Skeleton } from "../components/Alert";
 import { Button } from "../components/Button";
 import { OrderStatusBadge } from "../components/OrderStatusBadge";
 import { useAsync } from "../hooks/useAsync";
-import { formatDateTime, formatPrice } from "../lib/format";
+import { formatDateTime } from "../lib/format";
+import { useMoney } from "../shop/useMoney";
 
 export function OrdersPage() {
+  const { money } = useMoney();
   const { session, signOut } = useAuth();
   const orders = useAsync(() => listMyOrders(), []);
   return (
@@ -29,7 +31,7 @@ export function OrdersPage() {
                 <div><strong>{o.reference}</strong><br /><span className="av-small av-muted">{formatDateTime(o.createdAt)}</span></div>
                 <div className="av-small">{o.items.map((i) => `${i.quantity} × ${i.productName}`).join(", ")}</div>
                 <OrderStatusBadge status={o.status} />
-                <span className="av-price">{formatPrice(o.total)}</span>
+                <span className="av-price">{money(o.total)}</span>
               </Link>
             </li>
           ))}

@@ -230,6 +230,9 @@ jobs:
           curl -fsS http://localhost:8081/ | grep -q '<div id="root">'
           curl -fsS http://localhost:8081/products/does-not-exist | grep -q '<div id="root">'   # a deep link still gets the app
           curl -fsS http://localhost:8081/actuator/health 2>/dev/null | grep -q UP || true
+          # Sign in the way a browser does (it sends its own Origin on a POST): this must be same-origin through the proxy.
+          curl -fsS -X POST http://localhost:8081/api/auth/login -H 'Origin: http://localhost:8081' \
+            -H 'Content-Type: application/json' -d '{"email":"admin@akven.test","password":"changeme-admin"}' | grep -q '"token"'
       - name: Show the logs on failure
         if: failure()
         run: docker compose logs

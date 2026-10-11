@@ -8,6 +8,7 @@ import { Input } from "../components/Field";
 import { useToast } from "../components/Toast";
 import { OwnersOnly } from "./OwnersOnly";
 import { useT } from "../i18n/I18n";
+import { toSom } from "../shop/useMoney";
 
 /** The owners' price rules: the minimum order, trusted customers, the "only N left" point, and the price ladder. */
 export function AdminPricing() {
@@ -25,7 +26,7 @@ function PolicyForm() {
   const toast = useToast();
   const { t } = useT();
   const [policy, setPolicy] = useState<PricingPolicy | null>(null);
-  const [form, setForm] = useState<Record<keyof PricingPolicy, string>>({ minOrderPairs: "", trustedMinOrderPairs: "", trustedAfterOrders: "", fewLeftThreshold: "" });
+  const [form, setForm] = useState<Record<keyof PricingPolicy, string>>({ minOrderPairs: "", trustedMinOrderPairs: "", trustedAfterOrders: "", fewLeftThreshold: "", somPerUsd: "", somRounding: "10" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -40,6 +41,7 @@ function PolicyForm() {
       const saved = await adminUpdatePolicy({
         minOrderPairs: Number(form.minOrderPairs), trustedMinOrderPairs: Number(form.trustedMinOrderPairs),
         trustedAfterOrders: Number(form.trustedAfterOrders), fewLeftThreshold: Number(form.fewLeftThreshold),
+        somPerUsd: Number(form.somPerUsd), somRounding: Number(form.somRounding),
       });
       setPolicy(saved); setForm(toForm(saved)); toast(t("a.pr.rulesSaved"));
     } catch (err) { setError(err instanceof ApiError ? err.message : t("a.err.save")); } finally { setBusy(false); }
@@ -57,6 +59,19 @@ function PolicyForm() {
         <Input label={t("a.pr.trustedAfter")} type="number" min={1} value={form.trustedAfterOrders} onChange={set("trustedAfterOrders")} hint={t("a.pr.trustedAfterHint")} />
         <Input label={t("a.pr.fewLeft")} type="number" min={0} value={form.fewLeftThreshold} onChange={set("fewLeftThreshold")} hint={t("a.pr.fewLeftHint")} />
       </div>
+      <h3>{t("a.pr.som")}</h3>
+      <p className="av-small">{t("a.pr.somLead")}</p>
+      <div className="av-formgrid av-formgrid--4">
+        <Input label={t("a.pr.somRate")} type="number" min={0.01} step="0.01" value={form.somPerUsd} onChange={set("somPerUsd")} hint={t("a.pr.somRateHint")} />
+        <label className="av-field">
+          <span className="av-label">{t("a.pr.somRound")}</span>
+          <select className="av-select" value={form.somRounding} onChange={(e) => setForm({ ...form, somRounding: e.target.value })}>
+            {["1", "5", "10", "50", "100"].map((n) => <option key={n} value={n}>{t("a.pr.somRoundTo", { n })}</option>)}
+          </select>
+        </label>
+        <div className="av-field"><span className="av-label">{t("a.pr.somExample")}</span>
+          <strong className="av-num">$7.50 = {Number(form.somPerUsd) > 0 ? toSom(7.5, Number(form.somPerUsd), Number(form.somRounding)) : "—"} {t("cur.somShort").toLowerCase()}</strong></div>
+      </div>
       <div className="av-row"><Button type="submit" loading={busy}>{t("a.pr.saveRules")}</Button></div>
     </form>
   );
@@ -65,6 +80,7 @@ function PolicyForm() {
 const toForm = (p: PricingPolicy) => ({
   minOrderPairs: String(p.minOrderPairs), trustedMinOrderPairs: String(p.trustedMinOrderPairs),
   trustedAfterOrders: String(p.trustedAfterOrders), fewLeftThreshold: String(p.fewLeftThreshold),
+  somPerUsd: String(Number(p.somPerUsd)), somRounding: String(p.somRounding),
 });
 
 function Ladder() {

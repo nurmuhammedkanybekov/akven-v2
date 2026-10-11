@@ -5,6 +5,7 @@ import { ApiError } from "../api/client";
 import type { NegotiateResponse } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { useT } from "../i18n/I18n";
+import { useMoney } from "../shop/useMoney";
 import { Alert } from "./Alert";
 import { Button } from "./Button";
 import { ChatBubble, NegotiationOffer } from "./Negotiation";
@@ -27,6 +28,7 @@ interface Props {
 export function NegotiationChat({ sku, quantity, disabled, onAccept }: Props) {
   const { session } = useAuth();
   const { t, lang } = useT();
+  const { shown } = useMoney();
   const location = useLocation();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [conversation, setConversation] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export function NegotiationChat({ sku, quantity, disabled, onAccept }: Props) {
     setBusy(true); setError(null); setText("");
     setTurns((list) => [...list, { from: "customer", text: clean }]);
     try {
-      const offer = await negotiate(sku, clean, quantity, conversation, lang);
+      const offer = await negotiate(sku, clean, quantity, conversation, lang, shown);
       setConversation(offer.sessionId);
       setTurns((list) => [...list, { from: "seller", text: offer.reply, offer, quantity }]);
     } catch (e) {

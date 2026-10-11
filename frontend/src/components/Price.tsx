@@ -1,4 +1,5 @@
-import { formatPrice } from "../lib/format";
+import { useT } from "../i18n/I18n";
+import { useMoney } from "../shop/useMoney";
 
 interface PriceProps {
   amount: number | null;
@@ -9,16 +10,19 @@ interface PriceProps {
   large?: boolean;
 }
 
+/** A price in the visitor's currency (dollars or som, see useMoney). */
 export function Price({ amount, from, was, large }: PriceProps) {
-  if (amount === null) return <span className="av-price av-muted">Unavailable</span>;
+  const { t } = useT();
+  const { money } = useMoney();
+  if (amount === null) return <span className="av-price av-muted">{t("price.unavailable")}</span>;
   return (
     <span className={`av-price${large ? " av-price--lg" : ""}`}>
-      {from && <span className="av-price__from">From</span>}
-      {formatPrice(amount)}
+      {from && <span className="av-price__from">{t("price.from")}</span>}
+      {money(amount)}
       {was !== undefined && (
         <>
-          <s className="av-price__was" aria-hidden="true">{formatPrice(was)}</s>
-          <span className="av-visually-hidden"> (was {formatPrice(was)})</span>
+          <s className="av-price__was" aria-hidden="true">{money(was)}</s>
+          <span className="av-visually-hidden"> ({t("price.was", { price: money(was) })})</span>
         </>
       )}
     </span>

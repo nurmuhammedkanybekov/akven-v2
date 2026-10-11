@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { discountedPrice, formatPrice } from "../lib/format";
+import { discountedPrice } from "../lib/format";
+import { useMoney } from "../shop/useMoney";
 import { useT } from "../i18n/I18n";
 import { Badge } from "./Badge";
 import { CheckIcon } from "./icons";
@@ -30,13 +31,14 @@ interface OfferProps {
  */
 export function NegotiationOffer({ listPrice, validatedDiscountPct, proposedDiscountPct, offerPrice }: OfferProps) {
   const { t } = useT();
+  const { money } = useMoney();
   const offer = offerPrice ?? discountedPrice(listPrice, validatedDiscountPct);
   const clamped = proposedDiscountPct !== undefined && proposedDiscountPct > validatedDiscountPct;
   return (
     <div className="av-offer" aria-label={t("chat.offer")}>
       <div className="av-offer__row">
-        <span className="av-offer__now">{formatPrice(offer)}</span>
-        <span className="av-offer__was">{formatPrice(listPrice)}</span>
+        <span className="av-offer__now">{money(offer)}</span>
+        <span className="av-offer__was">{money(listPrice)}</span>
         <Badge tone="success">−{validatedDiscountPct}%</Badge>
       </div>
       {proposedDiscountPct !== undefined && (

@@ -78,7 +78,8 @@ super admin can repeat that run at any time.
 
 **For customers**
 
-- **English, Russian and Kyrgyz**, light and dark, on phone, tablet and laptop. The site can be installed as an app
+- **English, Russian and Kyrgyz**, prices in **US dollars or Kyrgyz som** (at the rate the owners set), light and
+  dark, on phone, tablet and laptop. The site can be installed as an app
   (PWA), and the bag works offline.
 - **Collections:** a minimum order and a price ladder counted in pairs across the whole bag, with "add 4 more pairs
   to save 5%" hints in the bag.
@@ -92,6 +93,9 @@ super admin can repeat that run at any time.
 - **Pickup at Dordoi** with a six-digit pickup code, or delivery to four countries.
 - **Wholesale and company gifts:** packs, cases, gift boxes for 23 February, 8 March, Nooruz and New Year, and a
   request form that opens in WhatsApp, Telegram or email, already written.
+- **Quick view** on every sock card: choose colour and size and add to the bag without leaving the shelf.
+- **Find us:** whether the stall is open right now (Bishkek time), the week's hours, the address step by step, and
+  links to Google Maps and 2GIS.
 - Saved socks, recently viewed, "complete the set", and checkout with a simulated Apple Pay or Google Pay wallet.
 
 **For the shop team (the admin, in English, Russian and Kyrgyz)**
@@ -100,7 +104,8 @@ super admin can repeat that run at any time.
 - Orders, and a hand-over screen for the stall (pickup code plus the end of the customer's phone number).
 - A dashboard: offers per day, how often the limit stepped in, offers that became orders, best sellers.
 - The rule-based against AI comparison, for the evaluation chapter.
-- Owners only: the minimum order, the price ladder, trusted customers, contacts, the stall and the size chart.
+- Owners only: the minimum order, the price ladder, the som rate, trusted customers, contacts, the stall and its
+  opening hours, and the size chart.
 - Super admin only: the team's accounts (add, disable, new password), which assistant answers the chat (the AI or the
   rules), a test box and the live comparison, and the full audit log.
 
@@ -118,7 +123,7 @@ docker compose up --build
 ```
 
 Then open **http://localhost:8081**. The first build takes a few minutes. The backend log ends with
-`Successfully applied 22 migrations … now at version v22` when everything is up.
+`Successfully applied 24 migrations … now at version v24` when everything is up.
 
 | Demo account | Email | Password | Can do |
 |---|---|---|---|
@@ -164,7 +169,7 @@ flowchart LR
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the admin. English, Russian and Kyrgyz |
 | API | Spring Boot 3.3, Java 17. JWT with three roles (customer, staff, owner). One error format (RFC 7807). OpenAPI at `/swagger-ui/index.html` |
-| Data | PostgreSQL 16 with pgvector. 22 Flyway migrations; demo data only in the demo profile |
+| Data | PostgreSQL 16 with pgvector. 24 Flyway migrations; demo data only in the demo profile |
 | Assistant | A `Negotiator` interface with two implementations: rule-based, and a language model (Gemini by default, any OpenAI-compatible API) that holds a conversation in three languages, with automatic fallback to the rules. The super admin switches between them at run time |
 | Delivery | Docker Compose. CI on GitLab (`.gitlab-ci.yml`) and GitHub Actions (six jobs) |
 
@@ -177,10 +182,10 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 195 tests, **97% line coverage**; the build fails below 80% |
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 200 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 10 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 123 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
-| End to end, in a real browser | `cd frontend && npm run e2e` | 24 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
+| Frontend | `cd frontend && npm test && npm run build` | 131 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| End to end, in a real browser | `cd frontend && npm run e2e` | 25 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:
 

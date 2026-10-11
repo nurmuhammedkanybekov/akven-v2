@@ -149,9 +149,13 @@
 .av-ann { background: var(--black-deep); color: var(--on-black); font-size: 0.75rem; letter-spacing: 0.08em; overflow: hidden; }
 .av-ann__bar { display: flex; align-items: center; justify-content: center; gap: var(--space-4); min-height: 36px; position: relative; }
 .av-ann__text { text-align: center; animation: av-ann-in 0.6s var(--ease) both; padding-right: 7.5rem; }
-@media (min-width: 1024px) { .av-ann__text { padding-right: 0; } }
+@media (min-width: 800px) { .av-ann__text { padding-right: 13rem; } }
+@media (min-width: 1280px) { .av-ann__text { padding-right: 0; } }
 @keyframes av-ann-in { from { transform: translateY(110%); } to { transform: none; } }
-.av-ann__langs { position: absolute; right: var(--gutter); }
+.av-ann__langs { position: absolute; right: var(--gutter); display: flex; align-items: center; gap: var(--space-2); }
+.av-ann__sep { width: 1px; height: 1rem; background: color-mix(in srgb, currentColor 35%, transparent); }
+/* On a phone the bar keeps only the languages; the currency switch is in the menu. */
+@media (max-width: 799px) { .av-ann__langs > .av-langs:first-child, .av-ann__sep { display: none; } }
 
 .av-langs { display: flex; gap: 2px; }
 .av-langs button { border: 0; background: transparent; color: inherit; cursor: pointer; padding: 6px 8px; border-radius: var(--radius-sm); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; opacity: 0.72; }
@@ -160,7 +164,8 @@
 /* In the admin sidebar the switch sits on a light surface: full-strength ink, and the chosen language in bold. */
 .av-admin__who .av-langs button { opacity: 1; color: var(--ink-2); }
 .av-admin__who .av-langs button[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
-.av-mobile-nav__langs { padding-top: var(--space-5); }
+.av-mobile-nav__langs { padding-top: var(--space-5); display: grid; gap: var(--space-3); justify-items: start; }
+.av-mobile-nav__langs .av-langs { gap: var(--space-2); }
 .av-mobile-nav__langs button { font-size: 0.9375rem; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 999px; opacity: 1; }
 .av-mobile-nav__langs button[aria-pressed="true"] { color: var(--on-ink); background: var(--ink); border-color: var(--ink); text-decoration: none; }
 
@@ -467,3 +472,31 @@ body.av-locked { overflow: hidden; }
 .av-dl dt { color: var(--ink-2); font-size: var(--text-small); }
 .av-dl dd { margin: 0; }
 @media (max-width: 560px) { .av-dl > div { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+/* ---- Quick view: a button on the card, and the panel it opens ------------------------------------------------- */
+.av-card-wrap { position: relative; }
+/* A layer exactly the size of the photo (4:5), so the button sits at the photo's bottom edge on any card width. */
+.av-quick-layer { position: absolute; inset: 0 0 auto 0; aspect-ratio: 4 / 5; z-index: 2; pointer-events: none; }
+.av-quick { position: absolute; left: 12px; right: 12px; bottom: 12px; pointer-events: auto; padding: .7rem 1rem; border: 0; border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink); background: color-mix(in srgb, var(--surface) 92%, transparent); box-shadow: 0 10px 24px -14px rgba(15, 25, 48, .6);
+  opacity: 0; transform: translateY(8px); transition: opacity .25s var(--ease), transform .25s var(--ease); }
+.av-card-wrap:hover .av-quick, .av-card-wrap:focus-within .av-quick { opacity: 1; transform: none; }
+@media (hover: none) { .av-quick { opacity: 1; transform: none; left: auto; padding: .45rem .8rem; font-size: .7rem; } }
+@media (prefers-reduced-motion: reduce) { .av-quick { transition: none; } }
+.av-qv { width: min(58rem, calc(100vw - 1.5rem)); max-height: calc(100svh - 1.5rem); overflow-y: auto; overscroll-behavior: contain; }
+@media (max-width: 719px) { .av-qv__media { aspect-ratio: 1 / 1; max-height: 42svh; margin-inline: auto; } .av-qv__info { padding-top: 0; } }
+.av-qv form { position: relative; padding: clamp(1rem, 3vw, 2rem); }
+.av-qv__close { position: absolute; top: .75rem; right: .75rem; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; cursor: pointer; background: var(--surface-2); color: var(--ink); }
+.av-qv__close svg { width: 20px; height: 20px; }
+.av-qv__grid { display: grid; gap: var(--space-5); }
+@media (min-width: 720px) { .av-qv__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+.av-qv__media { position: relative; aspect-ratio: 4 / 5; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+.av-qv__media img, .av-qv__media .av-imgplaceholder { width: 100%; height: 100%; object-fit: cover; }
+.av-qv__dots { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; }
+.av-qv__dots button { width: 10px; height: 10px; padding: 0; border-radius: 50%; border: 0; cursor: pointer; background: color-mix(in srgb, var(--ink) 30%, transparent); }
+.av-qv__dots button[aria-pressed="true"] { background: var(--ink); }
+.av-qv__info { display: grid; gap: var(--space-4); align-content: start; padding-top: var(--space-5); }
+.av-qv__name { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); margin: 0; padding-right: 2.5rem; }
+.av-qv__desc { margin: 0; }
+.av-qv__more { font-weight: 600; text-align: center; }

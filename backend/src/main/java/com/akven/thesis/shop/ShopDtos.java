@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,14 +32,17 @@ public final class ShopDtos {
                                      @Size(max = 120) String section, @Size(max = 40) String passage,
                                      @NotBlank @Size(max = 40) String container, @Size(max = 80) String city,
                                      @Size(max = 200) String hours, @Size(max = 1000) String directions,
-                                     @Min(0) @Max(1000) Integer position, Boolean active) {}
+                                     @Min(0) @Max(1000) Integer position, Boolean active,
+                                     LocalTime opensAt, LocalTime closesAt, @Min(0) @Max(127) Integer openDays) {}
 
+    /** opensAt and closesAt are Bishkek time ("08:00"); openDays has a bit per day, Monday = 1 ... Sunday = 64. */
     public record PickupPointView(UUID id, String name, String market, String section, String passage, String container,
-                                  String city, String hours, String directions, int position, boolean active) {
+                                  String city, String hours, String directions, int position, boolean active,
+                                  LocalTime opensAt, LocalTime closesAt, int openDays) {
 
         public static PickupPointView of(PickupPoint p) {
             return new PickupPointView(p.getId(), p.getName(), p.getMarket(), p.getSection(), p.getPassage(), p.getContainer(),
-                    p.getCity(), p.getHours(), p.getDirections(), p.getPosition(), p.isActive());
+                    p.getCity(), p.getHours(), p.getDirections(), p.getPosition(), p.isActive(), p.getOpensAt(), p.getClosesAt(), p.getOpenDays());
         }
     }
 

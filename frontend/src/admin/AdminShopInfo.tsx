@@ -12,6 +12,7 @@ import { Switch } from "../components/Switch";
 import { useToast } from "../components/Toast";
 import { OwnersOnly } from "./OwnersOnly";
 import { useT } from "../i18n/I18n";
+import { weekdayNames } from "../lib/hours";
 
 const KINDS: Array<[ContactKind, string, string]> = [
   ["WHATSAPP", "WhatsApp", "+996700123456"], ["PHONE", "a.si.phone", "+996700123456"], ["TELEGRAM", "Telegram", "nurmss4"],
@@ -120,7 +121,10 @@ function ContactRow({ contact, onSave, onDelete }: { contact: ShopContact; onSav
   );
 }
 
-const emptyPoint = (): PickupPointInput => ({ name: "AKVEN at Dordoi", market: "Dordoi Bazaar", section: "", passage: "", container: "", city: "Bishkek", hours: "", directions: "", position: 0, active: true });
+const emptyPoint = (): PickupPointInput => ({ name: "AKVEN at Dordoi", market: "Dordoi Bazaar", section: "", passage: "", container: "", city: "Bishkek", hours: "", directions: "", position: 0, active: true, opensAt: "08:00", closesAt: "16:00", openDays: 127 });
+
+/** "08:00:00" from the server → "08:00" for a time field. */
+const hhmm = (t: string | null) => (t ? t.slice(0, 5) : "");
 
 function PickupPoints() {
   const { t } = useT();
@@ -141,18 +145,34 @@ function PickupPoints() {
 
 function PointForm({ initial, onSave }: { initial: PickupPointInput; onSave: (b: PickupPointInput) => void }) {
   const { t } = useT();
-  const [p, setP] = useState<PickupPointInput>({ ...initial, section: initial.section ?? "", passage: initial.passage ?? "", hours: initial.hours ?? "", directions: initial.directions ?? "" });
+  const { lang } = useT();
+  const [p, setP] = useState<PickupPointInput>({ ...initial, section: initial.section ?? "", passage: initial.passage ?? "", hours: initial.hours ?? "", directions: initial.directions ?? "",
+    opensAt: hhmm(initial.opensAt), closesAt: hhmm(initial.closesAt), openDays: initial.openDays ?? 127 });
+  const days = weekdayNames(lang, "short");
+  const toggleDay = (d: number) => setP({ ...p, openDays: p.openDays ^ (1 << d) });
+  const save = () => onSave({ ...p, opensAt: p.opensAt || null, closesAt: p.closesAt || null });
   const set = (k: keyof PickupPointInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setP({ ...p, [k]: e.target.value });
   return (
-    <form className="av-stack" onSubmit={(e) => { e.preventDefault(); onSave(p); }}>
+    <form className="av-stack" onSubmit={(e) => { e.preventDefault(); save(); }}>
       <div className="av-formgrid av-formgrid--4">
         <Input label={t("a.si.market")} value={p.market} onChange={set("market")} />
         <Input label={t("a.si.section")} value={p.section ?? ""} onChange={set("section")} />
         <Input label={t("a.si.passage")} value={p.passage ?? ""} onChange={set("passage")} />
         <Input label={t("a.si.container")} value={p.container} onChange={set("container")} />
       </div>
+      <fieldset className="av-option">
+        <legend className="av-label">{t("a.si.hours")}</legend>
+        <div className="av-formgrid av-formgrid--4">
+          <Input label={t("a.si.opens")} type="time" value={p.opensAt ?? ""} onChange={set("opensAt")} />
+          <Input label={t("a.si.closes")} type="time" value={p.closesAt ?? ""} onChange={set("closesAt")} />
+        </div>
+        <div className="av-row" role="group" aria-label={t("a.si.days")}>
+          {days.map((name, d) => <button key={d} type="button" className="av-chip" aria-pressed={(p.openDays & (1 << d)) !== 0} onClick={() => toggleDay(d)}>{name}</button>)}
+        </div>
+        <span className="av-hint">{t("a.si.hoursHint")}</span>
+      </fieldset>
       <div className="av-formgrid">
-        <Input label={t("a.si.hours")} value={p.hours ?? ""} placeholder={t("a.si.hoursEg")} onChange={set("hours")} />
+        <Input label={t("a.si.hoursNote")} value={p.hours ?? ""} placeholder={t("a.si.hoursNoteEg")} onChange={set("hours")} />
         <Input label={t("a.si.city")} value={p.city} onChange={set("city")} />
       </div>
       <Textarea label={t("a.si.directions")} rows={2} value={p.directions ?? ""} onChange={set("directions")} />

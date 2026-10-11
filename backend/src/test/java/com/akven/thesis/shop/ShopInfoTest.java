@@ -176,4 +176,26 @@ class ShopInfoTest extends IntegrationTest {
         assertThat(order.get("pickup").get("code").asText()).matches("[0-9]{6}");
         assertThat(order.get("pickup").get("point").isNull()).isTrue();
     }
+
+    // ---- opening hours --------------------------------------------------------------------
+
+    @Test
+    void openingHoursAreTimesAndDaysAndTheyMustMakeSense() throws Exception {
+        String admin = tokenFor(Role.ADMIN);
+        Map<String, Object> body = new java.util.HashMap<>(Map.of("name", "AKVEN at Dordoi", "market", "Dordoi Bazaar", "container", "70-E",
+                "opensAt", "08:00", "closesAt", "16:00", "openDays", 127));
+        sendJson("POST", "/api/admin/shop/pickup-points", admin, body).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.opensAt").value("08:00:00")).andExpect(jsonPath("$.openDays").value(127));
+        getJson("/api/shop/info", null).andExpect(jsonPath("$.pickupPoints[0].closesAt").value("16:00:00"));
+
+        body.put("closesAt", "07:00");
+        sendJson("POST", "/api/admin/shop/pickup-points", admin, body).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("The closing time must be after the opening time."));
+        body.remove("closesAt");
+        sendJson("POST", "/api/admin/shop/pickup-points", admin, body).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Enter both the opening and the closing time, or neither."));
+        body.put("closesAt", "16:00");
+        body.put("openDays", 200);
+        sendJson("POST", "/api/admin/shop/pickup-points", admin, body).andExpect(status().isBadRequest());
+    }
 }

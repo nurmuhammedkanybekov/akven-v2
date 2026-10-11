@@ -29,6 +29,17 @@
     radial-gradient(120% 90% at 20% 0%, var(--black-glow) 0%, var(--black) 55%, var(--black-deep) 100%);
 }
 .av-hero2__grid { display: grid; gap: var(--space-7); align-items: center; padding-block: clamp(2.5rem, 7vh, 5.5rem) clamp(2.5rem, 6vh, 4.5rem); }
+/* On a laptop or a big screen the opening scene fills the first view (below the bars), with the ribbon of sock names
+   peeking in at the bottom, so the page never looks cut short. */
+@media (min-width: 960px) and (min-height: 620px) {
+  .av-hero2 { min-height: calc(100svh - 150px); display: grid; align-content: center; }
+}
+.av-hero2__open { margin-top: -0.5rem; }
+.av-hero2__more { position: absolute; left: 50%; bottom: 18px; width: 26px; height: 42px; margin-left: -13px; border-radius: 13px; border: 1.5px solid color-mix(in srgb, var(--on-black) 45%, transparent); display: none; }
+.av-hero2__more span { position: absolute; left: 50%; top: 8px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: var(--accent); animation: av-scrollcue 1.8s var(--ease) infinite; }
+@media (min-width: 960px) and (min-height: 760px) { .av-hero2__more { display: block; } }
+@keyframes av-scrollcue { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) { .av-hero2__more span { animation: none; } }
 @media (min-width: 960px) { .av-hero2__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--space-6); } }
 .av-hero2__copy { display: grid; gap: var(--space-5); justify-items: start; }
 .av-hero2__copy > * { animation: av-up 1s var(--ease) both; }
@@ -326,3 +337,25 @@
   .av-marquee__track, .av-shelf > *, .av-fit__sock, .av-family__row, .av-crate__sock, .av-calc__stamp.is-on, .av-route__pulse { animation: none !important; }
   .av-hang, .av-meter > i, .av-say { transition: none !important; }
 }
+
+/* ---- Shop by category: four big drawn tiles --------------------------------------------------------------------- */
+.av-cats { display: grid; gap: var(--space-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 900px) { .av-cats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.av-cat { position: relative; display: grid; align-content: end; gap: 4px; min-height: clamp(14rem, 22vw, 20rem); padding: var(--space-5); border-radius: var(--radius-lg);
+  overflow: hidden; text-decoration: none; color: var(--ink); isolation: isolate; }
+.av-cat__socks { position: absolute; inset: 8% 10% 34% 10%; display: flex; justify-content: center; align-items: flex-end; gap: 4%; z-index: -1; }
+.av-cat__socks svg { width: 46%; height: auto; transition: transform .5s var(--ease); filter: drop-shadow(0 12px 14px rgba(15, 25, 48, .18)); }
+.av-cat:hover .av-cat__socks svg { transform: translateY(-8px) rotate(0deg) !important; }
+.av-cat__name { font-family: var(--font-display); font-size: clamp(1.6rem, 1.2rem + 1vw, 2.2rem); line-height: 1; }
+.av-cat__go { font-size: var(--text-small); font-weight: 600; letter-spacing: .06em; color: var(--accent-ink); }
+@media (prefers-reduced-motion: reduce) { .av-cat__socks svg { transition: none; } }
+
+/* ---- How ordering works ------------------------------------------------------------------------------------------ */
+.av-how { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); counter-reset: how; }
+@media (min-width: 860px) { .av-how { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.av-how li { position: relative; display: grid; gap: var(--space-2); align-content: start; padding: var(--space-6) var(--space-5) var(--space-5); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.av-how__n { position: absolute; top: var(--space-4); right: var(--space-5); font-family: var(--font-display); font-size: 3rem; line-height: 1; color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.av-how__icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--surface-2); color: var(--accent-ink); }
+.av-how__icon svg { width: 24px; height: 24px; }
+.av-how h3 { margin: var(--space-2) 0 0; font-size: 1.25rem; }
+.av-how p { margin: 0; color: var(--ink-2); }

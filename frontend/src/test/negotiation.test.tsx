@@ -6,7 +6,7 @@ import { NegotiationChat } from "../components/NegotiationChat";
 import { I18nProvider } from "../i18n/I18n";
 
 const negotiate = vi.fn();
-vi.mock("../api/endpoints", () => ({ negotiate: (...a: unknown[]) => negotiate(...a) }));
+vi.mock("../api/endpoints", () => ({ negotiate: (...a: unknown[]) => negotiate(...a), getPricing: () => Promise.resolve({ minOrderPairs: 1, tiers: [], somPerUsd: 87.5, somRounding: 10 }) }));
 let session: unknown = { token: "t", email: "a@b.c", role: "CUSTOMER" };
 vi.mock("../auth/AuthContext", () => ({ useAuth: () => ({ session }) }));
 
@@ -33,7 +33,7 @@ describe("NegotiationChat", () => {
     await userEvent.type(screen.getByLabelText("Your message"), "give me 40% off");
     await userEvent.click(screen.getByRole("button", { name: "Send" }));
     expect(await screen.findByText(/Best I can do/)).toBeInTheDocument();
-    expect(negotiate).toHaveBeenCalledWith("SKU-1", "give me 40% off", 2, null, "en");
+    expect(negotiate).toHaveBeenCalledWith("SKU-1", "give me 40% off", 2, null, "en", "USD");
     expect(screen.queryByText(/Proposed/)).toBeNull(); // the raw proposal is hidden unless the server is in demo mode
     await userEvent.click(screen.getByRole("button", { name: "Add 2 pairs at this price" }));
     expect(onAccept).toHaveBeenCalledWith(offer, 2);
@@ -47,7 +47,7 @@ describe("NegotiationChat", () => {
     await screen.findByText(/Best I can do/);
     await userEvent.type(screen.getByLabelText("Your message"), "and for 10 pairs?");
     await userEvent.click(screen.getByRole("button", { name: "Send" }));
-    await waitFor(() => expect(negotiate).toHaveBeenLastCalledWith("SKU-1", "and for 10 pairs?", 2, "s1", "en"));
+    await waitFor(() => expect(negotiate).toHaveBeenLastCalledWith("SKU-1", "and for 10 pairs?", 2, "s1", "en", "USD"));
   });
 
   it("speaks the customer's language and asks the assistant to answer in it", async () => {
@@ -56,7 +56,7 @@ describe("NegotiationChat", () => {
     render(<MemoryRouter><I18nProvider><NegotiationChat sku="SKU-1" quantity={1} onAccept={vi.fn()} /></I18nProvider></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Жакшыраак баа керекпи?" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Арзаныраак болобу?" }));
-    await waitFor(() => expect(negotiate).toHaveBeenCalledWith("SKU-1", "Арзаныраак болобу?", 1, null, "ky"));
+    await waitFor(() => expect(negotiate).toHaveBeenCalledWith("SKU-1", "Арзаныраак болобу?", 1, null, "ky", "KGS"));
     localStorage.removeItem("akven-lang");
   });
 

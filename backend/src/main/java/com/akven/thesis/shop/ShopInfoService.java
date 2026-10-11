@@ -103,9 +103,12 @@ public class ShopInfoService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public PickupPointView createPickupPoint(String actorEmail, PickupPointRequest r) {
-        PickupPoint p = points.saveAndFlush(new PickupPoint(r.name().trim(), r.market().trim(), blankToNull(r.section()), blankToNull(r.passage()),
+        checkHours(r);
+        PickupPoint fresh = new PickupPoint(r.name().trim(), r.market().trim(), blankToNull(r.section()), blankToNull(r.passage()),
                 r.container().trim(), blankToNull(r.city()), blankToNull(r.hours()), blankToNull(r.directions()), orZero(r.position()),
-                r.active() == null || r.active()));
+                r.active() == null || r.active());
+        fresh.setOpeningHours(r.opensAt(), r.closesAt(), r.openDays() == null ? 127 : r.openDays());
+        PickupPoint p = points.saveAndFlush(fresh);
         PickupPointView view = PickupPointView.of(p);
         audit.record(actorEmail, "PICKUP_POINT_CREATED", "PICKUP_POINT", p.getId(), null, view);
         return view;
@@ -115,12 +118,24 @@ public class ShopInfoService {
     @PreAuthorize("hasRole('ADMIN')")
     public PickupPointView updatePickupPoint(String actorEmail, UUID id, PickupPointRequest r) {
         PickupPoint p = points.findById(id).orElseThrow(() -> new NotFoundException("Pickup point not found."));
+        checkHours(r);
         PickupPointView before = PickupPointView.of(p);
+        p.setOpeningHours(r.opensAt(), r.closesAt(), r.openDays() == null ? p.getOpenDays() : r.openDays());
         p.update(r.name().trim(), r.market().trim(), blankToNull(r.section()), blankToNull(r.passage()), r.container().trim(),
                 blankToNull(r.city()), blankToNull(r.hours()), blankToNull(r.directions()), orZero(r.position()), r.active() == null || r.active());
         PickupPointView after = PickupPointView.of(points.saveAndFlush(p));
         audit.record(actorEmail, "PICKUP_POINT_UPDATED", "PICKUP_POINT", id, before, after);
         return after;
+    }
+
+    /** Both times or neither, and closing after opening (the stall is not open overnight). */
+    private static void checkHours(PickupPointRequest r) {
+        if ((r.opensAt() == null) != (r.closesAt() == null)) {
+            throw new BusinessRuleException("Enter both the opening and the closing time, or neither.");
+        }
+        if (r.opensAt() != null && !r.closesAt().isAfter(r.opensAt())) {
+            throw new BusinessRuleException("The closing time must be after the opening time.");
+        }
     }
 
     private static String blankToNull(String s) {

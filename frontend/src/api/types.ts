@@ -187,8 +187,9 @@ export interface NegotiationTurn {
 
 // ---- pricing, shop info and sizes ----
 
-export interface PublicPricing { minOrderPairs: number; tiers: Array<{ minPairs: number; discountPct: number }> }
-export interface PricingPolicy { minOrderPairs: number; trustedMinOrderPairs: number; trustedAfterOrders: number; fewLeftThreshold: number }
+export interface PublicPricing { minOrderPairs: number; tiers: Array<{ minPairs: number; discountPct: number }>; somPerUsd?: number; somRounding?: number }
+/** somPerUsd: som for one dollar, as the owners set it; somRounding: som prices are rounded to this (1, 5, 10, 50, 100). */
+export interface PricingPolicy { minOrderPairs: number; trustedMinOrderPairs: number; trustedAfterOrders: number; fewLeftThreshold: number; somPerUsd: number; somRounding: number }
 export interface PriceTier { id: string; minPairs: number; discountPct: number }
 
 export type ContactKind = "INSTAGRAM" | "TELEGRAM" | "WHATSAPP" | "PHONE" | "EMAIL" | "FACEBOOK";
@@ -196,6 +197,8 @@ export interface ShopContact { id: string; kind: ContactKind; label: string | nu
 export interface PickupPoint {
   id: string; name: string; market: string; section: string | null; passage: string | null; container: string;
   city: string; hours: string | null; directions: string | null; position: number; active: boolean;
+  /** "08:00:00", Bishkek time; null until the owners set them. openDays: a bit per day, Monday = 1 ... Sunday = 64. */
+  opensAt: string | null; closesAt: string | null; openDays: number;
 }
 export interface ShopInfo { contacts: ShopContact[]; pickupPoints: PickupPoint[] }
 

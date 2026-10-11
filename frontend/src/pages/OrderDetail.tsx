@@ -12,10 +12,12 @@ import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
-import { formatDateTime, formatPrice } from "../lib/format";
+import { formatDateTime } from "../lib/format";
+import { useMoney } from "../shop/useMoney";
 import { NotFoundPage } from "./NotFound";
 
 export function OrderDetailPage() {
+  const { money } = useMoney();
   const { id = "" } = useParams();
   const justPaid = Boolean((useLocation().state as { justPaid?: boolean } | null)?.justPaid);
   const toast = useToast();
@@ -59,16 +61,16 @@ export function OrderDetailPage() {
               <div className="av-cartline__body">
                 {i.productSlug ? <Link to={`/products/${i.productSlug}`} className="av-cartline__name">{i.productName}</Link> : <span className="av-cartline__name">{i.productName}</span>}
                 <span className="av-small av-muted">{i.colorHex && <span className="av-dot" style={{ background: i.colorHex }} />} {i.variantLabel}</span>
-                <span className="av-small">{i.quantity} × {formatPrice(i.unitPrice)}{i.discountPct > 0 ? ` (${formatPrice(i.listPrice)} less ${i.discountPct}%)` : ""}</span>
+                <span className="av-small">{i.quantity} × {money(i.unitPrice)}{i.discountPct > 0 ? ` (${money(i.listPrice)} less ${i.discountPct}%)` : ""}</span>
               </div>
-              <div className="av-cartline__total av-price">{formatPrice(i.lineTotal)}</div>
+              <div className="av-cartline__total av-price">{money(i.lineTotal)}</div>
             </li>
           ))}
         </ul>
         <aside className="av-summary">
           <h2>Details</h2>
           <dl className="av-specs">
-            <div><dt className="av-eyebrow">Total</dt><dd className="av-price av-price--lg">{formatPrice(o.total)}</dd></div>
+            <div><dt className="av-eyebrow">Total</dt><dd className="av-price av-price--lg">{money(o.total)}</dd></div>
             <div><dt className="av-eyebrow">{o.fulfillment.method === "PICKUP" ? "Pick up" : "Delivery"}</dt><dd>{o.fulfillment.contactName}, {o.fulfillment.contactPhone}{o.fulfillment.address ? <><br />{o.fulfillment.address}</> : null}</dd></div>
             {o.fulfillment.country && <div><dt className="av-eyebrow">{t("order.country")}</dt><dd>{t(`country.${o.fulfillment.country}` as MessageKey)}</dd></div>}
             {o.fulfillment.note && <div><dt className="av-eyebrow">Note</dt><dd>{o.fulfillment.note}</dd></div>}

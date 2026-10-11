@@ -38,8 +38,8 @@ export const adminCancelOrder = (id: string) => api<OrderView>(`/api/admin/order
 
 // ---- negotiation ----
 /** sessionId continues the conversation; language is the one the assistant answers in. */
-export const negotiate = (variantSku: string, message: string, quantity: number, sessionId?: string | null, language?: string) =>
-  api<NegotiateResponse>("/api/negotiate", { method: "POST", body: { variantSku, message, quantity, sessionId: sessionId ?? undefined, language } });
+export const negotiate = (variantSku: string, message: string, quantity: number, sessionId?: string | null, language?: string, currency?: string) =>
+  api<NegotiateResponse>("/api/negotiate", { method: "POST", body: { variantSku, message, quantity, sessionId: sessionId ?? undefined, language, currency } });
 export const adminGetNegotiation = (id: string) => api<NegotiationSessionView>(`/api/admin/negotiations/${id}`);
 export const adminListNegotiations = (p: { page?: number; pageSize?: number }) =>
   api<PageResponse<NegotiationSessionView>>(`/api/admin/negotiations${qs(p)}`);
