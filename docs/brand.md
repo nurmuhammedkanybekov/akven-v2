@@ -7,15 +7,16 @@ screenshots are in [`docs/design/`](design/) and double as thesis figures.
 
 ## The mark
 
-**AKVEN** is Akyl and Venera's names on one label. The mark joins their initials: the A and the V share their middle
-stroke, like one knitted stitch, and a thread runs from the A's crossbar into the V. That thread is the "and" of the
-old Ak&Ven name, kept in the drawing instead of the spelling. A pointed apex above, a pointed vertex below, one thick
-shared stroke and thin outer arms; where the thread crosses the shared stroke a small gap lets it pass over.
+**AKVEN** is Akyl and Venera's names on one label. The mark is the family's own design, redrawn as clean vectors: a
+Roman A with a thin left leg and a wide right leg that runs on into the V, a flag serif on the V, and a ribbon that
+rises from the A's foot, arches over the A and falls into the V. The ribbon is the "and" of the old Ak&Ven name: the
+two initials joined. A thin fold line along the ribbon keeps its folded look in a single colour, and a small gap where
+it passes over the A shows which is in front.
 
-The mark is built from a few numbers (`frontend/src/brand/mark.ts`), not traced from a picture, so it stays crisp at
-16 px, on a sign and on a knitting machine: one colour, no gradients needed, no hairlines thinner than the thread. The
-name AKVEN is set in Marcellus (Roman capitals) with wide spacing and converted to outlines, so **the logo needs no
-font anywhere**.
+The mark lives in `frontend/src/brand/mark.ts` as vector paths, so it stays crisp from a favicon to a sign and works in
+one colour for labels and stamps. The name AKVEN is set in Cinzel capitals with wide spacing and the tagline
+"PREMIUM SOCKS" in Onest, both converted to outlines, so **the logo needs no font anywhere**. The family may replace it
+with a final design later: change `mark.ts` and run `npm run logo`, `npm run icons` and `npm run art`.
 
 | File (`frontend/public/brand/`) | Use |
 |---|---|

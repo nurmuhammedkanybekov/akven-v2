@@ -1,7 +1,7 @@
 /**
  * Builds the AKVEN logo files from two sources of truth:
  *   - src/brand/mark.ts     the AV mark (geometry, not a tracing)
- *   - Marcellus             Roman capitals for AKVEN and the tagline, converted to outlines here so the finished
+ *   - Cinzel (name) and Onest (tagline), converted to outlines here so the finished
  *                           logo needs no font anywhere (web, print, signage, sock labels, favicon)
  * Output: public/brand/*.svg in gold, ink, white and metallic gold, in three lockups (horizontal, stacked, mark),
  * and src/brand/logo.generated.ts for the React <Logo>.
@@ -14,30 +14,31 @@ import { fileURLToPath } from "node:url";
 import { MARK, markMarkup } from "../src/brand/mark.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const buf = fs.readFileSync(path.join(root, "node_modules/@fontsource/marcellus/files/marcellus-latin-400-normal.woff"));
-const font = opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+const load = (file) => { const b = fs.readFileSync(path.join(root, "node_modules/@fontsource", file)); return opentype.parse(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)); };
+const font = load("cinzel/files/cinzel-latin-400-normal.woff");
+const sans = load("onest/files/onest-latin-400-normal.woff");
 
 const SIZE = 100;
 const CAP = (font.tables.os2.sCapHeight / font.unitsPerEm) * SIZE;
 const f = (n) => +n.toFixed(2);
 
 /** Text as outlines with the baseline at y = 0, starting at x = 0. Tracking is added between letters only. */
-function outline(text, size, tracking) {
-  const p = font.getPath(text, 0, 0, size, { letterSpacing: tracking, kerning: true });
+function outline(text, size, tracking, face = font) {
+  const p = face.getPath(text, 0, 0, size, { letterSpacing: tracking, kerning: true });
   const bb = p.getBoundingBox();
   return { d: p.toPathData(2), x1: bb.x1, x2: bb.x2, y1: bb.y1, y2: bb.y2 };
 }
 
-const word = outline("AKVEN", SIZE, 0.26);
-const tag = outline("PREMIUM SOCKS", SIZE * 0.24, 0.62);
+const word = outline("AKVEN", SIZE, 0.42);
+const tag = outline("PREMIUM SOCKS", SIZE * 0.22, 0.42, sans);
 
 // Horizontal: the mark a little taller than the capitals, centred on them.
-const hMarkH = CAP * 1.42, hScale = hMarkH / MARK.h, hMarkW = MARK.w * hScale;
-const hGap = CAP * 0.5;
+const hMarkH = CAP * 2.0, hScale = hMarkH / MARK.h, hMarkW = MARK.w * hScale;
+const hGap = CAP * 0.32;
 const hMarkY = -CAP / 2 - hMarkH / 2;
 const horizontal = {
   viewBox: `0 ${f(hMarkY)} ${f(hMarkW + hGap + (word.x2 - word.x1))} ${f(hMarkH)}`,
-  mark: `translate(0 ${f(hMarkY)}) scale(${hScale.toFixed(5)}) translate(${-(-1)} ${-1})`,
+  mark: `translate(0 ${f(hMarkY)}) scale(${hScale.toFixed(5)})`,
   word: `translate(${f(hMarkW + hGap - word.x1)} 0)`,
 };
 horizontal.aspect = +(+horizontal.viewBox.split(" ")[2] / hMarkH).toFixed(4);
@@ -45,12 +46,12 @@ horizontal.aspect = +(+horizontal.viewBox.split(" ")[2] / hMarkH).toFixed(4);
 // Stacked: the mark above, the name, then the tagline. Everything centred on one axis.
 const sWordW = word.x2 - word.x1, sTagW = tag.x2 - tag.x1;
 const sW = Math.max(sWordW, sTagW);
-const sMarkH = CAP * 2.6, sScale = sMarkH / MARK.h, sMarkW = MARK.w * sScale;
-const sWordBase = sMarkH + CAP * 0.62 + CAP;
-const sTagBase = sWordBase + CAP * 0.78;
+const sMarkH = CAP * 3.5, sScale = sMarkH / MARK.h, sMarkW = MARK.w * sScale;
+const sWordBase = sMarkH + CAP * 0.7 + CAP;
+const sTagBase = sWordBase + CAP * 0.85;
 const stacked = {
   viewBox: `0 0 ${f(sW)} ${f(sTagBase + 2)}`,
-  mark: `translate(${f((sW - sMarkW) / 2)} 0) scale(${sScale.toFixed(5)}) translate(1 -1)`,
+  mark: `translate(${f((sW - sMarkW) / 2)} 0) scale(${sScale.toFixed(5)})`,
   word: `translate(${f((sW - sWordW) / 2 - word.x1)} ${f(sWordBase)})`,
   tag: `translate(${f((sW - sTagW) / 2 - tag.x1)} ${f(sTagBase)})`,
 };

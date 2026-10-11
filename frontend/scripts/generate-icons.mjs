@@ -14,11 +14,11 @@ import { MARK, markMarkup } from "../src/brand/mark.ts";
 const INK = "#0f1930";
 
 const svg = (size, fraction) => {
-  const h = size * fraction * 0.86, w = h * (MARK.w / MARK.h);
+  const w = size * fraction * 1.3, h = w * (MARK.h / MARK.w);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ebd596"/><stop offset=".5" stop-color="#c9a24b"/><stop offset="1" stop-color="#9c7a2d"/></linearGradient></defs>
     <rect width="${size}" height="${size}" fill="${INK}"/>
-    <g transform="translate(${(size - w) / 2} ${(size - h) / 2}) scale(${h / MARK.h}) translate(1 -1)">${markMarkup("url(#g)", "i")}</g></svg>`;
+    <g transform="translate(${(size - w) / 2} ${(size - h) / 2}) scale(${h / MARK.h})">${markMarkup("url(#g)", "i")}</g></svg>`;
 };
 
 const targets = [

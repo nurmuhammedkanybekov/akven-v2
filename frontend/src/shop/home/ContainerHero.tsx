@@ -61,7 +61,7 @@ export function ContainerHero({ minPairs }: { minPairs: number }) {
         </div>
 
         <div className="av-stage" aria-hidden="true" onPointerMove={onMove} onPointerLeave={() => { last.current = null; }}>
-          <div className="av-stage__sign"><Logo height={24} /></div>
+          <div className="av-stage__sign"><Logo height={30} /></div>
           <div className="av-box">
             <span className="av-box__plate">70-E</span>
             <div className="av-box__inside">
