@@ -45,8 +45,10 @@ value (`export JWT_SECRET=$(openssl rand -base64 48)`).
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Exact origins allowed to call the API. If the site is served through a proxy that rewrites the `Host` header (Vite's dev proxy does), list the site's own origin here |
 | `MEDIA_DIR` | `./data/media` | Where uploaded product photos are stored. Back this folder up |
 | `AUTH_MAX_FAILED_LOGINS`, `AUTH_LOCKOUT_MINUTES` | 5, 15 | Login lockout |
-| `NEGOTIATION_PROVIDER` | `rule` | `rule` for the built-in assistant, `llm` for a language model |
+| `NEGOTIATION_PROVIDER` | `rule` | `rule` for the built-in assistant, `llm` for a language model. Only the starting choice: the super admin can switch it in Admin > AI assistant without a restart |
 | `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL` | Gemini defaults | Any OpenAI-compatible API (for a free local model use Ollama: `LLM_BASE_URL=http://localhost:11434/v1`, no key) |
+| `SHOP_CONTACTS` | empty | The real contacts, `KIND\|label\|value` separated by `;`, in display order. Applied on start whenever the list changes; phone numbers live here and in the database, never in the repository |
+| `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`, `SUPER_ADMIN_NAME` | empty | Create the super admin on the first start of a real installation (password at least 12 characters). An existing account is never changed |
 | `AKVEN_DEMO_EXPOSE_PROPOSAL` | `false` | When `true`, the chat also shows the assistant's raw proposal next to the validated discount (for demonstrations) |
 
 Copy `.env.example` to `.env` for local values; git ignores `.env`, and secrets are never committed.

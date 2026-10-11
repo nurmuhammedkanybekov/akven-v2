@@ -7,7 +7,7 @@ screenshots are in [`docs/design/`](design/) and double as thesis figures.
 
 ## The mark
 
-**AKVEN** is Akyl and Venera's names on one label. The mark is the family's own design, redrawn as clean vectors: a
+**AKVEN** is Akylbek and Venera's names on one label. The mark is the family's own design, redrawn as clean vectors: a
 Roman A with a thin left leg and a wide right leg that runs on into the V, a flag serif on the V, and a ribbon that
 rises from the A's foot, arches over the A and falls into the V. The ribbon is the "and" of the old Ak&Ven name: the
 two initials joined. A thin fold line along the ribbon keeps its folded look in a single colour, and a small gap where
