@@ -36,6 +36,7 @@ Delivered ahead of the date, and well beyond the 30 to 50 percent asked for.
 | Size chart | Done: one chart with foot length, Korean mm, local, EU and US sizes, led by EU and US in English and by local sizes in Russian and Kyrgyz, plus a finder from shoe size to sock size. Demo values still need checking against the packaging |
 | Dashboard and comparison | Done: the owners' negotiation dashboard (per day, limits, conversion, best sellers, discount sources), "why this price" on every offer and order line, and a rule-based against AI comparison on 16 simulated customers. The AI side uses scripted answers, labelled in every report, until a recorded live run replaces them |
 | New storefront | Done: navy and gold design in Onest, English, Russian and Kyrgyz, a rebuilt home page, visit, size guide and wholesale pages, stock status and collections in the shop, and owner screens for pricing, contacts, sizes, the dashboard and the stall hand-over. The end-to-end check covers the languages and every new screen, including the accessibility rules |
+| Brand and second design round | Done: the AKVEN name and the family's own AV mark as vectors (logo files in four colours, app icons, sock-label mark), Cormorant Garamond and Onest with full Kyrgyz letters, and a distinct look per page. New: the family planner, wholesale and gift-box request form, ordering the bag by WhatsApp, Telegram or email, saved and recently viewed socks, a drawn route to container 70-E, Facebook among the contacts, and 30 more socks in the demo assortment (20 migrations). Checked at 320 to 1440 px in all three languages |
 | Remaining gaps | Creating staff and admin accounts from the admin (UC-9), a single audit-log screen, real product photos, the real certificate and story texts, a native speaker's check of the Russian and Kyrgyz texts, a customers screen for marking trusted customers |
 | Evaluation of the negotiator | A simulated-customer comparison is built (`/api/admin/negotiations/evaluation`). Still to agree with the supervisor: whether to add a recorded live-model run and a small user study |
 
@@ -45,5 +46,5 @@ Not started. The technical chapters can follow the structure of `architecture.md
 
 ## Known limitations
 
-The payment wallet is simulated and no money moves. There is no email, shipping or tax handling. The chat interface and
-the visual design are a first version and will be redone. The catalog cannot be browsed offline, only the bag can.
+The payment wallet is simulated and no money moves. There is no email, shipping or tax handling. The logo is the family's
+chosen design for now and may still change. The catalog cannot be browsed offline, only the bag can.
