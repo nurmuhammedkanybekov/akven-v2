@@ -41,7 +41,8 @@ Delivered ahead of the date, and well beyond the 30 to 50 percent asked for.
 | Admin in three languages | Done: every admin screen, the price chat and the shared messages in English, Russian and Kyrgyz, checked by a test that every key exists in all three |
 | The AI assistant | Done: a real conversation (every turn stored, V21), answers in the customer's language, the public price ladder and stock in the prompt, a number check in all three languages, one retry when the free plan is busy, and a run-time switch between the AI and the rules. Tested live against gemini-3.5-flash-lite |
 | Som prices, opening hours, quick view | Done (V23): the owners set the som rate and rounding, customers switch between dollars and som (the chat quotes som too); the stall's hours are times and days, so the site says "open now, until 16:00" in Bishkek time; a redesigned visit page; quick view on every sock card; the home page's opening scene fills the first screen, with new "shop by family member" and "how ordering works" sections. Sign-in through the Docker demo fixed (the proxy kept the port off the address, so every POST was refused) and now checked in CI |
-| Remaining gaps | Real product photos, the real certificate and story texts, a native speaker's check of the Russian and Kyrgyz texts |
+| Hardening and the final design round | Done (V25): every installation signs logins with its own random key (no key in the repository); demo accounts switch off on a real installation; sign-ups limited per address, with the visitor's address taken from the proxy; a strict Content-Security-Policy and other security headers, checked in CI; the shop listens on this computer only by default; owners can set a new password for a customer or switch a fake account off; `scripts/backup.sh`. Design: one typeface (heavy Onest headings), a price calculator in the hero, a washing line of socks, flat colour blocks, ten home sections instead of thirteen. 26 new knit patterns and 57 more demo products (100 in all), generated with their seed from one list. The dashboard adds sales, orders waiting at the stall and socks running out |
+| Remaining gaps | Real product photos, the family's own story text, a native speaker's check of the Russian and Kyrgyz texts |
 | Evaluation of the negotiator | Done: the comparison uses a recorded live run of gemini-3.5-flash-lite on the 16 simulated customers (`docs/evaluation/live-2026-10-11.json`); no final price went below the limit, and the AI gave smaller discounts than the rules (6% against 11% on average). The super admin can repeat it live. Still to agree with the supervisor: whether to add a small user study |
 
 ## Milestone 4: thesis draft (due 22 November)
@@ -50,5 +51,6 @@ Not started. The technical chapters can follow the structure of `architecture.md
 
 ## Known limitations
 
-The payment wallet is simulated and no money moves. There is no email, shipping or tax handling. The logo is the family's
+The payment wallet is simulated and no money moves; with a real provider the charge would move out of the checkout
+transaction (see `architecture.md`, Known limitations). There is no email, shipping or tax handling. The logo is the family's
 chosen design for now and may still change. The catalog cannot be browsed offline, only the bag can.

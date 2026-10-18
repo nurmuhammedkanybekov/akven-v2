@@ -21,7 +21,7 @@ who runs the system) can do everything an owner can, plus the accounts, the AI a
 | Handle orders: see what is waiting, mark it completed, or cancel and refund | Orders |
 | Read what the assistant offered customers, next to what the policy allowed | Negotiations |
 | Record stock **on the way**, its arrival date and the **pairs in a wholesale case** (the shop then says "arrives in about N days") | The product's page, each colour and size |
-| See offers per day, how often the limit stepped in, offers that became orders, best sellers, and the **rule-based against AI comparison** | Dashboard |
+| See **paid orders, revenue and pairs sold**, how many paid orders wait at the stall, **which socks are running out** (and what is on the way); and offers per day, how often the limit stepped in, offers that became orders, best sellers, and the **rule-based against AI comparison** | Dashboard |
 | **Hand over a pickup order** at the stall: the customer says the six-digit code and the last four digits of their phone | Hand over an order |
 | Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, the **price ladder**, and the **som rate** (som for one dollar, and how som prices are rounded) (owners) | Pricing |
 | Enter **WhatsApp, phone, Telegram, Instagram, email and Facebook**, and the stall: market, passage, container, and the **opening hours** (opening and closing time, and the days it is open) (owners) | Contacts and the stall |

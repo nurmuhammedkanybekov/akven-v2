@@ -24,7 +24,7 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | Endpoint | Purpose |
 |---|---|
 | `GET /actuator/health` | Liveness check |
-| `POST /api/auth/register` | Customer self-registration |
+| `POST /api/auth/register` | Customer self-registration; at most 30 new accounts an hour from one address (`429` with `Retry-After`) |
 | `POST /api/auth/login` | Issues a JWT for an existing account |
 | `GET /api/auth/me` | Current authenticated user (requires a bearer token) |
 | `GET /api/products` | Catalog: filters (category, section, cut, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
@@ -46,6 +46,7 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `POST /api/admin/orders/handover` | At the stall: `{code, phoneEnd}` hands over a paid pickup order; a wrong code and a wrong phone give the same 404 (STAFF / ADMIN) |
 | `POST /api/negotiate` | Chat message `{variantSku, message, quantity?, sessionId?, language?, currency?}` (`sessionId` continues a conversation about the same item; `language` is `en`, `ru` or `ky`; `currency` `KGS` makes the reply quote som, while the offer itself stays in dollars) → validated offer `{sessionId, reply, validatedDiscountPct, offerPrice, outcome}`, where `outcome` (`AS_OFFERED`, `LIMITED_BY_SHOP`, `LIST_PRICE`) says why (signed in; 20 messages per 10 minutes, then 429). Pass `sessionId` as `negotiationSessionId` in the bag |
 | `GET /api/admin/negotiations`, `GET /api/admin/negotiations/{id}` | Proposed against validated discount and the transcript; the detail also lists every `turn` with the assistant that answered (STAFF / ADMIN) |
+| `GET /api/admin/summary?days=30` | Dashboard: paid orders, revenue, pairs and average order in the period, paid orders still to hand over, and the options at or below the few-left threshold with incoming stock (STAFF / ADMIN) |
 | `GET /api/admin/negotiations/stats?days=30` | Dashboard: offers per day, how often the shop's limit stepped in, average discount, offers that became paid orders, best-selling items, lines by discount source (STAFF / ADMIN) |
 | `GET /api/admin/negotiations/evaluation` | Rule-based against AI assistant on 16 simulated customers, both through the PolicyValidator: discount given, would-buy rate, limit interventions, and final prices above the limit (always zero). The AI answers are a recorded live run, labelled `RECORDED`, each with the reply the customer would have read (STAFF / ADMIN) |
 | `GET`, `PUT /api/admin/assistant` | Which assistant answers the chat `{mode: "ai" \| "rules"}`, whether the model is configured, the model and service host (never the key), answers per assistant in the last 7 days (SUPER_ADMIN) |
@@ -53,6 +54,7 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `POST /api/admin/assistant/evaluation` | The same 16 customers against the live model, about one minute, labelled `LIVE` (SUPER_ADMIN) |
 | `GET`, `POST /api/admin/accounts`, `PUT /api/admin/accounts/{id}`, `PUT /api/admin/accounts/{id}/password` | The shop team's accounts: create an owner or staff account, change name, role and active, set a new password; super admin accounts cannot be changed through the API (SUPER_ADMIN) |
 | `GET /api/admin/customers?q=` | Customers by email, with `trusted` (ADMIN) |
+| `PUT /api/admin/customers/{id}/password`, `PUT /api/admin/customers/{id}/active` | Set a new password for a customer `{password}` (at least 8 characters), or switch a customer account off or on `{active}`; both end the customer's sessions and are audited. Team accounts are not reachable here (ADMIN) |
 | `GET /api/admin/audit` | The whole audit log, newest first, with the actor's email (SUPER_ADMIN) |
 | `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer. Deliveries take `fulfillment.country` (`KG`, `KZ`, `UZ`, `RU`; `KG` when left out) |
 | `GET /api/orders`, `GET /api/orders/{id}`, `POST /api/orders/{id}/cancel` | The customer's own orders |
