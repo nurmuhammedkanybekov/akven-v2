@@ -8,7 +8,7 @@
 //  - /api/**: never touched here. A worker that silently served stale prices or stock would be worse than no
 //    offline support. The offline cart is handled in the app (client-side), not by caching API responses.
 
-const VERSION = "v3";
+const VERSION = "v4";
 const SHELL_CACHE = `akven-shell-${VERSION}`;
 const STATIC_CACHE = `akven-static-${VERSION}`;
 const SHELL_ASSETS = ["/", "/theme-init.js", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/brand/logo-gold.svg"];

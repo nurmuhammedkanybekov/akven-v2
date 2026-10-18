@@ -8,28 +8,18 @@ screenshots are in [`docs/design/`](design/) and double as thesis figures.
 
 ## The mark
 
-**AKVEN** is Akylbek and Venera's names on one label. The mark is the family's own design, redrawn as clean vectors: a
-Roman A with a thin left leg and a wide right leg that runs on into the V, a flag serif on the V, and a ribbon that
-rises from the A's foot, arches over the A and falls into the V. The ribbon is the "and" of the old Ak&Ven name: the
-two initials joined. A thin fold line along the ribbon keeps its folded look in a single colour, and a small gap where
-it passes over the A shows which is in front.
+**AKVEN** is Akylbek and Venera's names on one label. The mark is the family's final choice (the "print-safe joint"
+concept, [`design/logo-reference.png`](design/logo-reference.png)): a Roman A whose swept crossbar runs out of the left
+foot, arches over the A and becomes the stroke of the V, the two initials joined in one line. A thin gap where the swoop
+passes the A's right leg shows which is in front.
 
-The mark lives in `frontend/src/brand/mark.ts` as vector paths, so it stays crisp from a favicon to a sign and works in
-one colour for labels and stamps. The name AKVEN is set in Cinzel capitals with wide spacing and the tagline
-"PREMIUM SOCKS" in Onest, both converted to outlines, so **the logo needs no font anywhere**. The family may replace it
-with a final design later: change `mark.ts` and run `npm run logo`, `npm run icons` and `npm run art`.
-
-| File (`frontend/public/brand/`) | Use |
-|---|---|
-| `logo-*.svg` | Mark and name on one line: the header, documents, receipts |
-| `logo-stacked-*.svg` | Mark above the name and "PREMIUM SOCKS": packaging, labels, signage, the footer |
-| `mark-*.svg` | The AV alone: app icon, favicon, sock labels, a wax seal |
-| `*-gold-metallic` | Brushed gold for large placements on navy or black |
-| `*-gold`, `*-ink`, `*-white` | One colour: print, embroidery, knitting, stamps |
-
-Rules: keep clear space of at least the height of the A's crossbar around the logo; never stretch, outline or
-recolour it outside gold, ink and white; minimum width 80 px on screen for the lockup, 16 px for the mark. In the app
-use the `<Logo>` component (`variant="full" | "stacked" | "mark"`), which takes its colour from the surrounding text.
+The concept came as an AI-generated image with a pixel-traced vector package, whose outlines were stepped like pixels
+when enlarged. The mark used here was traced again from the reference image, upscaled eightfold, into smooth curves
+(potrace), and lives in `frontend/src/brand/mark.ts` as one even-odd path: crisp from a favicon to a sign, in any single
+colour, for labels and stamps. The name AKVEN is set in Cinzel capitals with wide spacing and the tagline "PREMIUM
+SOCKS" in Onest, both converted to outlines, so **the logo needs no font anywhere**. To change the mark, edit `mark.ts`
+and run `npm run logo`, `npm run icons` and `npm run art`. Before printing labels or registering the mark, a designer
+should check the joins at real size, and the mark should be searched in Kyrgyzpatent and WIPO's Global Brand Database.
 
 ## Colour
 
