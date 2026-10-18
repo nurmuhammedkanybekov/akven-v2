@@ -34,7 +34,7 @@ const tag = outline("PREMIUM SOCKS", SIZE * 0.22, 0.42, sans);
 
 // Horizontal: the mark a little taller than the capitals, centred on them.
 const hMarkH = CAP * 2.0, hScale = hMarkH / MARK.h, hMarkW = MARK.w * hScale;
-const hGap = CAP * 0.32;
+const hGap = CAP * 0.55;
 const hMarkY = -CAP / 2 - hMarkH / 2;
 const horizontal = {
   viewBox: `0 ${f(hMarkY)} ${f(hMarkW + hGap + (word.x2 - word.x1))} ${f(hMarkH)}`,
