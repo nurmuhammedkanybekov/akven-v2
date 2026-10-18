@@ -1,5 +1,6 @@
 import { api } from "./client";
 import type {
+  ShopSummary,
   AdminProduct, AdminTerm, AdminVariant, AuditEntry, AuthResponse, Facets, PageResponse, ProductDetail,
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
   CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote, NegotiateResponse, NegotiationSessionView,
@@ -136,6 +137,7 @@ export const adminUpdateSupply = (id: string, body: { casePairs: number | null; 
   api<AdminVariant>(`/api/admin/variants/${id}/supply`, { method: "PUT", body });
 
 // ---- owners' dashboard ----
+export const adminSummary = (days: number) => api<ShopSummary>(`/api/admin/summary${qs({ days })}`);
 export const adminNegotiationStats = (days: number) => api<NegotiationStats>(`/api/admin/negotiations/stats${qs({ days })}`);
 export const adminEvaluation = () => api<EvaluationReport>("/api/admin/negotiations/evaluation");
 

@@ -503,3 +503,8 @@ body.av-locked { overflow: hidden; }
 .av-qv__name { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); margin: 0; padding-right: 2.5rem; }
 .av-qv__desc { margin: 0; }
 .av-qv__more { font-weight: 600; text-align: center; }
+
+/* Dashboard: the two parts, the shop and the price assistant. */
+.av-db__part { margin-top: var(--space-6); }
+.av-card__price { display: grid; gap: 1px; }
+.av-card__pair { font-size: var(--text-small); color: var(--success); font-weight: 600; }

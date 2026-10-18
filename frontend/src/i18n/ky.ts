@@ -50,6 +50,7 @@ const shop: Partial<Record<MessageKey, string>> = {
   "cut.knee-high": "Тизеге чейин",
   "card.soldOut": "Түгөндү",
   "card.colours": "{n} түс",
+  "card.perPair": "жубу {price}",
 
   "best.eyebrow": "Коллекция",
   "best.title": "Эң көп сатылгандар жана жаңылар",
