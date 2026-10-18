@@ -61,7 +61,7 @@ export function BazaarCalculator() {
     <section className="av-block" aria-labelledby="ask-title" data-reveal>
       <div className="av-container av-ask2">
         <div className="av-stack">
-          <span className="av-eyebrow av-orn">{t("ask.eyebrow")}</span>
+          <span className="av-eyebrow">{t("ask.eyebrow")}</span>
           <h2 id="ask-title">{t("ask.title")}</h2>
           <p className="av-lead">{t("ask.lead")}</p>
           <ol className="av-numbered">

@@ -23,7 +23,7 @@ export function HeightRuler() {
     <section className="av-block" aria-labelledby="height-title" data-reveal>
       <div className="av-container av-fit">
         <div className="av-stack av-fit__copy">
-          <span className="av-eyebrow av-orn">{t("height.eyebrow")}</span>
+          <span className="av-eyebrow">{t("height.eyebrow")}</span>
           <h2 id="height-title">{t("height.title")}</h2>
           <p className="av-lead">{t("height.lead")}</p>
           <div className="av-fit__choices" role="radiogroup" aria-label={t("height.title")}>

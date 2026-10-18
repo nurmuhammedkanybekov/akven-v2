@@ -31,7 +31,7 @@ export function VisitPage() {
       <section className="av-visit-hero">
         <div className="av-container av-visit-hero__inner">
           <div className="av-stack">
-            <span className="av-eyebrow av-orn">{t("visit.eyebrow")}</span>
+            <span className="av-eyebrow">{t("visit.eyebrow")}</span>
             <h1>{t("visit.title")}</h1>
             <p className="av-lead">{t("visit.lead")}</p>
             {point && <OpenNow point={point} />}

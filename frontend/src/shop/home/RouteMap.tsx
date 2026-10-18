@@ -24,7 +24,7 @@ export function RouteMap({ onVisitPage = false }: { onVisitPage?: boolean }) {
       <div className="av-container">
         <div className="av-deep av-route">
           <div className="av-stack">
-            <span className="av-eyebrow av-orn">{t("visit.eyebrow")}</span>
+            <span className="av-eyebrow">{t("visit.eyebrow")}</span>
             <h2 id="route-title">{t("route.title", { container: container.replace(/-/g, "\u2011") })}</h2>
             <p>{t("route.lead")}</p>
             <ol className="av-route__steps">

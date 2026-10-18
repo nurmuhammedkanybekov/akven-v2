@@ -5,6 +5,7 @@ import { Button } from "../components/Button";
 import { SizeFinder } from "../components/SizeFinder";
 import { useAsync } from "../hooks/useAsync";
 import { useT } from "../i18n/I18n";
+import { HeightRuler } from "../shop/home/HeightRuler";
 import type { MessageKey } from "../i18n/en";
 
 const LABEL: Record<string, MessageKey> = { footCm: "sizes.footCm", krMm: "sizes.krMm", local: "sizes.local", eu: "sizes.eu", us: "sizes.us" };
@@ -47,7 +48,7 @@ export function SizesPage() {
     <div className="av-container av-page av-stack av-sizes">
       <section className="av-sizes__hero" data-reveal>
         <div className="av-stack">
-          <span className="av-eyebrow av-orn">{t("sizes.eyebrow")}</span>
+          <span className="av-eyebrow">{t("sizes.eyebrow")}</span>
           <h1>{t("sizes.title")}</h1>
           <p className="av-lead">{t("sizes.lead")}</p>
           <ol className="av-sizes__how">
@@ -82,6 +83,7 @@ export function SizesPage() {
         </div>
       )}
       <p className="av-small av-muted">{t("sizes.note")}</p>
+      <HeightRuler />
       <ul className="av-sizes__tips">
         <li><strong>{t("sizes.tip1")}</strong><span>{t("sizes.tip1S")}</span></li>
         <li><strong>{t("sizes.tip2")}</strong><span>{t("sizes.tip2S")}</span></li>

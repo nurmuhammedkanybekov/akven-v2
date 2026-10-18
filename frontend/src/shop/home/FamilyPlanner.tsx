@@ -71,7 +71,7 @@ export function FamilyPlanner({ minPairs, tiers }: { minPairs: number; tiers: Ar
       <div className="av-container">
         <div className="av-family">
           <div className="av-stack av-family__copy">
-            <span className="av-eyebrow av-orn">{t("family.eyebrow")}</span>
+            <span className="av-eyebrow">{t("family.eyebrow")}</span>
             <h2 id="family-title">{t("family.title")}</h2>
             <p className="av-lead">{t("family.lead")}</p>
             <div className="av-family__add" role="group" aria-label={t("family.addLabel")}>

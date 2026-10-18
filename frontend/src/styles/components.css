@@ -8,17 +8,18 @@
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
   min-height: 50px; padding: 0 var(--space-6);
   border: 1.5px solid transparent; border-radius: 999px;
-  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1;
+  font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1;
   text-decoration: none; cursor: pointer; white-space: nowrap;
-  transition: color 0.45s var(--ease), border-color 0.45s var(--ease), background-color var(--dur-fast) var(--ease);
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
 .av-btn::before {
   content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit;
-  background: var(--av-sweep, transparent); transform: translateX(-102%); transition: transform 0.45s var(--ease);
+  background: var(--av-sweep, transparent); opacity: 0; transition: opacity var(--dur-fast) var(--ease);
 }
-.av-btn:hover::before, .av-btn:focus-visible::before { transform: none; }
-.av-btn--sm { min-height: 40px; padding: 0 var(--space-5); font-size: 0.72rem; }
-.av-btn--lg { min-height: 56px; padding: 0 var(--space-7); font-size: 0.8125rem; }
+.av-btn:hover::before, .av-btn:focus-visible::before { opacity: 1; }
+.av-btn:active { transform: scale(0.98); }
+.av-btn--sm { min-height: 40px; padding: 0 var(--space-5); font-size: 0.9375rem; }
+.av-btn--lg { min-height: 56px; padding: 0 var(--space-6); font-size: 1.0625rem; }
 .av-btn--block { width: 100%; }
 
 .av-btn--primary { background: var(--ink); color: var(--on-ink); border-color: var(--ink); --av-sweep: var(--accent); }
@@ -27,7 +28,7 @@
 .av-btn--secondary:hover, .av-btn--secondary:focus-visible { color: var(--on-ink); }
 .av-btn--accent { background: var(--accent); color: var(--on-accent); border-color: var(--accent); --av-sweep: var(--on-black); }
 .av-btn--accent:hover, .av-btn--accent:focus-visible { color: #14110d; border-color: var(--on-black); }
-.av-btn--ghost { background: transparent; color: var(--ink); padding-inline: var(--space-3); letter-spacing: 0.08em; }
+.av-btn--ghost { background: transparent; color: var(--ink); padding-inline: var(--space-3); }
 .av-btn--ghost:hover { background: var(--surface-2); }
 .av-btn--danger { --av-sweep: var(--danger); }
 .av-btn:disabled::before, .av-btn[aria-disabled="true"]::before { display: none; }
@@ -176,7 +177,7 @@
 .av-header.is-scrolled .av-header__bar { min-height: 60px; }
 .av-header__logo { color: var(--ink); justify-self: center; grid-column: 2; grid-row: 1; padding-inline: var(--space-4); }
 .av-nav { display: none; gap: clamp(var(--space-3), 1.4vw, var(--space-5)); grid-column: 1; grid-row: 1; min-width: 0; overflow: hidden; }
-.av-nav a { position: relative; text-decoration: none; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; padding: 26px 0; white-space: nowrap; }
+.av-nav a { position: relative; text-decoration: none; font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; padding: 26px 0; white-space: nowrap; }
 .av-nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 18px; height: 1.5px; background: var(--accent); transform: scaleX(0); transform-origin: right; transition: transform 0.35s var(--ease); }
 .av-nav a:hover::after, .av-nav a[aria-current="page"]::after { transform: scaleX(1); transform-origin: left; }
 .av-header__actions { display: flex; align-items: center; justify-content: flex-end; gap: 2px; grid-column: 3; grid-row: 1; }
@@ -198,7 +199,7 @@
 .av-drawer { position: fixed; inset: 108px 0 0; z-index: 49; display: grid; align-content: start; gap: var(--space-4); padding: var(--space-6) var(--gutter); background: var(--paper); overflow-y: auto; visibility: hidden; transform: translateY(-12px); transition: transform 0.35s var(--ease), visibility 0s 0.35s; }
 .av-drawer.is-open { visibility: visible; transform: none; transition: transform 0.35s var(--ease); }
 .av-drawer__links { display: grid; }
-.av-drawer__links a { font-family: var(--font-display); font-size: 2.1rem; font-weight: 600; line-height: 1.2; text-decoration: none; padding: 10px 0; border-bottom: 1px solid var(--line); transform: translateX(-16px); transition: transform 0.5s var(--ease); transition-delay: calc(var(--i) * 40ms); }
+.av-drawer__links a { font-family: var(--font-display); font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; text-decoration: none; padding: 10px 0; border-bottom: 1px solid var(--line); transform: translateX(-16px); transition: transform 0.5s var(--ease); transition-delay: calc(var(--i) * 40ms); }
 .av-drawer.is-open .av-drawer__links a { transform: none; }
 .av-drawer__links a[aria-current="page"] { color: var(--accent-ink); }
 body.av-locked { overflow: hidden; }
@@ -208,11 +209,11 @@ body.av-locked { overflow: hidden; }
 .av-footer__band { display: block; color: var(--accent); opacity: 0.75; }
 .av-footer__top { display: grid; justify-items: center; gap: var(--space-5); padding-block: var(--space-8) var(--space-7); text-align: center; color: var(--accent); border-bottom: 1px solid color-mix(in srgb, var(--on-black) 14%, transparent); }
 .av-footer__logo { max-width: 70vw; height: auto !important; }
-.av-footer__line { font-family: var(--font-display); font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem); font-style: italic; font-weight: 500; color: var(--on-black); max-width: 30ch; text-wrap: balance; }
+.av-footer__line { font-family: var(--font-display); font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--on-black); max-width: 24ch; text-wrap: balance; }
 .av-footer__grid { display: grid; gap: var(--space-6); padding-block: var(--space-7); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 900px) { .av-footer__grid { grid-template-columns: repeat(3, minmax(0, 0.8fr)) minmax(0, 1.4fr); } }
 .av-footer__col { display: grid; gap: var(--space-3); align-content: start; }
-.av-footer__head { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent); margin-bottom: var(--space-1); }
+.av-footer__head { font-size: 0.9375rem; font-weight: 700; color: var(--accent); margin-bottom: var(--space-1); }
 .av-footer a { color: var(--on-black); text-decoration: none; font-size: 0.9375rem; justify-self: start; background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 1px no-repeat; transition: background-size 0.35s var(--ease), color 0.35s var(--ease); }
 .av-footer a:hover { color: var(--accent); background-size: 100% 1px; }
 .av-footer__contact { display: inline-flex; align-items: center; gap: var(--space-3); }
@@ -480,11 +481,11 @@ body.av-locked { overflow: hidden; }
 /* A layer exactly the size of the photo (4:5), so the button sits at the photo's bottom edge on any card width. */
 .av-quick-layer { position: absolute; inset: 0 0 auto 0; aspect-ratio: 4 / 5; z-index: 2; pointer-events: none; }
 .av-quick { position: absolute; left: 12px; right: 12px; bottom: 12px; pointer-events: auto; padding: .7rem 1rem; border: 0; border-radius: 999px; cursor: pointer;
-  font: inherit; font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  font: inherit; font-size: .9375rem; font-weight: 600;
   color: var(--ink); background: color-mix(in srgb, var(--surface) 92%, transparent); box-shadow: 0 10px 24px -14px rgba(15, 25, 48, .6);
   opacity: 0; transform: translateY(8px); transition: opacity .25s var(--ease), transform .25s var(--ease); }
 .av-card-wrap:hover .av-quick, .av-card-wrap:focus-within .av-quick { opacity: 1; transform: none; }
-@media (hover: none) { .av-quick { opacity: 1; transform: none; left: auto; padding: .45rem .8rem; font-size: .7rem; } }
+@media (hover: none) { .av-quick { opacity: 1; transform: none; left: auto; padding: .45rem .8rem; font-size: .8125rem; } }
 @media (prefers-reduced-motion: reduce) { .av-quick { transition: none; } }
 .av-qv { width: min(58rem, calc(100vw - 1.5rem)); max-height: calc(100svh - 1.5rem); overflow-y: auto; overscroll-behavior: contain; }
 @media (max-width: 719px) { .av-qv__media { aspect-ratio: 1 / 1; max-height: 42svh; margin-inline: auto; } .av-qv__info { padding-top: 0; } }

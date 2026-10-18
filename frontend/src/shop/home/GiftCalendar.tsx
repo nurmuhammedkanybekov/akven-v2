@@ -47,7 +47,7 @@ export function GiftCalendar() {
         <div className="av-gifts">
           <div className="av-gifts__head">
             <div className="av-stack">
-              <span className="av-eyebrow av-orn">{t("gift.eyebrow")}</span>
+              <span className="av-eyebrow">{t("gift.eyebrow")}</span>
               <h2 id="gift-title">{t("gift.title")}</h2>
               <p>{t("gift.lead")}</p>
             </div>

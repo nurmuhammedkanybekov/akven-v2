@@ -22,6 +22,8 @@ export interface ProductSummary {
   cut: TermView | null;
   collection: string | null;
   minPrice: number | null;
+  /** The cheapest single pair: a pack price divided by its pairs. */
+  minPairPrice?: number | null;
   inStock: boolean;
   variantCount: number;
   image: ImageView | null;

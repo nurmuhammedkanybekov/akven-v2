@@ -194,6 +194,7 @@ class CatalogControllerTest extends IntegrationTest {
     void summaryCarriesFromPriceAndStockFlag() throws Exception {
         getJson("/api/products?collection=" + COLLECTION + "&category=WOMEN", null)
                 .andExpect(jsonPath("$.items[0].minPrice").value(12.00))
+                .andExpect(jsonPath("$.items[0].minPairPrice").value(4.00))   // a pack of three
                 .andExpect(jsonPath("$.items[0].inStock").value(false));
     }
 

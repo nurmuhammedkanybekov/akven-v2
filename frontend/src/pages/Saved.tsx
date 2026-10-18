@@ -12,7 +12,7 @@ export function SavedPage() {
   return (
     <div className="av-container av-page">
       <header className="av-page__head">
-        <span className="av-eyebrow av-orn">{t("saved.eyebrow")}</span>
+        <span className="av-eyebrow">{t("saved.eyebrow")}</span>
         <h1>{t("nav.savedTitle")}</h1>
         <p className="av-small">{t("saved.lead")}</p>
       </header>

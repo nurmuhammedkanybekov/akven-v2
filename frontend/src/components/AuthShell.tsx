@@ -28,7 +28,7 @@ export function AuthShell({ eyebrow, title, lead, children }: { eyebrow: string;
       </aside>
       <div className="av-auth__form">
         <header className="av-page__head">
-          <span className="av-eyebrow av-orn">{eyebrow}</span>
+          <span className="av-eyebrow">{eyebrow}</span>
           <h1>{title}</h1>
           {lead && <p className="av-small">{lead}</p>}
         </header>

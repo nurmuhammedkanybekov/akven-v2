@@ -351,17 +351,21 @@ try {
     await page.getByRole("heading", { level: 1, name: /Korean socks/ }).waitFor();
   });
 
-  await step("the home page's fitting, collection box and gift calendar work", async () => {
+  await step("the home page's price calculator, shelf and gift calendar work; the fitting is on the size guide", async () => {
     await page.goto(`${BASE}/`);
-    await page.getByRole("radio", { name: "Knee-high" }).check();
-    await page.getByRole("link", { name: "Shop knee-high socks" }).waitFor();
-    await page.getByRole("button", { name: "Empty the box" }).click();
-    for (let i = 0; i < 20; i++) await page.getByRole("button", { name: "Add Argyle to the box" }).click();
-    await page.getByText("−3% on every pair").waitFor();
+    const calc = page.locator(".av-pricer");
+    await calc.getByRole("button", { name: "Men", exact: true }).click();
+    await calc.getByRole("spinbutton", { name: "Pairs" }).fill("30");
+    await calc.getByText("−5%").waitFor();
+    await calc.getByText("Add 20 more pairs and every pair is 8% cheaper.").waitFor();
+    await calc.getByText(/typical men's pair/).waitFor();
     await page.getByRole("heading", { name: "Socks for every holiday" }).waitFor();
-    await page.getByRole("button", { name: "Women" }).first().click();
+    await page.getByRole("group", { name: "Show socks for" }).getByRole("button", { name: "Women" }).click();
     await page.locator(".av-shelf .av-card").first().waitFor();
     await a11y("the home page after using it");
+    await page.goto(`${BASE}/sizes`);
+    await page.getByRole("radio", { name: "Knee-high" }).check();
+    await page.getByRole("link", { name: "Shop knee-high socks" }).waitFor();
   });
   await step("the owners' screens open and pass the accessibility rules; staff cannot change prices", async () => {
     await page.goto(`${BASE}/orders`);

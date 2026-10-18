@@ -22,7 +22,7 @@ export function Shelf() {
     <section className="av-block" aria-labelledby="best-title">
       <div className="av-container">
         <header className="av-block__head av-block__head--row">
-          <div><span className="av-eyebrow av-orn">{t("best.eyebrow")}</span><h2 id="best-title">{t("best.title")}</h2></div>
+          <div><span className="av-eyebrow">{t("best.eyebrow")}</span><h2 id="best-title">{t("best.title")}</h2></div>
           <div className="av-chips" role="group" aria-label={t("best.filter")}>
             <button type="button" aria-pressed={cat === null} onClick={() => setCat(null)}>{t("height.all")}</button>
             {CATEGORIES.map((c) => (
