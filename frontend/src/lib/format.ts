@@ -13,3 +13,9 @@ export function discountedPrice(list: number, discountPct: number): number {
 export function formatDateTime(iso: string, locale = "en-GB"): string {
   return new Date(iso).toLocaleString(locale, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
+
+/** A calendar date ("2026-10-28") as "28 Oct 2026", read as a date, not shifted by the visitor's time zone. */
+export function formatDay(isoDate: string, locale = "en-GB"): string {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+}

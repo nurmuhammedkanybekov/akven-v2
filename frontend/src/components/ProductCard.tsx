@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { ProductSummary } from "../api/types";
 import { useT } from "../i18n/I18n";
+import { useMoney } from "../shop/useMoney";
 import { useSaved } from "../shop/useSaved";
 import { HeartIcon } from "./icons";
 import type { MessageKey } from "../i18n/en";
@@ -18,6 +19,10 @@ import { QuickView } from "./QuickView";
  */
 export function ProductCard({ product, to, tint }: { product: ProductSummary; to: string; tint?: number }) {
   const { t } = useT();
+  const { money } = useMoney();
+  // Packs are compared by the pair: "From $11.00 · $3.67 a pair". Gift boxes are a gift, not a pack, so they are left alone.
+  const perPair = product.category !== "BUNDLES" && product.minPairPrice != null && product.minPrice != null
+    && product.minPairPrice < product.minPrice - 0.005 ? product.minPairPrice : null;
   const saved = useSaved();
   const soldOut = !product.inStock;
   const isSaved = saved.has(product.slug);
@@ -36,7 +41,10 @@ export function ProductCard({ product, to, tint }: { product: ProductSummary; to
         <span className="av-card__name">{product.name}</span>
         <span className="av-small">{productMeta(product, t(`nav.${product.category.toLowerCase()}` as MessageKey))}</span>
         <span className="av-card__foot">
-          <Price amount={product.minPrice} from={product.variantCount > 1} />
+          <span className="av-card__price">
+            <Price amount={product.minPrice} from={product.variantCount > 1} />
+            {perPair !== null && <span className="av-card__pair">{t("card.perPair", { price: money(perPair) })}</span>}
+          </span>
           {product.colors.length > 1 && (
             <span className="av-dots" aria-label={t("card.colours", { n: product.colors.length })}>
               {product.colors.map((c) => <span key={c} className="av-dot" style={{ background: c }} />)}

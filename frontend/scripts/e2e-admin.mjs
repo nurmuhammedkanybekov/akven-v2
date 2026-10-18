@@ -378,6 +378,7 @@ try {
     for (const [link, heading] of [["Dashboard", "Dashboard"], ["Pricing", "Pricing"], ["Contacts and the stall", "Contacts and the stall"], ["Size chart", "Size chart"], ["Hand over an order", "Hand over an order"]]) {
       await page.getByRole("link", { name: link, exact: true }).click();
       await page.getByRole("heading", { level: 1, name: heading }).waitFor();
+      if (heading === "Dashboard") await page.getByRole("heading", { name: "Running out" }).waitFor();
       await a11y(`admin ${heading.toLowerCase()}`);
     }
     await page.getByRole("button", { name: "Sign out" }).click();

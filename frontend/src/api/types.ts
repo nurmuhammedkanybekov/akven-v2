@@ -212,6 +212,16 @@ export interface SizeMatch { system: SizeSystem; size: number; labels: string[] 
 
 // ---- owners' dashboard ----
 
+export interface ShopSummary {
+  days: number;
+  sales: { orders: number; revenue: number; pairs: number; averageOrder: number | null };
+  toHandOver: number;
+  fewLeftThreshold: number;
+  soldOut: number;
+  lowStock: Array<{ productId: string; slug: string; productName: string; sku: string; color: string | null; size: string | null;
+                    available: number; incoming: number; restockEta: string | null }>;
+}
+
 export interface NegotiationStats {
   days: number;
   perDay: Array<{ date: string; offers: number; limitedByShop: number; averageDiscountPct: number | null; offersUsed: number }>;

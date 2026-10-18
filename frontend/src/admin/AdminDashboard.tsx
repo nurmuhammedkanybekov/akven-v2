@@ -1,20 +1,25 @@
 import { useState } from "react";
-import { adminEvaluation, adminNegotiationStats } from "../api/endpoints";
-import type { EvaluationReport, NegotiationStats } from "../api/types";
+import { Link } from "react-router-dom";
+import { adminEvaluation, adminNegotiationStats, adminSummary } from "../api/endpoints";
+import type { EvaluationReport, NegotiationStats, ShopSummary } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { Badge } from "../components/Badge";
 import { useAsync } from "../hooks/useAsync";
-import { formatPrice } from "../lib/format";
+import { formatDay, formatPrice } from "../lib/format";
 import { useT } from "../i18n/I18n";
 
 const RANGES = [7, 30, 90];
 const pct = (n: number | null) => (n == null ? "—" : `${Number(n)}%`);
 
-/** How the assistant is doing and what sells, for the owners. Never shows cost prices or discount limits of real socks. */
+/**
+ * The shop at a glance (sales, orders waiting at the stall, socks running out), then how the assistant is doing and
+ * what sells. Never shows cost prices or discount limits of real socks.
+ */
 export function AdminDashboard() {
   const { t } = useT();
   const [days, setDays] = useState(30);
   const stats = useAsync(() => adminNegotiationStats(days), [days]);
+  const summary = useAsync(() => adminSummary(days), [days]);
   return (
     <>
       <header className="av-admin__head">
@@ -23,10 +28,52 @@ export function AdminDashboard() {
           {RANGES.map((d) => <button key={d} type="button" className="av-tabbtn" aria-pressed={days === d} onClick={() => setDays(d)}>{t("a.db.lastDays", { n: d })}</button>)}
         </div>
       </header>
+      {summary.error && <Alert tone="danger">{summary.error.message}</Alert>}
+      {summary.loading && !summary.data && <Skeleton height={200} />}
+      {summary.data && <ShopNow s={summary.data} />}
+      <h2 className="av-formtitle av-db__part">{t("a.db.assistantPart")}</h2>
       {stats.error && <Alert tone="danger">{stats.error.message}</Alert>}
       {stats.loading && !stats.data && <Skeleton height={260} />}
       {stats.data && <Stats s={stats.data} />}
       <Comparison />
+    </>
+  );
+}
+
+const LOCALES = { en: "en-GB", ru: "ru-RU", ky: "ky-KG" } as const;
+
+function ShopNow({ s }: { s: ShopSummary }) {
+  const { t, lang } = useT();
+  return (
+    <>
+      <h2 className="av-formtitle av-db__part">{t("a.db.shopPart")}</h2>
+      <ul className="av-tiles4" aria-label={t("a.db.shopPart")}>
+        <li><span className="av-eyebrow">{t("a.db.sold")}</span><strong className="av-num">{s.sales.orders}</strong><span className="av-small">{t("a.db.inLast", { n: s.days })}</span></li>
+        <li><span className="av-eyebrow">{t("a.db.revenue")}</span><strong className="av-num">{formatPrice(s.sales.revenue)}</strong><span className="av-small">{s.sales.averageOrder == null ? t("a.db.noPaid") : t("a.db.average", { price: formatPrice(s.sales.averageOrder) })}</span></li>
+        <li><span className="av-eyebrow">{t("a.db.pairs")}</span><strong className="av-num">{s.sales.pairs}</strong><span className="av-small">{t("a.db.pairsNote")}</span></li>
+        <li><span className="av-eyebrow">{t("a.db.waiting")}</span><strong className="av-num">{s.toHandOver}</strong><Link className="av-small" to="/admin/handover">{t("a.nav.handover")}</Link></li>
+      </ul>
+      <section className="av-card-form" aria-labelledby="low-h">
+        <h2 id="low-h" className="av-formtitle">{t("a.db.low")}</h2>
+        <p className="av-small">{t("a.db.lowLead", { n: s.fewLeftThreshold, out: s.soldOut })}</p>
+        {s.lowStock.length === 0 ? <p className="av-small">{t("a.db.lowNone")}</p> : (
+          <div className="av-tablewrap">
+            <table className="av-table">
+              <thead><tr><th scope="col">{t("a.db.sock")}</th><th scope="col">{t("a.db.option")}</th><th scope="col">{t("a.db.left")}</th><th scope="col">{t("a.db.coming")}</th></tr></thead>
+              <tbody>
+                {s.lowStock.map((l) => (
+                  <tr key={l.sku}>
+                    <td><Link to={`/admin/products/${l.productId}`}>{l.productName}</Link><br /><span className="av-small av-muted">{l.sku}</span></td>
+                    <td>{[l.color, l.size].filter(Boolean).join(" · ")}</td>
+                    <td className="av-num">{l.available === 0 ? <Badge tone="danger">{t("a.db.out")}</Badge> : l.available}</td>
+                    <td className="av-num">{l.incoming > 0 ? (l.restockEta ? t("a.db.comingOn", { n: l.incoming, date: formatDay(l.restockEta, LOCALES[lang]) }) : l.incoming) : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </>
   );
 }

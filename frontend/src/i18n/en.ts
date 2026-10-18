@@ -56,6 +56,7 @@ const shop = {
   "cut.knee-high": "Knee-high",
   "card.soldOut": "Sold out",
   "card.colours": "{n} colours",
+  "card.perPair": "{price} a pair",
 
   // home: collection
   "best.eyebrow": "The collection",
