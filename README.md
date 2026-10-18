@@ -7,7 +7,7 @@ Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
-![The AKVEN home page: container 70-E at Dordoi Bazaar](docs/design/readme-home.jpg)
+![The AKVEN home page: the headline and the live price calculator](docs/design/readme-home.jpg)
 
 ## Contents
 
@@ -81,8 +81,12 @@ super admin can repeat that run at any time.
 - **English, Russian and Kyrgyz**, prices in **US dollars or Kyrgyz som** (at the rate the owners set), light and
   dark, on phone, tablet and laptop. The site can be installed as an app
   (PWA), and the bag works offline.
+- **A price calculator on the home page:** say how many pairs and for whom, and see today's price of a pair, the bulk
+  discount, the total and how many more pairs reach the next step, from the shop's own prices.
 - **Collections:** a minimum order and a price ladder counted in pairs across the whole bag, with "add 4 more pairs
-  to save 5%" hints in the bag.
+  to save 5%" hints in the bag. Packs show their price per pair.
+- **About a hundred drawn designs** in the demo catalogue, from argyle and cable knit to the Kyrgyz oimo and shyrdak
+  patterns, cats, bunnies and football socks, until real photographs replace them.
 - **The family planner:** add each person and their shoe size; the sock size comes from the size chart, and the list
   can be sent to the shop in a message.
 - **Ask for your price:** a negotiation chat on every product page, in the customer's language. It remembers the
@@ -102,10 +106,11 @@ super admin can repeat that run at any time.
 
 - Products, sections, cuts, colours, sizes, photos, stock on the way and wholesale case sizes.
 - Orders, and a hand-over screen for the stall (pickup code plus the end of the customer's phone number).
-- A dashboard: offers per day, how often the limit stepped in, offers that became orders, best sellers.
+- A dashboard: paid orders, revenue and pairs sold, orders waiting at the stall, socks running out with what is on
+  the way; and for the assistant, offers per day, how often the limit stepped in, offers that became orders, best sellers.
 - The rule-based against AI comparison, for the evaluation chapter.
-- Owners only: the minimum order, the price ladder, the som rate, trusted customers, contacts, the stall and its
-  opening hours, and the size chart.
+- Owners only: the minimum order, the price ladder, the som rate, trusted customers (and a new password or switching
+  off for a customer account), contacts, the stall and its opening hours, and the size chart.
 - Super admin only: the team's accounts (add, disable, new password), which assistant answers the chat (the AI or the
   rules), a test box and the live comparison, and the full audit log.
 
@@ -123,7 +128,7 @@ docker compose up --build
 ```
 
 Then open **http://localhost:8081**. The first build takes a few minutes. The backend log ends with
-`Successfully applied 24 migrations … now at version v24` when everything is up.
+`Successfully applied 25 migrations … now at version v25` when everything is up.
 
 | Demo account | Email | Password | Can do |
 |---|---|---|---|
@@ -132,10 +137,12 @@ Then open **http://localhost:8081**. The first build takes a few minutes. The ba
 | Staff | `staff@akven.test` | `changeme-staff` | Products, stock and orders, but not prices |
 | Customer | Create one with "Sign in" → "Create an account" | | Shop, check out, see orders |
 
-These accounts exist only in demo mode. A short tour:
+These accounts exist only in demo mode, and are switched off as soon as you set up your own super admin in `.env`
+(`SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`), unless you also set `DEMO_ACCOUNTS=on`. A short tour:
 
 1. **Switch the language** in the top bar (EN · РУС · КЫР). The whole site follows.
-2. **Plan a family set** on the home page: change a shoe size and watch the sock size and the price step change.
+2. **Try the price calculator** at the top of the home page, then **plan a family set** further down: change a shoe
+   size and watch the sock size and the price step change.
 3. **Ask for a better price.** Sign in as a customer, open any product and type "50% off". The assistant answers, but
    the offer stays within the limit.
 4. **Fill the bag** with 20 pairs of mixed socks to reach the first collection step, then pay for a pickup order with
@@ -169,7 +176,7 @@ flowchart LR
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the admin. English, Russian and Kyrgyz |
 | API | Spring Boot 3.3, Java 17. JWT with three roles (customer, staff, owner). One error format (RFC 7807). OpenAPI at `/swagger-ui/index.html` |
-| Data | PostgreSQL 16 with pgvector. 24 Flyway migrations; demo data only in the demo profile |
+| Data | PostgreSQL 16 with pgvector. 25 Flyway versions (schema, plus demo data only in the demo profile) |
 | Assistant | A `Negotiator` interface with two implementations: rule-based, and a language model (Gemini by default, any OpenAI-compatible API) that holds a conversation in three languages, with automatic fallback to the rules. The super admin switches between them at run time |
 | Delivery | Docker Compose. CI on GitLab (`.gitlab-ci.yml`) and GitHub Actions (six jobs) |
 
@@ -182,9 +189,9 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 200 tests, **97% line coverage**; the build fails below 80% |
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 209 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 10 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 131 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| Frontend | `cd frontend && npm test && npm run build` | 136 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
 | End to end, in a real browser | `cd frontend && npm run e2e` | 25 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:
@@ -193,9 +200,12 @@ Safety properties that the tests demonstrate:
 - Prices are decided only on the server; the browser's numbers are never trusted.
 - The last pair is sold once, even when two people pay at the same moment, and a double click never charges twice.
 - The AI cannot state a price of its own in English, Russian or Kyrgyz; a reply that tries is replaced.
-- Login lockout after repeated failures, four roles, a disabled account or a new password ends its sessions at once,
-  an audit log of every change, and database constraints that refuse impossible values even if the application is
-  bypassed.
+- Login lockout after repeated failures, a sign-up limit per address, four roles, a disabled account or a new password
+  ends its sessions at once, an audit log of every change, and database constraints that refuse impossible values even
+  if the application is bypassed.
+- Each installation signs its logins with its own random key (no key is written in the repository), demo accounts are
+  switched off on a real installation, and the web server sends a strict Content-Security-Policy; CI checks the
+  headers on every push.
 
 ## Status
 
@@ -206,7 +216,7 @@ Safety properties that the tests demonstrate:
 | M3: final program, CI/CD, over 80% coverage | 10 November | Feature-complete; see the open points below |
 | M4: thesis draft | 22 November | In progress |
 
-Open points: real product photos, the certificate and story texts, a native speaker's check of the Russian and
+Open points: real product photos, the family's own story text, a native speaker's check of the Russian and
 Kyrgyz texts, and whether to add a small user study to the recorded live-model evaluation. Details
 are in [`docs/progress.md`](docs/progress.md); every requirement, where it is implemented and which test shows it, is
 in [`docs/traceability.md`](docs/traceability.md).
