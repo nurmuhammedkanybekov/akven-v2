@@ -10,6 +10,7 @@
     "test": "vitest run",
     "logo": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-logo.mjs",
     "art": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-product-art.mjs",
+    "seed": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-seed.mjs",
     "icons": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-icons.mjs",
     "screenshots": "node scripts/screenshots.mjs",
     "e2e": "node scripts/e2e-admin.mjs"
