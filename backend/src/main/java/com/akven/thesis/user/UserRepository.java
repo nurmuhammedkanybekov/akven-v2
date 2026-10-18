@@ -20,4 +20,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     org.springframework.data.domain.Page<User> findByRoleAndEmailContainingIgnoreCaseOrderByEmailAsc(Role role, String text, org.springframework.data.domain.Pageable page);
 
     boolean existsByRole(Role role);
+
+    /** The demo accounts still switched on, to turn them off on a real installation. */
+    List<User> findByEmailEndingWithAndActiveTrue(String suffix);
 }

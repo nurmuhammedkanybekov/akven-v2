@@ -26,7 +26,7 @@ who runs the system) can do everything an owner can, plus the accounts, the AI a
 | Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, the **price ladder**, and the **som rate** (som for one dollar, and how som prices are rounded) (owners) | Pricing |
 | Enter **WhatsApp, phone, Telegram, Instagram, email and Facebook**, and the stall: market, passage, container, and the **opening hours** (opening and closing time, and the days it is open) (owners) | Contacts and the stall |
 | Edit the **size chart** (owners) | Size chart |
-| Find a customer by email and mark them as **trusted** (they may order from the lower minimum) (owners) | Customers |
+| Find a customer by email and mark them as **trusted** (they may order from the lower minimum), **set a new password** for a customer who forgot theirs, or **switch off** a fake account (owners) | Customers |
 | Add an owner or a staff account, change a role, **disable** an account (it is signed out at once) or **set a new password** (super admin) | Accounts |
 | Choose who answers the price chat, the **AI assistant** or the built-in rules; see whether the AI has its key and how often each answered; **try a message** without storing it; run the **comparison against the live AI** (super admin) | AI assistant |
 | Read the **audit log**: every change, who made it, and the values before and after (super admin) | Audit log |

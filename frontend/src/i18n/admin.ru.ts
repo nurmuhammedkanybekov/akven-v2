@@ -345,7 +345,7 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "a.pr.stepRemoved": "Ступень удалена",
   "a.pr.removeStep": "Удалить ступень от {n} пар",
 
-  "a.cu.lead": "Найдите покупателя по email и отметьте его как проверенного: такие покупатели могут заказывать от меньшего минимума из раздела «Цены».",
+  "a.cu.lead": "Найдите покупателя по email. Отметьте проверенных (они могут заказывать от меньшего минимума из раздела «Цены»), задайте новый пароль тому, кто его забыл, или отключите поддельный аккаунт.",
   "a.cu.search": "Поиск по email",
   "a.cu.noMatch": "Нет покупателя с таким email.",
   "a.cu.none": "Покупателей пока нет.",
@@ -354,6 +354,12 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "a.cu.trustedFor": "{email} — проверенный",
   "a.cu.trustedOn": "{email} теперь проверенный покупатель",
   "a.cu.trustedOff": "{email} больше не проверенный",
+  "a.cu.activeOn": "{email} снова может войти",
+  "a.cu.activeOff": "{email} отключён и вышел со всех устройств",
+  "a.cu.switchOn": "Включить",
+  "a.cu.switchOff": "Отключить",
+  "a.cu.newPassword": "Новый пароль",
+  "a.cu.actions": "Действия",
 
   "a.si.phone": "Телефон",
   "a.si.email": "Email",

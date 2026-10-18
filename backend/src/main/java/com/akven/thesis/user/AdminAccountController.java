@@ -4,6 +4,7 @@ import com.akven.thesis.common.PageResponse;
 import com.akven.thesis.user.AccountDtos.AccountView;
 import com.akven.thesis.user.AccountDtos.AuditView;
 import com.akven.thesis.user.AccountDtos.CreateAccount;
+import com.akven.thesis.user.AccountDtos.CustomerActive;
 import com.akven.thesis.user.AccountDtos.CustomerView;
 import com.akven.thesis.user.AccountDtos.ResetPassword;
 import com.akven.thesis.user.AccountDtos.UpdateAccount;
@@ -53,6 +54,17 @@ public class AdminAccountController {
                                                 @RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "20") int pageSize) {
         return service.customers(q, page, pageSize);
+    }
+
+    @PutMapping("/customers/{id}/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resetCustomerPassword(Authentication auth, @PathVariable UUID id, @Valid @RequestBody ResetPassword body) {
+        service.resetCustomerPassword(auth.getName(), id, body.password());
+    }
+
+    @PutMapping("/customers/{id}/active")
+    public CustomerView setCustomerActive(Authentication auth, @PathVariable UUID id, @Valid @RequestBody CustomerActive body) {
+        return service.setCustomerActive(auth.getName(), id, body.active());
     }
 
     @GetMapping("/audit")

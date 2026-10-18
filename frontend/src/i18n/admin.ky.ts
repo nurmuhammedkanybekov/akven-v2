@@ -345,7 +345,7 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
   "a.pr.stepRemoved": "Тепкич өчүрүлдү",
   "a.pr.removeStep": "{n} жуптан баштаган тепкичти өчүрүү",
 
-  "a.cu.lead": "Кардарды email боюнча таап, ишенимдүү деп белгилеңиз: ишенимдүү кардарлар «Баалар» бөлүмүндөгү азыраак минимумдан буйрутма бере алат.",
+  "a.cu.lead": "Кардарды email боюнча табыңыз. Ишенимдүүлөрдү белгилеңиз («Баалар» бөлүмүндөгү азыраак минимумдан буйрутма бере алышат), сырсөзүн унуткан адамга жаңысын коюңуз же жасалма аккаунтту өчүрүңүз.",
   "a.cu.search": "Email боюнча издөө",
   "a.cu.noMatch": "Мындай email менен кардар жок.",
   "a.cu.none": "Азырынча кардар жок.",
@@ -354,6 +354,12 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
   "a.cu.trustedFor": "{email} ишенимдүү",
   "a.cu.trustedOn": "{email} эми ишенимдүү кардар",
   "a.cu.trustedOff": "{email} мындан ары ишенимдүү эмес",
+  "a.cu.activeOn": "{email} кайра кире алат",
+  "a.cu.activeOff": "{email} өчүрүлдү жана бардык түзмөктөрдөн чыгарылды",
+  "a.cu.switchOn": "Күйгүзүү",
+  "a.cu.switchOff": "Өчүрүү",
+  "a.cu.newPassword": "Жаңы сырсөз",
+  "a.cu.actions": "Аракеттер",
 
   "a.si.phone": "Телефон",
   "a.si.email": "Email",

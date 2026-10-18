@@ -149,4 +149,36 @@ class AccountsTest extends IntegrationTest {
         assertThat(found.get("items").get(0).get("trusted").asBoolean()).isFalse();
         getJson("/api/admin/customers", tokenFor(Role.STAFF)).andExpect(status().isForbidden());
     }
+
+    @Test
+    void ownersSetANewPasswordForACustomerAndCanSwitchTheAccountOff() throws Exception {
+        String mail = email("forgetful");
+        tokenForEmail(mail, Role.CUSTOMER);
+        String id = users.findByEmail(mail).orElseThrow().getId().toString();
+        String owner = tokenFor(Role.ADMIN);
+
+        sendJson("PUT", "/api/admin/customers/" + id + "/password", tokenFor(Role.STAFF), Map.of("password", "a-new-password"))
+                .andExpect(status().isForbidden());
+        sendJson("PUT", "/api/admin/customers/" + id + "/password", owner, Map.of("password", "short")).andExpect(status().isBadRequest());
+        sendJson("PUT", "/api/admin/customers/" + id + "/password", owner, Map.of("password", "a-new-password")).andExpect(status().isNoContent());
+        login(mail, "a-new-password");
+
+        sendJson("PUT", "/api/admin/customers/" + id + "/active", owner, Map.of("active", false))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.active").value(false));
+        int refused = sendJson("POST", "/api/auth/login", null, Map.of("email", mail, "password", "a-new-password"))
+                .andReturn().getResponse().getStatus();
+        assertThat(refused).isEqualTo(401);
+        sendJson("PUT", "/api/admin/customers/" + id + "/active", owner, Map.of("active", true)).andExpect(jsonPath("$.active").value(true));
+        login(mail, "a-new-password");
+    }
+
+    @Test
+    void theCustomerEndpointsNeverTouchATeamAccount() throws Exception {
+        String sup = tokenFor(Role.SUPER_ADMIN);
+        String staffId = create(sup, email("team"), "STAFF").get("id").asText();
+        sendJson("PUT", "/api/admin/customers/" + staffId + "/password", tokenFor(Role.ADMIN), Map.of("password", "a-new-password"))
+                .andExpect(status().isNotFound());
+        sendJson("PUT", "/api/admin/customers/" + staffId + "/active", tokenFor(Role.ADMIN), Map.of("active", false))
+                .andExpect(status().isNotFound());
+    }
 }

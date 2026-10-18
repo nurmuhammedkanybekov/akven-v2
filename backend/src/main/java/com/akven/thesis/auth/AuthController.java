@@ -38,11 +38,13 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final LoginAttemptService loginAttempts;
+    private final RegistrationLimiter registrations;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
                            AuthenticationManager authenticationManager, JwtService jwtService,
-                           LoginAttemptService loginAttempts) {
+                           LoginAttemptService loginAttempts, RegistrationLimiter registrations) {
         this.loginAttempts = loginAttempts;
+        this.registrations = registrations;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -50,13 +52,20 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
+                                                 HttpServletRequest http) {
+        long retryAfter = registrations.secondsUntilAllowed(http.getRemoteAddr());
+        if (retryAfter > 0) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .header("Retry-After", String.valueOf(retryAfter)).build();
+        }
         String email = request.email().trim().toLowerCase();
         if (userRepository.findByEmail(email).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         User user = new User(email, passwordEncoder.encode(request.password()), Role.CUSTOMER);
         userRepository.save(user);
+        registrations.recordRegistration(http.getRemoteAddr());
         String token = jwtService.generateToken(user);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AuthResponse(token, user.getEmail(), user.getRole().name()));

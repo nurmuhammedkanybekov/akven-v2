@@ -238,10 +238,11 @@ plan. Summary of what's already reflected in this codebase:
   restricted to `ADMIN` with `@PreAuthorize` on the service (FR-11), so the
   rule holds for any caller, not just one URL.
 - Secrets (`JWT_SECRET`, `LLM_API_KEY`, payment merchant IDs) are read from
-  environment variables only (`application.yml`) — never committed. The
-  in-repo default for `JWT_SECRET` is dev-only and is accepted only by the
-  `demo` profile; any other profile refuses to start without a real random
-  secret, so a forgotten variable fails loudly instead of running insecurely.
+  environment variables only (`application.yml`) — never committed. There is
+  no in-repo default for `JWT_SECRET`: when it is unset, the shop makes its own
+  random 384-bit signing key on first start and keeps it in `app_setting`, so
+  every installation signs tokens with a different key. A secret that is set
+  must be at least 32 bytes, and the old public development value is refused.
 - **A bug only a real server exposed:** on Tomcat a `403` is re-dispatched
   internally to `/error`; with `/error` protected, that second dispatch (which
   carries no token) rewrote every `403` to `401`. MockMvc never performs that
@@ -281,3 +282,32 @@ plan. Summary of what's already reflected in this codebase:
 - Verified with a real `mvn test` run (see `AuthControllerTest`) exercising
   the actual register → login → protected-route flow against the H2 test
   profile, not just reviewed by eye.
+- **Hardening before release (Milestone 3).** Once a super admin is set up
+  from the environment, the `@akven.test` demo accounts are switched off at
+  every start (`DEMO_ACCOUNTS=on` keeps them for presentations). Sign-ups are
+  limited per visitor address like failed logins, and the visitor's address
+  is taken from `X-Forwarded-For` only when the request comes from a
+  private-network proxy (`server.forward-headers-strategy: native`), so the
+  limits count visitors rather than the web container. The web server sends a
+  Content-Security-Policy that allows only the site's own scripts (the theme
+  script moved out of `index.html` for this), `nosniff`,
+  `frame-ancestors 'none'` and a referrer policy, checked by the Docker smoke
+  test in CI. The `next` parameter after sign-in accepts only a path inside the
+  site. The owners can set a new password for a customer or switch a fake
+  customer account off; both are audited.
+
+### Known limitations
+
+- **Payment runs inside the checkout transaction.** `OrderService.checkout`
+  charges the wallet while the stock rows are locked (a declined payment is
+  kept as a failed order and gives the stock back). With the simulated wallet
+  that is instant; with a
+  real payment provider the call would move outside the transaction (reserve
+  stock, pay, then confirm, with a timeout that releases the reservation),
+  because a slow provider would otherwise hold the stock locks.
+- **`product_embedding` is prepared but not used yet.** The table and its
+  `ivfflat` index exist so retrieval-grounded answers can be added without a
+  breaking migration; the assistant today is grounded by the product data
+  and the shop policy passed in each request, not by vector search.
+- **Rate limits are kept in memory**, which is right for one backend; several
+  backends would share them through the database or Redis.

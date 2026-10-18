@@ -7,27 +7,28 @@ import { Button } from "../components/Button";
 import { AuthShell } from "../components/AuthShell";
 import { Input } from "../components/Field";
 import { useT } from "../i18n/I18n";
+import { safeNext } from "../lib/safeNext";
 
 export function RegisterPage() {
   const { t } = useT();
   const { session, signUp } = useAuth();
   const navigate = useNavigate();
   const next = new URLSearchParams(useLocation().search).get("next");
-  const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const safeNextPath = safeNext(next) ?? "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (session) return <Navigate to={safeNext} replace />;
+  if (session) return <Navigate to={safeNextPath} replace />;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError(null); setFieldErrors({});
     if (password.length < 8) { setFieldErrors({ password: t("auth.short") }); return; }
     setBusy(true);
-    try { await signUp(email.trim(), password); navigate(safeNext, { replace: true }); }
+    try { await signUp(email.trim(), password); navigate(safeNextPath, { replace: true }); }
     catch (err) {
       if (err instanceof ApiError && err.status === 409) setError(t("auth.exists"));
       else { setError((err as Error).message); if (err instanceof ApiError) setFieldErrors(err.fieldErrors); }
