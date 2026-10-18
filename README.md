@@ -7,7 +7,7 @@ Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
-![The AKVEN home page: the headline and the live price calculator](docs/design/readme-home.jpg)
+![The AKVEN home page: container 70-E at Dordoi Bazaar, at night](docs/design/readme-home.jpg)
 
 ## Contents
 
@@ -81,8 +81,8 @@ super admin can repeat that run at any time.
 - **English, Russian and Kyrgyz**, prices in **US dollars or Kyrgyz som** (at the rate the owners set), light and
   dark, on phone, tablet and laptop. The site can be installed as an app
   (PWA), and the bag works offline.
-- **A price calculator on the home page:** say how many pairs and for whom, and see today's price of a pair, the bulk
-  discount, the total and how many more pairs reach the next step, from the shop's own prices.
+- **The collection box on the home page:** tap socks into the AKVEN box and watch the price step reached on the
+  shop's real ladder.
 - **Collections:** a minimum order and a price ladder counted in pairs across the whole bag, with "add 4 more pairs
   to save 5%" hints in the bag. Packs show their price per pair.
 - **About a hundred drawn designs** in the demo catalogue, from argyle and cable knit to the Kyrgyz oimo and shyrdak
@@ -141,7 +141,7 @@ These accounts exist only in demo mode, and are switched off as soon as you set 
 (`SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`), unless you also set `DEMO_ACCOUNTS=on`. A short tour:
 
 1. **Switch the language** in the top bar (EN · РУС · КЫР). The whole site follows.
-2. **Try the price calculator** at the top of the home page, then **plan a family set** further down: change a shoe
+2. **Fill the collection box** on the home page, then **plan a family set**: change a shoe
    size and watch the sock size and the price step change.
 3. **Ask for a better price.** Sign in as a customer, open any product and type "50% off". The assistant answers, but
    the offer stays within the limit.

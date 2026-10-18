@@ -568,6 +568,7 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "hours.closedDay": "Выходной",
   "hours.tz": "Время Бишкека",
   "how.eyebrow": "Как заказать",
+  "hero.more": "Листайте вниз",
   "how.title": "Три шага, без очереди",
   "how.s1": "Соберите корзину",
   "how.s1t": "Смешивайте любые носки. Чем больше пар в корзине, тем ниже цена каждой.",

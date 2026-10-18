@@ -588,6 +588,7 @@ export const adminEn = {
   "hours.closedDay": "Closed",
   "hours.tz": "Bishkek time",
   "how.eyebrow": "How ordering works",
+  "hero.more": "Scroll down",
   "how.title": "Three steps, no queue",
   "how.s1": "Fill your bag",
   "how.s1t": "Mix any socks. The more pairs in the bag, the lower the price of every pair.",

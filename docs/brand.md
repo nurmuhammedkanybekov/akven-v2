@@ -89,11 +89,12 @@ Ordered by the questions a visitor has: what does it cost, what is there, why he
 
 | Section | What it shows |
 |---|---|
-| The hero | A flat navy block with the headline and a live price calculator: pairs, for whom, the price of a pair today (the middle price of the real shelf), the bulk discount, the total and how many more pairs reach the next step |
+| The hero | In place of a photograph, night at Dordoi: a string of bulbs, a row of closed containers, and container 70-E, whose doors swing open on a rail of socks that sway and lean away from the pointer, with warm light on the ground. The headline sits over the darker left side |
 | The washing line | The drawn socks pegged on a rope across the page, drifting and swaying, leaning away when the pointer passes |
 | Shop by family member | Four flat colour tiles: men, women, kids, gift boxes |
 | The shelf | The newest socks, switchable between men, women, kids and gift boxes without leaving the page |
 | The facts | Big figures from the shop's own data (designs on the shelf, the top discount, since 2018, four countries) and the three ordering steps |
+| The box | Tap socks into the AKVEN box and watch the step reached on the real price ladder (`/api/pricing`) |
 | The family planner | Add each person, their shoe size and pairs; the sock size comes from the size chart and the price step from the ladder; the list can be sent in WhatsApp or Telegram |
 | Ask for your price | The negotiation the Dordoi way: the seller types the price and the shop's stamp checks it |
 | The gift calendar | Days to 23 February, 8 March, Nooruz, the first day of school and New Year, with the gift boxes |
@@ -104,7 +105,7 @@ The height fitting (a leg with a ruler; pick a height and the sock is pulled up 
 
 ## Motion
 
-Sections slide in as they scroll into view, the socks on the line drift and sway, the road draws itself and the
+Sections slide in as they scroll into view, the container doors open on load, the socks on the rail and on the line sway, the road draws itself and the
 calculator types. Motion
 never fades text, so it keeps full contrast at every moment, and all of it stops for visitors who ask for less motion.
 

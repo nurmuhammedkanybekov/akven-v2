@@ -9,7 +9,7 @@ import { sockSizeFor } from "../shop/home/FamilyPlanner";
 import { resetSavedCache, useSaved } from "../shop/useSaved";
 import { upcomingHolidays } from "../shop/home/GiftCalendar";
 import { HeightRuler } from "../shop/home/HeightRuler";
-import { ladder, typicalPairPrice } from "../shop/home/HeroCalculator";
+import { BoxBuilder } from "../shop/home/BoxBuilder";
 
 const CUTS: SockCut[] = ["no-show", "ankle", "crew", "mid-long", "knee-high"];
 const TIERS = [{ minPairs: 20, discountPct: 3 }, { minPairs: 30, discountPct: 5 }, { minPairs: 50, discountPct: 8 }];
@@ -53,18 +53,15 @@ describe("the gift calendar", () => {
   });
 });
 
-describe("the price calculator in the hero", () => {
-  it("takes the middle pair price of the shelf, ignoring gaps", () => {
-    expect(typicalPairPrice([7, null, 4.33, 6, undefined, 0])).toBe(6);
-    expect(typicalPairPrice([4, 6, 8, 10])).toBe(7);
-    expect(typicalPairPrice([])).toBeNull();
-  });
-
-  it("finds the step a number of pairs reaches and the next one, in any order", () => {
-    const shuffled = [TIERS[2], TIERS[0], TIERS[1]];
-    expect(ladder(10, shuffled)).toEqual({ pct: 0, next: TIERS[0] });
-    expect(ladder(30, shuffled)).toEqual({ pct: 5, next: TIERS[2] });
-    expect(ladder(80, shuffled)).toEqual({ pct: 8, next: null });
+describe("the collection box", () => {
+  it("applies the shop's own minimum and steps as socks go in", async () => {
+    wrap(<BoxBuilder minPairs={10} tiers={TIERS} />);
+    await userEvent.click(screen.getByRole("button", { name: "Empty the box" }));
+    expect(screen.getByText("Add 10 more pairs: orders start at 10.")).toBeInTheDocument();
+    const argyle = screen.getByRole("button", { name: "Add Argyle to the box" });
+    for (let i = 0; i < 20; i++) await userEvent.click(argyle);
+    expect(screen.getByText("−3% on every pair")).toBeInTheDocument();
+    expect(screen.getByText("Add 10 more pairs for 5% off every pair.")).toBeInTheDocument();
   });
 });
 

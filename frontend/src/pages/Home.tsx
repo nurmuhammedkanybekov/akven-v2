@@ -2,13 +2,14 @@ import { SOCK_COLOURS as C, SockArt, type SockSpec } from "../brand/SockArt";
 import { Button } from "../components/Button";
 import { useT } from "../i18n/I18n";
 import { BazaarCalculator } from "../shop/home/BazaarCalculator";
+import { BoxBuilder } from "../shop/home/BoxBuilder";
 import { CategoryTiles } from "../shop/home/CategoryTiles";
 import { Clothesline } from "../shop/home/Clothesline";
+import { ContainerHero } from "../shop/home/ContainerHero";
 import { Facts } from "../shop/home/Facts";
 import { FamilyPlanner } from "../shop/home/FamilyPlanner";
 import { ForBusiness } from "../shop/home/ForBusiness";
 import { GiftCalendar } from "../shop/home/GiftCalendar";
-import { HeroCalculator } from "../shop/home/HeroCalculator";
 import { RouteMap } from "../shop/home/RouteMap";
 import { Shelf } from "../shop/home/Shelf";
 import { usePricing } from "../shop/useShopInfo";
@@ -23,9 +24,10 @@ const FAMILY: SockSpec[] = [
 ];
 
 /**
- * The home page, in the order a visitor's questions come: what does it cost (the calculator in the hero), what is
- * there (the line of socks, the four shelves, the newest pairs), why here (the facts and the three steps), and then
- * the shop's own tools: a set for the family, asking for a price, gifts by the calendar, and the way to the stall.
+ * The home page. It opens on the family's stall, container 70-E at night, in place of a photograph; then what is
+ * there (the line of socks, the four shelves, the newest pairs), why here (the facts and the three steps), and the
+ * shop's own tools: a set for the family, the box that shows the price fall, asking for a price, gifts by the
+ * calendar, and the way to the stall.
  */
 export function HomePage() {
   const { t } = useT();
@@ -35,12 +37,13 @@ export function HomePage() {
 
   return (
     <>
-      <HeroCalculator minPairs={min} tiers={tiers} />
+      <ContainerHero minPairs={min} />
       <Clothesline />
       <CategoryTiles />
       <Shelf />
       <Facts tiers={tiers} />
       <FamilyPlanner minPairs={min} tiers={tiers} />
+      <BoxBuilder minPairs={min} tiers={tiers} />
       <BazaarCalculator />
       <GiftCalendar />
       <ForBusiness />
