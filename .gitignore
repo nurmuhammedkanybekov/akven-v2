@@ -10,6 +10,7 @@ backend/target/
 
 # Uploaded product photos (runtime data, not source)
 backend/data/
+/data/
 
 # Frontend (Node)
 frontend/node_modules/
