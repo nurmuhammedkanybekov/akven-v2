@@ -4,12 +4,12 @@ import { formatPrice } from "../lib/format";
 import { usePricing } from "./useShopInfo";
 
 /**
- * Prices in US dollars or Kyrgyz som. The shop keeps every price in dollars (what the wallet charges); som are worked
- * out with the rate and rounding the owners set under Pricing, exactly as the server rounds them in the chat. The
- * visitor's choice is remembered on this device; until they choose, Russian and Kyrgyz read som and English reads
- * dollars. Without the rate (offline, still loading) prices stay in dollars rather than guess.
+ * Prices in US dollars, Kyrgyz som or Russian roubles. The shop keeps every price in dollars (what the wallet charges);
+ * som and roubles are worked out with the rate and rounding the owners set under Pricing, exactly as the server rounds
+ * som in the chat. The visitor's choice is remembered on this device; until they choose, Russian and Kyrgyz read som
+ * and English reads dollars. Without a rate (offline, still loading) prices stay in dollars rather than guess.
  */
-export type Currency = "USD" | "KGS";
+export type Currency = "USD" | "KGS" | "RUB";
 
 const KEY = "akven-currency";
 const listeners = new Set<() => void>();
@@ -17,7 +17,7 @@ const listeners = new Set<() => void>();
 function readChoice(): Currency | null {
   try {
     const v = localStorage.getItem(KEY);
-    return v === "USD" || v === "KGS" ? v : null;
+    return v === "USD" || v === "KGS" || v === "RUB" ? v : null;
   } catch {
     return null;
   }
@@ -48,20 +48,24 @@ export function useMoney() {
   const currency: Currency = chosen ?? (lang === "en" ? "USD" : "KGS");
   const rate = pricing?.somPerUsd ? Number(pricing.somPerUsd) : null;
   const step = pricing?.somRounding ?? 10;
+  const rubRate = pricing?.rubPerUsd ? Number(pricing.rubPerUsd) : null;
+  const rubStep = pricing?.rubRounding ?? 10;
   const inSom = currency === "KGS" && rate !== null;
+  const inRub = currency === "RUB" && rubRate !== null;
   const unit = lang === "en" ? "som" : "сом";
   return {
     currency,
-    /** What prices are actually shown in right now (som needs the rate). */
-    shown: (inSom ? "KGS" : "USD") as Currency,
+    /** What prices are actually shown in right now (som and roubles need their rate). */
+    shown: (inSom ? "KGS" : inRub ? "RUB" : "USD") as Currency,
     setCurrency,
-    money: (usd: number) => (inSom ? `${grouped(toSom(usd, rate!, step))} ${unit}` : formatPrice(usd)),
+    money: (usd: number) => (inSom ? `${grouped(toSom(usd, rate!, step))} ${unit}`
+      : inRub ? `${grouped(toSom(usd, rubRate!, rubStep))} ₽` : formatPrice(usd)),
     /** Always in dollars, for what the wallet actually charges. */
     usd: (usd: number) => formatPrice(usd),
   };
 }
 
-/** $ · СОМ, next to the language switch. */
+/** $ · СОМ · ₽, next to the language switch. */
 export function CurrencySwitch({ className }: { className?: string }) {
   const { t } = useT();
   const { currency, setCurrency: choose } = useMoney();
@@ -69,6 +73,7 @@ export function CurrencySwitch({ className }: { className?: string }) {
     <div className={`av-langs ${className ?? ""}`} role="group" aria-label={t("cur.label")}>
       <button type="button" aria-pressed={currency === "USD"} aria-label={t("cur.usd")} onClick={() => choose("USD")}>$</button>
       <button type="button" aria-pressed={currency === "KGS"} aria-label={t("cur.kgs")} onClick={() => choose("KGS")}>{t("cur.somShort")}</button>
+      <button type="button" aria-pressed={currency === "RUB"} aria-label={t("cur.rub")} onClick={() => choose("RUB")}>₽</button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2270 3014" width="2270" height="3014" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Entity-relationship diagram of the AKVEN schema after migration V24: 17 tables">
-<title>AKVEN data model after migration V24</title>
-<rect width="2270" height="3014" fill="#ffffff"/>
-<text x="22" y="52" font-size="34" font-weight="700" fill="#1b2340">AKVEN data model, all 17 tables after migration V24</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2270 3066" width="2270" height="3066" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Entity-relationship diagram of the AKVEN schema after migration V28: 18 tables">
+<title>AKVEN data model after migration V28</title>
+<rect width="2270" height="3066" fill="#ffffff"/>
+<text x="22" y="52" font-size="34" font-weight="700" fill="#1b2340">AKVEN data model, all 18 tables after migration V28</text>
 <path d="M474,651.0 H508 V230.0 H474" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M488,651.0 L474,643.0 M488,651.0 L474,651.0 M488,651.0 L474,659.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M484,221.0 L484,239.0" stroke="#6b7390" stroke-width="2"/>
@@ -14,39 +14,45 @@
 <path d="M1796,289.0 H1676 V140 H259.0 V210" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1782,289.0 L1796,281.0 M1782,289.0 L1796,289.0 M1782,289.0 L1796,297.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M250.0,200 L268.0,200" stroke="#6b7390" stroke-width="2"/>
-<path d="M1796,315.0 H1688 V1316.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M1796,315.0 H1688 V1342.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1782,315.0 L1796,307.0 M1782,315.0 L1796,315.0 M1782,315.0 L1796,323.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M1652,1307.0 L1652,1325.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M1652,1333.0 L1652,1351.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M2226,599.0 H2260 V230.0 H2226" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M2240,599.0 L2226,591.0 M2240,599.0 L2226,599.0 M2240,599.0 L2226,607.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M2236,221.0 L2236,239.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1058,937.0 H1104 V230.0 H1058" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1072,937.0 L1058,929.0 M1072,937.0 L1058,937.0 M1072,937.0 L1058,945.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1068,221.0 L1068,239.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M1058,963.0 H1116 V1316.0 H1212" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M1058,963.0 H1116 V1342.0 H1212" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1072,963.0 L1058,955.0 M1072,963.0 L1058,963.0 M1072,963.0 L1058,971.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M1202,1307.0 L1202,1325.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M1202,1333.0 L1202,1351.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1642,937.0 H1700 V230.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1656,937.0 L1642,929.0 M1656,937.0 L1642,937.0 M1656,937.0 L1642,945.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1652,221.0 L1652,239.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1642,911.0 H1712 V230.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1656,911.0 L1642,903.0 M1656,911.0 L1642,911.0 M1656,911.0 L1642,919.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1652,221.0 L1652,239.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M1642,1971.0 H1724 V1316.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
-<path d="M1656,1971.0 L1642,1963.0 M1656,1971.0 L1642,1971.0 M1656,1971.0 L1642,1979.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M1652,1307.0 L1652,1325.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M1642,1997.0 H1724 V1342.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M1656,1997.0 L1642,1989.0 M1656,1997.0 L1642,1997.0 M1656,1997.0 L1642,2005.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M1652,1333.0 L1652,1351.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1642,1143.0 H1736 V566.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1656,1143.0 L1642,1135.0 M1656,1143.0 L1642,1143.0 M1656,1143.0 L1642,1151.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1652,557.0 L1652,575.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M1642,1375.0 H1748 V566.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
-<path d="M1656,1375.0 L1642,1367.0 M1656,1375.0 L1642,1375.0 M1656,1375.0 L1642,1383.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,1451.0 H532 V230.0 H474" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M488,1451.0 L474,1443.0 M488,1451.0 L474,1451.0 M488,1451.0 L474,1459.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M484,221.0 L484,239.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,1425.0 H544 V128 H1427.0 V1322" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M488,1425.0 L474,1417.0 M488,1425.0 L474,1425.0 M488,1425.0 L474,1433.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M1418.0,1312 L1436.0,1312" stroke="#6b7390" stroke-width="2"/>
+<path d="M1642,1401.0 H1748 V566.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M1656,1401.0 L1642,1393.0 M1656,1401.0 L1642,1401.0 M1656,1401.0 L1642,1409.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1652,557.0 L1652,575.0" stroke="#6b7390" stroke-width="2"/>
 <text x="22" y="84" font-size="20" fill="#5f6678">PK primary key · FK foreign key · bold = NOT NULL · lines run from a foreign key (crow's foot, many) to the table it points at (bar, one)</text>
-<rect x="22" y="196" width="474" height="1140" rx="14" fill="#eef1f7" stroke="#9aa6c2" stroke-width="2"/>
+<rect x="22" y="196" width="474" height="1346" rx="14" fill="#eef1f7" stroke="#9aa6c2" stroke-width="2"/>
 <text x="44" y="186" font-size="22" font-weight="700" fill="#1b2340">Identity and system</text>
-<rect x="606" y="196" width="474" height="2748" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
+<rect x="606" y="196" width="474" height="2800" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
 <text x="628" y="186" font-size="22" font-weight="700" fill="#1b2340">Orders and pricing</text>
-<rect x="1190" y="196" width="474" height="1918" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
+<rect x="1190" y="196" width="474" height="1944" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
 <text x="1212" y="186" font-size="22" font-weight="700" fill="#1b2340">Catalog</text>
 <rect x="1774" y="196" width="474" height="676" rx="14" fill="#f2eefa" stroke="#a596cf" stroke-width="2"/>
 <text x="1796" y="186" font-size="22" font-weight="700" fill="#1b2340">AI negotiation</text>
@@ -166,6 +172,26 @@
 <text x="58" y="1303" font-size="18" fill="#a07a1f" font-weight="700"></text>
 <text x="108" y="1303" font-size="18" font-weight="700" fill="#1b2340">version</text>
 <text x="460" y="1303" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<rect x="44" y="1346" width="430" height="180" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<path d="M44,1386 H474" stroke="#1b2340" stroke-width="1.5"/>
+<rect x="44" y="1346" width="430" height="40" rx="8" fill="#1b2340"/>
+<rect x="44" y="1376" width="430" height="10" fill="#1b2340"/>
+<text x="58" y="1373" font-size="21" font-weight="700" fill="#ffffff">stock_request</text>
+<text x="58" y="1405" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
+<text x="108" y="1405" font-size="18" font-weight="700" fill="#1b2340">id</text>
+<text x="460" y="1405" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="1431" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="108" y="1431" font-size="18" font-weight="700" fill="#1b2340">variant_id</text>
+<text x="460" y="1431" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="1457" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="108" y="1457" font-size="18" font-weight="700" fill="#1b2340">user_id</text>
+<text x="460" y="1457" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="1483" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="1483" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
+<text x="460" y="1483" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="58" y="1509" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="1509" font-size="18" font-weight="400" fill="#1b2340">notified_at</text>
+<text x="460" y="1509" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
 <rect x="628" y="210" width="430" height="622" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
 <path d="M628,250 H1058" stroke="#1b2340" stroke-width="1.5"/>
 <rect x="628" y="210" width="430" height="40" rx="8" fill="#1b2340"/>
@@ -375,7 +401,7 @@
 <text x="642" y="2109" font-size="18" fill="#a07a1f" font-weight="700"></text>
 <text x="692" y="2109" font-size="18" font-weight="700" fill="#1b2340">version</text>
 <text x="1044" y="2109" font-size="17" fill="#5f6678" text-anchor="end">int</text>
-<rect x="628" y="2152" width="430" height="310" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<rect x="628" y="2152" width="430" height="362" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
 <path d="M628,2192 H1058" stroke="#1b2340" stroke-width="1.5"/>
 <rect x="628" y="2152" width="430" height="40" rx="8" fill="#1b2340"/>
 <rect x="628" y="2182" width="430" height="10" fill="#1b2340"/>
@@ -410,56 +436,62 @@
 <text x="642" y="2445" font-size="18" fill="#a07a1f" font-weight="700"></text>
 <text x="692" y="2445" font-size="18" font-weight="700" fill="#1b2340">som_rounding</text>
 <text x="1044" y="2445" font-size="17" fill="#5f6678" text-anchor="end">int</text>
-<rect x="628" y="2488" width="430" height="440" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
-<path d="M628,2528 H1058" stroke="#1b2340" stroke-width="1.5"/>
-<rect x="628" y="2488" width="430" height="40" rx="8" fill="#1b2340"/>
-<rect x="628" y="2518" width="430" height="10" fill="#1b2340"/>
-<text x="642" y="2515" font-size="21" font-weight="700" fill="#ffffff">size_chart_row</text>
-<text x="642" y="2547" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
-<text x="692" y="2547" font-size="18" font-weight="700" fill="#1b2340">id</text>
-<text x="1044" y="2547" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
-<text x="642" y="2573" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2573" font-size="18" font-weight="700" fill="#1b2340">label</text>
-<text x="1044" y="2573" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
-<text x="642" y="2599" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2599" font-size="18" font-weight="700" fill="#1b2340">foot_cm_min</text>
-<text x="1044" y="2599" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
+<text x="642" y="2471" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="692" y="2471" font-size="18" font-weight="700" fill="#1b2340">rub_per_usd</text>
+<text x="1044" y="2471" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
+<text x="642" y="2497" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="692" y="2497" font-size="18" font-weight="700" fill="#1b2340">rub_rounding</text>
+<text x="1044" y="2497" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<rect x="628" y="2540" width="430" height="440" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<path d="M628,2580 H1058" stroke="#1b2340" stroke-width="1.5"/>
+<rect x="628" y="2540" width="430" height="40" rx="8" fill="#1b2340"/>
+<rect x="628" y="2570" width="430" height="10" fill="#1b2340"/>
+<text x="642" y="2567" font-size="21" font-weight="700" fill="#ffffff">size_chart_row</text>
+<text x="642" y="2599" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
+<text x="692" y="2599" font-size="18" font-weight="700" fill="#1b2340">id</text>
+<text x="1044" y="2599" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
 <text x="642" y="2625" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2625" font-size="18" font-weight="700" fill="#1b2340">foot_cm_max</text>
-<text x="1044" y="2625" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
+<text x="692" y="2625" font-size="18" font-weight="700" fill="#1b2340">label</text>
+<text x="1044" y="2625" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
 <text x="642" y="2651" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2651" font-size="18" font-weight="700" fill="#1b2340">kr_mm_min</text>
-<text x="1044" y="2651" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="692" y="2651" font-size="18" font-weight="700" fill="#1b2340">foot_cm_min</text>
+<text x="1044" y="2651" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="642" y="2677" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2677" font-size="18" font-weight="700" fill="#1b2340">kr_mm_max</text>
-<text x="1044" y="2677" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="692" y="2677" font-size="18" font-weight="700" fill="#1b2340">foot_cm_max</text>
+<text x="1044" y="2677" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="642" y="2703" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2703" font-size="18" font-weight="700" fill="#1b2340">local_min</text>
-<text x="1044" y="2703" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
+<text x="692" y="2703" font-size="18" font-weight="700" fill="#1b2340">kr_mm_min</text>
+<text x="1044" y="2703" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="642" y="2729" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2729" font-size="18" font-weight="700" fill="#1b2340">local_max</text>
-<text x="1044" y="2729" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
+<text x="692" y="2729" font-size="18" font-weight="700" fill="#1b2340">kr_mm_max</text>
+<text x="1044" y="2729" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="642" y="2755" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2755" font-size="18" font-weight="700" fill="#1b2340">eu_min</text>
+<text x="692" y="2755" font-size="18" font-weight="700" fill="#1b2340">local_min</text>
 <text x="1044" y="2755" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="642" y="2781" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2781" font-size="18" font-weight="700" fill="#1b2340">eu_max</text>
+<text x="692" y="2781" font-size="18" font-weight="700" fill="#1b2340">local_max</text>
 <text x="1044" y="2781" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="642" y="2807" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2807" font-size="18" font-weight="700" fill="#1b2340">us_label</text>
-<text x="1044" y="2807" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
+<text x="692" y="2807" font-size="18" font-weight="700" fill="#1b2340">eu_min</text>
+<text x="1044" y="2807" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="642" y="2833" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2833" font-size="18" font-weight="700" fill="#1b2340">position</text>
-<text x="1044" y="2833" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="692" y="2833" font-size="18" font-weight="700" fill="#1b2340">eu_max</text>
+<text x="1044" y="2833" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="642" y="2859" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2859" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
-<text x="1044" y="2859" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="692" y="2859" font-size="18" font-weight="700" fill="#1b2340">us_label</text>
+<text x="1044" y="2859" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
 <text x="642" y="2885" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2885" font-size="18" font-weight="700" fill="#1b2340">updated_at</text>
-<text x="1044" y="2885" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="692" y="2885" font-size="18" font-weight="700" fill="#1b2340">position</text>
+<text x="1044" y="2885" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="642" y="2911" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="692" y="2911" font-size="18" font-weight="700" fill="#1b2340">version</text>
-<text x="1044" y="2911" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="692" y="2911" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
+<text x="1044" y="2911" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="642" y="2937" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="692" y="2937" font-size="18" font-weight="700" fill="#1b2340">updated_at</text>
+<text x="1044" y="2937" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="642" y="2963" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="692" y="2963" font-size="18" font-weight="700" fill="#1b2340">version</text>
+<text x="1044" y="2963" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <rect x="1212" y="210" width="430" height="310" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
 <path d="M1212,250 H1642" stroke="#1b2340" stroke-width="1.5"/>
 <rect x="1212" y="210" width="430" height="40" rx="8" fill="#1b2340"/>
@@ -551,7 +583,7 @@
 <text x="1226" y="1021" font-size="18" fill="#a07a1f" font-weight="700"></text>
 <text x="1276" y="1021" font-size="18" font-weight="400" fill="#1b2340">origin</text>
 <text x="1628" y="1021" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
-<rect x="1212" y="1064" width="430" height="206" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<rect x="1212" y="1064" width="430" height="232" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
 <path d="M1212,1104 H1642" stroke="#1b2340" stroke-width="1.5"/>
 <rect x="1212" y="1064" width="430" height="40" rx="8" fill="#1b2340"/>
 <rect x="1212" y="1094" width="430" height="10" fill="#1b2340"/>
@@ -574,94 +606,97 @@
 <text x="1226" y="1253" font-size="18" fill="#a07a1f" font-weight="700"></text>
 <text x="1276" y="1253" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
 <text x="1628" y="1253" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
-<rect x="1212" y="1296" width="430" height="570" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
-<path d="M1212,1336 H1642" stroke="#1b2340" stroke-width="1.5"/>
-<rect x="1212" y="1296" width="430" height="40" rx="8" fill="#1b2340"/>
-<rect x="1212" y="1326" width="430" height="10" fill="#1b2340"/>
-<text x="1226" y="1323" font-size="21" font-weight="700" fill="#ffffff">variant</text>
-<text x="1226" y="1355" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
-<text x="1276" y="1355" font-size="18" font-weight="700" fill="#1b2340">id</text>
-<text x="1628" y="1355" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
-<text x="1226" y="1381" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
-<text x="1276" y="1381" font-size="18" font-weight="700" fill="#1b2340">product_id</text>
+<text x="1226" y="1279" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="1276" y="1279" font-size="18" font-weight="400" fill="#1b2340">color</text>
+<text x="1628" y="1279" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
+<rect x="1212" y="1322" width="430" height="570" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<path d="M1212,1362 H1642" stroke="#1b2340" stroke-width="1.5"/>
+<rect x="1212" y="1322" width="430" height="40" rx="8" fill="#1b2340"/>
+<rect x="1212" y="1352" width="430" height="10" fill="#1b2340"/>
+<text x="1226" y="1349" font-size="21" font-weight="700" fill="#ffffff">variant</text>
+<text x="1226" y="1381" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
+<text x="1276" y="1381" font-size="18" font-weight="700" fill="#1b2340">id</text>
 <text x="1628" y="1381" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
-<text x="1226" y="1407" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1407" font-size="18" font-weight="700" fill="#1b2340">sku</text>
-<text x="1628" y="1407" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
+<text x="1226" y="1407" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="1276" y="1407" font-size="18" font-weight="700" fill="#1b2340">product_id</text>
+<text x="1628" y="1407" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
 <text x="1226" y="1433" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1433" font-size="18" font-weight="400" fill="#1b2340">size</text>
+<text x="1276" y="1433" font-size="18" font-weight="700" fill="#1b2340">sku</text>
 <text x="1628" y="1433" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
 <text x="1226" y="1459" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1459" font-size="18" font-weight="400" fill="#1b2340">color</text>
+<text x="1276" y="1459" font-size="18" font-weight="400" fill="#1b2340">size</text>
 <text x="1628" y="1459" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
 <text x="1226" y="1485" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1485" font-size="18" font-weight="400" fill="#1b2340">pack_size</text>
-<text x="1628" y="1485" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="1276" y="1485" font-size="18" font-weight="400" fill="#1b2340">color</text>
+<text x="1628" y="1485" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
 <text x="1226" y="1511" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1511" font-size="18" font-weight="700" fill="#1b2340">price</text>
-<text x="1628" y="1511" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
+<text x="1276" y="1511" font-size="18" font-weight="400" fill="#1b2340">pack_size</text>
+<text x="1628" y="1511" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="1226" y="1537" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1537" font-size="18" font-weight="700" fill="#1b2340">cost_price</text>
+<text x="1276" y="1537" font-size="18" font-weight="700" fill="#1b2340">price</text>
 <text x="1628" y="1537" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="1226" y="1563" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1563" font-size="18" font-weight="700" fill="#1b2340">margin_floor_pct</text>
+<text x="1276" y="1563" font-size="18" font-weight="700" fill="#1b2340">cost_price</text>
 <text x="1628" y="1563" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="1226" y="1589" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1589" font-size="18" font-weight="700" fill="#1b2340">stock_qty</text>
-<text x="1628" y="1589" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="1276" y="1589" font-size="18" font-weight="700" fill="#1b2340">margin_floor_pct</text>
+<text x="1628" y="1589" font-size="17" fill="#5f6678" text-anchor="end">numeric</text>
 <text x="1226" y="1615" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1615" font-size="18" font-weight="700" fill="#1b2340">reserved_qty</text>
+<text x="1276" y="1615" font-size="18" font-weight="700" fill="#1b2340">stock_qty</text>
 <text x="1628" y="1615" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="1226" y="1641" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1641" font-size="18" font-weight="400" fill="#1b2340">available_qty</text>
+<text x="1276" y="1641" font-size="18" font-weight="700" fill="#1b2340">reserved_qty</text>
 <text x="1628" y="1641" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="1226" y="1667" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1667" font-size="18" font-weight="700" fill="#1b2340">is_active</text>
-<text x="1628" y="1667" font-size="17" fill="#5f6678" text-anchor="end">bool</text>
+<text x="1276" y="1667" font-size="18" font-weight="400" fill="#1b2340">available_qty</text>
+<text x="1628" y="1667" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="1226" y="1693" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1693" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
-<text x="1628" y="1693" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="1276" y="1693" font-size="18" font-weight="700" fill="#1b2340">is_active</text>
+<text x="1628" y="1693" font-size="17" fill="#5f6678" text-anchor="end">bool</text>
 <text x="1226" y="1719" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1719" font-size="18" font-weight="700" fill="#1b2340">updated_at</text>
+<text x="1276" y="1719" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
 <text x="1628" y="1719" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
 <text x="1226" y="1745" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1745" font-size="18" font-weight="700" fill="#1b2340">version</text>
-<text x="1628" y="1745" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="1276" y="1745" font-size="18" font-weight="700" fill="#1b2340">updated_at</text>
+<text x="1628" y="1745" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
 <text x="1226" y="1771" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1771" font-size="18" font-weight="400" fill="#1b2340">color_hex</text>
-<text x="1628" y="1771" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
+<text x="1276" y="1771" font-size="18" font-weight="700" fill="#1b2340">version</text>
+<text x="1628" y="1771" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="1226" y="1797" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1797" font-size="18" font-weight="700" fill="#1b2340">incoming_qty</text>
-<text x="1628" y="1797" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="1276" y="1797" font-size="18" font-weight="400" fill="#1b2340">color_hex</text>
+<text x="1628" y="1797" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
 <text x="1226" y="1823" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1823" font-size="18" font-weight="400" fill="#1b2340">restock_eta</text>
-<text x="1628" y="1823" font-size="17" fill="#5f6678" text-anchor="end">date</text>
+<text x="1276" y="1823" font-size="18" font-weight="700" fill="#1b2340">incoming_qty</text>
+<text x="1628" y="1823" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="1226" y="1849" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="1849" font-size="18" font-weight="400" fill="#1b2340">case_pairs</text>
-<text x="1628" y="1849" font-size="17" fill="#5f6678" text-anchor="end">int</text>
-<rect x="1212" y="1892" width="430" height="206" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
-<path d="M1212,1932 H1642" stroke="#1b2340" stroke-width="1.5"/>
-<rect x="1212" y="1892" width="430" height="40" rx="8" fill="#1b2340"/>
-<rect x="1212" y="1922" width="430" height="10" fill="#1b2340"/>
-<text x="1226" y="1919" font-size="21" font-weight="700" fill="#ffffff">product_embedding</text>
-<text x="1226" y="1951" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
-<text x="1276" y="1951" font-size="18" font-weight="700" fill="#1b2340">id</text>
-<text x="1628" y="1951" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
-<text x="1226" y="1977" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
-<text x="1276" y="1977" font-size="18" font-weight="700" fill="#1b2340">variant_id</text>
+<text x="1276" y="1849" font-size="18" font-weight="400" fill="#1b2340">restock_eta</text>
+<text x="1628" y="1849" font-size="17" fill="#5f6678" text-anchor="end">date</text>
+<text x="1226" y="1875" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="1276" y="1875" font-size="18" font-weight="400" fill="#1b2340">case_pairs</text>
+<text x="1628" y="1875" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<rect x="1212" y="1918" width="430" height="206" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<path d="M1212,1958 H1642" stroke="#1b2340" stroke-width="1.5"/>
+<rect x="1212" y="1918" width="430" height="40" rx="8" fill="#1b2340"/>
+<rect x="1212" y="1948" width="430" height="10" fill="#1b2340"/>
+<text x="1226" y="1945" font-size="21" font-weight="700" fill="#ffffff">product_embedding</text>
+<text x="1226" y="1977" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
+<text x="1276" y="1977" font-size="18" font-weight="700" fill="#1b2340">id</text>
 <text x="1628" y="1977" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
-<text x="1226" y="2003" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="2003" font-size="18" font-weight="700" fill="#1b2340">chunk_index</text>
-<text x="1628" y="2003" font-size="17" fill="#5f6678" text-anchor="end">int</text>
+<text x="1226" y="2003" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="1276" y="2003" font-size="18" font-weight="700" fill="#1b2340">variant_id</text>
+<text x="1628" y="2003" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
 <text x="1226" y="2029" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="2029" font-size="18" font-weight="700" fill="#1b2340">content</text>
-<text x="1628" y="2029" font-size="17" fill="#5f6678" text-anchor="end">text</text>
+<text x="1276" y="2029" font-size="18" font-weight="700" fill="#1b2340">chunk_index</text>
+<text x="1628" y="2029" font-size="17" fill="#5f6678" text-anchor="end">int</text>
 <text x="1226" y="2055" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="2055" font-size="18" font-weight="400" fill="#1b2340">embedding</text>
-<text x="1628" y="2055" font-size="17" fill="#5f6678" text-anchor="end">vector</text>
+<text x="1276" y="2055" font-size="18" font-weight="700" fill="#1b2340">content</text>
+<text x="1628" y="2055" font-size="17" fill="#5f6678" text-anchor="end">text</text>
 <text x="1226" y="2081" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="1276" y="2081" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
-<text x="1628" y="2081" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="1276" y="2081" font-size="18" font-weight="400" fill="#1b2340">embedding</text>
+<text x="1628" y="2081" font-size="17" fill="#5f6678" text-anchor="end">vector</text>
+<text x="1226" y="2107" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="1276" y="2107" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
+<text x="1628" y="2107" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
 <rect x="1796" y="210" width="430" height="284" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
 <path d="M1796,250 H2226" stroke="#1b2340" stroke-width="1.5"/>
 <rect x="1796" y="210" width="430" height="40" rx="8" fill="#1b2340"/>

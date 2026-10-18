@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { adminEvaluation, adminNegotiationStats, adminSummary } from "../api/endpoints";
-import type { EvaluationReport, NegotiationStats, ShopSummary } from "../api/types";
+import { adminAnswerStockRequest, adminEvaluation, adminNegotiationStats, adminStockRequests, adminSummary } from "../api/endpoints";
+import type { EvaluationReport, NegotiationStats, ShopSummary, StockWaiting } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { Badge } from "../components/Badge";
 import { useAsync } from "../hooks/useAsync";
@@ -31,6 +31,7 @@ export function AdminDashboard() {
       {summary.error && <Alert tone="danger">{summary.error.message}</Alert>}
       {summary.loading && !summary.data && <Skeleton height={200} />}
       {summary.data && <ShopNow s={summary.data} />}
+      <WaitingList />
       <h2 className="av-formtitle av-db__part">{t("a.db.assistantPart")}</h2>
       {stats.error && <Alert tone="danger">{stats.error.message}</Alert>}
       {stats.loading && !stats.data && <Skeleton height={260} />}
@@ -75,6 +76,48 @@ function ShopNow({ s }: { s: ShopSummary }) {
         )}
       </section>
     </>
+  );
+}
+
+/** Customers who asked to hear when a sold-out option is back; the team writes to them and marks them as told. */
+function WaitingList() {
+  const { t } = useT();
+  const [list, setList] = useState<StockWaiting[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => { adminStockRequests().then(setList).catch((e: Error) => setError(e.message)); }, []);
+  async function answered(id: string) {
+    try { await adminAnswerStockRequest(id); setList(await adminStockRequests()); }
+    catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+  }
+  return (
+    <section className="av-card-form" aria-labelledby="wait-h">
+      <h2 id="wait-h" className="av-formtitle">{t("a.db.waitTitle")}</h2>
+      <p className="av-small">{t("a.db.waitLead")}</p>
+      {error && <Alert tone="danger">{error}</Alert>}
+      {list && list.length === 0 && <p className="av-small">{t("a.db.waitNone")}</p>}
+      {list && list.length > 0 && (
+        <ul className="av-waitlist">
+          {list.map((w) => (
+            <li key={w.sku}>
+              <div className="av-waitlist__head">
+                <strong>{w.productName}</strong> <span className="av-small">{[w.color, w.size].filter(Boolean).join(" · ")} · {w.sku}</span>
+                <Badge tone="accent">{t("a.db.waitN", { n: w.customers.length })}</Badge>
+                {w.available > 0 && <Badge tone="success">{t("a.db.backIn", { n: w.available })}</Badge>}
+              </div>
+              <ul className="av-waitlist__people">
+                {w.customers.map((c) => (
+                  <li key={c.requestId}>
+                    <a href={`mailto:${c.email}?subject=${encodeURIComponent(t("a.db.mailSubject", { name: w.productName }))}`}>{c.email}</a>
+                    <span className="av-small av-muted">{formatDay(c.since.slice(0, 10))}</span>
+                    <button type="button" className="av-link-btn" onClick={() => void answered(c.requestId)}>{t("a.db.told")}</button>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

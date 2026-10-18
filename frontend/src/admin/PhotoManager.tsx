@@ -7,11 +7,12 @@ import { Button } from "../components/Button";
 import { useToast } from "../components/Toast";
 import { useT } from "../i18n/I18n";
 
-const MAX = 8;
+const MAX = 40;
 
 /**
- * Photos for one product. Upload (or drop) as many as you like up to 8; the first is the cover. Rearranging,
- * renaming (the alt text that screen readers and Google read) and removing all save immediately.
+ * Photos for one product. Upload (or drop) as many as you like up to 40; the first is the cover. Each photo can belong
+ * to one colour: choosing that colour in the shop shows its photos. Rearranging, renaming (the alt text that screen
+ * readers and Google read), the colour and removing all save immediately.
  */
 export function PhotoManager({ product, onChange }: { product: AdminProduct; onChange: (p: AdminProduct) => void }) {
   const toast = useToast();
@@ -40,13 +41,18 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
     if (input.current) input.current.value = "";
   }
 
-  async function replace(next: Array<{ url: string; alt: string }>, message: string) {
+  type Item = { url: string; alt: string; color: string | null };
+  async function replace(next: Item[], message: string) {
     setBusy(t("a.saving")); setError(null);
     try { onChange(await adminReplaceImages(product.id, next)); toast(message); }
     catch (e) { setError(e instanceof ApiError ? e.message : t("a.ph.saveFailed")); }
     finally { setBusy(null); }
   }
-  const asList = () => images.map((i) => ({ url: i.url, alt: i.alt }));
+  const asList = (): Item[] => images.map((i) => ({ url: i.url, alt: i.alt, color: i.color ?? null }));
+  const colours = [...new Set(product.variants.map((v) => v.color).filter((c): c is string => !!c))];
+  function recolour(index: number, color: string) {
+    const list = asList(); list[index] = { ...list[index], color: color || null }; void replace(list, t("a.ph.recoloured"));
+  }
   function move(index: number, by: -1 | 1) {
     const list = asList(); const [item] = list.splice(index, 1); list.splice(index + by, 0, item);
     void replace(list, t("a.ph.moved"));
@@ -76,6 +82,12 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
               {i === 0 && <span className="av-badge av-badge--accent">{t("a.ph.cover")}</span>}
               <label className="av-visually-hidden" htmlFor={`alt-${img.id}`}>{t("a.ph.alt", { n: i + 1 })}</label>
               <input id={`alt-${img.id}`} className="av-input" defaultValue={img.alt} onBlur={(e) => rename(i, e.target.value)} />
+              {colours.length > 0 && (
+                <select className="av-select" aria-label={t("a.ph.colourFor", { n: i + 1 })} value={img.color ?? ""} disabled={!!busy} onChange={(e) => recolour(i, e.target.value)}>
+                  <option value="">{t("a.ph.allColours")}</option>
+                  {colours.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              )}
               <div className="av-row">
                 <Button size="sm" variant="ghost" disabled={i === 0 || !!busy} aria-label={t("a.ph.earlier", { n: i + 1 })} onClick={() => move(i, -1)}>←</Button>
                 <Button size="sm" variant="ghost" disabled={i === images.length - 1 || !!busy} aria-label={t("a.ph.later", { n: i + 1 })} onClick={() => move(i, 1)}>→</Button>

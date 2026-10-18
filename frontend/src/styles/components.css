@@ -166,6 +166,12 @@
 .av-admin__who .av-langs button { opacity: 1; color: var(--ink-2); }
 .av-admin__who .av-langs button[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
 .av-mobile-nav__langs { padding-top: var(--space-5); display: grid; gap: var(--space-3); justify-items: start; }
+/* Light and dark, in the top bar next to the languages: a small icon button in the bar's own colour. */
+.av-ann__theme { display: inline-grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; opacity: 0.8; transition: opacity var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease), transform 0.4s var(--ease); }
+.av-ann__theme:hover { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); transform: rotate(-20deg); }
+.av-ann__theme svg { width: 16px; height: 16px; }
+.av-mobile-nav__langs .av-ann__theme { width: 44px; height: 44px; color: var(--ink); border: 1px solid var(--line-strong); }
+.av-mobile-nav__langs .av-ann__theme svg { width: 20px; height: 20px; }
 .av-mobile-nav__langs .av-langs { gap: var(--space-2); }
 .av-mobile-nav__langs button { font-size: 0.9375rem; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 999px; opacity: 1; }
 .av-mobile-nav__langs button[aria-pressed="true"] { color: var(--on-ink); background: var(--ink); border-color: var(--ink); text-decoration: none; }
@@ -508,3 +514,12 @@ body.av-locked { overflow: hidden; }
 .av-db__part { margin-top: var(--space-6); }
 .av-card__price { display: grid; gap: 1px; }
 .av-card__pair { font-size: var(--text-small); color: var(--success); font-weight: 600; }
+.av-notify { display: grid; gap: var(--space-2); }
+.av-notify__note { margin: 0; color: var(--success); font-weight: 600; }
+.av-waitlist, .av-waitlist__people { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+.av-waitlist__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.av-waitlist__people { gap: var(--space-1); margin-top: var(--space-2); padding-left: var(--space-4); border-left: 2px solid var(--line); }
+.av-waitlist__people li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.av-scan__view { position: relative; display: grid; gap: var(--space-2); }
+.av-scan__view video { width: 100%; max-height: 18rem; object-fit: cover; border-radius: var(--radius-md); background: #000; }
+.av-scan__frame { position: absolute; top: 50%; left: 50%; width: 9rem; height: 9rem; translate: -50% calc(-50% - 1.4rem); border: 3px solid var(--accent); border-radius: 14px; box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.25); pointer-events: none; }

@@ -11,6 +11,8 @@ import { fileURLToPath } from "node:url";
 import { MARK, markMarkup } from "../src/brand/mark.ts";
 import { SOCK_COLOURS as C, sockBounds, sockMarkup } from "../src/brand/sockDrawing.ts";
 import { COLLECTION_2 } from "./collection-2.mjs";
+import { COLLECTION_3 } from "./collection-3.mjs";
+import { LEGACY_COLOURS, collectionColours, colourSlug, colourise } from "./colours.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -141,18 +143,33 @@ const PRODUCTS = {
 };
 
 for (const p of COLLECTION_2) PRODUCTS[p.slug] = p.box ? { tint: p.tint, box: p.box } : { tint: p.tint, sock: p.sock };
+// The classics are drawn in their first colour by default.
+for (const p of COLLECTION_3) PRODUCTS[p.slug] = { tint: p.tint, sock: colourise(p.sock, collectionColours(p)[0][1]) };
+
+/** Every sock product's colours, for the pictures that change with the colour chosen. */
+const COLOURS = { ...LEGACY_COLOURS };
+for (const p of [...COLLECTION_2, ...COLLECTION_3]) if (!p.box) COLOURS[p.slug] = collectionColours(p);
+const BASE = Object.fromEntries([...COLLECTION_3].map((p) => [p.slug, p.sock]));
 
 const outDir = path.join(root, "public/media/products");
 fs.mkdirSync(outDir, { recursive: true });
+let files = 0;
+const write = (name, svg) => { fs.writeFileSync(path.join(outDir, name), svg); files++; };
 for (const [slug, p] of Object.entries(PRODUCTS)) {
   if (p.sock) {
-    fs.writeFileSync(path.join(outDir, `${slug}-1.svg`), frame(p.tint, single(slug, p.sock)));
-    fs.writeFileSync(path.join(outDir, `${slug}-2.svg`), frame(p.tint, pair(slug, p.sock)));
+    write(`${slug}-1.svg`, frame(p.tint, single(slug, p.sock)));
+    write(`${slug}-2.svg`, frame(p.tint, pair(slug, p.sock)));
+    for (const [name, hex] of COLOURS[slug] ?? []) {
+      const spec = colourise(BASE[slug] ?? p.sock, hex);
+      const c = colourSlug(name);
+      write(`${slug}--${c}-1.svg`, frame(p.tint, single(`${slug}-${c}`, spec)));
+      write(`${slug}--${c}-2.svg`, frame(p.tint, pair(`${slug}-${c}`, spec)));
+    }
   } else {
-    fs.writeFileSync(path.join(outDir, `${slug}-1.svg`), frame(p.tint, box(slug, p.box)));
+    write(`${slug}-1.svg`, frame(p.tint, box(slug, p.box)));
     const n = p.box.socks.length;
     const fan = p.box.socks.map((spec, i) => placed(spec, `${slug}-f${i}`, { cx: 220 + (360 / Math.max(1, n - 1)) * i, cy: 500, fit: 330, rotate: (i - (n - 1) / 2) * 9 })).join("");
-    fs.writeFileSync(path.join(outDir, `${slug}-2.svg`), frame(p.tint, fan));
+    write(`${slug}-2.svg`, frame(p.tint, fan));
   }
 }
-console.log(`wrote ${Object.keys(PRODUCTS).length * 2} product images to public/media/products`);
+console.log(`wrote ${files} product images to public/media/products`);

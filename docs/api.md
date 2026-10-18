@@ -30,10 +30,10 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET /api/products` | Catalog: filters (category, section, cut, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
 | `GET /api/products/facets` | Counts per category / section / cut for the current filters |
 | `GET /api/catalog/terms` | The owners' sections and cuts (for menus and filters) |
-| `GET /api/products/{slug}` | Product detail with variants and images. Each variant has `stockStatus` (`IN_STOCK`, `FEW_LEFT`, `COMING_SOON`, `SOLD_OUT`), `restockInDays` while coming soon, and `casePairs` |
+| `GET /api/products/{slug}` | Product detail with variants and images (an image with a `color` shows that colour of the product; the shop shows it when the colour is chosen). Each variant has `stockStatus` (`IN_STOCK`, `FEW_LEFT`, `COMING_SOON`, `SOLD_OUT`), `restockInDays` while coming soon, and `casePairs` |
 | `POST /api/cart/quote` | Today's prices and availability for a cart (public; negotiated prices only for their owner). Also returns `collection`: total pairs, the minimum that applies, the reached tier, the next tier (`pairsToGo`), and a message when the cart is below the minimum |
-| `GET /api/pricing` | Public: the minimum order in pairs, the price ladder `[{minPairs, discountPct}]`, and `somPerUsd` / `somRounding` for showing prices in som |
-| `GET`, `PUT /api/admin/pricing/policy` | Minimum order, trusted minimum, paid orders after which a customer counts as trusted, and the som rate `somPerUsd` with `somRounding` (1, 5, 10, 50 or 100) (ADMIN) |
+| `GET /api/pricing` | Public: the minimum order in pairs, the price ladder `[{minPairs, discountPct}]`, `somPerUsd` / `somRounding` for showing prices in som, and `rubPerUsd` / `rubRounding` for roubles |
+| `GET`, `PUT /api/admin/pricing/policy` | Minimum order, trusted minimum, paid orders after which a customer counts as trusted, the som rate `somPerUsd` with `somRounding` and the rouble rate `rubPerUsd` with `rubRounding` (each 1, 5, 10, 50 or 100) (ADMIN) |
 | `GET`, `POST /api/admin/pricing/tiers`, `PUT`, `DELETE /api/admin/pricing/tiers/{id}` | The price ladder; one step per number of pairs, 0 to 90% (ADMIN) |
 | `PUT /api/admin/customers/{id}/trusted` | Mark a customer as trusted `{trusted}` (ADMIN) |
 | `GET /api/sizes?lang=en\|ru\|ky` | Public size chart: every row has foot length, Korean mm, local (RU / KG), EU and US sizes; `columns` says which lead for the language (EU and US for English, local sizes for Russian and Kyrgyz) |
@@ -54,6 +54,8 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `POST /api/admin/assistant/evaluation` | The same 16 customers against the live model, about one minute, labelled `LIVE` (SUPER_ADMIN) |
 | `GET`, `POST /api/admin/accounts`, `PUT /api/admin/accounts/{id}`, `PUT /api/admin/accounts/{id}/password` | The shop team's accounts: create an owner or staff account, change name, role and active, set a new password; super admin accounts cannot be changed through the API (SUPER_ADMIN) |
 | `GET /api/admin/customers?q=` | Customers by email, with `trusted` (ADMIN) |
+| `GET /api/stock-requests`, `PUT /api/stock-requests/{sku}`, `DELETE /api/stock-requests/{sku}` | "Tell me when it's back": the SKUs the signed-in customer is waiting for; join or leave the list for a sold-out option (an option in stock is refused: it can go in the bag) |
+| `GET /api/admin/stock-requests`, `PUT /api/admin/stock-requests/{id}/answered` | Sold-out options with the customers waiting for them (email and since when), most-wanted first; mark a customer as told (STAFF / ADMIN, audited) |
 | `PUT /api/admin/customers/{id}/password`, `PUT /api/admin/customers/{id}/active` | Set a new password for a customer `{password}` (at least 8 characters), or switch a customer account off or on `{active}`; both end the customer's sessions and are audited. Team accounts are not reachable here (ADMIN) |
 | `GET /api/admin/audit` | The whole audit log, newest first, with the actor's email (SUPER_ADMIN) |
 | `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer. Deliveries take `fulfillment.country` (`KG`, `KZ`, `UZ`, `RU`; `KG` when left out) |

@@ -162,63 +162,99 @@
 
 /* ---------- less motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .av-hero4__copy > *, .av-hero4__lights i, .av-hang__sway, .av-hang:hover .av-hang__sway, .av-box__door, .av-crate__sock, .av-line__track, .av-line__sway, .av-line__sock:hover .av-line__sway, .av-shelf > *, .av-fit__sock,
+  .av-hero5__copy > *, .av-hero5__lights i, .av-yard__door, .av-yard__emboss, .av-yard__sign, .av-yard .av-hang, .av-hang__sway, .av-hang:hover .av-hang__sway, .av-box__door, .av-crate__sock, .av-line__track, .av-line__sway, .av-line__sock:hover .av-line__sway, .av-shelf > *, .av-fit__sock,
   .av-family__row, .av-calc__stamp.is-on, .av-route__pulse { animation: none !important; }
   .av-line__sock, .av-hang, .av-meter > i, .av-say, .av-cat__socks svg, .av-biz__art svg { transition: none !important; }
 }
 
 
-/* ---------- hero: night at Dordoi, container 70-E opening, the headline over it ---------- */
-.av-hero4 { position: relative; overflow: hidden; isolation: isolate; color: var(--on-black);
-  background: linear-gradient(180deg, #08101f 0%, #0f1a34 58%, #16223d 100%); }
-.av-hero4__scene { position: relative; height: clamp(300px, 86vw, 440px); }
-.av-hero4__ground { position: absolute; left: 0; right: 0; bottom: 0; height: 16%; background: linear-gradient(#1a2643, #10182d); border-top: 1px solid rgba(255, 255, 255, 0.07); }
-/* Warm light from the open container, falling on the ground in front of it. */
-.av-hero4__ground::before { content: ""; position: absolute; left: 50%; top: -20%; width: 70%; height: 140%; transform: translateX(-50%);
-  background: radial-gradient(closest-side, rgba(255, 214, 140, 0.32), transparent); }
-.av-hero4__row { position: absolute; left: 0; right: 0; bottom: 16%; height: 60%; }
-.av-ghost { position: absolute; bottom: 0; width: 30%; aspect-ratio: 4 / 2.8; border: 6px solid rgba(0, 0, 0, 0.35); border-bottom: 0;
-  background: repeating-linear-gradient(90deg, var(--c) 0 9px, color-mix(in srgb, var(--c) 72%, #000) 9px 13px, color-mix(in srgb, var(--c) 88%, #fff) 13px 20px);
-  filter: brightness(0.42) saturate(0.8); }
-.av-ghost::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 49.4%, rgba(0, 0, 0, 0.55) 49.4% 50.6%, transparent 50.6%); }
-.av-ghost--0 { left: -12%; } .av-ghost--1 { left: 14%; bottom: 0; width: 24%; filter: brightness(0.3) saturate(0.7); }
-.av-ghost--2 { right: -14%; } .av-ghost--3 { left: -6%; bottom: calc(100% * 0.7); width: 24%; filter: brightness(0.28) saturate(0.7); }
-.av-hero4 .av-stage { position: absolute; left: 50%; bottom: 13%; width: min(560px, 96vw); transform: translateX(-50%); max-width: none; }
-.av-hero4 .av-stage__floor { display: none; }
-/* A string of bulbs over the passage. */
-.av-hero4__lights { position: absolute; top: 5%; left: -2%; right: -2%; display: flex; justify-content: space-between; }
-.av-hero4__lights::before { content: ""; position: absolute; left: 0; right: 0; top: 2px; height: 26px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); border-radius: 0 0 50% 50% / 0 0 100% 100%; }
-.av-hero4__lights i { position: relative; width: 7px; height: 9px; margin-top: calc(8px + (var(--i) - 8.5) * (var(--i) - 8.5) * -0.28px + 20px); border-radius: 50% 50% 45% 45%;
+/* ---------- hero: a Dordoi passage at night, containers on two floors, 70-E opening in the middle ---------- */
+.av-hero5 {
+  --cw: clamp(150px, min(19vw, 26svh), 290px);       /* one container's width; everything in the yard follows it */
+  position: relative; overflow: hidden; isolation: isolate; color: var(--on-black);
+  background: radial-gradient(120% 70% at 50% 0%, #15224a 0%, #0b1328 55%, #070d1d 100%);
+}
+.av-hero5__sky { position: absolute; inset: 0; z-index: -3; pointer-events: none; }
+/* A string of bulbs over the passage, hung in a gentle curve. */
+.av-hero5__lights { position: absolute; top: 0; left: -2%; right: -2%; display: flex; justify-content: space-between; }
+.av-hero5__lights::before { content: ""; position: absolute; left: 0; right: 0; top: 2px; height: 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+.av-hero5__lights i { position: relative; width: 7px; height: 9px; margin-top: calc(28px - (var(--i) - 10.5) * (var(--i) - 10.5) * 0.2px); border-radius: 50% 50% 45% 45%;
   background: #ffd98a; box-shadow: 0 0 12px 3px rgba(255, 200, 110, 0.45); animation: av-bulb 3.6s ease-in-out calc(var(--i) * -0.37s) infinite alternate; }
-@keyframes av-bulb { from { opacity: 1; } to { opacity: 0.55; } }
-.av-hero4__copy { position: relative; display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--space-6) clamp(2.5rem, 7vw, 4rem); }
-.av-hero4__copy > * { animation: av-up 0.8s var(--ease) both; }
-.av-hero4__copy > :nth-child(2) { animation-delay: 0.06s; } .av-hero4__copy > :nth-child(3) { animation-delay: 0.12s; }
-.av-hero4__copy > :nth-child(4) { animation-delay: 0.18s; } .av-hero4__copy > :nth-child(5) { animation-delay: 0.24s; }
-.av-hero4__where { margin: 0; font-size: 0.9375rem; font-weight: 600; color: var(--accent); }
-.av-hero4__title { margin: 0; font-size: clamp(2.7rem, 1.3rem + 4.6vw, 5.6rem); line-height: 0.95; letter-spacing: -0.05em; color: var(--on-black); max-width: 11ch; }
-.av-hero4__title em { color: var(--accent); }
-.av-hero4__lead { max-width: 32rem; font-size: 1.1875rem; line-height: 1.55; color: var(--on-black-2); text-wrap: pretty; }
-@media (min-width: 960px) {
-  .av-hero4 { min-height: min(52rem, calc(100svh - 110px)); display: grid; align-items: center; }
-  .av-hero4__scene { position: absolute; inset: 0; height: auto; z-index: -1; }
-  /* Keep the headline readable: the left of the scene is darkened, the container on the right stays bright. */
-  .av-hero4__scene::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8, 16, 31, 0.92) 0%, rgba(8, 16, 31, 0.6) 34%, transparent 56%); }
-  .av-hero4 .av-stage { left: auto; right: 3%; bottom: 14%; width: min(900px, 58vw); transform: none; }
-  .av-hero4__ground::before { left: 70%; width: 60%; }
-  .av-ghost { width: 22%; } .av-ghost--0 { left: -4%; } .av-ghost--1 { left: 16%; width: 18%; } .av-ghost--3 { left: 2%; width: 17%; } .av-ghost--2 { right: -8%; width: 16%; }
-  .av-hero4__copy { padding-block: var(--space-8); }
-}
-@media (max-width: 479px) { .av-hero4 .av-hang:nth-child(n + 6) { display: none; } .av-hero4 .av-hang { width: 17%; } }
+@keyframes av-bulb { from { opacity: 1; } to { opacity: 0.5; } }
 
-/* the stage: sign, container, doors, rail */
-.av-stage { position: relative; padding-inline: 13%; perspective: 1600px; max-width: 660px; width: 100%; justify-self: center; }
-.av-stage__sign {
-  position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 14px; width: 52%; margin: 0 auto -2px;
-  padding: 10px 16px; border-radius: 6px 6px 0 0; color: var(--accent);
-  background: linear-gradient(#0b1428, #101c36); border: 2px solid color-mix(in srgb, var(--accent) 60%, transparent); border-bottom: 0;
-  box-shadow: 0 0 40px -8px color-mix(in srgb, var(--accent) 45%, transparent);
+.av-hero5__copy { position: relative; display: grid; gap: var(--space-4); justify-items: center; text-align: center; padding-block: var(--space-7) var(--space-5); }
+/* The words sit on a soft dark pool, so they read over the containers behind them. */
+.av-hero5__copy::before { content: ""; position: absolute; inset: -6% -14% 18%; z-index: -1;
+  background: radial-gradient(closest-side, rgba(7, 13, 29, 0.82), rgba(7, 13, 29, 0.5) 60%, transparent); }
+.av-hero5__copy > * { animation: av-up 0.9s var(--ease) both; }
+.av-hero5__copy > :nth-child(2) { animation-delay: 0.08s; } .av-hero5__copy > :nth-child(3) { animation-delay: 0.16s; }
+.av-hero5__copy > :nth-child(4) { animation-delay: 0.24s; } .av-hero5__copy > :nth-child(5) { animation-delay: 0.32s; }
+.av-hero5__where { margin: 0; font-size: 0.9375rem; font-weight: 600; color: var(--accent); }
+.av-hero5__title { margin: 0; font-size: clamp(2.5rem, 1.2rem + 4.4vw, 5.2rem); line-height: 0.95; letter-spacing: -0.05em; color: var(--on-black); max-width: 15ch; }
+.av-hero5__title em { color: var(--accent); }
+.av-hero5__lead { max-width: 36rem; margin: 0; font-size: 1.125rem; line-height: 1.55; color: var(--on-black-2); text-wrap: pretty; }
+.av-hero5__ctas { justify-content: center; }
+
+/* The yard: two floors of containers, centred on ours, wider than the screen so it runs off both edges. */
+.av-yard { position: relative; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.av-yard__floor { display: flex; gap: 6px; width: max-content; }
+.av-yard__box { position: relative; flex: none; width: var(--cw); aspect-ratio: 4 / 2.8; border: 7px solid #10182c; border-bottom-width: 5px; border-radius: 3px;
+  background: repeating-linear-gradient(90deg, var(--c) 0 9px, color-mix(in srgb, var(--c) 72%, #000) 9px 13px, color-mix(in srgb, var(--c) 88%, #fff) 13px 20px);
+  filter: brightness(calc(0.66 - var(--d, 0) * 0.07)) saturate(0.85); }
+.av-yard__floor--up .av-yard__box { filter: brightness(calc(0.5 - var(--d, 0) * 0.06)) saturate(0.8); }
+/* Door seam and lock bars on every closed container; the stencilled number in a corner. */
+.av-yard__box::before { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 21%, rgba(200, 208, 222, 0.5) 21% 22.5%, transparent 22.5% 29%, rgba(200, 208, 222, 0.5) 29% 30.5%, transparent 30.5% 49.4%,
+    rgba(0, 0, 0, 0.55) 49.4% 50.6%, transparent 50.6% 69.5%, rgba(200, 208, 222, 0.5) 69.5% 71%, transparent 71% 77.5%, rgba(200, 208, 222, 0.5) 77.5% 79%, transparent 79%); }
+.av-yard__box::after { content: attr(data-n); position: absolute; top: 6%; right: 6%; font: 700 clamp(0.55rem, 0.9vw, 0.8rem)/1 var(--font-sans); letter-spacing: 0.12em; color: rgba(255, 255, 255, 0.8); }
+/* Above ours, hung on the walkway: the lit AKVEN sign. */
+.av-yard__sign { position: absolute; z-index: 4; left: 4%; right: 4%; bottom: calc(100% + 1px); height: calc(var(--cw) * 0.21); display: grid; place-items: center; padding: 3% 8%;
+  border-radius: 6px 6px 2px 2px; color: var(--accent); background: linear-gradient(#0b1428, #101c36); border: 2px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  box-shadow: 0 0 46px -6px rgba(212, 179, 115, 0.55), inset 0 0 18px -6px rgba(212, 179, 115, 0.4); animation: av-sign 6s ease-in-out infinite; }
+.av-yard__sign { display: flex; align-items: center; justify-content: center; gap: 8%; }
+.av-yard__sign svg { height: 100%; width: auto; min-width: 0; max-width: 72%; }
+.av-yard__sign b { flex: none; padding: 2px 6px; border: 1.5px solid #c7cedb; border-radius: 3px; color: #e9dfc8; font-size: clamp(0.5rem, 0.85vw, 0.8rem); letter-spacing: 0.14em; line-height: 1.2; }
+@keyframes av-sign { 0%, 100% { box-shadow: 0 0 46px -6px rgba(212, 179, 115, 0.55), inset 0 0 18px -6px rgba(212, 179, 115, 0.4); } 50% { box-shadow: 0 0 60px -4px rgba(212, 179, 115, 0.7), inset 0 0 22px -6px rgba(212, 179, 115, 0.5); } }
+/* The upper floor's walkway: a slab and a handrail on posts. */
+.av-yard__walk { align-self: stretch; height: 26px; margin-top: -2px;
+  background: linear-gradient(#4a5884 0 3px, transparent 3px 19px, #1c2643 19px), repeating-linear-gradient(90deg, rgba(74, 88, 132, 0.95) 0 3px, transparent 3px 46px); }
+.av-yard__floor--down { margin-top: 4px; }
+.av-yard__ground { align-self: stretch; height: clamp(40px, 7svh, 70px); position: relative; background: linear-gradient(#1a2643, #0a1122); border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.av-yard__ground::before { content: ""; position: absolute; left: 50%; top: -30%; width: calc(var(--cw) * 3); height: 170%; transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(255, 214, 140, 0.34), transparent); }
+
+/* Ours: lit from inside, warm light falling on its neighbours. */
+.av-yard__ours { position: relative; z-index: 1; flex: none; width: var(--cw); }
+.av-yard__ours::before { content: ""; position: absolute; inset: -20% -90% -30%; z-index: -1; background: radial-gradient(closest-side, rgba(255, 210, 140, 0.2), transparent); }
+.av-yard .av-box { transform-style: flat; border-width: 7px; border-bottom-width: 5px; box-shadow: 0 0 60px -10px rgba(255, 205, 130, 0.35); }
+.av-yard .av-box__plate { z-index: 5; top: 8px; right: 8px; transform: none; border-bottom: 2px solid #c7cedb; border-radius: 4px; font-size: clamp(0.55rem, 0.9vw, 0.85rem); }
+/* The doors open outwards on their hinges, towards the visitor, each in its own perspective, so they never cut
+   through the container in any browser; the embossed mark is on the outside, so it is gone once a door has turned. */
+.av-yard__door { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 3; background: repeating-linear-gradient(90deg, #2b3e68 0 9px, #213259 9px 13px, #34497c 13px 20px);
+  border: 3px solid #18233f; }
+.av-yard__door--l { left: 0; transform-origin: 0 50%; transform: perspective(900px) rotateY(-118deg); animation: av-yard-door-l 2.2s cubic-bezier(0.55, 0, 0.25, 1) 0.7s both; }
+.av-yard__door--r { right: 0; transform-origin: 100% 50%; transform: perspective(900px) rotateY(118deg); animation: av-yard-door-r 2.2s cubic-bezier(0.55, 0, 0.25, 1) 0.7s both; }
+@keyframes av-yard-door-l { from { transform: perspective(900px) rotateY(0); filter: brightness(1); } to { transform: perspective(900px) rotateY(-118deg); filter: brightness(0.62); } }
+@keyframes av-yard-door-r { from { transform: perspective(900px) rotateY(0); filter: brightness(1); } to { transform: perspective(900px) rotateY(118deg); filter: brightness(0.62); } }
+.av-yard__emboss { position: absolute; top: 22%; left: 50%; width: auto !important; transform: translateX(-50%); color: #d4b373;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.25)) drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.4)); animation: av-emboss 2.2s linear 0.7s both; }
+@keyframes av-emboss { 0%, 40% { opacity: 1; } 46%, 100% { opacity: 0; } }
+/* The rail inside starts still and the socks drop into their swing as the doors open. */
+.av-yard .av-hang { animation: av-hang-in 0.9s cubic-bezier(0.3, 1.5, 0.5, 1) calc(1.2s + var(--i) * 0.07s) both; }
+@keyframes av-hang-in { from { translate: 0 -30%; } to { translate: 0 0; } }
+
+@media (min-width: 760px) {
+  .av-hero5 { min-height: min(60rem, calc(100svh - 110px)); }
+  .av-hero5__copy { padding-block: calc(var(--space-7) + 12px) calc(var(--cw) * 0.95 + 96px); }
+  .av-yard { position: absolute; left: 0; right: 0; bottom: 0; z-index: -1; }
 }
+@media (max-width: 759px) {
+  .av-hero5 { --cw: 46vw; }
+  .av-hero5__copy { padding-bottom: var(--space-6); }
+  .av-hero5__title { font-size: clamp(2.3rem, 9.5vw, 3.2rem); }
+}
+@media (max-width: 479px) { .av-yard .av-hang:nth-child(n + 6) { display: none; } .av-yard .av-hang { width: 17%; } }
+
 
 .av-box {
   --steel: repeating-linear-gradient(90deg, #2b3e68 0 9px, #213259 9px 13px, #34497c 13px 20px);
@@ -247,20 +283,10 @@
   background: linear-gradient(90deg, #1f2a44 0 13%, transparent 13% 15%, #9b4a3a 15% 27%, transparent 27% 29%, #e9dfc8 29% 43%, transparent 43% 58%, #c9a24b 58% 70%, transparent 70% 72%, #1f2a44 72% 86%, transparent 86% 88%, #8fb1cf 88% 100%);
   -webkit-mask: linear-gradient(transparent 0 30%, #000 30%); mask: linear-gradient(transparent 0 30%, #000 30%);
 }
-.av-box__door {
-  position: absolute; top: 0; bottom: 0; width: 50%; z-index: 3; background: var(--steel); border: 3px solid #18233f; transform-style: preserve-3d;
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.05);
-}
-.av-box__door--l { left: 0; transform-origin: 0 50%; transform: rotateY(-112deg); animation: av-door-l 2s var(--ease) 0.5s both; }
-.av-box__door--r { right: 0; transform-origin: 100% 50%; transform: rotateY(112deg); animation: av-door-r 2s var(--ease) 0.5s both; }
-@keyframes av-door-l { from { transform: rotateY(0); } to { transform: rotateY(-112deg); } }
-@keyframes av-door-r { from { transform: rotateY(0); } to { transform: rotateY(112deg); } }
 .av-box__bars { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 26%, #a8b2c6 26% 30%, transparent 30% 66%, #a8b2c6 66% 70%, transparent 70%); }
 .av-box__bars::after { content: ""; position: absolute; top: 52%; left: 18%; width: 20%; height: 12px; border-radius: 3px; background: #c7cedb; box-shadow: 98px 0 #c7cedb; }
-.av-box__emboss { position: absolute; top: 20%; left: 50%; width: auto !important; transform: translateX(-50%); color: #d4b373; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.25)) drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.4)); backface-visibility: hidden; }
 /* The container's number, stencilled on a plate on the frame like a real shipping container. */
 .av-box__plate { position: absolute; z-index: 4; top: -10px; right: 1%; transform: translateY(-100%); padding: 4px 10px 3px; border: 2px solid #c7cedb; border-bottom: 0; border-radius: 4px 4px 0 0; background: #18233f; color: #e9dfc8; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.18em; line-height: 1.2; }
-.av-stage__floor { height: 26px; margin: 2px 4% 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, 0.45), transparent); }
 @media (max-width: 639px) { .av-stage { padding-inline: 15%; } .av-stage__sign { width: 86%; gap: 10px; padding: 8px 10px; } }
 
 

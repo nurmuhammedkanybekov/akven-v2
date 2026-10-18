@@ -48,6 +48,18 @@ class SomPricesTest extends IntegrationTest {
     }
 
     @Test
+    void ownersSetTheRoubleRateTooAndABadRoundingIsRefused() throws Exception {
+        Map<String, Object> body = policy(87.5, 10);
+        body.put("rubPerUsd", 81.5);
+        body.put("rubRounding", 5);
+        sendJson("PUT", "/api/admin/pricing/policy", tokenFor(Role.ADMIN), body).andExpect(status().isOk())
+                .andExpect(jsonPath("$.rubPerUsd").value(81.5)).andExpect(jsonPath("$.rubRounding").value(5));
+        getJson("/api/pricing", null).andExpect(jsonPath("$.rubPerUsd").value(81.5)).andExpect(jsonPath("$.rubRounding").value(5));
+        body.put("rubRounding", 3);
+        sendJson("PUT", "/api/admin/pricing/policy", tokenFor(Role.ADMIN), body).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void ownersSetTheRateAndEveryoneSeesIt() throws Exception {
         sendJson("PUT", "/api/admin/pricing/policy", tokenFor(Role.ADMIN), policy(88, 5)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.somPerUsd").value(88)).andExpect(jsonPath("$.somRounding").value(5));

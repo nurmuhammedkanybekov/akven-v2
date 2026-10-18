@@ -26,7 +26,7 @@ function PolicyForm() {
   const toast = useToast();
   const { t } = useT();
   const [policy, setPolicy] = useState<PricingPolicy | null>(null);
-  const [form, setForm] = useState<Record<keyof PricingPolicy, string>>({ minOrderPairs: "", trustedMinOrderPairs: "", trustedAfterOrders: "", fewLeftThreshold: "", somPerUsd: "", somRounding: "10" });
+  const [form, setForm] = useState<Record<keyof PricingPolicy, string>>({ minOrderPairs: "", trustedMinOrderPairs: "", trustedAfterOrders: "", fewLeftThreshold: "", somPerUsd: "", somRounding: "10", rubPerUsd: "", rubRounding: "10" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -42,6 +42,7 @@ function PolicyForm() {
         minOrderPairs: Number(form.minOrderPairs), trustedMinOrderPairs: Number(form.trustedMinOrderPairs),
         trustedAfterOrders: Number(form.trustedAfterOrders), fewLeftThreshold: Number(form.fewLeftThreshold),
         somPerUsd: Number(form.somPerUsd), somRounding: Number(form.somRounding),
+        rubPerUsd: Number(form.rubPerUsd), rubRounding: Number(form.rubRounding),
       });
       setPolicy(saved); setForm(toForm(saved)); toast(t("a.pr.rulesSaved"));
     } catch (err) { setError(err instanceof ApiError ? err.message : t("a.err.save")); } finally { setBusy(false); }
@@ -72,6 +73,18 @@ function PolicyForm() {
         <div className="av-field"><span className="av-label">{t("a.pr.somExample")}</span>
           <strong className="av-num">$7.50 = {Number(form.somPerUsd) > 0 ? toSom(7.5, Number(form.somPerUsd), Number(form.somRounding)) : "—"} {t("cur.somShort").toLowerCase()}</strong></div>
       </div>
+      <h3>{t("a.pr.rub")}</h3>
+      <div className="av-formgrid av-formgrid--4">
+        <Input label={t("a.pr.rubRate")} type="number" min={0.01} step="0.01" value={form.rubPerUsd} onChange={set("rubPerUsd")} hint={t("a.pr.somRateHint")} />
+        <label className="av-field">
+          <span className="av-label">{t("a.pr.rubRound")}</span>
+          <select className="av-select" value={form.rubRounding} onChange={(e) => setForm({ ...form, rubRounding: e.target.value })}>
+            {["1", "5", "10", "50", "100"].map((n) => <option key={n} value={n}>{n} ₽</option>)}
+          </select>
+        </label>
+        <div className="av-field"><span className="av-label">{t("a.pr.somExample")}</span>
+          <strong className="av-num">$7.50 = {Number(form.rubPerUsd) > 0 ? toSom(7.5, Number(form.rubPerUsd), Number(form.rubRounding)) : "—"} ₽</strong></div>
+      </div>
       <div className="av-row"><Button type="submit" loading={busy}>{t("a.pr.saveRules")}</Button></div>
     </form>
   );
@@ -81,6 +94,7 @@ const toForm = (p: PricingPolicy) => ({
   minOrderPairs: String(p.minOrderPairs), trustedMinOrderPairs: String(p.trustedMinOrderPairs),
   trustedAfterOrders: String(p.trustedAfterOrders), fewLeftThreshold: String(p.fewLeftThreshold),
   somPerUsd: String(Number(p.somPerUsd)), somRounding: String(p.somRounding),
+  rubPerUsd: String(Number(p.rubPerUsd)), rubRounding: String(p.rubRounding),
 });
 
 function Ladder() {

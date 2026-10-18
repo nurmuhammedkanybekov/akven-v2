@@ -1,0 +1,62 @@
+/*
+ * Motion, in one place. Everything moves things (transform, clip-path) and never fades text, so text keeps full
+ * contrast at every moment; base.css turns all of it off for visitors who ask for less motion.
+ */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);        /* fast start, long soft landing */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* a small overshoot, for things that pop */
+}
+
+/* A new page slides up into place. */
+#main > :first-child { animation: av-page-in 0.6s var(--ease-out) both; }
+@keyframes av-page-in { from { transform: translateY(14px); } to { transform: none; } }
+
+/* Sections slide up as they arrive, and the items in their grids follow one after another. */
+.reveal [data-reveal] { transition-timing-function: var(--ease-out); }
+.reveal [data-reveal] :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > * {
+  transform: translateY(26px); transition: transform 0.9s var(--ease-out);
+}
+.reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > * { transform: none; }
+.reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > :nth-child(2) { transition-delay: 70ms; }
+.reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > :nth-child(3) { transition-delay: 140ms; }
+.reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > :nth-child(4) { transition-delay: 210ms; }
+.reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > :nth-child(5) { transition-delay: 280ms; }
+.reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > :nth-child(n + 6) { transition-delay: 340ms; }
+
+/* Product cards lift a little, their picture grows slowly, and the shadow settles under them. */
+.av-card { transition: transform 0.5s var(--ease-out); }
+.av-card__media { transition: box-shadow 0.5s var(--ease-out); }
+.av-card__media img { transition: transform 0.9s var(--ease-out); }
+@media (hover: hover) {
+  .av-card:hover { transform: translateY(-4px); }
+  .av-card:hover .av-card__media { box-shadow: 0 22px 40px -26px rgba(15, 25, 48, 0.45); }
+  .av-card:hover .av-card__media img { transform: scale(1.05); }
+}
+
+/* Buttons rise a hair on hover and settle when pressed; arrows in links nudge forward. */
+.av-btn { transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease), transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out); }
+@media (hover: hover) {
+  .av-btn--primary:hover, .av-btn--accent:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -12px rgba(15, 25, 48, 0.55); }
+}
+.av-btn:active { transform: translateY(0) scale(0.97); box-shadow: none; transition-duration: 0.08s; }
+.av-cat__go, .av-biz__go span, .av-path__go span { transition: transform 0.4s var(--ease-spring); }
+
+/* The bag and saved counters pop when the number changes (the badge is re-created with its number as key). */
+.av-icon-btn__count { animation: av-count-pop 0.5s var(--ease-spring) both; }
+@keyframes av-count-pop { from { transform: scale(0.3); } to { transform: none; } }
+
+/* The socks on the category tiles give a little wiggle on hover. */
+@media (hover: hover) {
+  .av-cat:hover .av-cat__socks svg:first-child { animation: av-wiggle 0.7s var(--ease-out); }
+  .av-cat:hover .av-cat__socks svg:last-child { animation: av-wiggle 0.7s var(--ease-out) 0.08s; }
+}
+@keyframes av-wiggle { 0% { rotate: 0deg; } 30% { rotate: -7deg; } 60% { rotate: 5deg; } 100% { rotate: 0deg; } }
+
+/* Chips and swatches answer the press. */
+.av-chips button, .av-colorchoice, .av-family__chip, .av-pick { transition: transform 0.3s var(--ease-spring), background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
+.av-chips button:active, .av-colorchoice:active, .av-family__chip:active { transform: scale(0.93); }
+.av-colorchoice[aria-pressed="true"] { animation: av-count-pop 0.4s var(--ease-spring); }
+
+/* The product picture changes colour with a soft wipe instead of a jump. */
+.av-pdp__main img, .av-qv__media img { animation: av-wipe 0.55s var(--ease-out); }
+@keyframes av-wipe { from { clip-path: inset(0 0 0 12%); transform: translateX(-10px); } to { clip-path: inset(0); transform: none; } }

@@ -20,6 +20,7 @@ import { WholesalePage } from "./pages/Wholesale";
 
 // Rarely used screens (admin, checkout, order history, style guide) load on demand, so the shop opens faster.
 import { RouteTitle } from "./components/RouteTitle";
+import { ScrollManager } from "./components/ScrollManager";
 const AdminLayout = lazy(() => import("./admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
 const AdminOrderDetail = lazy(() => import("./admin/AdminOrderDetail").then((m) => ({ default: m.AdminOrderDetail })));
 const AdminNegotiations = lazy(() => import("./admin/AdminNegotiations").then((m) => ({ default: m.AdminNegotiations })));
@@ -50,6 +51,7 @@ export default function App() {
           <CartProvider>
           <Suspense fallback={<div className="av-container av-page" role="status" aria-live="polite">Loading…</div>}>
           <RouteTitle />
+          <ScrollManager />
           <Routes>
             <Route element={<ShopLayout />}>
               <Route index element={<HomePage />} />

@@ -67,6 +67,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
             <CurrencySwitch />
             <span className="av-ann__sep" aria-hidden="true" />
             <LanguageSwitch />
+            {extra && <><span className="av-ann__sep" aria-hidden="true" />{extra}</>}
           </div>
         </div>
       </div>
@@ -82,17 +83,16 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
             </nav>
             <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={32} /></Link>
             <div className="av-header__actions">
-              {extra && <span className="av-hide-phone">{extra}</span>}
               <Link className="av-icon-btn av-hide-md" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>
               <Link className="av-icon-btn" to="/shop" aria-label={t("nav.search")}><SearchIcon /></Link>
               <Link className="av-icon-btn av-hide-md" to="/saved" aria-label={t("nav.saved", { n: savedCount })}>
                 <HeartIcon />
-                {savedCount > 0 && <span className="av-icon-btn__count" aria-hidden="true">{savedCount}</span>}
+                {savedCount > 0 && <span key={savedCount} className="av-icon-btn__count" aria-hidden="true">{savedCount}</span>}
               </Link>
               <Link className="av-icon-btn" to={accountTo} aria-label={accountLabel ?? t("nav.signin")}><UserIcon /></Link>
               <Link className="av-icon-btn" to="/cart" aria-label={t("nav.bag", { n: cartCount })}>
                 <BagIcon />
-                {cartCount > 0 && <span className="av-icon-btn__count" aria-hidden="true">{cartCount}</span>}
+                {cartCount > 0 && <span key={cartCount} className="av-icon-btn__count" aria-hidden="true">{cartCount}</span>}
               </Link>
             </div>
           </div>
@@ -108,6 +108,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
         <div className="av-mobile-nav__langs">
           <LanguageSwitch />
           <CurrencySwitch />
+          {extra}
         </div>
       </nav>
     </>

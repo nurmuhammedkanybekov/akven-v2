@@ -16,9 +16,10 @@ public final class CatalogViews {
     private CatalogViews() {
     }
 
-    public record ImageView(String url, String alt) {
+    /** color: the variants' colour this picture shows, or null for the product as a whole. */
+    public record ImageView(String url, String alt, String color) {
         static ImageView of(ProductImage i) {
-            return new ImageView(i.getUrl(), i.getAlt());
+            return new ImageView(i.getUrl(), i.getAlt(), i.getColor());
         }
     }
 

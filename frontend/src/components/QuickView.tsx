@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getProduct } from "../api/endpoints";
 import type { ProductDetail } from "../api/types";
@@ -12,6 +12,7 @@ import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { CloseIcon } from "./icons";
 import { Price } from "./Price";
+import { NotifyMe } from "./NotifyMe";
 import { ProductImage } from "./ProductImage";
 import { QuantityStepper } from "./QuantityStepper";
 import { useToast } from "./Toast";
@@ -42,15 +43,17 @@ function Chooser({ product, onDone }: { product: ProductDetail; onDone: () => vo
   const { t } = useT();
   const cart = useCart();
   const toast = useToast();
-  const { current, colors, sizes, pick, label } = useVariantChoice(product);
+  const { current, colors, sizes, pick, label, images } = useVariantChoice(product);
   const [image, setImage] = useState(0);
+  // A new colour starts on its first picture.
+  useEffect(() => { setImage(0); }, [current?.color]);
   const [quantity, setQuantity] = useState(1);
   const available = current?.availableQty ?? 0;
 
   function add() {
     if (!current) return;
     cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
-      colorHex: current.colorHex, imageUrl: product.images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, available), available);
+      colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, available), available);
     toast(t("pdp.added"));
     onDone();
   }
@@ -58,10 +61,10 @@ function Chooser({ product, onDone }: { product: ProductDetail; onDone: () => vo
   return (
     <div className="av-qv__grid">
       <div className="av-qv__media">
-        <ProductImage image={product.images[image]} eager />
-        {product.images.length > 1 && (
+        <ProductImage key={images[Math.min(image, images.length - 1)]?.url} image={images[Math.min(image, images.length - 1)]} eager />
+        {images.length > 1 && (
           <div className="av-qv__dots" role="group" aria-label={t("pdp.photos")}>
-            {product.images.map((img, i) => (
+            {images.map((img, i) => (
               <button key={img.url} type="button" aria-pressed={i === image} aria-label={t("qv.photo", { n: i + 1 })} onClick={() => setImage(i)} />
             ))}
           </div>
@@ -95,6 +98,7 @@ function Chooser({ product, onDone }: { product: ProductDetail; onDone: () => vo
         {current && <StockBadge available={available} status={current.stockStatus} restockInDays={current.restockInDays} />}
         {available > 0 && <QuantityStepper value={Math.min(quantity, available)} max={Math.min(MAX_PER_LINE, available)} label={t("pdp.quantity")} onChange={setQuantity} />}
         <Button block disabled={!current || available <= 0} onClick={add}>{available <= 0 ? t("pdp.soldOut") : t("pdp.add")}</Button>
+        {current && available <= 0 && <NotifyMe sku={current.sku} />}
         <Link className="av-qv__more" to={`/products/${product.slug}`} onClick={onDone}>{t("qv.details")}</Link>
       </div>
     </div>

@@ -7,7 +7,7 @@ Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
-![The AKVEN home page: container 70-E at Dordoi Bazaar, at night](docs/design/readme-home.jpg)
+![The AKVEN home page: a Dordoi passage at night, with container 70-E opening in the middle](docs/design/readme-home.jpg)
 
 ## Contents
 
@@ -78,20 +78,23 @@ super admin can repeat that run at any time.
 
 **For customers**
 
-- **English, Russian and Kyrgyz**, prices in **US dollars or Kyrgyz som** (at the rate the owners set), light and
-  dark, on phone, tablet and laptop. The site can be installed as an app
+- **English, Russian and Kyrgyz**, prices in **US dollars, Kyrgyz som or Russian roubles** (at the rates the owners
+  set), light and dark, on phone, tablet and laptop. The site can be installed as an app
   (PWA), and the bag works offline.
 - **The collection box on the home page:** tap socks into the AKVEN box and watch the price step reached on the
   shop's real ladder.
 - **Collections:** a minimum order and a price ladder counted in pairs across the whole bag, with "add 4 more pairs
   to save 5%" hints in the bag. Packs show their price per pair.
-- **About a hundred drawn designs** in the demo catalogue, from argyle and cable knit to the Kyrgyz oimo and shyrdak
-  patterns, cats, bunnies and football socks, until real photographs replace them.
+- **About 120 drawn designs and over 600 options** in the demo catalogue: a classic line of plain and ribbed socks in
+  every height and up to ten colours, and patterns from argyle and cable knit to the Kyrgyz oimo and shyrdak, cats,
+  bunnies and football socks. **The picture follows the colour** you choose, on the product page and in quick view.
 - **The family planner:** add each person and their shoe size; the sock size comes from the size chart, and the list
   can be sent to the shop in a message.
 - **Ask for your price:** a negotiation chat on every product page, in the customer's language. It remembers the
   conversation, answers questions about the sock, and shows the reason for each price.
-- **Honest stock:** in stock, only a few left, arrives in about N days, or sold out.
+- **Honest stock:** in stock, only a few left, arrives in about N days, or sold out, with **"Tell me when it's
+  back"** on sold-out options.
+- **Order again** from any past order in one tap, and a **QR code** on the pickup ticket that the stall can scan.
 - **Size guide** in the sizes each customer knows (EU and US in English, local sizes in Russian and Kyrgyz), with a
   shoe-size finder and how to measure.
 - **Pickup at Dordoi** with a six-digit pickup code, or delivery to four countries.
@@ -104,12 +107,14 @@ super admin can repeat that run at any time.
 
 **For the shop team (the admin, in English, Russian and Kyrgyz)**
 
-- Products, sections, cuts, colours, sizes, photos, stock on the way and wholesale case sizes.
-- Orders, and a hand-over screen for the stall (pickup code plus the end of the customer's phone number).
+- Products, sections, cuts, colours, sizes, photos (each can belong to one colour), stock on the way and wholesale
+  case sizes.
+- Orders, and a hand-over screen for the stall (pickup code, typed or scanned from the customer's QR code, plus the
+  end of the customer's phone number).
 - A dashboard: paid orders, revenue and pairs sold, orders waiting at the stall, socks running out with what is on
-  the way; and for the assistant, offers per day, how often the limit stepped in, offers that became orders, best sellers.
+  the way, customers waiting for a sold-out option (to write to when it is back); and for the assistant, offers per day, how often the limit stepped in, offers that became orders, best sellers.
 - The rule-based against AI comparison, for the evaluation chapter.
-- Owners only: the minimum order, the price ladder, the som rate, trusted customers (and a new password or switching
+- Owners only: the minimum order, the price ladder, the som and rouble rates, trusted customers (and a new password or switching
   off for a customer account), contacts, the stall and its opening hours, and the size chart.
 - Super admin only: the team's accounts (add, disable, new password), which assistant answers the chat (the AI or the
   rules), a test box and the live comparison, and the full audit log.
@@ -128,7 +133,7 @@ docker compose up --build
 ```
 
 Then open **http://localhost:8081**. The first build takes a few minutes. The backend log ends with
-`Successfully applied 25 migrations … now at version v25` when everything is up.
+`Successfully applied 28 migrations … now at version v28` when everything is up.
 
 | Demo account | Email | Password | Can do |
 |---|---|---|---|
@@ -176,7 +181,7 @@ flowchart LR
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the admin. English, Russian and Kyrgyz |
 | API | Spring Boot 3.3, Java 17. JWT with three roles (customer, staff, owner). One error format (RFC 7807). OpenAPI at `/swagger-ui/index.html` |
-| Data | PostgreSQL 16 with pgvector. 25 Flyway versions (schema, plus demo data only in the demo profile) |
+| Data | PostgreSQL 16 with pgvector. 28 Flyway versions (schema, plus demo data only in the demo profile) |
 | Assistant | A `Negotiator` interface with two implementations: rule-based, and a language model (Gemini by default, any OpenAI-compatible API) that holds a conversation in three languages, with automatic fallback to the rules. The super admin switches between them at run time |
 | Delivery | Docker Compose. CI on GitLab (`.gitlab-ci.yml`) and GitHub Actions (six jobs) |
 
@@ -189,9 +194,9 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 209 tests, **97% line coverage**; the build fails below 80% |
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 214 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 10 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 136 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| Frontend | `cd frontend && npm test && npm run build` | 138 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
 | End to end, in a real browser | `cd frontend && npm run e2e` | 25 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:
