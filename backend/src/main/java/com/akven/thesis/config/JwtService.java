@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.function.Supplier;
 
 /**
  * Issues and verifies the JWTs that carry a user's identity and role across
@@ -24,30 +26,50 @@ import java.util.Date;
  * username, so Authentication#getName() means the same thing everywhere);
  * the user's id and role travel as claims.
  *
- * The signing key comes from akven.jwt.secret (env JWT_SECRET). The default
- * in application.yml is dev-only — override it with a real random 32+ byte
- * secret before this runs anywhere but a laptop; see docs/architecture.md's
- * Security section.
+ * The signing key is JWT_SECRET when it is set (a random value of at least 32 bytes). Without it, each installation
+ * makes its own random key on first use and keeps it in its database (InstallationKey). A key written in the code or
+ * the repository is never used: anyone who has read the repository could otherwise forge an owner's token.
  */
 @Component
 public class JwtService {
 
-    private final SecretKey signingKey;
-    private final long expirationMinutes;
-
-    /** Prefix of the insecure default in application.yml. Refusing it outside dev is a startup guard. */
+    /** The old built-in development value. Refused everywhere: it is public, in the repository's history. */
     static final String DEV_SECRET_PREFIX = "dev-only-insecure";
 
-    public JwtService(@Value("${akven.jwt.secret}") String secret,
-                       @Value("${akven.jwt.expiration-minutes}") long expirationMinutes,
-                       @Value("${akven.jwt.allow-dev-secret:false}") boolean allowDevSecret) {
-        if (secret.startsWith(DEV_SECRET_PREFIX) && !allowDevSecret) {
-            throw new IllegalStateException("Refusing to start with the built-in development JWT secret. "
-                    + "Set JWT_SECRET to a random value of at least 32 bytes (openssl rand -base64 48), "
-                    + "or run with the demo profile for local development.");
+    private final Supplier<byte[]> keySource;
+    private volatile SecretKey signingKey;
+    private final long expirationMinutes;
+
+    @Autowired
+    public JwtService(@Value("${akven.jwt.secret:}") String secret,
+                      @Value("${akven.jwt.expiration-minutes}") long expirationMinutes,
+                      InstallationKey installationKey) {
+        this(secret, expirationMinutes, installationKey::get);
+    }
+
+    JwtService(String secret, long expirationMinutes, Supplier<byte[]> installationKey) {
+        String s = secret == null ? "" : secret.strip();
+        if (s.startsWith(DEV_SECRET_PREFIX)) {
+            throw new IllegalStateException("JWT_SECRET is the old public development value. Remove it (the shop then makes its own key) "
+                    + "or set a random value of at least 32 bytes (openssl rand -base64 48).");
         }
-        this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        if (!s.isEmpty() && s.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT_SECRET must be at least 32 bytes long (openssl rand -base64 48).");
+        }
+        this.keySource = s.isEmpty() ? installationKey : () -> s.getBytes(StandardCharsets.UTF_8);
         this.expirationMinutes = expirationMinutes;
+    }
+
+    /** Read once, on first use: the installation key lives in the database, which is not ready while beans are built. */
+    private SecretKey key() {
+        SecretKey k = signingKey;
+        if (k == null) {
+            synchronized (this) {
+                if (signingKey == null) signingKey = Keys.hmacShaKeyFor(keySource.get());
+                k = signingKey;
+            }
+        }
+        return k;
     }
 
     public String generateToken(User user) {
@@ -58,7 +80,7 @@ public class JwtService {
                 .claim("role", user.getRole().name())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(expirationMinutes, ChronoUnit.MINUTES)))
-                .signWith(signingKey)
+                .signWith(key())
                 .compact();
     }
 
@@ -69,7 +91,7 @@ public class JwtService {
      */
     public Claims parseClaims(String token) {
         return Jwts.parser()
-                .verifyWith(signingKey)
+                .verifyWith(key())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

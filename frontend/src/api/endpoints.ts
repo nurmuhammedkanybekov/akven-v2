@@ -151,6 +151,10 @@ export const adminListCustomers = (p: { q?: string; page?: number; pageSize?: nu
   api<PageResponse<CustomerAccount>>(`/api/admin/customers${qs(p)}`);
 export const adminSetTrusted = (id: string, trusted: boolean) =>
   api<{ customerId: string; trusted: boolean }>(`/api/admin/customers/${id}/trusted`, { method: "PUT", body: { trusted } });
+export const adminResetCustomerPassword = (id: string, password: string) =>
+  api<void>(`/api/admin/customers/${id}/password`, { method: "PUT", body: { password } });
+export const adminSetCustomerActive = (id: string, active: boolean) =>
+  api<CustomerAccount>(`/api/admin/customers/${id}/active`, { method: "PUT", body: { active } });
 export const adminAuditLog = (p: { page?: number; pageSize?: number }) => api<PageResponse<AuditLine>>(`/api/admin/audit${qs(p)}`);
 
 // ---- the assistant (super admin) ----

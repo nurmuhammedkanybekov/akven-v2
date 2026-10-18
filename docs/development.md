@@ -33,25 +33,47 @@ npm run dev
 
 `demo` is active by default. It loads the demo accounts, a demo catalog and placeholder images (the files in
 `db/seed/`) on top of the real migrations in `db/migration/`. Anything shared or real must run with
-`SPRING_PROFILES_ACTIVE=prod`: no seed data, and the application refuses to start unless `JWT_SECRET` is a real random
-value (`export JWT_SECRET=$(openssl rand -base64 48)`).
+`SPRING_PROFILES_ACTIVE=prod`: no seed data. Login tokens are signed with `JWT_SECRET` when it is set, otherwise with a
+random key the installation makes on its first start and keeps in its database; a key written in the repository is
+never used.
 
 ### Settings (environment variables)
 
 | Variable | Default | Meaning |
 |---|---|---|
 | `DB_URL`, `DB_USER`, `DB_PASSWORD` | local Postgres | Database connection |
-| `JWT_SECRET` | dev-only value, demo profile only | Signing key for login tokens |
+| `JWT_SECRET` | none: the installation makes its own random key | Signing key for login tokens (at least 32 bytes when set) |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Exact origins allowed to call the API. If the site is served through a proxy that rewrites the `Host` header (Vite's dev proxy does), list the site's own origin here |
 | `MEDIA_DIR` | `./data/media` | Where uploaded product photos are stored. Back this folder up |
-| `AUTH_MAX_FAILED_LOGINS`, `AUTH_LOCKOUT_MINUTES` | 5, 15 | Login lockout |
+| `AUTH_MAX_FAILED_LOGINS`, `AUTH_LOCKOUT_MINUTES` | 5, 15 | Login lockout, per visitor address and account |
+| `AUTH_MAX_REGISTRATIONS_PER_HOUR` | 30 | New accounts one visitor address may create in an hour (generous: many shoppers share one mobile network address) |
+| `AKVEN_BIND` | `127.0.0.1` | Docker only: which network address the shop listens on. `0.0.0.0` opens it to other computers |
 | `NEGOTIATION_PROVIDER` | `rule` | `rule` for the built-in assistant, `llm` for a language model. Only the starting choice: the super admin can switch it in Admin > AI assistant without a restart |
 | `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL` | Gemini defaults | Any OpenAI-compatible API (for a free local model use Ollama: `LLM_BASE_URL=http://localhost:11434/v1`, no key) |
 | `SHOP_CONTACTS` | empty | The real contacts, `KIND\|label\|value` separated by `;`, in display order. Applied on start whenever the list changes; phone numbers live here and in the database, never in the repository |
 | `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`, `SUPER_ADMIN_NAME` | empty | Create the super admin on the first start of a real installation (password at least 12 characters). An existing account is never changed |
+| `DEMO_ACCOUNTS` | `off` | With a super admin set, every `@akven.test` demo account is switched off at start. `on` keeps them, for presenting the project |
 | `AKVEN_DEMO_EXPOSE_PROPOSAL` | `false` | When `true`, the chat also shows the assistant's raw proposal next to the validated discount (for demonstrations) |
 
 Copy `.env.example` to `.env` for local values; git ignores `.env`, and secrets are never committed.
+
+## Running it for real
+
+1. In `.env`: `SPRING_PROFILES_ACTIVE=prod`, `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD`, `SHOP_CONTACTS`, and change
+   `DB_PASSWORD` (a long random value, set before the very first start: the database keeps the password it was
+   created with).
+2. Put the shop behind HTTPS (for example Caddy or nginx with a Let's Encrypt certificate) that forwards to
+   `localhost:8081`, set `AKVEN_BIND=127.0.0.1` (the default, so only the HTTPS proxy reaches it) and
+   `CORS_ALLOWED_ORIGINS=https://your-domain`.
+3. Back up every day with `sh scripts/backup.sh` (database and photos into `backups/`, which git ignores) and copy the
+   files off the server. The script's header shows how to restore.
+
+What protects the installation, in short: passwords are hashed with BCrypt; login tokens are signed with a key that is
+unique to the installation and stop working at once when an account is disabled, its role changes or its password is
+reset; failed logins and new sign-ups are limited per visitor address (taken from the proxy's `X-Forwarded-For`, which
+the backend trusts only from a private-network proxy); every admin change is in the audit log; and the web server
+sends a strict Content-Security-Policy (only this site's own scripts, styles, images and API) with `nosniff`,
+`frame-ancestors 'none'` and a referrer policy (`frontend/security-headers.conf`).
 
 ## Tests
 

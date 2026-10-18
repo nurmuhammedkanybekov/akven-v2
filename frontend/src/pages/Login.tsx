@@ -7,6 +7,7 @@ import { Button } from "../components/Button";
 import { AuthShell } from "../components/AuthShell";
 import { Input } from "../components/Field";
 import { useT } from "../i18n/I18n";
+import { safeNext } from "../lib/safeNext";
 
 export function LoginPage() {
   const { session, isStaff, signIn, signOut } = useAuth();
@@ -19,15 +20,15 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false);
 
   // `next` must be a path inside this site, never a full URL (no open redirect).
-  const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
-  if (session) return <Navigate to={safeNext ?? (isStaff ? "/admin" : "/")} replace />;
+  const safeNextPath = safeNext(next);
+  if (session) return <Navigate to={safeNextPath ?? (isStaff ? "/admin" : "/")} replace />;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     setBusy(true); setError(null);
     try {
       const s = await signIn(email.trim(), password);
-      navigate(safeNext ?? (s.role === "CUSTOMER" ? "/" : "/admin"), { replace: true });
+      navigate(safeNextPath ?? (s.role === "CUSTOMER" ? "/" : "/admin"), { replace: true });
     } catch (err) {
       setError(err instanceof ApiError && err.status === 401 ? t("auth.wrong") : (err as Error).message);
       signOut();

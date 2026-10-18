@@ -18,6 +18,7 @@ import { HeartIcon, PinIcon, StackIcon, TruckIcon } from "../components/icons";
 import { useSaved } from "../shop/useSaved";
 import { rememberViewed, useViewed } from "../shop/useViewed";
 import { useAsync } from "../hooks/useAsync";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
 import { usePricing } from "../shop/useShopInfo";
@@ -44,6 +45,7 @@ function ProductView({ product }: { product: ProductDetail }) {
   const pricing = usePricing();
   const saved = useSaved();
   const isSaved = saved.has(product.slug);
+  usePageTitle(product.name);
   const minPrice = product.variants.length ? Math.min(...product.variants.map((v) => v.price)) : null;
   useEffect(() => { rememberViewed({ slug: product.slug, name: product.name, image: product.images[0]?.url ?? null, price: minPrice }); }, [product.slug, product.name, product.images, minPrice]);
   const variants = product.variants;

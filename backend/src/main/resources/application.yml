@@ -1,10 +1,15 @@
+server:
+  # Behind the web container's nginx, take the visitor's address from X-Forwarded-For (only when the request comes
+  # from a private-network proxy), so login and sign-up limits count visitors, not the proxy.
+  forward-headers-strategy: native
+
 spring:
   application:
     name: akven-thesis-backend
 
   # Local development convenience: the `demo` profile loads demo accounts and a demo catalog
   # (application-demo.yml). Anything shared or real must run with SPRING_PROFILES_ACTIVE=prod
-  # (or any profile other than demo): no seed data, and the app refuses the dev JWT secret.
+  # (or any profile other than demo): no seed data or demo accounts.
   profiles:
     active: demo
 
@@ -44,14 +49,14 @@ management:
 # that's in .gitignore. See docs/architecture.md, Security section.
 akven:
   jwt:
-    # Dev-only default. Override with a real random secret (32+ bytes) via
-    # JWT_SECRET before this runs anywhere but a laptop — see JwtService.
-    secret: ${JWT_SECRET:dev-only-insecure-secret-change-in-production-min-32-bytes!!}
+    # Leave JWT_SECRET unset and the shop makes its own random key on first start (kept in its database). Or set a
+    # random value of at least 32 bytes (openssl rand -base64 48). A key written in this file is never used.
+    secret: ${JWT_SECRET:}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:1440}
-    allow-dev-secret: false   # only the demo profile sets this to true
   auth:
     max-failed-logins: ${AUTH_MAX_FAILED_LOGINS:5}
     lockout-minutes: ${AUTH_LOCKOUT_MINUTES:15}
+    max-registrations-per-hour: ${AUTH_MAX_REGISTRATIONS_PER_HOUR:30}   # per client address
   media:
     dir: ${MEDIA_DIR:./data/media}   # uploaded product photos live in <dir>/uploads; back this up
   cors:
@@ -71,6 +76,8 @@ akven:
     email: ${SUPER_ADMIN_EMAIL:}
     password: ${SUPER_ADMIN_PASSWORD:}
     name: ${SUPER_ADMIN_NAME:}
+  # With a super admin set above, the @akven.test demo accounts are switched off at start; "on" keeps them.
+  demo-accounts: ${DEMO_ACCOUNTS:off}
   payments:
     apple-pay-merchant-id: ${APPLE_PAY_MERCHANT_ID:}
     google-pay-merchant-id: ${GOOGLE_PAY_MERCHANT_ID:}

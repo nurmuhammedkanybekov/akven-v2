@@ -359,7 +359,7 @@ export const adminEn = {
   "a.pr.removeStep": "Remove the step from {n} pairs",
 
   // customers
-  "a.cu.lead": "Find a customer by email and mark them as trusted: trusted customers may order from the lower minimum set under Pricing.",
+  "a.cu.lead": "Find a customer by email. Mark trusted customers (they may order from the lower minimum set under Pricing), set a new password for someone who forgot theirs, or switch off a fake account.",
   "a.cu.search": "Search by email",
   "a.cu.noMatch": "No customer matches that email.",
   "a.cu.none": "No customers yet.",
@@ -368,6 +368,12 @@ export const adminEn = {
   "a.cu.trustedFor": "{email} is trusted",
   "a.cu.trustedOn": "{email} is now a trusted customer",
   "a.cu.trustedOff": "{email} is no longer trusted",
+  "a.cu.activeOn": "{email} can sign in again",
+  "a.cu.activeOff": "{email} is switched off and signed out",
+  "a.cu.switchOn": "Switch on",
+  "a.cu.switchOff": "Switch off",
+  "a.cu.newPassword": "New password",
+  "a.cu.actions": "Actions",
 
   // contacts and the stall
   "a.si.phone": "Phone",

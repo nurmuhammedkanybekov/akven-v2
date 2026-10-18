@@ -20,6 +20,8 @@ public final class AccountDtos {
 
     public record UpdateAccount(@Size(max = 80) String displayName, @NotNull Role role, @NotNull Boolean active) {}
 
+    public record CustomerActive(@NotNull Boolean active) {}
+
     public record ResetPassword(@NotBlank @Size(min = 8, max = 100) String password) {}
 
     public record AccountView(UUID id, String email, String displayName, Role role, boolean active, Instant createdAt) {

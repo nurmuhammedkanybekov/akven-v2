@@ -2,15 +2,18 @@
 //
 // Strategies:
 //  - Navigations: network first, fall back to the cached app shell ("/"), so the installed app opens offline.
-//  - Static, content-addressed files (/assets/*, fonts, /media/*, /brand/*, /icons/*): cache first, filled as used.
+//  - Built files with a content hash in the name (/assets/*): cache first, they never change.
+//  - Pictures that can change under the same name (/media/*, /brand/*, /icons/*): answer from the cache at once and
+//    refresh it in the background, so new product art or a new logo shows up on the next visit.
 //  - /api/**: never touched here. A worker that silently served stale prices or stock would be worse than no
 //    offline support. The offline cart is handled in the app (client-side), not by caching API responses.
 
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL_CACHE = `akven-shell-${VERSION}`;
 const STATIC_CACHE = `akven-static-${VERSION}`;
-const SHELL_ASSETS = ["/", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/brand/logo-gold.svg"];
-const STATIC_PREFIXES = ["/assets/", "/media/", "/brand/", "/icons/"];
+const SHELL_ASSETS = ["/", "/theme-init.js", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/brand/logo-gold.svg"];
+const HASHED_PREFIX = "/assets/";
+const REFRESHED_PREFIXES = ["/media/", "/brand/", "/icons/", "/theme-init.js"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS)).then(() => self.skipWaiting()));
@@ -35,23 +38,32 @@ self.addEventListener("fetch", (event) => {
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request).then((response) => {
-        const copy = response.clone();
-        caches.open(SHELL_CACHE).then((cache) => cache.put("/", copy));
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(SHELL_CACHE).then((cache) => cache.put("/", copy));
+        }
         return response;
       }).catch(() => caches.match("/"))
     );
     return;
   }
 
-  if (STATIC_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) {
-    event.respondWith(
-      caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy));
-        }
-        return response;
-      }))
-    );
+  const fetchAndStore = () => fetch(request).then((response) => {
+    if (response.ok) {
+      const copy = response.clone();
+      caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy));
+    }
+    return response;
+  });
+
+  if (url.pathname.startsWith(HASHED_PREFIX)) {
+    event.respondWith(caches.match(request).then((cached) => cached || fetchAndStore()));
+  } else if (REFRESHED_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) {
+    event.respondWith(caches.match(request).then((cached) => {
+      const fresh = fetchAndStore();
+      if (!cached) return fresh;
+      event.waitUntil(fresh.catch(() => undefined));
+      return cached;
+    }));
   }
 });

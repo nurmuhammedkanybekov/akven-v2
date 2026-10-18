@@ -22,3 +22,6 @@ frontend/dist/
 
 # OS
 .DS_Store
+
+# Backups made by scripts/backup.sh (customer data)
+backups/

@@ -95,6 +95,28 @@ public class AccountService {
         audit.record(actorEmail, "ACCOUNT_PASSWORD_RESET", "USER", id, null, Map.of("email", user.getEmail()));
     }
 
+    /** A customer who forgot their password asks at the container; an owner sets a new one. Signs them out everywhere. */
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void resetCustomerPassword(String actorEmail, UUID id, String password) {
+        User user = customer(id);
+        user.changePassword(encoder.encode(password));
+        users.saveAndFlush(user);
+        audit.record(actorEmail, "CUSTOMER_PASSWORD_RESET", "USER", id, null, Map.of("email", user.getEmail()));
+    }
+
+    /** Owners switch off a customer account (a spammer, a fake account) or switch it back on. */
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public CustomerView setCustomerActive(String actorEmail, UUID id, boolean active) {
+        User user = customer(id);
+        boolean before = user.isActive();
+        user.setActive(active);
+        users.saveAndFlush(user);
+        audit.record(actorEmail, "CUSTOMER_ACTIVE_CHANGED", "USER", id, Map.of("active", before), Map.of("active", active));
+        return CustomerView.of(user);
+    }
+
     /** Owners look customers up by email to mark trusted ones (the switch itself is in PricingAdminService). */
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
@@ -122,6 +144,11 @@ public class AccountService {
         User user = users.findById(id).filter(u -> ASSIGNABLE.contains(u.getRole()))
                 .orElseThrow(() -> new NotFoundException("Account not found."));
         return user;
+    }
+
+    private User customer(UUID id) {
+        return users.findById(id).filter(u -> u.getRole() == Role.CUSTOMER)
+                .orElseThrow(() -> new NotFoundException("Customer not found."));
     }
 
     private static void requireAssignable(Role role) {

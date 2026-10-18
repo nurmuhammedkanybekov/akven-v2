@@ -142,19 +142,24 @@ function AccountRow({ account, onSaved, onReset }: { account: Account; onSaved: 
 }
 
 function ResetPassword({ account, onClose }: { account: Account; onClose: () => void }) {
+  return <NewPasswordDialog email={account.email} save={(password) => adminResetPassword(account.id, password)} onClose={onClose} />;
+}
+
+/** Sets a new password for someone who forgot theirs: a team member here, a customer on the customers screen. */
+export function NewPasswordDialog({ email, save, onClose }: { email: string; save: (password: string) => Promise<void>; onClose: () => void }) {
   const { t } = useT();
   const toast = useToast();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  async function save() {
+  async function submit() {
     setBusy(true); setError(null);
-    try { await adminResetPassword(account.id, password); toast(t("a.ac.resetDone", { email: account.email })); onClose(); }
+    try { await save(password); toast(t("a.ac.resetDone", { email })); onClose(); }
     catch (e) { setError(e instanceof ApiError ? e.message : t("a.err.save")); } finally { setBusy(false); }
   }
   return (
-    <Dialog open title={t("a.ac.resetTitle", { email: account.email })} onClose={onClose}
-            actions={<><Button variant="ghost" onClick={onClose}>{t("a.cancel")}</Button><Button loading={busy} disabled={password.length < 8} onClick={save}>{t("a.ac.reset")}</Button></>}>
+    <Dialog open title={t("a.ac.resetTitle", { email })} onClose={onClose}
+            actions={<><Button variant="ghost" onClick={onClose}>{t("a.cancel")}</Button><Button loading={busy} disabled={password.length < 8} onClick={submit}>{t("a.ac.reset")}</Button></>}>
       {error && <Alert tone="danger">{error}</Alert>}
       <Input label={t("a.ac.newPassword")} type="password" autoComplete="new-password" autoFocus value={password} hint={t("a.ac.passwordHint")} onChange={(e) => setPassword(e.target.value)} />
       <p className="av-small">{t("a.ac.resetLead")}</p>

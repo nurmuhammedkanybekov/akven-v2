@@ -230,6 +230,10 @@ jobs:
           curl -fsS http://localhost:8081/ | grep -q '<div id="root">'
           curl -fsS http://localhost:8081/products/does-not-exist | grep -q '<div id="root">'   # a deep link still gets the app
           curl -fsS http://localhost:8081/actuator/health 2>/dev/null | grep -q UP || true
+          # The security headers are sent on pages and on built files alike (nginx drops them in a location with its own headers).
+          curl -fsSI http://localhost:8081/ | grep -qi '^content-security-policy:.*frame-ancestors'
+          ASSET=$(curl -fsS http://localhost:8081/ | grep -o '/assets/[^"]*\.js' | head -1)
+          curl -fsSI "http://localhost:8081$ASSET" | grep -qi '^x-content-type-options: nosniff'
           # Sign in the way a browser does (it sends its own Origin on a POST): this must be same-origin through the proxy.
           curl -fsS -X POST http://localhost:8081/api/auth/login -H 'Origin: http://localhost:8081' \
             -H 'Content-Type: application/json' -d '{"email":"admin@akven.test","password":"changeme-admin"}' | grep -q '"token"'
