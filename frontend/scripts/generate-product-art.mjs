@@ -10,6 +10,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MARK, markMarkup } from "../src/brand/mark.ts";
 import { SOCK_COLOURS as C, sockBounds, sockMarkup } from "../src/brand/sockDrawing.ts";
+import { COLLECTION_2 } from "./collection-2.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -71,6 +72,12 @@ const EMBLEMS = {
   snow: `<path d="M0 -38V38M-33 -19L33 19M-33 19L33 -19M-8 -30L0 -22L8 -30M-8 30L0 22L8 30"/>`,
   pencil: `<path d="M-26 26L-20 8L14 -26L26 -14L-8 20Z"/><path d="M-20 8L-8 20M8 -20L20 -8"/>`,
   week: `<rect x="-30" y="-26" width="60" height="54" rx="6"/><path d="M-30 -10H30M-16 -34V-20M16 -34V-20M-14 4H-6M4 4H12M-14 16H-6"/>`,
+  heart: `<path d="M0 30C-34 6-34-22-16-26C-8-28 -2-22 0-14C2-22 8-28 16-26C34-22 34 6 0 30Z"/>`,
+  ring: `<circle cx="-10" cy="6" r="20"/><circle cx="12" cy="6" r="20"/><path d="M-4-30L2-20L8-30"/>`,
+  mountain: `<path d="M-38 26L-12-18L4 6L16-10L38 26Z"/><path d="M-18-8L-12-18L-6-8"/>`,
+  moon: `<path d="M6-34A34 34 0 1 0 30 18A26 26 0 1 1 6-34Z"/><path d="M20-22V-12M15-17H25"/>`,
+  ball: `<circle r="32"/><path d="M0-12L11-4L7 9H-7L-11-4Z"/><path d="M0-12V-32M11-4L30-10M7 9L18 26M-7 9L-18 26M-11-4L-30-10"/>`,
+  foot: `<path d="M-6 30C-22 30-22 8-14-6C-8-16-6-26 2-26C14-26 14-6 8 8C4 18 8 30-6 30Z"/><circle cx="16" cy="-30" r="3"/><circle cx="22" cy="-22" r="3"/><circle cx="25" cy="-12" r="3"/>`,
 };
 
 const S = (cut, main, accent, pattern = "plain", extra = {}) => ({ cut, main, accent, pattern, ...extra });
@@ -132,6 +139,8 @@ const PRODUCTS = {
   "office-week-pack": { tint: "#e8e8ea", box: { colour: C.charcoal, ribbon: C.gold, emblem: "week",
     socks: [S("crew", C.navy, C.navy, "rib", { heel: false }), S("crew", C.black, C.gold, "pinstripe", { heel: false }), S("crew", C.charcoal, C.charcoal, "rib", { heel: false }), S("crew", C.navy, C.gold, "argyle", { second: C.cream })] } },
 };
+
+for (const p of COLLECTION_2) PRODUCTS[p.slug] = p.box ? { tint: p.tint, box: p.box } : { tint: p.tint, sock: p.sock };
 
 const outDir = path.join(root, "public/media/products");
 fs.mkdirSync(outDir, { recursive: true });
