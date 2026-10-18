@@ -32,7 +32,7 @@ describe("languages", () => {
     render(<I18nProvider><LanguageSwitch /><Hello /></I18nProvider>);
     expect(screen.getByText("for the whole family. · Add 4 more pairs to save 5% on every pair.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Кыргызча" }));
-    expect(screen.getByText(/бүт үй-бүлө үчүн\./)).toBeInTheDocument();
+    expect(screen.getByText(/бүт үй\u2011бүлө үчүн\./u)).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("ky");
     expect(localStorage.getItem("akven-lang")).toBe("ky");
     expect(screen.getByRole("button", { name: "Кыргызча" })).toHaveAttribute("aria-pressed", "true");
