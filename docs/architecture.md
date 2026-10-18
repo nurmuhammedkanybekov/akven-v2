@@ -112,6 +112,12 @@ constraint failures above firing correctly (bad role, stock/reserved
 violation, margin-invariant violation, duplicate email by case, and
 `ON DELETE RESTRICT` blocking a product delete while variants exist).
 
+- **Pictures per colour and the waiting list (V26).** `product_image.color` ties a picture to one colour of the
+  product (the variants' colour name); the shop shows the chosen colour's pictures and falls back to the product's
+  own, and the card's cover is always a picture of the product as a whole. `stock_request` holds one row per customer
+  and sold-out option (unique together); the owners close it when they have written to the customer, so the table is
+  also a record of demand for what to reorder. `shop_policy` gained the rouble rate and rounding next to som.
+
 ## Status
 
 **Milestone 1 (due 25 Sept) — complete, pushed to GitLab:**

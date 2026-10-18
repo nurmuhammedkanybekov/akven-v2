@@ -15,15 +15,15 @@ who runs the system) can do everything an owner can, plus the accounts, the AI a
 | Add, rename, hide, reorder or delete a **section** (Classic, Sport, "Premium Gold Line") or a **cut** (Crew, Mid-long) | Sections and cuts, or "+ Add a new section" inside the product form |
 | Add a product: name, who it is for, section, cut, quality, fabric, care, origin | Products, Add a product |
 | Add each **colour and size** with a swatch, price, stock, cost and the biggest discount the assistant may give | The product form, or later on the product's page |
-| Upload **photos** when they exist (JPEG, PNG or WebP, up to 5 MB, 8 per product; the first is the cover) | The product's page, Photos |
+| Upload **photos** when they exist (JPEG, PNG or WebP, up to 5 MB, 40 per product; the first is the cover). A photo can belong to **one colour**: customers who choose that colour see its photos | The product's page, Photos |
 | **Remove** a product from the shop (immediate, reversible) and **put it back** | The product's page. Nothing is ever hard-deleted, so past orders stay intact |
 | See who changed what (admins) | The product's page, History |
 | Handle orders: see what is waiting, mark it completed, or cancel and refund | Orders |
 | Read what the assistant offered customers, next to what the policy allowed | Negotiations |
 | Record stock **on the way**, its arrival date and the **pairs in a wholesale case** (the shop then says "arrives in about N days") | The product's page, each colour and size |
-| See **paid orders, revenue and pairs sold**, how many paid orders wait at the stall, **which socks are running out** (and what is on the way); and offers per day, how often the limit stepped in, offers that became orders, best sellers, and the **rule-based against AI comparison** | Dashboard |
-| **Hand over a pickup order** at the stall: the customer says the six-digit code and the last four digits of their phone | Hand over an order |
-| Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, the **price ladder**, and the **som rate** (som for one dollar, and how som prices are rounded) (owners) | Pricing |
+| See **paid orders, revenue and pairs sold**, how many paid orders wait at the stall, **which socks are running out** (and what is on the way), **who is waiting for a sold-out option** (write to them when it is back, then mark them as told); and offers per day, how often the limit stepped in, offers that became orders, best sellers, and the **rule-based against AI comparison** | Dashboard |
+| **Hand over a pickup order** at the stall: the customer says the six-digit code or shows its QR code (scan it with the button, in Chrome or Edge), and says the last four digits of their phone | Hand over an order |
+| Set the **minimum order** in pairs, the minimum for trusted customers, when "only N left" appears, the **price ladder**, and the **som and rouble rates** (how many for one dollar, and how prices are rounded) (owners) | Pricing |
 | Enter **WhatsApp, phone, Telegram, Instagram, email and Facebook**, and the stall: market, passage, container, and the **opening hours** (opening and closing time, and the days it is open) (owners) | Contacts and the stall |
 | Edit the **size chart** (owners) | Size chart |
 | Find a customer by email and mark them as **trusted** (they may order from the lower minimum), **set a new password** for a customer who forgot theirs, or **switch off** a fake account (owners) | Customers |
@@ -43,9 +43,11 @@ that the owners change contacts in the admin; the list in `.env` is applied agai
 ## For customers
 
 The shop speaks English, Russian and Kyrgyz (EN · РУС · КЫР in the top bar, or in the menu on a phone) and shows prices
-in US dollars or Kyrgyz som ($ · СОМ; som by default in Russian and Kyrgyz). Both choices are remembered on the
-device. Prices are kept in dollars, which is what the wallet charges; som are worked out with the owners' rate and
-rounding, and checkout says what the wallet will charge in dollars. Every sock card has a **Quick view** to choose
+in US dollars, Kyrgyz som or Russian roubles ($ · СОМ · ₽; som by default in Russian and Kyrgyz). The light and dark
+switch is in the top bar too. These choices are remembered on the device. Prices are kept in dollars, which is what
+the wallet charges; som and roubles are worked out with the owners' rates and rounding, and checkout says what the
+wallet will charge in dollars. Choosing a colour changes the sock's picture. A sold-out option offers **"Tell me when
+it's back"** (signed in): the owners see who is waiting and write when it arrives. Every sock card has a **Quick view** to choose
 and add a sock without leaving the shelf. Collections are mixed freely: the minimum order and the price ladder count pairs across
 the whole bag, and the bag says how many more pairs reach the next step. `/visit` explains how to find container
 70-E at Dordoi, `/sizes` has the size chart and a size finder, and `/wholesale` explains packs and cases.
@@ -61,7 +63,8 @@ the whole bag, and the bag says how many more pairs reach the next step. `/visit
    one-time token, never a card number, and no money moves. A switch in the sheet makes the "bank" decline, to show a
    failed payment. A real payment provider would sit behind the same `PaymentProvider` interface.
 4. **Order.** A confirmation page, then the order under "Your orders". A paid pickup order shows a six-digit pickup
-   code to say at the stall. A customer can cancel while the order is paid
+   code to say at the stall, and a QR code the stall can scan instead. **"Order these again"** puts the same socks back
+   in the bag at today's prices. A customer can cancel while the order is paid
    and not yet completed: the payment is refunded and the socks go back on the shelf.
 
 ## The assistant and why it cannot lose money

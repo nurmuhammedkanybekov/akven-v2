@@ -196,8 +196,8 @@ class AdminCatalogControllerTest extends IntegrationTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors").exists());
         }
-        List<ImageRequest> nine = java.util.Collections.nCopies(9, new ImageRequest("/media/a.svg", "x"));
-        sendJson("PUT", "/api/admin/products/" + id + "/images", staff, new ReplaceImagesRequest(nine))
+        List<ImageRequest> tooMany = java.util.Collections.nCopies(41, new ImageRequest("/media/a.svg", "x"));
+        sendJson("PUT", "/api/admin/products/" + id + "/images", staff, new ReplaceImagesRequest(tooMany))
                 .andExpect(status().isBadRequest());
     }
 
@@ -424,14 +424,14 @@ class AdminCatalogControllerTest extends IntegrationTest {
     }
 
     @Test
-    void uploadsNeedAStaffLoginAndAreCappedAtEightPhotos() throws Exception {
+    void uploadsNeedAStaffLoginAndAreCappedAtFortyPhotos() throws Exception {
         String staff = tokenFor(Role.STAFF);
         UUID id = createProduct(staff, "gallery-cap-product");
         upload(null, id, "a.png", "image/png", PNG).andExpect(status().isUnauthorized());
         upload(tokenFor(Role.CUSTOMER), id, "a.png", "image/png", PNG).andExpect(status().isForbidden());
-        for (int i = 0; i < 8; i++) upload(staff, id, "p" + i + ".png", "image/png", PNG).andExpect(status().isOk());
-        upload(staff, id, "p9.png", "image/png", PNG).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("A product can have at most 8 photos."));
+        for (int i = 0; i < 40; i++) upload(staff, id, "p" + i + ".png", "image/png", PNG).andExpect(status().isOk());
+        upload(staff, id, "p41.png", "image/png", PNG).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("A product can have at most 40 photos."));
     }
 
     @Test
@@ -477,5 +477,16 @@ class AdminCatalogControllerTest extends IntegrationTest {
 
     private BigDecimal floorOf(UUID variantId) {
         return variantRepository.findById(variantId).orElseThrow().getMarginFloorPct();
+    }
+
+    @Test
+    void aPhotoCanBelongToOneColourAndKeepsItWhenTheGalleryIsRearranged() throws Exception {
+        String staff = tokenFor(Role.STAFF);
+        UUID id = createProduct(staff, "colour-photos-product");
+        JsonNode saved = json(sendJson("PUT", "/api/admin/products/" + id + "/images", staff, new ReplaceImagesRequest(List.of(
+                new ImageRequest("/media/a.svg", "All colours"), new ImageRequest("/media/b.svg", "In navy", "Navy"))))
+                .andExpect(status().isOk()));
+        assertThat(saved.get("images").get(0).get("color").isNull()).isTrue();
+        assertThat(saved.get("images").get(1).get("color").asText()).isEqualTo("Navy");
     }
 }

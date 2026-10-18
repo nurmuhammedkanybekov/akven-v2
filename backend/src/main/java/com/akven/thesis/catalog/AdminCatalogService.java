@@ -58,7 +58,8 @@ public class AdminCatalogService {
     private final CatalogTermRepository termRepository;
     private final MediaStorage mediaStorage;
 
-    private static final int MAX_IMAGES = 8;
+    /** Pictures per product: a few of the product, and one or two for each colour. */
+    private static final int MAX_IMAGES = 40;
 
     /** Routes that would be shadowed by fixed paths under /api/products. */
     private static final java.util.Set<String> RESERVED_SLUGS = java.util.Set.of("facets");
@@ -192,7 +193,7 @@ public class AdminCatalogService {
                 .map(ProductImage::getUrl).filter(u -> r.images().stream().noneMatch(n -> n.url().equals(u))).toList();
         imageRepository.deleteAllForProduct(productId);
         List<ProductImage> saved = imageRepository.saveAll(IntStream.range(0, r.images().size())
-                .mapToObj(i -> new ProductImage(productId, r.images().get(i).url(), r.images().get(i).alt().trim(), i))
+                .mapToObj(i -> new ProductImage(productId, r.images().get(i).url(), r.images().get(i).alt().trim(), i, r.images().get(i).color()))
                 .toList());
         auditService.record(actor, "PRODUCT_IMAGES_REPLACED", PRODUCT, productId, before, imageSnapshot(saved));
         afterCommit(() -> removedUrls.forEach(mediaStorage::deleteQuietly));
@@ -209,7 +210,8 @@ public class AdminCatalogService {
         }
         String url = mediaStorage.store(file);
         String altText = alt != null && !alt.isBlank() ? alt.trim() : product.getName();
-        ProductImage saved = imageRepository.save(new ProductImage(productId, url, altText, existing.size()));
+        int next = existing.stream().mapToInt(ProductImage::getPosition).max().orElse(-1) + 1;
+        ProductImage saved = imageRepository.save(new ProductImage(productId, url, altText, next));
         auditService.record(actor, "PRODUCT_IMAGE_ADDED", PRODUCT, productId, null,
                 Map.of("url", saved.getUrl(), "alt", saved.getAlt(), "position", saved.getPosition()));
         return view(product);
@@ -293,7 +295,8 @@ public class AdminCatalogService {
     }
 
     private static List<Map<String, String>> imageSnapshot(List<ProductImage> images) {
-        return images.stream().map(i -> Map.of("url", i.getUrl(), "alt", i.getAlt())).toList();
+        return images.stream().map(i -> i.getColor() == null ? Map.of("url", i.getUrl(), "alt", i.getAlt())
+                : Map.of("url", i.getUrl(), "alt", i.getAlt(), "color", i.getColor())).toList();
     }
 
     private Product requireProduct(UUID id) {

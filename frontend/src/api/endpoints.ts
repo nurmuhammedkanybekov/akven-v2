@@ -1,5 +1,6 @@
 import { api } from "./client";
 import type {
+  StockWaiting,
   ShopSummary,
   AdminProduct, AdminTerm, AdminVariant, AuditEntry, AuthResponse, Facets, PageResponse, ProductDetail,
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
@@ -83,7 +84,7 @@ export const adminUploadImage = (productId: string, file: File, alt: string) => 
   if (alt) form.append("alt", alt);
   return api<AdminProduct>(`/api/admin/products/${productId}/images/upload`, { method: "POST", form });
 };
-export const adminReplaceImages = (productId: string, images: Array<{ url: string; alt: string }>) =>
+export const adminReplaceImages = (productId: string, images: Array<{ url: string; alt: string; color?: string | null }>) =>
   api<AdminProduct>(`/api/admin/products/${productId}/images`, { method: "PUT", body: { images } });
 
 // ---- admin: sections and cuts ----
@@ -165,3 +166,10 @@ export const adminSetAssistantMode = (mode: AssistantMode) => api<AssistantStatu
 export const adminTryAssistant = (body: { sku: string; message: string; quantity: number; language: string }) =>
   api<AssistantTry>("/api/admin/assistant/try", { method: "POST", body });
 export const adminLiveEvaluation = () => api<EvaluationReport>("/api/admin/assistant/evaluation", { method: "POST", body: {} });
+
+// ---- "tell me when it is back" ----
+export const myStockRequests = () => api<string[]>("/api/stock-requests");
+export const requestStock = (sku: string) => api<string[]>(`/api/stock-requests/${encodeURIComponent(sku)}`, { method: "PUT", body: {} });
+export const cancelStockRequest = (sku: string) => api<string[]>(`/api/stock-requests/${encodeURIComponent(sku)}`, { method: "DELETE", body: {} });
+export const adminStockRequests = () => api<StockWaiting[]>("/api/admin/stock-requests");
+export const adminAnswerStockRequest = (id: string) => api<void>(`/api/admin/stock-requests/${id}/answered`, { method: "PUT", body: {} });

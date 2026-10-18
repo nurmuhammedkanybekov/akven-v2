@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import { ApiError } from "../api/client";
 import { adminHandOver } from "../api/endpoints";
 import type { OrderView } from "../api/types";
@@ -7,8 +7,12 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Field";
 import { formatPrice } from "../lib/format";
 import { useT } from "../i18n/I18n";
+import { QrScanner } from "./QrScanner";
 
-/** At the stall: the customer says the code and the end of their phone number, and the order is handed over once. */
+/**
+ * At the stall: the customer says the code (or shows its QR code to be scanned) and the end of their phone number, and
+ * the order is handed over once.
+ */
 export function AdminHandover() {
   const { t } = useT();
   const [code, setCode] = useState("");
@@ -16,6 +20,8 @@ export function AdminHandover() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<OrderView | null>(null);
+
+  const scanned = useCallback((c: string) => setCode(`${c.slice(0, 3)} ${c.slice(3)}`), []);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -31,6 +37,7 @@ export function AdminHandover() {
       <header className="av-admin__head"><div><span className="av-eyebrow">{t("a.ho.eyebrow")}</span><h1>{t("a.nav.handover")}</h1></div></header>
       <form className="av-card-form av-narrow" onSubmit={submit}>
         <p className="av-small">{t("a.ho.lead")}</p>
+        <QrScanner onCode={scanned} />
         <Input label={t("a.ho.code")} inputMode="numeric" autoComplete="off" maxLength={7} value={code} onChange={(e) => setCode(e.target.value)} />
         <Input label={t("a.ho.phone")} inputMode="numeric" autoComplete="off" maxLength={4} value={phoneEnd} onChange={(e) => setPhoneEnd(e.target.value)} />
         <Button type="submit" size="lg" loading={busy} disabled={code.replace(/\D/g, "").length !== 6 || phoneEnd.replace(/\D/g, "").length !== 4}>{t("a.ho.submit")}</Button>

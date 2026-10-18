@@ -23,10 +23,11 @@ export function useTheme() {
   return { theme, setTheme, toggle: () => setTheme(theme === "dark" ? "light" : "dark") };
 }
 
-export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
+export function ThemeToggle({ theme, onToggle, className = "av-icon-btn" }: { theme: Theme; onToggle: () => void; className?: string }) {
   const { t } = useT();
   return (
-    <button type="button" className="av-icon-btn" onClick={onToggle} aria-label={theme === "dark" ? t("theme.toLight") : t("theme.toDark")}>
+    <button type="button" className={className} onClick={onToggle} aria-label={theme === "dark" ? t("theme.toLight") : t("theme.toDark")}
+            title={theme === "dark" ? t("theme.toLight") : t("theme.toDark")}>
       {theme === "dark" ? <SunIcon /> : <MoonIcon />}
     </button>
   );

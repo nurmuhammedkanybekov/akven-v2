@@ -353,7 +353,7 @@ try {
 
   await step("the home page opens on container 70-E; the collection box, shelf and gift calendar work; the fitting is on the size guide", async () => {
     await page.goto(`${BASE}/`);
-    await page.locator(".av-hero4 .av-box").waitFor();
+    await page.locator(".av-yard .av-box").waitFor();
     await page.getByRole("button", { name: "Empty the box" }).click();
     for (let i = 0; i < 20; i++) await page.getByRole("button", { name: "Add Argyle to the box" }).click();
     await page.getByText("−3% on every pair").waitFor();

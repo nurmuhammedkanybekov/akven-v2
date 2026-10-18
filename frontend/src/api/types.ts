@@ -3,7 +3,8 @@ export type Category = "MEN" | "WOMEN" | "KIDS" | "BUNDLES";
 export type Role = "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN";
 export type TermKind = "SECTION" | "CUT";
 
-export interface ImageView { url: string; alt: string }
+/** color: the variants' colour this picture shows; null or missing for the product as a whole. */
+export interface ImageView { url: string; alt: string; color?: string | null }
 export interface TermView { slug: string; name: string }
 export interface TermInfo { slug: string; name: string; description: string | null }
 export interface TermsView { sections: TermInfo[]; cuts: TermInfo[] }
@@ -77,7 +78,7 @@ export interface AdminTerm {
   id: string; kind: TermKind; slug: string; name: string; description: string | null;
   position: number; active: boolean; productCount: number; version: number;
 }
-export interface AdminImage { id: string; url: string; alt: string; position: number }
+export interface AdminImage { id: string; url: string; alt: string; position: number; color?: string | null }
 export interface AdminVariant {
   id: string; sku: string; size: string | null; color: string | null; colorHex: string | null; packSize: number | null;
   price: number; costPrice: number; marginFloorPct: number;
@@ -189,9 +190,9 @@ export interface NegotiationTurn {
 
 // ---- pricing, shop info and sizes ----
 
-export interface PublicPricing { minOrderPairs: number; tiers: Array<{ minPairs: number; discountPct: number }>; somPerUsd?: number; somRounding?: number }
+export interface PublicPricing { minOrderPairs: number; tiers: Array<{ minPairs: number; discountPct: number }>; somPerUsd?: number; somRounding?: number; rubPerUsd?: number; rubRounding?: number }
 /** somPerUsd: som for one dollar, as the owners set it; somRounding: som prices are rounded to this (1, 5, 10, 50, 100). */
-export interface PricingPolicy { minOrderPairs: number; trustedMinOrderPairs: number; trustedAfterOrders: number; fewLeftThreshold: number; somPerUsd: number; somRounding: number }
+export interface PricingPolicy { minOrderPairs: number; trustedMinOrderPairs: number; trustedAfterOrders: number; fewLeftThreshold: number; somPerUsd: number; somRounding: number; rubPerUsd: number; rubRounding: number }
 export interface PriceTier { id: string; minPairs: number; discountPct: number }
 
 export type ContactKind = "INSTAGRAM" | "TELEGRAM" | "WHATSAPP" | "PHONE" | "EMAIL" | "FACEBOOK";
@@ -247,3 +248,10 @@ export interface AuditLine { id: string; at: string; actor: string; action: stri
 export type AssistantMode = "ai" | "rules";
 export interface AssistantStatus { mode: AssistantMode; aiConfigured: boolean; model: string; endpointHost: string | null; answersLast7Days: Record<string, number> }
 export interface AssistantTry { assistant: string; proposedPct: number; validatedPct: number; offerPrice: number; reply: string; millis: number }
+
+/** A sold-out option and the customers waiting for it (the shop team's list). */
+export interface StockWaiting {
+  sku: string; productName: string; productSlug: string; color: string | null; size: string | null;
+  available: number; incoming: number; restockEta: string | null;
+  customers: Array<{ requestId: string; email: string; since: string }>;
+}

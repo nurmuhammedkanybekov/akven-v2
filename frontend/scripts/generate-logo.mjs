@@ -15,7 +15,8 @@ import { MARK, markMarkup } from "../src/brand/mark.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const load = (file) => { const b = fs.readFileSync(path.join(root, "node_modules/@fontsource", file)); return opentype.parse(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)); };
-const font = load("cinzel/files/cinzel-latin-400-normal.woff");
+// Cinzel 600: heavy enough to stand next to the mark's thick strokes, still a Roman capital.
+const font = load("cinzel/files/cinzel-latin-600-normal.woff");
 const sans = load("onest/files/onest-latin-400-normal.woff");
 
 const SIZE = 100;
@@ -29,13 +30,14 @@ function outline(text, size, tracking, face = font) {
   return { d: p.toPathData(2), x1: bb.x1, x2: bb.x2, y1: bb.y1, y2: bb.y2 };
 }
 
-const word = outline("AKVEN", SIZE, 0.42);
+const word = outline("AKVEN", SIZE, 0.3);
 const tag = outline("PREMIUM SOCKS", SIZE * 0.22, 0.42, sans);
 
-// Horizontal: the mark a little taller than the capitals, centred on them.
-const hMarkH = CAP * 2.0, hScale = hMarkH / MARK.h, hMarkW = MARK.w * hScale;
-const hGap = CAP * 0.55;
-const hMarkY = -CAP / 2 - hMarkH / 2;
+// Horizontal: the mark stands on the same baseline as the capitals (its feet overshoot it a little, like a serif),
+// rising well above them, so the two read as one line rather than a picture next to a word.
+const hMarkH = CAP * 1.7, hScale = hMarkH / MARK.h, hMarkW = MARK.w * hScale;
+const hGap = CAP * 0.42;
+const hMarkY = CAP * 0.05 - hMarkH;
 const horizontal = {
   viewBox: `0 ${f(hMarkY)} ${f(hMarkW + hGap + (word.x2 - word.x1))} ${f(hMarkH)}`,
   mark: `translate(0 ${f(hMarkY)}) scale(${hScale.toFixed(5)})`,

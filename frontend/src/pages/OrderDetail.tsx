@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../api/client";
-import { cancelMyOrder, getMyOrder } from "../api/endpoints";
+import { cancelMyOrder, getMyOrder, getProduct } from "../api/endpoints";
 import type { OrderView } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { OrderStatusBadge } from "../components/OrderStatusBadge";
 import { ProductImage } from "../components/ProductImage";
+import { QrCode, pickupQrText } from "../components/QrCode";
 import { useToast } from "../components/Toast";
+import { useCart } from "../cart/CartContext";
 import { useAsync } from "../hooks/useAsync";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
@@ -78,6 +80,7 @@ export function OrderDetailPage() {
             {o.fulfilledAt && <div><dt className="av-eyebrow">Completed</dt><dd>{formatDateTime(o.fulfilledAt)}</dd></div>}
             {o.cancelledAt && <div><dt className="av-eyebrow">Cancelled</dt><dd>{formatDateTime(o.cancelledAt)}</dd></div>}
           </dl>
+          <OrderAgain order={o} />
           {(o.status === "PAID" || o.status === "PENDING") && <Button variant="secondary" onClick={() => setConfirm(true)}>Cancel this order</Button>}
         </aside>
       </div>
@@ -100,6 +103,10 @@ function PickupCode({ code, point }: { code: string; point: NonNullable<OrderVie
         <strong className="av-pickup__code av-num" aria-label={code.split("").join(" ")}>{code.slice(0, 3)} {code.slice(3)}</strong>
         <p>{t("order.pickupLead")}</p>
       </div>
+      <figure className="av-pickup__qr">
+        <QrCode text={pickupQrText(code)} label={t("order.qrLabel", { code })} />
+        <figcaption className="av-small">{t("order.qrNote")}</figcaption>
+      </figure>
       {point && (
         <div className="av-stack">
           <span className="av-eyebrow">{t("order.pickupAt")}</span>
@@ -109,4 +116,38 @@ function PickupCode({ code, point }: { code: string; point: NonNullable<OrderVie
       )}
     </section>
   );
+}
+
+/**
+ * The same socks again, in one tap: every line goes back into the bag at today's price, as many as are in stock now.
+ * Lines that are sold out or no longer sold are named, so nothing disappears silently.
+ */
+function OrderAgain({ order }: { order: OrderView }) {
+  const { t } = useT();
+  const cart = useCart();
+  const toast = useToast();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  async function again() {
+    setBusy(true);
+    let added = 0;
+    const missing: string[] = [];
+    for (const item of order.items) {
+      try {
+        if (!item.productSlug) throw new Error("gone");
+        const product = await getProduct(item.productSlug);
+        const v = product.variants.find((x) => x.sku === item.sku);
+        if (!v || v.availableQty <= 0) throw new Error("out");
+        const picture = product.images.find((i) => i.color && i.color === v.color) ?? product.images[0];
+        cart.add({ sku: v.sku, productSlug: product.slug, productName: product.name, variantLabel: item.variantLabel, colorHex: v.colorHex,
+          imageUrl: picture?.url ?? null, unitPrice: v.price }, Math.min(item.quantity, v.availableQty), v.availableQty);
+        added++;
+      } catch { missing.push(item.productName); }
+    }
+    setBusy(false);
+    if (added) toast(missing.length ? t("again.partly", { names: missing.join(", ") }) : t("again.done"));
+    else toast(t("again.none"), "danger");
+    if (added) navigate("/cart");
+  }
+  return <Button variant="primary" block loading={busy} onClick={() => void again()}>{t("again.cta")}</Button>;
 }

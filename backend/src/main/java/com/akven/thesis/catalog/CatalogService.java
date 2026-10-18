@@ -77,12 +77,15 @@ public class CatalogService {
                 : variantRepository.findByProductIdInAndActiveTrue(ids).stream()
                         .collect(Collectors.groupingBy(v -> v.getProduct().getId()));
 
-        // The first image is the card's cover, the second (if any) shows on hover.
+        // The first picture of the product as a whole is the card's cover, the second (if any) shows on hover. Pictures
+        // of one colour are for the product page; a product with only those uses its first ones.
         Map<UUID, List<ImageView>> imagesByProduct = new HashMap<>();
         if (!ids.isEmpty()) {
-            imageRepository.findByProductIdInOrderByPositionAsc(ids).forEach(i -> {
-                List<ImageView> list = imagesByProduct.computeIfAbsent(i.getProductId(), k -> new java.util.ArrayList<>());
-                if (list.size() < 2) list.add(ImageView.of(i));
+            Map<UUID, List<ProductImage>> all = imageRepository.findByProductIdInOrderByPositionAsc(ids).stream()
+                    .collect(Collectors.groupingBy(ProductImage::getProductId));
+            all.forEach((id, list) -> {
+                List<ProductImage> general = list.stream().filter(i -> i.getColor() == null).toList();
+                imagesByProduct.put(id, (general.isEmpty() ? list : general).stream().limit(2).map(ImageView::of).toList());
             });
         }
 

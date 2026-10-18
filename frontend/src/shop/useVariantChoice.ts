@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import type { ProductDetail, VariantView } from "../api/types";
+import type { ImageView, ProductDetail, VariantView } from "../api/types";
 import { useT } from "../i18n/I18n";
 
 /**
  * Choosing a colour, size and pack for one product, shared by the product page and the quick view so both behave the
  * same. Starts on the first option in stock; picking one option keeps the others where possible, so changing colour
- * does not reset the size.
+ * does not reset the size. The pictures follow the colour: the chosen colour's own pictures when it has some, the
+ * product's general pictures otherwise.
  */
 export function useVariantChoice(product: ProductDetail) {
   const { t } = useT();
@@ -30,8 +31,15 @@ export function useVariantChoice(product: ProductDetail) {
     if (best) setSku(best.sku);
   }
 
+  const images: ImageView[] = useMemo(() => {
+    const own = product.images.filter((i) => i.color && i.color === current?.color);
+    if (own.length) return own;
+    const general = product.images.filter((i) => !i.color);
+    return general.length ? general : product.images;
+  }, [product.images, current?.color]);
+
   /** "Navy, M, 3 pairs": how the option is named in the bag. */
   const label = (v: VariantView) => [v.color, v.size, v.packSize && v.packSize > 1 ? t("pdp.pairsN", { n: v.packSize }) : null].filter(Boolean).join(", ") || null;
 
-  return { current, colors, sizes, packs, pick, label };
+  return { current, colors, sizes, packs, pick, label, images };
 }

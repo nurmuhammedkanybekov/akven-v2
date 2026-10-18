@@ -8,7 +8,10 @@ import jakarta.persistence.Table;
 
 import java.util.UUID;
 
-/** One picture of a product. Position 0 is the cover image shown on catalog cards. */
+/**
+ * One picture of a product. Position 0 is the cover image shown on catalog cards. A picture with a colour belongs to
+ * that colour of the product (the variants' colour name): choosing the colour shows its pictures.
+ */
 @Entity
 @Table(name = "product_image")
 public class ProductImage {
@@ -29,15 +32,23 @@ public class ProductImage {
     @Column(nullable = false)
     private int position;
 
+    @Column(length = 60)
+    private String color;
+
     protected ProductImage() {
         // JPA
     }
 
     public ProductImage(UUID productId, String url, String alt, int position) {
+        this(productId, url, alt, position, null);
+    }
+
+    public ProductImage(UUID productId, String url, String alt, int position, String color) {
         this.productId = productId;
         this.url = url;
         this.alt = alt;
         this.position = position;
+        this.color = color == null || color.isBlank() ? null : color.strip();
     }
 
     public UUID getId() { return id; }
@@ -45,4 +56,5 @@ public class ProductImage {
     public String getUrl() { return url; }
     public String getAlt() { return alt; }
     public int getPosition() { return position; }
+    public String getColor() { return color; }
 }

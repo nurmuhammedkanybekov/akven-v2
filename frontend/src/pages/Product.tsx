@@ -12,6 +12,7 @@ import { Button } from "../components/Button";
 import { NegotiationChat } from "../components/NegotiationChat";
 import { Price } from "../components/Price";
 import { SizeFinder } from "../components/SizeFinder";
+import { NotifyMe } from "../components/NotifyMe";
 import { ProductImage } from "../components/ProductImage";
 import { ProductCard } from "../components/ProductCard";
 import { HeartIcon, PinIcon, StackIcon, TruckIcon } from "../components/icons";
@@ -49,13 +50,15 @@ function ProductView({ product }: { product: ProductDetail }) {
   const minPrice = product.variants.length ? Math.min(...product.variants.map((v) => v.price)) : null;
   useEffect(() => { rememberViewed({ slug: product.slug, name: product.name, image: product.images[0]?.url ?? null, price: minPrice }); }, [product.slug, product.name, product.images, minPrice]);
   const variants = product.variants;
-  const { current, colors, sizes, packs, pick, label } = useVariantChoice(product);
+  const { current, colors, sizes, packs, pick, label, images } = useVariantChoice(product);
   const [imageIndex, setImageIndex] = useState(0);
+  // A new colour starts on its first picture.
+  useEffect(() => { setImageIndex(0); }, [current?.color]);
   const [quantity, setQuantity] = useState(1);
   const cart = useCart();
   const toast = useToast();
 
-  const image = product.images[imageIndex];
+  const image = images[Math.min(imageIndex, images.length - 1)];
   const details: Array<[MessageKey, string | null]> = [["pdp.fabric", product.fabricComposition], ["pdp.quality", product.quality], ["pdp.madeIn", product.origin], ["pdp.care", product.care]];
   const steps = pricing?.tiers ?? [];
 
@@ -67,10 +70,10 @@ function ProductView({ product }: { product: ProductDetail }) {
       </nav>
       <div className="av-pdp">
         <div className="av-pdp__gallery">
-          <div className="av-pdp__main"><ProductImage image={image} eager /></div>
-          {product.images.length > 1 && (
+          <div className="av-pdp__main"><ProductImage key={image?.url} image={image} eager /></div>
+          {images.length > 1 && (
             <div className="av-pdp__thumbs" role="group" aria-label={t("pdp.photos")}>
-              {product.images.map((img, i) => (
+              {images.map((img, i) => (
                 <button key={img.url} type="button" className="av-pdp__thumb" aria-pressed={i === imageIndex} aria-label={`Photo ${i + 1}: ${img.alt}`} onClick={() => setImageIndex(i)}>
                   <img src={img.url} alt="" width={96} height={120} loading="lazy" />
                 </button>
@@ -144,9 +147,10 @@ function ProductView({ product }: { product: ProductDetail }) {
             <Button size="lg" block disabled={!current || current.availableQty <= 0} onClick={() => {
               if (!current) return;
               cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
-                colorHex: current.colorHex, imageUrl: product.images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, current.availableQty), current.availableQty);
+                colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, current.availableQty), current.availableQty);
               toast(t("pdp.added"));
             }}>{current && current.availableQty <= 0 ? t("pdp.soldOut") : t("pdp.add")}</Button>
+            {current && current.availableQty <= 0 && <NotifyMe sku={current.sku} />}
             {cart.count > 0 && <p className="av-small"><Link to="/cart">{t("pdp.viewBag", { n: cart.count })}</Link></p>}
           </div>
           <ul className="av-promises">
@@ -159,7 +163,7 @@ function ProductView({ product }: { product: ProductDetail }) {
             <NegotiationChat sku={current.sku} quantity={Math.min(quantity, current.availableQty)} onAccept={(offer, offeredQty) => {
               const qty = Math.min(offeredQty, current.availableQty);
               cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
-                colorHex: current.colorHex, imageUrl: product.images[0]?.url ?? null, unitPrice: offer.offerPrice, negotiationSessionId: offer.sessionId }, qty, current.availableQty);
+                colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: offer.offerPrice, negotiationSessionId: offer.sessionId }, qty, current.availableQty);
               toast(`Added at ${offer.validatedDiscountPct}% off`);
             }} />
           )}

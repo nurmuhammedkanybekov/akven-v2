@@ -16,8 +16,9 @@ passes the A's right leg shows which is in front.
 The concept came as an AI-generated image with a pixel-traced vector package, whose outlines were stepped like pixels
 when enlarged. The mark used here was traced again from the reference image, upscaled eightfold, into smooth curves
 (potrace), and lives in `frontend/src/brand/mark.ts` as one even-odd path: crisp from a favicon to a sign, in any single
-colour, for labels and stamps. The name AKVEN is set in Cinzel capitals with wide spacing and the tagline "PREMIUM
-SOCKS" in Onest, both converted to outlines, so **the logo needs no font anywhere**. To change the mark, edit `mark.ts`
+colour, for labels and stamps. The name AKVEN is set in Cinzel SemiBold capitals, heavy enough to stand beside the mark's thick strokes; in the one-line
+logo the mark stands on the same baseline as the letters. The tagline "PREMIUM SOCKS" is in Onest. Both are converted
+to outlines, so **the logo needs no font anywhere**. To change the mark, edit `mark.ts`
 and run `npm run logo`, `npm run icons` and `npm run art`. Before printing labels or registering the mark, a designer
 should check the joins at real size, and the mark should be searched in Kyrgyzpatent and WIPO's Global Brand Database.
 
@@ -79,7 +80,7 @@ Ordered by the questions a visitor has: what does it cost, what is there, why he
 
 | Section | What it shows |
 |---|---|
-| The hero | In place of a photograph, night at Dordoi: a string of bulbs, a row of closed containers, and container 70-E, whose doors swing open on a rail of socks that sway and lean away from the pointer, with warm light on the ground. The headline sits over the darker left side |
+| The hero | In place of a photograph, a Dordoi passage at night: a string of bulbs, containers on two floors with a walkway, and in the middle of the lower floor container 70-E under its lit AKVEN sign. Its doors swing outwards on their hinges onto a rail of socks that drop into their swing, sway and lean away from the pointer, with warm light on the ground and the neighbours. The centred headline sits over the upper floor |
 | The washing line | The drawn socks pegged on a rope across the page, drifting and swaying, leaning away when the pointer passes |
 | Shop by family member | Four flat colour tiles: men, women, kids, gift boxes |
 | The shelf | The newest socks, switchable between men, women, kids and gift boxes without leaving the page |

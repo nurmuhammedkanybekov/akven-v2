@@ -37,6 +37,14 @@ public class ShopPolicy extends AuditableEntity {
     @Column(name = "som_rounding", nullable = false)
     private Integer somRounding = 10;
 
+    /** How many Russian roubles one US dollar is, for visitors from Russia, as the owners set it. */
+    @Column(name = "rub_per_usd", nullable = false)
+    private BigDecimal rubPerUsd = new BigDecimal("82.00");
+
+    /** Rouble prices are rounded to this many roubles: 1, 5, 10, 50 or 100. */
+    @Column(name = "rub_rounding", nullable = false)
+    private Integer rubRounding = 10;
+
     protected ShopPolicy() {
         // JPA
     }
@@ -59,6 +67,13 @@ public class ShopPolicy extends AuditableEntity {
     public int getFewLeftThreshold() { return fewLeftThreshold; }
     public BigDecimal getSomPerUsd() { return somPerUsd; }
     public int getSomRounding() { return somRounding; }
+    public BigDecimal getRubPerUsd() { return rubPerUsd; }
+    public int getRubRounding() { return rubRounding; }
+
+    void updateRub(BigDecimal rubPerUsd, int rubRounding) {
+        this.rubPerUsd = rubPerUsd;
+        this.rubRounding = rubRounding;
+    }
 
     void updateSom(BigDecimal somPerUsd, int somRounding) {
         this.somPerUsd = somPerUsd;

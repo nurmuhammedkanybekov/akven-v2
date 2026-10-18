@@ -101,14 +101,21 @@ public final class AdminCatalogDtos {
     public record ImageRequest(
             @NotBlank @Size(max = 500) @Pattern(regexp = "(https://|/media/)[^\\s\"'<>]+",
                     message = "must start with https:// or /media/ and contain no spaces or quotes") String url,
-            @NotBlank @Size(max = 255) String alt) {}
+            @NotBlank @Size(max = 255) String alt,
+            /** The variants' colour this picture shows; empty for the product as a whole. */
+            @Size(max = 60) String color) {
+
+        public ImageRequest(String url, String alt) {
+            this(url, alt, null);
+        }
+    }
 
     /** Replaces the whole ordered image list (this is also how photos are reordered or removed); first = cover. */
-    public record ReplaceImagesRequest(@NotNull @Size(max = 8) List<@Valid @NotNull ImageRequest> images) {}
+    public record ReplaceImagesRequest(@NotNull @Size(max = 40) List<@Valid @NotNull ImageRequest> images) {}
 
-    public record AdminImageView(UUID id, String url, String alt, int position) {
+    public record AdminImageView(UUID id, String url, String alt, int position, String color) {
         static AdminImageView of(ProductImage i) {
-            return new AdminImageView(i.getId(), i.getUrl(), i.getAlt(), i.getPosition());
+            return new AdminImageView(i.getId(), i.getUrl(), i.getAlt(), i.getPosition(), i.getColor());
         }
     }
 

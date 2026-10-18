@@ -54,7 +54,7 @@ public class PricingAdminService {
         ShopPolicy policy = collections.policy();
         return new PublicPricing(policy.getMinOrderPairs(),
                 collections.ladder().stream().map(t -> new PublicTier(t.getMinPairs(), t.getDiscountPct())).toList(),
-                policy.getSomPerUsd(), policy.getSomRounding());
+                policy.getSomPerUsd(), policy.getSomRounding(), policy.getRubPerUsd(), policy.getRubRounding());
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +78,11 @@ public class PricingAdminService {
         }
         policy.updateSom(r.somPerUsd() == null ? policy.getSomPerUsd() : r.somPerUsd(),
                 r.somRounding() == null ? policy.getSomRounding() : r.somRounding());
+        if (r.rubRounding() != null && !java.util.Set.of(1, 5, 10, 50, 100).contains(r.rubRounding())) {
+            throw new BusinessRuleException("Rouble prices can be rounded to 1, 5, 10, 50 or 100 roubles.");
+        }
+        policy.updateRub(r.rubPerUsd() == null ? policy.getRubPerUsd() : r.rubPerUsd(),
+                r.rubRounding() == null ? policy.getRubRounding() : r.rubRounding());
         PolicyView after = PolicyView.of(policies.saveAndFlush(policy));
         audit.record(actorEmail, "PRICING_POLICY_UPDATED", "SHOP_POLICY", POLICY_AUDIT_ID, before, after);
         return after;

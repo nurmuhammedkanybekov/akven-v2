@@ -17,14 +17,22 @@ const RAIL: SockSpec[] = [
   { cut: "ankle", main: C.mint, accent: C.forest, pattern: "dino", second: C.white },
 ];
 
-/** The neighbours in the row: closed containers in the colours you see walking down a Dordoi passage. */
-const ROW = ["#7c3b2e", "#3f5a4a", "#55606e", "#8a6a2f"];
+/** The neighbours on each floor, outwards from ours: colour and number, as in a Dordoi passage. */
+const LEFT = [{ c: "#7c3b2e", n: "70-D" }, { c: "#3f5a4a", n: "70-C" }, { c: "#8a6a2f", n: "70-B" }, { c: "#55606e", n: "70-A" }];
+const RIGHT = [{ c: "#55606e", n: "70-F" }, { c: "#8a3c35", n: "70-G" }, { c: "#2f4d6b", n: "70-H" }, { c: "#5c5a3a", n: "70-I" }];
+const UP_LEFT = [{ c: "#2f4d6b", n: "D-2" }, { c: "#6b4a35", n: "C-2" }, { c: "#55606e", n: "B-2" }, { c: "#3f5a4a", n: "A-2" }];
+const UP_RIGHT = [{ c: "#7c3b2e", n: "F-2" }, { c: "#3f5a4a", n: "G-2" }, { c: "#8a6a2f", n: "H-2" }, { c: "#55606e", n: "I-2" }];
+
+function Closed({ c, n, side, i }: { c: string; n: string; side: "l" | "r"; i: number }) {
+  return <span className={`av-yard__box av-yard__box--${side}`} data-n={n} style={{ "--c": c, "--d": i } as React.CSSProperties} />;
+}
 
 /**
- * The opening scene, standing in for a photograph: night at Dordoi, a row of closed containers, and the family's
- * own, 70-E, whose doors swing open on a rail of socks that sway and lean away from the pointer, with warm light
- * spilling onto the ground. The scene is decoration (aria-hidden) behind the headline; the words and links carry the
- * meaning. With reduced motion the doors are simply open.
+ * The opening scene, in place of a photograph: a passage at Dordoi at night, containers on two floors, and in the
+ * middle of the lower floor the family's own, 70-E, under its lit AKVEN sign on the walkway. Its doors swing open on a rail of socks
+ * that sway and lean away from the pointer, and warm light spills onto the ground. The headline sits over the scene.
+ * All of the scene is decoration (aria-hidden); the words and links carry the meaning. With reduced motion the doors
+ * are simply open.
  */
 export function ContainerHero({ minPairs }: { minPairs: number }) {
   const { t } = useT();
@@ -46,41 +54,49 @@ export function ContainerHero({ minPairs }: { minPairs: number }) {
   }
 
   return (
-    <section className="av-hero4" aria-labelledby="hero-title" onPointerMove={onMove} onPointerLeave={() => { last.current = null; }}>
-      <div className="av-hero4__scene" aria-hidden="true">
-        <div className="av-hero4__lights">{Array.from({ length: 18 }, (_, i) => <i key={i} style={{ "--i": i } as React.CSSProperties} />)}</div>
-        <div className="av-hero4__ground" />
-        <div className="av-hero4__row">
-          {ROW.map((c, i) => <span key={i} className={`av-ghost av-ghost--${i}`} style={{ "--c": c } as React.CSSProperties} />)}
-        </div>
-        <div className="av-stage">
-          <div className="av-stage__sign"><Logo height={30} /></div>
-          <div className="av-box">
-            <span className="av-box__plate">70-E</span>
-            <div className="av-box__inside">
-              <div className="av-box__rail" />
-              <div className="av-box__socks" ref={rail}>
-                {RAIL.map((s, i) => (
-                  <div key={i} className="av-hang" style={{ "--i": i } as React.CSSProperties}>
-                    <span className="av-hang__peg" />
-                    <div className="av-hang__sway"><SockArt {...s} /></div>
-                  </div>
-                ))}
-              </div>
-              <div className="av-box__shelf" />
-            </div>
-            <div className="av-box__door av-box__door--l"><span className="av-box__bars" /><Logo variant="mark" height="28%" className="av-box__emboss" /></div>
-            <div className="av-box__door av-box__door--r"><span className="av-box__bars" /><Logo variant="mark" height="28%" className="av-box__emboss" /></div>
-          </div>
-          <div className="av-stage__floor" />
-        </div>
+    <section className="av-hero5" aria-labelledby="hero-title" onPointerMove={onMove} onPointerLeave={() => { last.current = null; }}>
+      <div className="av-hero5__sky" aria-hidden="true">
+        <div className="av-hero5__lights">{Array.from({ length: 22 }, (_, i) => <i key={i} style={{ "--i": i } as React.CSSProperties} />)}</div>
       </div>
 
-      <div className="av-container av-hero4__copy">
-        <p className="av-hero4__where">{t("hero.where")}</p>
-        <h1 id="hero-title" className="av-hero4__title">{t("hero.title1")} <em>{t("hero.title2")}</em></h1>
-        <p className="av-hero4__lead">{minPairs > 1 ? t("hero.lead", { n: minPairs }) : t("hero.leadOne")}</p>
-        <div className="av-row av-hero4__ctas">
+      <div className="av-yard" aria-hidden="true">
+        <div className="av-yard__floor av-yard__floor--up">
+          {[...UP_LEFT].reverse().map((b, i) => <Closed key={b.n} {...b} side="l" i={UP_LEFT.length - i} />)}
+          <span className="av-yard__box" data-n="E-2" style={{ "--c": "#2f4d6b", "--d": 0 } as React.CSSProperties} />
+          {UP_RIGHT.map((b, i) => <Closed key={b.n} {...b} side="r" i={i + 1} />)}
+        </div>
+        <div className="av-yard__walk" />
+        <div className="av-yard__floor av-yard__floor--down">
+          {[...LEFT].reverse().map((b, i) => <Closed key={b.n} {...b} side="l" i={LEFT.length - i} />)}
+          <div className="av-yard__ours">
+            <span className="av-yard__sign"><Logo height="100%" /><b>70-E</b></span>
+            <div className="av-box">
+              <div className="av-box__inside">
+                <div className="av-box__rail" />
+                <div className="av-box__socks" ref={rail}>
+                  {RAIL.map((s, i) => (
+                    <div key={i} className="av-hang" style={{ "--i": i } as React.CSSProperties}>
+                      <span className="av-hang__peg" />
+                      <div className="av-hang__sway"><SockArt {...s} /></div>
+                    </div>
+                  ))}
+                </div>
+                <div className="av-box__shelf" />
+              </div>
+              <div className="av-yard__door av-yard__door--l"><span className="av-box__bars" /><Logo variant="mark" height="26%" className="av-yard__emboss" /></div>
+              <div className="av-yard__door av-yard__door--r"><span className="av-box__bars" /><Logo variant="mark" height="26%" className="av-yard__emboss" /></div>
+            </div>
+          </div>
+          {RIGHT.map((b, i) => <Closed key={b.n} {...b} side="r" i={i + 1} />)}
+        </div>
+        <div className="av-yard__ground" />
+      </div>
+
+      <div className="av-container av-hero5__copy">
+        <p className="av-hero5__where">{t("hero.where")}</p>
+        <h1 id="hero-title" className="av-hero5__title">{t("hero.title1")} <em>{t("hero.title2")}</em></h1>
+        <p className="av-hero5__lead">{minPairs > 1 ? t("hero.lead", { n: minPairs }) : t("hero.leadOne")}</p>
+        <div className="av-row av-hero5__ctas">
           <Button to="/shop" variant="accent" size="lg">{t("hero.shop")}</Button>
           <Button to="/#family" variant="secondary" size="lg" className="av-btn--onnavy">{t("hero.family")}</Button>
         </div>
