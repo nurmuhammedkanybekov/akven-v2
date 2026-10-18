@@ -47,7 +47,7 @@ export function WholesalePage() {
           <div className="av-whole2__stack" aria-hidden="true">
             {[0, 1, 2, 3, 4].map((i) => <SockArt key={i} cut="crew" main={[C.navy, C.charcoal, C.cream, C.navy, C.charcoal][i]} accent={C.gold} pattern={i === 2 ? "oimo" : "rib"} second={C.gold} heel={i === 2} style={{ "--k": i } as React.CSSProperties} />)}
           </div>
-          <span className="av-eyebrow av-orn">{t("whole.eyebrow")}</span>
+          <span className="av-eyebrow">{t("whole.eyebrow")}</span>
           <h1>{t("whole.title")}</h1>
           <p className="av-lead">{t("whole.pageLead")}</p>
           <div className="av-row">
@@ -71,7 +71,7 @@ export function WholesalePage() {
 
       <section id="gifts" className="av-container av-block" aria-labelledby="gifts-title" data-reveal>
         <header className="av-block__head">
-          <span className="av-eyebrow av-orn">{t("gift.eyebrow")}</span>
+          <span className="av-eyebrow">{t("gift.eyebrow")}</span>
           <h2 id="gifts-title">{t("quote.giftsTitle")}</h2>
           <p className="av-lead">{t("quote.giftsLead")}</p>
         </header>
@@ -85,7 +85,7 @@ export function WholesalePage() {
       <section id="quote" className="av-container av-block" aria-labelledby="quote-title" data-reveal>
         <div className="av-quote">
           <div className="av-stack">
-            <span className="av-eyebrow av-orn">{t("quote.eyebrow")}</span>
+            <span className="av-eyebrow">{t("quote.eyebrow")}</span>
             <h2 id="quote-title">{t("quote.title")}</h2>
             <p className="av-lead">{t("quote.lead")}</p>
             <ol className="av-numbered">

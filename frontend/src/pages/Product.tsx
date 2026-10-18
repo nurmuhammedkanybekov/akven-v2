@@ -197,7 +197,7 @@ function MoreLikeThis({ product }: { product: ProductDetail }) {
   if (items.length === 0) return null;
   return (
     <section className="av-block" aria-labelledby="more-title">
-      <header className="av-block__head"><span className="av-eyebrow av-orn">{t("ladder.eyebrow")}</span><h2 id="more-title">{t("pdp.more")}</h2></header>
+      <header className="av-block__head"><span className="av-eyebrow">{t("ladder.eyebrow")}</span><h2 id="more-title">{t("pdp.more")}</h2></header>
       <div className="av-grid-products">{items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={((i + 3) % 6) + 1} />)}</div>
     </section>
   );

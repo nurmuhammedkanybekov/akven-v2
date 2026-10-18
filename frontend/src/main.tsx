@@ -14,16 +14,10 @@ import "@fontsource/onest/cyrillic-ext-600.css";
 import "@fontsource/onest/latin-700.css";
 import "@fontsource/onest/cyrillic-700.css";
 import "@fontsource/onest/cyrillic-ext-700.css";
-// Cormorant Garamond for headings: a refined serif with the same three alphabets.
-import "@fontsource/cormorant-garamond/latin-500.css";
-import "@fontsource/cormorant-garamond/cyrillic-500.css";
-import "@fontsource/cormorant-garamond/cyrillic-ext-500.css";
-import "@fontsource/cormorant-garamond/latin-600.css";
-import "@fontsource/cormorant-garamond/cyrillic-600.css";
-import "@fontsource/cormorant-garamond/cyrillic-ext-600.css";
-import "@fontsource/cormorant-garamond/latin-500-italic.css";
-import "@fontsource/cormorant-garamond/cyrillic-500-italic.css";
-import "@fontsource/cormorant-garamond/cyrillic-ext-500-italic.css";
+// Headings are Onest too, heavy and tight: one typeface, the way Wise and Bombas set theirs.
+import "@fontsource/onest/latin-800.css";
+import "@fontsource/onest/cyrillic-800.css";
+import "@fontsource/onest/cyrillic-ext-800.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/components.css";

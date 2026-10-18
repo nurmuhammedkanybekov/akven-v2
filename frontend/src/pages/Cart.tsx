@@ -42,7 +42,7 @@ export function CartPage() {
 
   return (
     <div className="av-container av-page">
-      <header className="av-page__head"><span className="av-eyebrow av-orn">{t("cart.eyebrow")}</span><h1>{t("cart.title", { n: cart.count })}</h1></header>
+      <header className="av-page__head"><span className="av-eyebrow">{t("cart.eyebrow")}</span><h1>{t("cart.title", { n: cart.count })}</h1></header>
       {offline && <Alert>{t("cart.offline")}</Alert>}
 
       <div className="av-cart">

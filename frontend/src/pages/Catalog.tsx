@@ -92,7 +92,7 @@ export function CatalogPage({ category }: { category?: Category }) {
     <section className={`av-shophead av-shophead--${key.toLowerCase()}`} aria-labelledby="shop-title">
       <div className="av-container av-shophead__inner">
         <div className="av-stack">
-          <span className="av-eyebrow av-orn">{t("shop.eyebrow")}</span>
+          <span className="av-eyebrow">{t("shop.eyebrow")}</span>
           <h1 id="shop-title">{t(`shop.title.${key}` as MessageKey)}</h1>
           <p className="av-shophead__lead">{t(`shop.lead.${key}` as MessageKey)}</p>
           {total !== undefined && <p className="av-small" aria-live="polite">{t(total === 1 ? "shop.count1" : "shop.count", { n: total })}</p>}

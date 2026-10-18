@@ -16,7 +16,6 @@
     "e2e": "node scripts/e2e-admin.mjs"
   },
   "dependencies": {
-    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/onest": "^5.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

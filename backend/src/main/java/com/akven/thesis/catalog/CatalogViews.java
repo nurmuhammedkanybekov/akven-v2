@@ -57,17 +57,21 @@ public final class CatalogViews {
 
     /** Card in the catalog grid. minPrice is the cheapest sellable variant ("from 6.50"). */
     public record ProductSummary(String slug, String name, Category category, TermView section, TermView cut,
-                                 String collection, BigDecimal minPrice, boolean inStock, int variantCount,
-                                 ImageView image, ImageView hoverImage, List<String> colors) {
+                                 String collection, BigDecimal minPrice, BigDecimal minPairPrice, boolean inStock,
+                                 int variantCount, ImageView image, ImageView hoverImage, List<String> colors) {
         static ProductSummary of(Product p, List<Variant> sellableVariants, ImageView cover, ImageView hover) {
             BigDecimal min = sellableVariants.stream().map(Variant::getPrice)
+                    .min(BigDecimal::compareTo).orElse(null);
+            // The cheapest pair: a pack of three at 13.00 is 4.33 a pair. Lets the shop compare packs with single pairs.
+            BigDecimal minPair = sellableVariants.stream()
+                    .map(v -> v.getPrice().divide(BigDecimal.valueOf(Math.max(1, v.getPackSize() == null ? 1 : v.getPackSize())), 2, java.math.RoundingMode.HALF_UP))
                     .min(BigDecimal::compareTo).orElse(null);
             boolean inStock = sellableVariants.stream().anyMatch(v -> v.available() > 0);
             // Distinct swatches for the card's colour dots, in variant order.
             List<String> colors = sellableVariants.stream().map(Variant::getColorHex)
                     .filter(java.util.Objects::nonNull).distinct().limit(6).toList();
             return new ProductSummary(p.getSlug(), p.getName(), p.getCategory(), TermView.of(p.getSection()),
-                    TermView.of(p.getCut()), p.getCollection(), min, inStock, sellableVariants.size(), cover, hover, colors);
+                    TermView.of(p.getCut()), p.getCollection(), min, minPair, inStock, sellableVariants.size(), cover, hover, colors);
         }
     }
 
