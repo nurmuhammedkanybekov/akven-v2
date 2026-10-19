@@ -88,8 +88,12 @@ super admin can repeat that run at any time.
 - **About 120 drawn designs and over 600 options** in the demo catalogue: a classic line of plain and ribbed socks in
   every height and up to ten colours, and patterns from argyle and cable knit to the Kyrgyz oimo and shyrdak, cats,
   bunnies and football socks. **The picture follows the colour** you choose, on the product page and in quick view.
-- **The family planner:** add each person and their shoe size; the sock size comes from the size chart, and the list
-  can be sent to the shop in a message.
+- **The family planner and family profiles:** add each person and their shoe size; the sock size comes from the size
+  chart, and the list can be sent to the shop in a message. Signed in, the family (names, sizes, birthdays) is kept in
+  the account: product pages say who in the family the shelf fits, and a birthday within a month suggests a gift box.
+- **Build a gift box:** a kraft, navy or red box with a ribbon and a hand-written card, filled with socks from any
+  shelf. The drawing shows the socks in the box and the lid closing over them; the family packs it at the stall.
+- **The sock finder:** who, how high and what for, in three taps, and the socks on the shelf that match.
 - **Ask for your price:** a negotiation chat on every product page, in the customer's language. It remembers the
   conversation, answers questions about the sock, and shows the reason for each price.
 - **Honest stock:** in stock, only a few left, arrives in about N days, or sold out, with **"Tell me when it's
@@ -103,13 +107,14 @@ super admin can repeat that run at any time.
 - **Quick view** on every sock card: choose colour and size and add to the bag without leaving the shelf.
 - **Find us:** whether the stall is open right now (Bishkek time), the week's hours, the address step by step, and
   links to Google Maps and 2GIS.
-- Saved socks, recently viewed, "complete the set", and checkout with a simulated Apple Pay or Google Pay wallet.
+- Saved socks (shareable as a link), recently viewed, "complete the set", when an order can be collected, an order
+  timeline, and checkout with a simulated Apple Pay or Google Pay wallet.
 
 **For the shop team (the admin, in English, Russian and Kyrgyz)**
 
 - Products, sections, cuts, colours, sizes, photos (each can belong to one colour), stock on the way and wholesale
   case sizes.
-- Orders, and a hand-over screen for the stall (pickup code, typed or scanned from the customer's QR code, plus the
+- Orders (a gift order says how to pack it: box, ribbon, card), and a hand-over screen for the stall (pickup code, typed or scanned from the customer's QR code, plus the
   end of the customer's phone number).
 - A dashboard: paid orders, revenue and pairs sold, orders waiting at the stall, socks running out with what is on
   the way, customers waiting for a sold-out option (to write to when it is back); and for the assistant, offers per day, how often the limit stepped in, offers that became orders, best sellers.
@@ -194,10 +199,10 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 214 tests, **97% line coverage**; the build fails below 80% |
-| Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 10 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 138 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
-| End to end, in a real browser | `cd frontend && npm run e2e` | 25 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 219 tests, **97% line coverage**; the build fails below 80% |
+| Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints (gift boxes and families too), the last-pair and double-payment races over real HTTP |
+| Frontend | `cd frontend && npm test && npm run build` | 149 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| End to end, in a real browser | `cd frontend && npm run e2e` | 26 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:
 

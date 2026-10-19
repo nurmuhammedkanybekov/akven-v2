@@ -117,6 +117,11 @@ violation, margin-invariant violation, duplicate email by case, and
   own, and the card's cover is always a picture of the product as a whole. `stock_request` holds one row per customer
   and sold-out option (unique together); the owners close it when they have written to the customer, so the table is
   also a record of demand for what to reorder. `shop_policy` gained the rouble rate and rounding next to som.
+- **Family profiles and gift boxes (V29).** `family_member` belongs to one customer (`on delete cascade`) and keeps
+  its place in the list (`unique (user_id, position)`, 0 to 11), so the API saves the whole list at once and reads it
+  back in order; the role, shoe size and pairs are checked by the database as well as by the API. A gift is five
+  nullable columns on `customer_order` rather than a table, because an order is packed in at most one box; one check
+  says a gift has both a box and a ribbon, and that card words never appear without a box.
 
 ## Status
 
@@ -301,6 +306,19 @@ plan. Summary of what's already reflected in this codebase:
   test in CI. The `next` parameter after sign-in accepts only a path inside the
   site. The owners can set a new password for a customer or switch a fake
   customer account off; both are audited.
+- **The final audit (V29).** Passwords are limited to 72 characters, the
+  length BCrypt actually reads, so a longer one is refused instead of being
+  cut without a word (and a megabyte-long one is never hashed). The CORS
+  rules allow the `Idempotency-Key` header, which checkout needs when the shop
+  and the API are on different origins. A customer can wait for at most 30
+  sold-out options. The sock drawing, the one place markup is built from data,
+  now accepts only `#rgb`-style colours, so a hand-edited bag in the browser
+  cannot inject anything. Gift card words are stored as plain text (control
+  characters removed) and rendered by React as text. The family API has no id
+  in its requests: it only ever reads and writes the caller's own family. The
+  bag, the gift box and saved socks kept in the browser are validated field
+  by field when read back. The bag and the receipt now show the chosen
+  colour's picture.
 
 ### Known limitations
 

@@ -1,6 +1,7 @@
 package com.akven.thesis.order;
 
 import com.akven.thesis.order.OrderDtos.FulfillmentView;
+import com.akven.thesis.order.OrderDtos.GiftView;
 import com.akven.thesis.order.OrderDtos.OrderItemView;
 import com.akven.thesis.order.OrderDtos.OrderView;
 import com.akven.thesis.order.OrderDtos.PaymentView;
@@ -25,7 +26,9 @@ final class OrderMapper {
                 withCustomer ? o.getCustomer().getEmail() : null,
                 o.getFulfillmentMethod() != FulfillmentMethod.PICKUP ? null
                         : new PickupView(withCustomer ? null : o.getPickupCode(),
-                                o.getPickupPoint() == null ? null : PickupPointView.of(o.getPickupPoint())));
+                                o.getPickupPoint() == null ? null : PickupPointView.of(o.getPickupPoint())),
+                o.getGiftBox() == null ? null : new GiftView(o.getGiftBox(), o.getGiftRibbon(), o.getGiftTo(), o.getGiftFrom(),
+                        o.getGiftMessage(), o.isGiftHidePrices()));
     }
 
     private static String shorten(String reference) {

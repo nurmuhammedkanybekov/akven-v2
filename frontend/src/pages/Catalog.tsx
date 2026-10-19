@@ -96,6 +96,7 @@ export function CatalogPage({ category }: { category?: Category }) {
           <h1 id="shop-title">{t(`shop.title.${key}` as MessageKey)}</h1>
           <p className="av-shophead__lead">{t(`shop.lead.${key}` as MessageKey)}</p>
           {total !== undefined && <p className="av-small" aria-live="polite">{t(total === 1 ? "shop.count1" : "shop.count", { n: total })}</p>}
+          <p className="av-small"><Link to="/finder">{t("fd.cta")}</Link></p>
         </div>
         <div className="av-shophead__art" aria-hidden="true">
           {BANNER[key].map((sp, i) => <SockArt key={i} {...sp} style={{ "--k": i } as React.CSSProperties} />)}

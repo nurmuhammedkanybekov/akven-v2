@@ -22,16 +22,19 @@ import { useAsync } from "../hooks/useAsync";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
-import { usePricing } from "../shop/useShopInfo";
+import { usePricing, useShopInfo } from "../shop/useShopInfo";
 import { useVariantChoice } from "../shop/useVariantChoice";
 import { CATEGORY_PATH, productMeta } from "../lib/labels";
 import { NotFoundPage } from "./NotFound";
+import { flyToBag } from "../lib/flyToBag";
+import { categoryFor, useFamily } from "../shop/family";
+import { openStatus, weekdayNames } from "../lib/hours";
 
 export function ProductPage() {
   const { slug = "" } = useParams();
   const product = useAsync(() => getProduct(slug), [slug]);
   if (product.loading && !product.data) return <div className="av-container av-page"><Skeleton height={520} /></div>;
-  if (product.error instanceof ApiError && product.error.status === 404) return <NotFoundPage what="That product" />;
+  if (product.error instanceof ApiError && product.error.status === 404) return <NotFoundPage kind="product" />;
   if (product.error || !product.data) return <div className="av-container av-page"><LoadError /></div>;
   return <ProductView product={product.data} />;
 }
@@ -74,7 +77,7 @@ function ProductView({ product }: { product: ProductDetail }) {
           {images.length > 1 && (
             <div className="av-pdp__thumbs" role="group" aria-label={t("pdp.photos")}>
               {images.map((img, i) => (
-                <button key={img.url} type="button" className="av-pdp__thumb" aria-pressed={i === imageIndex} aria-label={`Photo ${i + 1}: ${img.alt}`} onClick={() => setImageIndex(i)}>
+                <button key={img.url} type="button" className="av-pdp__thumb" aria-pressed={i === imageIndex} aria-label={t("pdp.photoN", { n: i + 1, alt: img.alt })} onClick={() => setImageIndex(i)}>
                   <img src={img.url} alt="" width={96} height={120} loading="lazy" />
                 </button>
               ))}
@@ -105,7 +108,7 @@ function ProductView({ product }: { product: ProductDetail }) {
 
           {current && colors.length > 0 && colors.some((c) => c.color) && (
             <fieldset className="av-option">
-              <legend className="av-label">{t("pdp.colour")}: <strong>{current.color ?? "Standard"}</strong></legend>
+              <legend className="av-label">{t("pdp.colour")}: <strong>{current.color ?? t("pdp.standard")}</strong></legend>
               <div className="av-row">
                 {colors.map((c) => (
                   <button key={`${c.color}${c.colorHex}`} type="button" className="av-colorchoice" aria-pressed={c.color === current.color && c.colorHex === current.colorHex}
@@ -139,6 +142,7 @@ function ProductView({ product }: { product: ProductDetail }) {
               {current.casePairs && <span className="av-small">{t("pdp.case", { n: current.casePairs })}</span>}
             </div>
           )}
+          <FamilyFits category={product.category} />
           <SizeFinder />
           <div className="av-stack">
             {current && current.availableQty > 0 && (
@@ -146,6 +150,7 @@ function ProductView({ product }: { product: ProductDetail }) {
             )}
             <Button size="lg" block disabled={!current || current.availableQty <= 0} onClick={() => {
               if (!current) return;
+              flyToBag(document.querySelector(".av-pdp__main img"));
               cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
                 colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, current.availableQty), current.availableQty);
               toast(t("pdp.added"));
@@ -154,7 +159,7 @@ function ProductView({ product }: { product: ProductDetail }) {
             {cart.count > 0 && <p className="av-small"><Link to="/cart">{t("pdp.viewBag", { n: cart.count })}</Link></p>}
           </div>
           <ul className="av-promises">
-            <li><PinIcon /><span>{t("pdp.p1")}</span></li>
+            <li><PinIcon /><span>{t("pdp.p1")} <PickupWhen /></span></li>
             <li><TruckIcon /><span>{t("pdp.p2")}</span></li>
             <li><StackIcon /><span>{t("pdp.p3")}</span></li>
           </ul>
@@ -164,7 +169,7 @@ function ProductView({ product }: { product: ProductDetail }) {
               const qty = Math.min(offeredQty, current.availableQty);
               cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
                 colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: offer.offerPrice, negotiationSessionId: offer.sessionId }, qty, current.availableQty);
-              toast(`Added at ${offer.validatedDiscountPct}% off`);
+              toast(t("pdp.addedAt", { pct: offer.validatedDiscountPct }));
             }} />
           )}
 
@@ -191,6 +196,30 @@ function ProductView({ product }: { product: ProductDetail }) {
       <RecentlyViewed current={product.slug} />
     </div>
   );
+}
+
+/** Who in the signed-in customer's saved family this shelf is for, so the right size is picked without looking it up. */
+function FamilyFits({ category }: { category: ProductDetail["category"] }) {
+  const { t } = useT();
+  const { members } = useFamily();
+  const fits = (members ?? []).filter((m) => categoryFor(m) === category);
+  if (fits.length === 0) return null;
+  const names = fits.map((m) => `${m.name || t(`family.${m.role}` as MessageKey)} (${m.shoeSize})`).join(", ");
+  return <p className="av-fits"><span aria-hidden="true">♥</span> {t("pdp.fits", { names })}</p>;
+}
+
+/** When an order could be collected: today while the stall is open, otherwise when it opens next. */
+function PickupWhen() {
+  const { t, lang } = useT();
+  const point = useShopInfo()?.pickupPoints[0];
+  if (!point) return null;
+  const s = openStatus(point);
+  if (s.kind === "open") return <strong className="av-pickupwhen">{t("pdp.collectToday", { time: s.closes })}</strong>;
+  if (s.kind === "closed") {
+    const when = s.inDays === 0 ? t("pdp.today") : s.inDays === 1 ? t("pdp.tomorrow") : weekdayNames(lang)[s.day];
+    return <strong className="av-pickupwhen">{t("pdp.collectFrom", { when, time: s.opens })}</strong>;
+  }
+  return null;
 }
 
 /** More from the same shelf, so a family can fill the set without going back to the catalogue. */

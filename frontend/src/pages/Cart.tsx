@@ -9,10 +9,13 @@ import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
 import { QuantityStepper } from "../components/QuantityStepper";
 import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/en";
 import { withMessage } from "../components/Contacts";
 import { useShopInfo } from "../shop/useShopInfo";
 import { useMoney } from "../shop/useMoney";
 import type { CollectionView } from "../api/types";
+import { GiftPromo, GiftSummary } from "../components/GiftSummary";
+import { setGift, useGift } from "../shop/useGift";
 
 /** The bag: what is in it, at today's prices, with honest notes about anything that changed. */
 export function CartPage() {
@@ -22,6 +25,7 @@ export function CartPage() {
   const { quote, loading, offline } = useQuote(cart.lines, session?.email ?? null);
   const { t } = useT();
   const info = useShopInfo();
+  const gift = useGift();
   const messengers = (info?.contacts ?? []).filter((c) => c.kind === "WHATSAPP" || c.kind === "TELEGRAM");
 
   if (cart.lines.length === 0) {
@@ -38,7 +42,8 @@ export function CartPage() {
   const fallbackTotal = cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
   const total = quote ? quote.total : fallbackTotal;
   // The bag written out, for customers who would rather order by message: nothing is sent until they press send.
-  const message = [t("cart.msgHello"), ...cart.lines.map((l) => `• ${l.productName} (${l.variantLabel}) × ${l.quantity}`), t("cart.msgTotal", { total: money(total) })].join("\n");
+  const message = [t("cart.msgHello"), ...cart.lines.map((l) => `• ${l.productName} (${l.variantLabel}) × ${l.quantity}`), t("cart.msgTotal", { total: money(total) }),
+    ...(gift ? [t("gb.msgLine", { box: t(`gb.box.${gift.box}` as MessageKey), ribbon: t(`gb.ribbon.${gift.ribbon}` as MessageKey) }), ...(gift.message ? [`“${gift.message}”`] : [])] : [])].join("\n");
 
   return (
     <div className="av-container av-page">
@@ -58,6 +63,7 @@ export function CartPage() {
             <div><dt>{t("cart.delivery")}</dt><dd className="av-small">{t("cart.deliveryS")}</dd></div>
             <div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(total)}</dd></div>
           </dl>
+          {gift ? <GiftSummary gift={gift} edit onRemove={() => setGift(null)} /> : <GiftPromo />}
           {quote && !quote.canCheckout && !quote.collection?.minimumMessage && <Alert tone="danger">{t("cart.attention")}</Alert>}
           {quote?.canCheckout && !offline
             ? <Button to="/checkout" size="lg" block>{t("cart.checkout")}</Button>
@@ -122,16 +128,16 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
         </span>
         <Price amount={unitPrice} was={q?.discountPct ? q.listPrice ?? undefined : undefined} />
         {q?.discountPct ? <span className="av-small av-price__save">{line.negotiationSessionId ? t("bag.negotiated", { pct: q.discountPct }) : t("bag.collectionPrice", { pct: q.discountPct })}</span> : null}
-        {priceChanged && <span className="av-small">Price is now {money(q!.unitPrice!)} (it was {money(line.unitPrice)} when you added it).</span>}
+        {priceChanged && <span className="av-small">{t("cart.priceNow", { now: money(q!.unitPrice!), was: money(line.unitPrice) })}</span>}
         {q?.note && <span className={problem ? "av-error" : "av-small"}>{q.note}</span>}
         {q?.problem === "NOT_ENOUGH_STOCK" && q.availableQty > 0 && (
-          <Button size="sm" variant="secondary" onClick={() => cart.setQuantity(line.sku, q.availableQty)}>Change to {q.availableQty}</Button>
+          <Button size="sm" variant="secondary" onClick={() => cart.setQuantity(line.sku, q.availableQty)}>{t("cart.changeTo", { n: q.availableQty })}</Button>
         )}
         {loading && <Skeleton width={120} height={12} />}
       </div>
       <div className="av-cartline__qty">
-        <QuantityStepper value={line.quantity} min={1} max={max} label={`Quantity of ${line.productName}`} onChange={(n) => cart.setQuantity(line.sku, n)} />
-        <Button size="sm" variant="ghost" aria-label={`Remove ${line.productName} from the bag`} onClick={() => cart.remove(line.sku)}>Remove</Button>
+        <QuantityStepper value={line.quantity} min={1} max={max} label={t("cart.qtyOf", { name: line.productName })} onChange={(n) => cart.setQuantity(line.sku, n)} />
+        <Button size="sm" variant="ghost" aria-label={t("cart.removeName", { name: line.productName })} onClick={() => cart.remove(line.sku)}>{t("cart.remove")}</Button>
       </div>
       <div className="av-cartline__total av-price">{q?.lineTotal != null ? money(q.lineTotal) : money(line.unitPrice * line.quantity)}</div>
     </li>

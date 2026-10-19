@@ -16,6 +16,7 @@ import { NotifyMe } from "./NotifyMe";
 import { ProductImage } from "./ProductImage";
 import { QuantityStepper } from "./QuantityStepper";
 import { useToast } from "./Toast";
+import { flyToBag } from "../lib/flyToBag";
 
 /**
  * Quick view, as Bombas does it: look at a sock, choose colour, size and how many, and put it in the bag without
@@ -52,6 +53,7 @@ function Chooser({ product, onDone }: { product: ProductDetail; onDone: () => vo
 
   function add() {
     if (!current) return;
+    flyToBag(document.querySelector(".av-qv img"));
     cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
       colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, available), available);
     toast(t("pdp.added"));

@@ -161,6 +161,27 @@ class PostgresIntegrationTest {
     }
 
     @Test
+    void giftBoxAndFamilyRulesHoldInTheDatabaseItself() {
+        String customer = jdbc.queryForObject("select id::text from app_user where email = 'staff@akven.test'", String.class);
+        // A gift needs both a box and a ribbon, and card words without a box make no sense.
+        assertThatThrownBy(() -> jdbc.update("insert into customer_order (customer_id, gift_box) values (?::uuid, 'NAVY')", customer))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update("insert into customer_order (customer_id, gift_message) values (?::uuid, 'hi')", customer))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update("insert into customer_order (customer_id, gift_box, gift_ribbon) values (?::uuid, 'PINK', 'GOLD')", customer))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        jdbc.update("insert into customer_order (customer_id, gift_box, gift_ribbon, gift_message) values (?::uuid, 'RED', 'WHITE', 'hi')", customer);
+
+        String member = "insert into family_member (user_id, position, role, shoe_size, pairs) values (?::uuid, ?, ?, ?, ?)";
+        jdbc.update(member, customer, 0, "mom", 38, 3);
+        assertThatThrownBy(() -> jdbc.update(member, customer, 0, "dad", 42, 3)).isInstanceOf(DataIntegrityViolationException.class);   // one per place
+        assertThatThrownBy(() -> jdbc.update(member, customer, 1, "uncle", 42, 3)).isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update(member, customer, 1, "dad", 99, 3)).isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update(member, customer, 12, "dad", 42, 3)).isInstanceOf(DataIntegrityViolationException.class);
+        jdbc.update("delete from family_member where user_id = ?::uuid", customer);
+    }
+
+    @Test
     void anOverGenerousAssistantIsCappedOnARealServerAndTheEvidenceIsInTheDatabase() throws Exception {
         String tag = Long.toString(System.nanoTime(), 36);
         String token = call("POST", "/api/auth/register", null, "{\"email\":\"haggle-" + tag + "@akven.test\",\"password\":\"correct-horse-battery\"}", 201).get("token").asText();

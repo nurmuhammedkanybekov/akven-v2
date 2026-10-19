@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,15 +48,31 @@ public class CartService {
         this.collections = collections;
     }
 
+    /**
+     * The picture for each option, by SKU: the first picture of its own colour, else the first picture of the product
+     * as a whole, else its first picture. So a beige pair is shown beige in the bag and on the receipt.
+     */
+    static Map<String, String> pictures(Collection<Variant> options, ProductImageRepository images) {
+        Set<UUID> productIds = options.stream().map(v -> v.getProduct().getId()).collect(Collectors.toSet());
+        if (productIds.isEmpty()) return Map.of();
+        Map<UUID, List<ProductImage>> byProduct = images.findByProductIdInOrderByPositionAsc(productIds).stream()
+                .collect(Collectors.groupingBy(ProductImage::getProductId));
+        Map<String, String> out = new HashMap<>();
+        for (Variant v : options) {
+            List<ProductImage> list = byProduct.getOrDefault(v.getProduct().getId(), List.of());
+            list.stream().filter(i -> i.getColor() != null && i.getColor().equalsIgnoreCase(v.getColor())).findFirst()
+                    .or(() -> list.stream().filter(i -> i.getColor() == null).findFirst())
+                    .or(() -> list.stream().findFirst())
+                    .ifPresent(i -> out.put(v.getSku(), i.getUrl()));
+        }
+        return out;
+    }
+
     /** customer is null for a visitor who is not signed in: listed prices only, no negotiated offers. */
     public Quote quote(List<CartItem> items, User customer) {
         Map<String, Variant> bySku = variants.findBySkuIn(items.stream().map(CartItem::sku).collect(Collectors.toSet()))
                 .stream().collect(Collectors.toMap(Variant::getSku, v -> v));
-        Set<UUID> productIds = bySku.values().stream().map(v -> v.getProduct().getId()).collect(Collectors.toSet());
-        Map<UUID, String> cover = new HashMap<>();
-        if (!productIds.isEmpty()) {
-            for (ProductImage i : images.findByProductIdInOrderByPositionAsc(productIds)) cover.putIfAbsent(i.getProductId(), i.getUrl());
-        }
+        Map<String, String> pictures = pictures(bySku.values(), images);
 
         // The collection counts every line that can still be bought, so the tier shown matches what checkout will give.
         Map<Variant, Integer> buyable = new LinkedHashMap<>();
@@ -96,7 +113,7 @@ public class CartService {
             BigDecimal lineTotal = unit.multiply(BigDecimal.valueOf(item.quantity()));
             total = total.add(lineTotal);
             lines.add(new QuoteLine(v.getSku(), v.getProduct().getSlug(), v.getProduct().getName(), label(v), v.getColorHex(),
-                    cover.get(v.getProduct().getId()), item.quantity(), list, pct, unit, lineTotal, available, problem, note));
+                    pictures.get(v.getSku()), item.quantity(), list, pct, unit, lineTotal, available, problem, note));
         }
         if (collection.belowMinimum()) canCheckout = false;
         CollectionPricing.NextTier next = collection.next();

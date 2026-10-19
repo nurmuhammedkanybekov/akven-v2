@@ -70,7 +70,7 @@ export function GiftCalendar() {
               {boxes.data.items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={((i + 2) % 6) + 1} />)}
             </div>
           )}
-          <div className="av-row"><Button to="/bundles" variant="accent">{t("gift.all")}</Button></div>
+          <div className="av-row"><Button to="/bundles" variant="accent">{t("gift.all")}</Button><Button to="/gift" variant="secondary">{t("gift.build")}</Button></div>
         </div>
       </div>
     </section>

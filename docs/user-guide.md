@@ -64,8 +64,23 @@ the whole bag, and the bag says how many more pairs reach the next step. `/visit
    failed payment. A real payment provider would sit behind the same `PaymentProvider` interface.
 4. **Order.** A confirmation page, then the order under "Your orders". A paid pickup order shows a six-digit pickup
    code to say at the stall, and a QR code the stall can scan instead. **"Order these again"** puts the same socks back
-   in the bag at today's prices. A customer can cancel while the order is paid
+   in the bag at today's prices. A line of four steps (placed, paid, ready at 70-E or on its way, collected) shows
+   where the order is. A customer can cancel while the order is paid
    and not yet completed: the payment is refunded and the socks go back on the shelf.
+5. **Your account** (the person icon, signed in). The family the customer buys for: a name, who they are (dad, mom,
+   son ...), shoe size, how many pairs and, if they like, a birthday. The sock size is worked out from the shop's chart.
+   Saved once, the family is used everywhere: the family planner on the home page starts from it, a product page says
+   who in the family the shelf fits ("this shelf fits: Venera (38)"), and a birthday within a month shows at the top
+   with **"Make a gift box"**. The account also lists the sold-out socks the customer is waiting for and the latest orders.
+6. **Gift box** (`/gift`, "Build a gift" in the menu). Choose the box (kraft, navy or red) and the ribbon (gold, red or
+   white), put socks in from the shelves on the same page (they go straight into the bag), and write the card: to, from
+   and up to 300 characters. The drawing shows the box with the socks in it; the lid comes down while the card is
+   written. "Put the gift box in my bag" keeps the choice with the bag; checkout sends it with the order and the family
+   sees it on the order to pack it. The box, ribbon and card are free, and the receipt can be left out of the box.
+7. **Sock finder** (`/finder`). Three taps (who, how high, what for) and the socks on the shelf that match. If nothing
+   matches all three, the page lets go of the last answers one by one and says so.
+8. **Saved socks** (the heart) can be shared as a link ("Share my list"); whoever opens it sees those socks and can save
+   them all.
 
 ## The assistant and why it cannot lose money
 
@@ -90,4 +105,6 @@ what was allowed.
 
 The server decides every price. The last pair can only be sold once, because rows are locked while stock is checked.
 Pressing pay twice cannot pay twice (idempotency key). An order is only paid with a payment reference from a confirmed
-token, and a declined payment releases the stock. Every change is in the audit log.
+token, and a declined payment releases the stock. Every change is in the audit log. The words on a gift card are
+stored and shown as plain text, never as markup; everything kept in the browser (the bag, the gift box, saved socks)
+is checked when it is read back, and a value that does not fit is dropped rather than trusted.

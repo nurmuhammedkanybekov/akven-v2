@@ -16,13 +16,13 @@ public final class AccountDtos {
 
     /** role is STAFF or ADMIN (an owner); a super admin is only ever created from the environment. */
     public record CreateAccount(@Email @NotBlank @Size(max = 255) String email, @Size(max = 80) String displayName,
-                                @NotNull Role role, @NotBlank @Size(min = 8, max = 100) String password) {}
+                                @NotNull Role role, @NotBlank @Size(min = 8, max = 72) String password) {}
 
     public record UpdateAccount(@Size(max = 80) String displayName, @NotNull Role role, @NotNull Boolean active) {}
 
     public record CustomerActive(@NotNull Boolean active) {}
 
-    public record ResetPassword(@NotBlank @Size(min = 8, max = 100) String password) {}
+    public record ResetPassword(@NotBlank @Size(min = 8, max = 72) String password) {}
 
     public record AccountView(UUID id, String email, String displayName, Role role, boolean active, Instant createdAt) {
         static AccountView of(User u) {

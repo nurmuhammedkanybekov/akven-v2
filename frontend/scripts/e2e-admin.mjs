@@ -274,7 +274,7 @@ try {
     await page.goto(productUrl);
     await page.getByRole("button", { name: "Cream" }).click();
     await page.getByText("Sold out", { exact: true }).first().waitFor();
-    await page.getByRole("link", { name: /Your orders/ }).click();
+    await page.getByRole("link", { name: /Your account/ }).click();      // recent orders are on the account page
     await page.getByRole("link", { name: /AV-/ }).first().click();       // the newest order (1 pair)
     await page.getByRole("button", { name: "Cancel this order" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Cancel the order" }).click();
@@ -442,6 +442,38 @@ try {
     await page.getByText(/8:00–16:00/).first().waitFor();
     await page.locator(".av-open").waitFor();
     await a11y("the visit page");
+  });
+
+  await step("a customer saves the family, builds a gift box, and the sock finder answers in three taps", async () => {
+    await page.goto(`${BASE}/login?next=%2Faccount`);
+    await page.getByLabel("Email").fill(CUSTOMER);
+    await page.getByLabel("Password").fill("correct-horse-battery");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/account`);
+    await page.getByRole("group", { name: "Add a person" }).getByRole("button", { name: /Mom/ }).click();
+    await page.getByLabel("Name").first().fill("Venera");
+    await page.getByRole("button", { name: "Save my family" }).click();
+    await page.getByText("Your family is saved.").waitFor();
+    await page.getByText("Sock size: Women 35–41").waitFor();
+    await a11y("the account page");
+    await page.goto(`${BASE}/women`);
+    await page.locator(".av-card").first().click();
+    await page.getByText(/this shelf fits: Venera \(38\)/).waitFor();
+    await page.goto(`${BASE}/gift?for=Venera`);
+    await page.getByLabel("Red").first().check();
+    await page.getByLabel("Your words").fill("Happy birthday!");
+    await a11y("the gift box builder");
+    await shot("shop-gift");
+    await page.getByRole("button", { name: "Put the gift box in my bag" }).click();
+    await page.waitForURL(`${BASE}/cart`);
+    await page.getByText("Gift box: Red, Gold ribbon").waitFor();
+    await page.goto(`${BASE}/finder`);
+    await page.getByRole("button", { name: /^Women/ }).click();
+    await page.getByRole("button", { name: /^Ankle/ }).click();
+    await page.getByRole("button", { name: /^Every day/ }).click();
+    await page.getByRole("heading", { name: "Your socks", exact: true }).waitFor();
+    await page.locator(".av-quiz__result .av-card").first().waitFor();
+    await a11y("the sock finder");
   });
 
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);

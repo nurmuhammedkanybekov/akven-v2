@@ -24,7 +24,7 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | Endpoint | Purpose |
 |---|---|
 | `GET /actuator/health` | Liveness check |
-| `POST /api/auth/register` | Customer self-registration; at most 30 new accounts an hour from one address (`429` with `Retry-After`) |
+| `POST /api/auth/register` | Customer self-registration; a password of 8 to 72 characters (BCrypt reads no further, so a longer one is refused rather than cut); at most 30 new accounts an hour from one address (`429` with `Retry-After`) |
 | `POST /api/auth/login` | Issues a JWT for an existing account |
 | `GET /api/auth/me` | Current authenticated user (requires a bearer token) |
 | `GET /api/products` | Catalog: filters (category, section, cut, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
@@ -54,11 +54,12 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `POST /api/admin/assistant/evaluation` | The same 16 customers against the live model, about one minute, labelled `LIVE` (SUPER_ADMIN) |
 | `GET`, `POST /api/admin/accounts`, `PUT /api/admin/accounts/{id}`, `PUT /api/admin/accounts/{id}/password` | The shop team's accounts: create an owner or staff account, change name, role and active, set a new password; super admin accounts cannot be changed through the API (SUPER_ADMIN) |
 | `GET /api/admin/customers?q=` | Customers by email, with `trusted` (ADMIN) |
-| `GET /api/stock-requests`, `PUT /api/stock-requests/{sku}`, `DELETE /api/stock-requests/{sku}` | "Tell me when it's back": the SKUs the signed-in customer is waiting for; join or leave the list for a sold-out option (an option in stock is refused: it can go in the bag) |
+| `GET`, `PUT /api/family` | The signed-in customer's family: `[{name?, role, shoeSize, pairs, birthday?}]`, saved whole and read back in order. `role` is one of `dad`, `mom`, `son`, `daughter`, `grandpa`, `grandma`, `baby`; shoe size 14 to 50, 1 to 30 pairs, a birthday in the past, at most 12 people; a name is letters, digits, spaces and simple punctuation. Only ever the caller's own family |
+| `GET /api/stock-requests`, `PUT /api/stock-requests/{sku}`, `DELETE /api/stock-requests/{sku}` | "Tell me when it's back": the SKUs the signed-in customer is waiting for; join or leave the list for a sold-out option (an option in stock is refused: it can go in the bag; at most 30 open requests per customer) |
 | `GET /api/admin/stock-requests`, `PUT /api/admin/stock-requests/{id}/answered` | Sold-out options with the customers waiting for them (email and since when), most-wanted first; mark a customer as told (STAFF / ADMIN, audited) |
 | `PUT /api/admin/customers/{id}/password`, `PUT /api/admin/customers/{id}/active` | Set a new password for a customer `{password}` (at least 8 characters), or switch a customer account off or on `{active}`; both end the customer's sessions and are audited. Team accounts are not reachable here (ADMIN) |
 | `GET /api/admin/audit` | The whole audit log, newest first, with the actor's email (SUPER_ADMIN) |
-| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer. Deliveries take `fulfillment.country` (`KG`, `KZ`, `UZ`, `RU`; `KG` when left out) |
+| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer. Deliveries take `fulfillment.country` (`KG`, `KZ`, `UZ`, `RU`; `KG` when left out). An optional `gift` `{box: KRAFT\|NAVY\|RED, ribbon: GOLD\|RED\|WHITE, to?, from?, message?, hidePrices}` packs the order as a gift (names up to 60 characters, the card up to 300; kept as plain text, control characters removed); the order then shows `gift` to the customer and the shop team |
 | `GET /api/orders`, `GET /api/orders/{id}`, `POST /api/orders/{id}/cancel` | The customer's own orders |
 | `/api/admin/**` | Catalog management: products, variants, sections and cuts, photo upload, retire and restore (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
 | `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |

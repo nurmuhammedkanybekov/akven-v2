@@ -7,21 +7,23 @@ import { OrderStatusBadge } from "../components/OrderStatusBadge";
 import { useAsync } from "../hooks/useAsync";
 import { formatDateTime } from "../lib/format";
 import { useMoney } from "../shop/useMoney";
+import { useT } from "../i18n/I18n";
 
 export function OrdersPage() {
   const { money } = useMoney();
+  const { t } = useT();
   const { session, signOut } = useAuth();
   const orders = useAsync(() => listMyOrders(), []);
   return (
     <div className="av-container av-page">
       <header className="av-page__head">
         <span className="av-eyebrow">{session?.email}</span>
-        <h1>Your orders</h1>
+        <h1>{t("od.yours")}</h1>
       </header>
       {orders.loading && !orders.data && <Skeleton height={96} />}
       {orders.error && <Alert tone="danger">{orders.error.message}</Alert>}
       {orders.data && orders.data.length === 0 && (
-        <div className="av-empty"><h2>No orders yet</h2><p className="av-lead">When you buy something, it will appear here.</p><Button to="/shop">Browse the socks</Button></div>
+        <div className="av-empty"><h2>{t("acc.noOrders")}</h2><p className="av-lead">{t("od.noneS")}</p><Button to="/shop">{t("cart.browse")}</Button></div>
       )}
       {orders.data && orders.data.length > 0 && (
         <ul className="av-orderlist">
@@ -37,7 +39,7 @@ export function OrdersPage() {
           ))}
         </ul>
       )}
-      <div className="av-row" style={{ marginTop: "var(--space-7)" }}><Button variant="ghost" onClick={signOut}>Sign out</Button></div>
+      <div className="av-row" style={{ marginTop: "var(--space-7)" }}><Button to="/account" variant="secondary">{t("nav.account")}</Button><Button variant="ghost" onClick={signOut}>{t("acc.signOut")}</Button></div>
     </div>
   );
 }

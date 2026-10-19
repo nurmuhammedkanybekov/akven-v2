@@ -7,6 +7,7 @@ import { CartProvider, readCart } from "../cart/CartContext";
 import { ToastProvider } from "../components/Toast";
 import { CartPage } from "../pages/Cart";
 import { CheckoutPage } from "../pages/Checkout";
+import { resetGiftCache } from "../shop/useGift";
 
 const LINE = { sku: "SOCK-1", productSlug: "sock", productName: "Mid-Long Sock", variantLabel: "Navy, M", colorHex: "#1F2A44", imageUrl: null, unitPrice: 9.5, quantity: 2 };
 const QUOTE_OK = { lines: [{ sku: "SOCK-1", productSlug: "sock", productName: "Mid-Long Sock", variantLabel: "Navy, M", colorHex: "#1F2A44", imageUrl: null, quantity: 2,
@@ -50,10 +51,25 @@ async function fillContact(user: ReturnType<typeof userEvent.setup>) {
 }
 const orderCalls = () => calls.filter((c) => c.url === "/api/orders");
 
-beforeEach(() => { localStorage.clear(); sessionStorage.clear(); });
+beforeEach(() => { localStorage.clear(); sessionStorage.clear(); resetGiftCache(); });
 afterEach(() => vi.restoreAllMocks());
 
 describe("checkout", () => {
+  it("sends the gift box with the order and forgets it once the order is placed", async () => {
+    mockServer((c) => (c.url === "/api/cart/quote" ? json(QUOTE_OK) : json(ORDER, 201)));
+    localStorage.setItem("akven-gift-v1", JSON.stringify({ box: "RED", ribbon: "GOLD", to: " Venera ", from: "", message: "Happy birthday!", hidePrices: true }));
+    resetGiftCache();
+    renderCheckout();
+    const user = userEvent.setup();
+    expect(await screen.findByText("Gift box: Red, Gold ribbon")).toBeInTheDocument();
+    await fillContact(user);
+    await user.click(screen.getByRole("button", { name: "Pay with Apple Pay" }));
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /Pay \$/ }));
+    await screen.findByText("order page");
+    expect(orderCalls()[0].body.gift).toEqual({ box: "RED", ribbon: "GOLD", to: "Venera", from: null, message: "Happy birthday!", hidePrices: true });
+    expect(localStorage.getItem("akven-gift-v1")).toBeNull();
+  });
+
   it("asks for contact details before opening the wallet, and sends nothing while they are missing", async () => {
     mockServer((c) => (c.url === "/api/cart/quote" ? json(QUOTE_OK) : json({}, 500)));
     renderCheckout();

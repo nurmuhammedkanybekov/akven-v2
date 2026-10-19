@@ -6,6 +6,7 @@ import type {
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
   CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote, NegotiateResponse, NegotiationSessionView,
   PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
+  FamilyMember, FamilyMemberInput,
   SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
 } from "./types";
 
@@ -168,6 +169,10 @@ export const adminTryAssistant = (body: { sku: string; message: string; quantity
 export const adminLiveEvaluation = () => api<EvaluationReport>("/api/admin/assistant/evaluation", { method: "POST", body: {} });
 
 // ---- "tell me when it is back" ----
+// ---- the customer's family ----
+export const getFamily = () => api<FamilyMember[]>("/api/family");
+export const saveFamily = (members: FamilyMemberInput[]) => api<FamilyMember[]>("/api/family", { method: "PUT", body: { members } });
+
 export const myStockRequests = () => api<string[]>("/api/stock-requests");
 export const requestStock = (sku: string) => api<string[]>(`/api/stock-requests/${encodeURIComponent(sku)}`, { method: "PUT", body: {} });
 export const cancelStockRequest = (sku: string) => api<string[]>(`/api/stock-requests/${encodeURIComponent(sku)}`, { method: "DELETE", body: {} });

@@ -104,8 +104,12 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    public record RegisterRequest(@Email @NotBlank String email, @NotBlank @Size(min = 8) String password) {}
-    public record LoginRequest(@Email @NotBlank String email, @NotBlank String password) {}
+    /**
+     * BCrypt reads only the first 72 bytes of a password, so a longer one would be cut without a word: the limit is said
+     * out loud instead. It also keeps a megabyte-long "password" from being hashed at all.
+     */
+    public record RegisterRequest(@Email @NotBlank @Size(max = 254) String email, @NotBlank @Size(min = 8, max = 72) String password) {}
+    public record LoginRequest(@Email @NotBlank @Size(max = 254) String email, @NotBlank @Size(max = 200) String password) {}
     public record AuthResponse(String token, String email, String role) {}
     public record MeResponse(String email, String role) {}
 }

@@ -79,6 +79,21 @@ public class Order extends AuditableEntity {
     @Column(length = 6)
     private String pickupCode;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 12)
+    private GiftBox giftBox;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 12)
+    private GiftRibbon giftRibbon;
+
+    @Column(length = 60) private String giftTo;
+    @Column(length = 60) private String giftFrom;
+    @Column(length = 300) private String giftMessage;
+
+    @Column(nullable = false)
+    private boolean giftHidePrices;
+
     private Instant paidAt;
     private Instant fulfilledAt;
     private Instant cancelledAt;
@@ -105,6 +120,16 @@ public class Order extends AuditableEntity {
         this.contactPhone = contactPhone;
         this.deliveryAddress = deliveryAddress;
         this.note = note;
+    }
+
+    /** Packs the order as a gift: a box, a ribbon and a card with the words exactly as typed. */
+    public void wrapAsGift(GiftBox box, GiftRibbon ribbon, String to, String from, String message, boolean hidePrices) {
+        this.giftBox = box;
+        this.giftRibbon = ribbon;
+        this.giftTo = to;
+        this.giftFrom = from;
+        this.giftMessage = message;
+        this.giftHidePrices = hidePrices;
     }
 
     /** Where a pickup order will be collected. */
@@ -166,6 +191,12 @@ public class Order extends AuditableEntity {
     public String getIdempotencyKey() { return idempotencyKey; }
     public PickupPoint getPickupPoint() { return pickupPoint; }
     public String getPickupCode() { return pickupCode; }
+    public GiftBox getGiftBox() { return giftBox; }
+    public GiftRibbon getGiftRibbon() { return giftRibbon; }
+    public String getGiftTo() { return giftTo; }
+    public String getGiftFrom() { return giftFrom; }
+    public String getGiftMessage() { return giftMessage; }
+    public boolean isGiftHidePrices() { return giftHidePrices; }
     public Instant getPaidAt() { return paidAt; }
     public Instant getFulfilledAt() { return fulfilledAt; }
     public Instant getCancelledAt() { return cancelledAt; }

@@ -21,8 +21,8 @@ export function ShopLayout() {
       <Header
         cartCount={cart.count}
         savedCount={saved.items.length}
-        accountTo={isStaff ? "/admin" : session ? "/orders" : "/login"}
-        accountLabel={session ? (isStaff ? t("nav.admin") : t("nav.orders")) : t("nav.signin")}
+        accountTo={isStaff ? "/admin" : session ? "/account" : "/login"}
+        accountLabel={session ? (isStaff ? t("nav.admin") : t("nav.account")) : t("nav.signin")}
         extra={<ThemeToggle theme={theme} onToggle={toggle} className="av-ann__theme" />}
       />
       <main id="main"><Outlet /></main>

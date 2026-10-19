@@ -39,8 +39,10 @@ export function useSaved() {
   return {
     items,
     has: (slug: string) => items.some((i) => i.slug === slug),
-    toggle: (item: SavedItem) => write(items.some((i) => i.slug === item.slug) ? items.filter((i) => i.slug !== item.slug) : [item, ...items]),
-    remove: (slug: string) => write(items.filter((i) => i.slug !== slug)),
+    // Each change starts from the stored list, not this render's copy, so several changes in a row all count.
+    toggle: (item: SavedItem) => { const now = read(); write(now.some((i) => i.slug === item.slug) ? now.filter((i) => i.slug !== item.slug) : [item, ...now]); },
+    addAll: (add: SavedItem[]) => { const now = read(); write([...add.filter((a) => !now.some((i) => i.slug === a.slug)), ...now].slice(0, 200)); },
+    remove: (slug: string) => write(read().filter((i) => i.slug !== slug)),
   };
 }
 

@@ -160,11 +160,14 @@ export interface OrderView {
   customerEmail: string | null;
   /** Pickup orders only. The code is shown to the customer, never to staff. */
   pickup?: { code: string | null; point: PickupPoint | null } | null;
+  /** Set when the order goes out as a gift box. */
+  gift?: GiftInput | null;
 }
 export interface CheckoutBody {
   items: CartLineRequest[];
   fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null };
   payment: { method: PaymentMethod; token: string };
+  gift?: GiftInput | null;
 }
 
 // ---- negotiation ----
@@ -255,3 +258,11 @@ export interface StockWaiting {
   available: number; incoming: number; restockEta: string | null;
   customers: Array<{ requestId: string; email: string; since: string }>;
 }
+
+// ---- family profiles and gift boxes ----
+export type FamilyRole = "dad" | "mom" | "son" | "daughter" | "grandpa" | "grandma" | "baby";
+export interface FamilyMemberInput { name: string | null; role: FamilyRole; shoeSize: number; pairs: number; birthday: string | null }
+export interface FamilyMember extends FamilyMemberInput { id: string }
+export type GiftBoxColour = "KRAFT" | "NAVY" | "RED";
+export type GiftRibbon = "GOLD" | "RED" | "WHITE";
+export interface GiftInput { box: GiftBoxColour; ribbon: GiftRibbon; to: string | null; from: string | null; message: string | null; hidePrices: boolean }
