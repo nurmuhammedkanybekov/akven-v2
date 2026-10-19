@@ -94,7 +94,7 @@ describe("ProductCard", () => {
   it("links to the product, carries alt text and a from-price", () => {
     render(<ProductCard product={SAMPLE_PRODUCTS[0]} to="/products/merino-dress-black" />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/products/merino-dress-black");
-    expect(screen.getByRole("img")).toHaveAttribute("alt", "Merino Dress Sock, AKVEN");
+    expect(screen.getByRole("img")).toHaveAttribute("alt", "Merino Dress Sock, AK&VEN");
     expect(screen.getByText("From")).toBeInTheDocument();
     expect(screen.getByText("$8.00")).toBeInTheDocument();
   });
@@ -127,10 +127,10 @@ describe("NegotiationOffer", () => {
 });
 
 describe("Logo", () => {
-  it("is one accessible image named AKVEN, in both lockups", () => {
+  it("is one accessible image named AK&VEN, in both lockups", () => {
     const { rerender } = render(<Logo />);
-    expect(screen.getByRole("img", { name: "AKVEN" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "AK&VEN" })).toBeInTheDocument();
     rerender(<Logo variant="mark" />);
-    expect(screen.getByRole("img", { name: "AKVEN" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "AK&VEN" })).toBeInTheDocument();
   });
 });

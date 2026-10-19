@@ -2,7 +2,7 @@ import type { adminEn } from "./admin.en";
 
 /** Russian for the admin, the price chat and shared pieces. A draft for a native speaker to read. */
 export const adminRu: Record<keyof typeof adminEn, string> = {
-  "a.home": "Админка AKVEN",
+  "a.home": "Админка AK&VEN",
   "a.menu": "Админка",
   "a.crumbs": "Навигация",
   "a.signOut": "Выйти",
@@ -86,7 +86,7 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
 
   "a.pf.aria": "Данные товара",
   "a.pf.details": "Описание",
-  "a.pf.nameEg": "например, AKVEN Mid-Long Socks",
+  "a.pf.nameEg": "например, AK&VEN Mid-Long Socks",
   "a.pf.who": "Для кого?",
   "a.pf.audience": "Для кого",
   "a.pf.sectionBundle": "Наборы не входят в линейки.",
@@ -285,7 +285,7 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "a.db.waitN": "ждут: {n}",
   "a.db.backIn": "снова в наличии: {n}",
   "a.db.told": "Отметить: сообщили",
-  "a.db.mailSubject": "{name} снова в AKVEN",
+  "a.db.mailSubject": "{name} снова в AK&VEN",
   "a.db.shopPart": "Магазин",
   "a.db.assistantPart": "Ассистент по цене",
   "a.db.sold": "Оплаченные заказы",
@@ -535,7 +535,7 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "chat.accept": "Добавить {pairs} по этой цене",
   "chat.onePair": "1 пару",
   "chat.nPairs": "{n} пар",
-  "chat.who": "Помощник AKVEN",
+  "chat.who": "Помощник AK&VEN",
   "chat.offer": "Ваше предложение",
   "chat.proposed": "Предложено",
   "chat.suggested": "помощник предложил {pct}%",

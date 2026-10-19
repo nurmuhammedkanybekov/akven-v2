@@ -23,13 +23,13 @@ export function Footer() {
           <nav className="av-footer__col" aria-label={t("foot.shop")}>
             <span className="av-footer__head">{t("foot.shop")}</span>
             <Link to="/men">{t("nav.men")}</Link><Link to="/women">{t("nav.women")}</Link>
-            <Link to="/kids">{t("nav.kids")}</Link><Link to="/bundles">{t("nav.bundles")}</Link>
+            <Link to="/kids">{t("nav.kids")}</Link><Link to="/gifts">{t("nav.gifts")}</Link>
             <Link to="/shop">{t("foot.all")}</Link>
           </nav>
           <nav className="av-footer__col" aria-label={t("foot.help")}>
             <span className="av-footer__head">{t("foot.help")}</span>
             <Link to="/sizes">{t("foot.sizes")}</Link><Link to="/finder">{t("fd.eyebrow")}</Link><Link to="/visit#pickup">{t("foot.pickup")}</Link>
-            <Link to="/visit">{t("foot.visit")}</Link><Link to="/orders">{t("foot.orders")}</Link>
+            <Link to="/visit">{t("foot.visit")}</Link><Link to="/story">{t("nav.story")}</Link><Link to="/orders">{t("foot.orders")}</Link>
           </nav>
           <nav className="av-footer__col" aria-label={t("foot.business")}>
             <span className="av-footer__head">{t("foot.business")}</span>
@@ -52,7 +52,7 @@ export function Footer() {
           </div>
         </div>
         <div className="av-footer__legal">
-          <span>© {year} AKVEN · {t("foot.since")}</span>
+          <span>© {year} AK&VEN · {t("foot.since")}</span>
           <span>{t("foot.legal")}</span>
         </div>
       </div>

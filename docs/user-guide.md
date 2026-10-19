@@ -72,7 +72,7 @@ the whole bag, and the bag says how many more pairs reach the next step. `/visit
    Saved once, the family is used everywhere: the family planner on the home page starts from it, a product page says
    who in the family the shelf fits ("this shelf fits: Venera (38)"), and a birthday within a month shows at the top
    with **"Make a gift box"**. The account also lists the sold-out socks the customer is waiting for and the latest orders.
-6. **Gift box** (`/gift`, "Build a gift" in the menu). Choose the box (kraft, navy or red) and the ribbon (gold, red or
+6. **Gift box** (`/gift`, from **Gift Sets** in the menu, which also has the ready-made boxes and the holiday calendar). Choose the box (kraft, navy or red) and the ribbon (gold, red or
    white), put socks in from the shelves on the same page (they go straight into the bag), and write the card: to, from
    and up to 300 characters. The drawing shows the box with the socks in it; the lid comes down while the card is
    written. "Put the gift box in my bag" keeps the choice with the bag; checkout sends it with the order and the family

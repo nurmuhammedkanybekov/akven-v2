@@ -341,26 +341,38 @@ try {
   await step("the site speaks Russian and Kyrgyz, and remembers the choice", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("button", { name: "Русский" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Корейские носки/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Комфорт каждый день/ }).waitFor();
     await page.reload();
-    await page.getByRole("heading", { level: 1, name: /Корейские носки/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Комфорт каждый день/ }).waitFor();
     await a11y("the home page in Russian");
     await page.getByRole("button", { name: "Кыргызча" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Корей байпактары/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Күн сайын ыңгайлуу/ }).waitFor();
     await page.getByRole("button", { name: "English" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Korean socks/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Everyday comfort/ }).waitFor();
   });
 
-  await step("the home page opens on container 70-E; the collection box, shelf and gift calendar work; the fitting is on the size guide", async () => {
+  await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting is on the size guide", async () => {
     await page.goto(`${BASE}/`);
-    await page.locator(".av-yard .av-box").waitFor();
+    await page.getByRole("heading", { name: /Everyday comfort/ }).waitFor();
+    await page.locator(".av-still__box").waitFor();
+    await page.getByRole("link", { name: /For her/ }).waitFor();
+    await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
+    await page.getByRole("group", { name: "Show socks for" }).getByRole("button", { name: "Women" }).click();
+    await page.locator(".av-shelf .av-card").first().waitFor();
+    await page.getByRole("heading", { name: "Two names. One family. One story." }).waitFor();
+    await page.locator(".av-dordoi").scrollIntoViewIfNeeded();
+    await page.evaluate(() => { const el = document.querySelector(".av-dordoi"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + el.offsetHeight - window.innerHeight); });
+    await page.locator(".av-dordoi.is-done").waitFor();
+    await page.getByRole("link", { name: "How to find us" }).waitFor();
+    await a11y("the home page after using it");
+    await page.goto(`${BASE}/story`);
+    await page.getByRole("heading", { name: "From Dordoi, with love." }).waitFor();
+    await page.goto(`${BASE}/gifts`);
     await page.getByRole("button", { name: "Empty the box" }).click();
     for (let i = 0; i < 20; i++) await page.getByRole("button", { name: "Add Argyle to the box" }).click();
     await page.getByText("−3% on every pair").waitFor();
     await page.getByRole("heading", { name: "Socks for every holiday" }).waitFor();
-    await page.getByRole("group", { name: "Show socks for" }).getByRole("button", { name: "Women" }).click();
-    await page.locator(".av-shelf .av-card").first().waitFor();
-    await a11y("the home page after using it");
+    await a11y("the gift sets page");
     await page.goto(`${BASE}/sizes`);
     await page.getByRole("radio", { name: "Knee-high" }).check();
     await page.getByRole("link", { name: "Shop knee-high socks" }).waitFor();

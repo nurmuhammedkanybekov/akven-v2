@@ -31,7 +31,7 @@ export function WalletSheet({ method, total, busy, onCancel, onConfirm }: Props)
     <Dialog open={method !== null} title={method ? t("ws.title", { name: NAME[method] }) : ""} onClose={onCancel}
             actions={<><Button variant="ghost" onClick={onCancel} disabled={busy}>{t("ws.cancel")}</Button>
               <Button loading={busy} onClick={() => method && onConfirm(method, declined)}>{t("ws.pay", { total: formatPrice(total) })}</Button></>}>
-      <p>AKVEN · <strong>{formatPrice(total)}</strong></p>
+      <p>AK&VEN · <strong>{formatPrice(total)}</strong></p>
       <Alert>{t("ws.demo")}</Alert>
       <Switch checked={declined} onChange={setDeclined} label={t("ws.decline")} />
     </Dialog>

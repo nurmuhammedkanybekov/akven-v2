@@ -29,6 +29,7 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET /api/auth/me` | Current authenticated user (requires a bearer token) |
 | `GET /api/products` | Catalog: filters (category, section, cut, collection, search, size, color, price, in stock), pagination, sort (newest, name, price) |
 | `GET /api/products/facets` | Counts per category / section / cut for the current filters |
+| `GET /api/catalog/bestsellers?category=&limit=8` | Public: `{items, sold}`, the socks with the most pairs in paid and completed orders, first `sold` of them; the rest of the list (up to `limit`, at most 24) is the newest in stock, so a new shop still has a full shelf |
 | `GET /api/catalog/terms` | The owners' sections and cuts (for menus and filters) |
 | `GET /api/products/{slug}` | Product detail with variants and images (an image with a `color` shows that colour of the product; the shop shows it when the colour is chosen). Each variant has `stockStatus` (`IN_STOCK`, `FEW_LEFT`, `COMING_SOON`, `SOLD_OUT`), `restockInDays` while coming soon, and `casePairs` |
 | `POST /api/cart/quote` | Today's prices and availability for a cart (public; negotiated prices only for their owner). Also returns `collection`: total pairs, the minimum that applies, the reached tier, the next tier (`pairsToGo`), and a message when the cart is below the minimum |

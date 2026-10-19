@@ -1,14 +1,17 @@
-# AKVEN brand and design system
+# AK&VEN brand and design system
 
-Plain and direct, after Wise and Bombas: one typeface with heavy, tight headings, flat blocks of colour, sentence-case
-labels and no decoration that does not carry meaning. Ivory pages keep the shop calm, navy carries the brand moments
-(the top bar, the hero, the footer) and gold is kept for the logo and savings. The Kyrgyz patterns live on the socks
+Three things at once: the warmth of a Kyrgyz family business, the quality of Korean socks, and the calm of a modern
+international brand. Concretely, COS-like pictures (still lifes in soft afternoon light), MUJI-like ease (plain words,
+everything one tap away), and the stall at Dordoi as the signature. One typeface with heavy, tight headings; a mostly
+ivory page with charcoal text and soft beige behind products; navy for the brand moments (the top bar, buttons, the
+night at Dordoi, the footer); gold used sparingly: the ampersand, savings and a few highlights. The Kyrgyz patterns live on the socks
 themselves (oimo, shyrdak) and in one band at the top of the footer. The living reference is the style-guide page of the frontend (`/styleguide` with `npm run dev`);
 screenshots are in [`docs/design/`](design/) and double as thesis figures.
 
 ## The mark
 
-**AKVEN** is Akylbek and Venera's names on one label. The mark is the family's final choice (the "print-safe joint"
+**AK&VEN** is Akylbek and Venera's names on one label: **AK** from Akylbek, **VEN** from Venera, and the ampersand
+between them, in gold, for what they built together. The mark is the family's final choice (the "print-safe joint"
 concept, [`design/logo-reference.png`](design/logo-reference.png)): a Roman A whose swept crossbar runs out of the left
 foot, arches over the A and becomes the stroke of the V, the two initials joined in one line. A thin gap where the swoop
 passes the A's right leg shows which is in front.
@@ -16,7 +19,10 @@ passes the A's right leg shows which is in front.
 The concept came as an AI-generated image with a pixel-traced vector package, whose outlines were stepped like pixels
 when enlarged. The mark used here was traced again from the reference image, upscaled eightfold, into smooth curves
 (potrace), and lives in `frontend/src/brand/mark.ts` as one even-odd path: crisp from a favicon to a sign, in any single
-colour, for labels and stamps. The name AKVEN is set in Cinzel SemiBold capitals, heavy enough to stand beside the mark's thick strokes; in the one-line
+colour, for labels and stamps. The name AK&VEN is set in Cinzel SemiBold capitals, heavy enough to stand beside the
+mark's thick strokes; the ampersand is Cinzel Regular at 98% of the capitals, with the same space either side as the
+letters have between them, so it reads as the link between the two names rather than a letter. It is gold on the ink
+and white logos (and wherever the page sets `--logo-amp`, such as the header), the same gold on the gold logos. In the one-line
 logo the mark stands on the same baseline as the letters. The tagline "PREMIUM SOCKS" is in Onest. Both are converted
 to outlines, so **the logo needs no font anywhere**. To change the mark, edit `mark.ts`
 and run `npm run logo`, `npm run icons` and `npm run art`. Before printing labels or registering the mark, a designer
@@ -27,7 +33,9 @@ should check the joins at real size, and the mark should be searched in Kyrgyzpa
 | Token | Light | Dark | Used for |
 |---|---|---|---|
 | `--paper` / `--surface` / `--surface-2` | ivory `#F7F4EE`, white, sand | deep navy family | page, cards, tinted blocks |
-| `--ink`, `--ink-2`, `--ink-3` | navy ink `#121A2C`, slate greys | cream, warm greys | text and primary buttons |
+| `--text` | charcoal `#262626` | warm cream | running text |
+| `--ink`, `--ink-2`, `--ink-3` | navy ink `#121A2C`, slate greys | cream, warm greys | primary buttons, selected states, secondary text |
+| `--sand` | soft beige `#E9DFD0` | deep navy | behind product sections (bestsellers) |
 | `--accent` | gold `#CBA862` | `#D4B373` | the gold button, highlights, ornaments |
 | `--accent-ink` | dark gold `#7E5F1E` | gold | gold used as text: eyebrows, savings |
 | `--black`, `--black-deep`, `--on-black` | navy `#16223D`, `#0F1930`, cream | same | the top bar, hero, wholesale and route panels and footer, navy in both themes |
@@ -76,28 +84,29 @@ one.
 
 ## The home page
 
-Ordered by the questions a visitor has: what does it cost, what is there, why here, and then the shop's own tools.
+Products first, then who is behind them and where, then the shop's own tools.
 
 | Section | What it shows |
 |---|---|
-| The hero | In place of a photograph, a Dordoi passage at night: a string of bulbs, containers on two floors with a walkway, and in the middle of the lower floor container 70-E under its lit AKVEN sign. Its doors swing outwards on their hinges onto a rail of socks that drop into their swing, sway and lean away from the pointer, with warm light on the ground and the neighbours. The centred headline sits over the upper floor |
-| The washing line | The drawn socks pegged on a rope across the page, drifting and swaying, leaning away when the pointer passes |
-| Shop by family member | Four flat colour tiles: men, women, kids, gift boxes |
-| The shelf | The newest socks, switchable between men, women, kids and gift boxes without leaving the page |
-| The facts | Big figures from the shop's own data (designs on the shelf, the top discount, since 2018, four countries) and the three ordering steps |
-| The box | Tap socks into the AKVEN box and watch the step reached on the real price ladder (`/api/pricing`) |
-| The family planner | Add each person, their shoe size and pairs; the sock size comes from the size chart and the price step from the ladder; the list can be sent in WhatsApp or Telegram |
-| Ask for your price | The negotiation the Dordoi way: the seller types the price and the shop's stamp checks it |
-| The gift calendar | Days to 23 February, 8 March, Nooruz, the first day of school and New Year, with the gift boxes |
-| Shops and companies | Two blocks: wholesale by the case, and gift boxes for teams |
-| The family and the way to 70-E | The story, and a drawn route from the city to Dordoi-Junhai, passage 8, container 70-E, with every contact |
+| The hero | Words on the left (AK&VEN · Korean quality · since 2018; "Everyday comfort. Made for everyone."; two ways in; three promises). On the right a still life on warm beige in afternoon light: an open navy AK&VEN box of folded pairs on tissue, its lid with the gold logo, loose pairs in cream, navy, white and charcoal, a kraft tag. It is drawn from the shop's own sock drawings, not a photograph, and is the one place to put the family's own product photograph when it exists. The pairs settle into place on arrival and shift a little with the pointer, by depth |
+| Trust | Five plain facts: Korean-made socks, a family business since 2018, container 70-E with whether it is open now, delivery to four countries, wholesale |
+| Shop by who it is for | Four editorial cards (for him, for her, for kids, gift sets): each a still life of that shelf's socks on its own soft backdrop; the picture grows slowly on hover and the arrow moves on |
+| Bestsellers | Ranked by pairs in paid orders (`/api/catalog/bestsellers`). Until four socks have really sold, the section is called "New on the shelf" and shows the newest, so nothing is called a bestseller that is not one |
+| Two names | "Two names. One family. One story.": AK and VEN slide in from either side and meet at the gold ampersand, with Akylbek, together and Venera underneath |
+| From Dordoi, with love | The stall as a scene that plays on scroll: containers on two floors at night; 70-E's sign lights up in gold, the view moves in, the doors open on a rail of socks, and the way to the story and to the stall appears. The section is pinned while it plays; only transforms and opacity change, once per frame. With reduced motion it is the finished scene |
+| The family planner | Add each person, their shoe size and pairs (or start from the family saved in the account) |
+| Gift box | The builder, introduced: a box that changes colour and ribbon and opens and closes |
+| Shops and companies | Wholesale by the case, and gift boxes for teams |
 
-The height fitting (a leg with a ruler; pick a height and the sock is pulled up to it) is on the size guide.
+**Gift sets** (`/gifts`) gathers the ready-made boxes, the gift box builder, the holiday calendar and the collection
+box (tap socks in and watch the price step). **Our story** (`/story`) has the two names, the Dordoi scene and the
+family's facts. The height fitting is on the size guide, the way to the stall on the visit page.
 
 ## Motion
 
-Sections slide in as they scroll into view, the container doors open on load, the socks on the rail and on the line sway, the road draws itself and the
-calculator types. Motion
+Sections slide in as they scroll into view; the hero's pairs settle onto the table; AK and VEN meet at the ampersand;
+the Dordoi scene plays with the scroll; the socks on the rail sway and lean away from the pointer; the gift box opens and
+closes; a picture flies into the bag when a sock is added. Motion
 never fades text, so it keeps full contrast at every moment, and all of it stops for visitors who ask for less motion.
 
 ## Regenerating assets (from `frontend/`)

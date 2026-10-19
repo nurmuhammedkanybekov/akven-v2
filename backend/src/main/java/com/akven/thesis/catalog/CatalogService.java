@@ -72,7 +72,46 @@ public class CatalogService {
         Page<Product> products = productRepository.findAll(ProductSpecifications.storefront(filter, sort),
                 PageRequest.of(Math.max(page, 0), safeSize, order));
 
-        List<UUID> ids = products.getContent().stream().map(Product::getId).toList();
+        Map<UUID, ProductSummary> summaries = summaries(products.getContent());
+        return PageResponse.of(products, p -> summaries.get(p.getId()));
+    }
+
+    /** The socks people buy most, and how many of them really sold: the rest of the list is the newest in stock. */
+    public record Bestsellers(List<ProductSummary> items, int sold) {}
+
+    /**
+     * Ranked by pairs in paid and completed orders (a pack counts once per pack, like a line on the receipt). When too
+     * few have sold, the list is topped up with the newest socks in stock, and {@code sold} says how many are real
+     * bestsellers, so the shop never calls a sock a bestseller that is not one.
+     */
+    @SuppressWarnings("unchecked")
+    public Bestsellers bestsellers(Category category, int limit) {
+        int n = Math.max(1, Math.min(limit, 24));
+        var query = entityManager.createQuery("""
+                select v.product.id from OrderItem i join i.variant v join i.order o
+                where o.status in (com.akven.thesis.order.OrderStatus.PAID, com.akven.thesis.order.OrderStatus.FULFILLED)
+                  and v.product.active = true and (:category is null or v.product.category = :category)
+                group by v.product.id order by sum(i.quantity) desc, v.product.id""", UUID.class)
+                .setParameter("category", category).setMaxResults(n);
+        List<UUID> ranked = query.getResultList();
+        Map<UUID, Product> byId = productRepository.findAllById(ranked).stream().collect(Collectors.toMap(Product::getId, p -> p));
+        List<Product> chosen = new java.util.ArrayList<>(ranked.stream().map(byId::get).filter(java.util.Objects::nonNull).toList());
+        int sold = chosen.size();
+        if (chosen.size() < n) {
+            CatalogFilter newest = new CatalogFilter(category, null, null, null, null, true, null, null, null, null);
+            for (Product p : productRepository.findAll(ProductSpecifications.storefront(newest, CatalogSort.NEWEST),
+                    PageRequest.of(0, n * 2, Sort.by(Sort.Order.desc("createdAt"), Sort.Order.asc("slug")))).getContent()) {
+                if (chosen.size() >= n) break;
+                if (!byId.containsKey(p.getId())) chosen.add(p);
+            }
+        }
+        Map<UUID, ProductSummary> summaries = summaries(chosen);
+        return new Bestsellers(chosen.stream().map(p -> summaries.get(p.getId())).toList(), sold);
+    }
+
+    /** Card data for a set of products: active options, and the cover and hover pictures. */
+    private Map<UUID, ProductSummary> summaries(List<Product> products) {
+        List<UUID> ids = products.stream().map(Product::getId).toList();
         Map<UUID, List<Variant>> variantsByProduct = ids.isEmpty() ? new HashMap<>()
                 : variantRepository.findByProductIdInAndActiveTrue(ids).stream()
                         .collect(Collectors.groupingBy(v -> v.getProduct().getId()));
@@ -88,12 +127,13 @@ public class CatalogService {
                 imagesByProduct.put(id, (general.isEmpty() ? list : general).stream().limit(2).map(ImageView::of).toList());
             });
         }
-
-        return PageResponse.of(products, p -> {
+        Map<UUID, ProductSummary> out = new HashMap<>();
+        for (Product p : products) {
             List<ImageView> images = imagesByProduct.getOrDefault(p.getId(), List.of());
-            return ProductSummary.of(p, variantsByProduct.getOrDefault(p.getId(), List.of()),
-                    images.isEmpty() ? null : images.get(0), images.size() < 2 ? null : images.get(1));
-        });
+            out.put(p.getId(), ProductSummary.of(p, variantsByProduct.getOrDefault(p.getId(), List.of()),
+                    images.isEmpty() ? null : images.get(0), images.size() < 2 ? null : images.get(1)));
+        }
+        return out;
     }
 
     /**

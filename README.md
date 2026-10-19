@@ -1,4 +1,4 @@
-# AKVEN
+# AK&VEN
 
 **An online shop for a family sock business, with a price-negotiating assistant that can never give away more than the owners allow.**
 
@@ -7,7 +7,7 @@ Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
-![The AKVEN home page: a Dordoi passage at night, with container 70-E opening in the middle](docs/design/readme-home.jpg)
+![The AK&VEN home page: the socks first, in a still life on warm beige](docs/design/readme-home.jpg)
 
 ## Contents
 
@@ -23,7 +23,8 @@ Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 ## The project in short
 
-AKVEN is my family's brand of Korean-made socks. My parents, Akylbek and Venera, have traded at Dordoi Bazaar in
+AK&VEN is my family's brand of Korean-made socks: **AK** from Akylbek, **VEN** from Venera, and the ampersand for what
+they built together. My parents have traded at Dordoi Bazaar in
 Bishkek, Kyrgyzstan, since the early 2000s and have sold socks there since 2018, from container 70-E. At the bazaar
 nobody pays the label price: customers bargain, buy for the whole family, and shops from the regions buy by the case.
 
@@ -76,12 +77,19 @@ super admin can repeat that run at any time.
 </tr>
 </table>
 
+![From Dordoi, with love: container 70-E opens as the visitor scrolls](docs/design/readme-dordoi.jpg)
+
 **For customers**
 
+- **A home page that shows the socks first:** a still life of the everyday colours in an AK&VEN box, the four shelves
+  as editorial cards, and bestsellers ranked by what really sells (until enough has sold, honestly called "new on the
+  shelf"). Then the family behind it ("Two names. One family. One story.") and the stall at Dordoi as a short scene
+  that plays as you scroll: 70-E's sign lights up, the view moves in and its doors open. **Gift sets** and **Our
+  story** have pages of their own.
 - **English, Russian and Kyrgyz**, prices in **US dollars, Kyrgyz som or Russian roubles** (at the rates the owners
   set), light and dark, on phone, tablet and laptop. The site can be installed as an app
   (PWA), and the bag works offline.
-- **The collection box on the home page:** tap socks into the AKVEN box and watch the price step reached on the
+- **The collection box on the home page:** tap socks into the AK&VEN box and watch the price step reached on the
   shop's real ladder.
 - **Collections:** a minimum order and a price ladder counted in pairs across the whole bag, with "add 4 more pairs
   to save 5%" hints in the bag. Packs show their price per pair.
@@ -193,15 +201,15 @@ flowchart LR
 The layers, the data model and the safety mechanism are described in [`docs/architecture.md`](docs/architecture.md).
 The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/brand.md).
 
-![The AKVEN logo: stacked, one line, and the mark alone for sock labels and the app icon](docs/design/readme-logo.jpg)
+![The AK&VEN logo: stacked, one line, and the mark alone for sock labels and the app icon](docs/design/readme-logo.jpg)
 
 ## Quality and tests
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 219 tests, **97% line coverage**; the build fails below 80% |
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 220 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints (gift boxes and families too), the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 149 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| Frontend | `cd frontend && npm test && npm run build` | 161 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
 | End to end, in a real browser | `cd frontend && npm run e2e` | 26 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:

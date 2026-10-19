@@ -7,12 +7,12 @@ import { BagIcon, CloseIcon, HeartIcon, MenuIcon, PinIcon, SearchIcon, UserIcon 
 import { CurrencySwitch } from "../shop/useMoney";
 
 const NAV: Array<{ to: string; key: MessageKey }> = [
+  { to: "/shop", key: "nav.shop" },
   { to: "/men", key: "nav.men" },
   { to: "/women", key: "nav.women" },
   { to: "/kids", key: "nav.kids" },
-  { to: "/bundles", key: "nav.bundles" },
-  { to: "/gift", key: "nav.gift" },
-  { to: "/wholesale", key: "nav.wholesale" },
+  { to: "/gifts", key: "nav.gifts" },
+  { to: "/story", key: "nav.story" },
 ];
 
 const MESSAGES: MessageKey[] = ["ann.1", "ann.2", "ann.3"];
@@ -82,8 +82,9 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
             <nav className="av-nav" aria-label={t("nav.main")}>
               {NAV.map((n) => <NavLink key={n.to} to={n.to}>{t(n.key)}</NavLink>)}
             </nav>
-            <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={32} /></Link>
+            <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={38} /></Link>
             <div className="av-header__actions">
+              <NavLink className="av-header__biz" to="/wholesale">{t("nav.wholesale")}</NavLink>
               <Link className="av-icon-btn av-hide-md" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>
               <Link className="av-icon-btn" to="/shop" aria-label={t("nav.search")}><SearchIcon /></Link>
               <Link className="av-icon-btn av-hide-md" to="/saved" aria-label={t("nav.saved", { n: savedCount })}>
@@ -105,7 +106,8 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
           {NAV.map((n, i) => (
             <NavLink key={n.to} to={n.to} style={{ "--i": i } as React.CSSProperties}>{t(n.key)}</NavLink>
           ))}
-          <NavLink to="/saved" style={{ "--i": NAV.length } as React.CSSProperties}>{t("nav.savedTitle")}</NavLink>
+          <NavLink to="/wholesale" style={{ "--i": NAV.length } as React.CSSProperties}>{t("nav.wholesale")}</NavLink>
+          <NavLink to="/saved" style={{ "--i": NAV.length + 1 } as React.CSSProperties}>{t("nav.savedTitle")}</NavLink>
         </div>
         <div className="av-mobile-nav__langs">
           <LanguageSwitch />

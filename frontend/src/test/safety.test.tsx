@@ -25,9 +25,9 @@ describe("the tab is named after the page", () => {
   };
 
   it("names shop and admin pages, and leaves the home page as the brand", () => {
-    expect(titleAt("/women")).toBe("Women · AKVEN");
-    expect(titleAt("/admin/pricing")).toBe("Pricing · AKVEN");
-    expect(titleAt("/no-such-page")).toBe("Page not found · AKVEN");
-    expect(titleAt("/")).toBe("AKVEN");
+    expect(titleAt("/women")).toBe("Women · AK&VEN");
+    expect(titleAt("/admin/pricing")).toBe("Pricing · AK&VEN");
+    expect(titleAt("/no-such-page")).toBe("Page not found · AK&VEN");
+    expect(titleAt("/")).toBe("AK&VEN");
   });
 });

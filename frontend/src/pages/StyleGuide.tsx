@@ -36,7 +36,7 @@ function Section({ id, eyebrow, title, lead, children }: { id: string; eyebrow: 
   );
 }
 
-/** Living reference for the AKVEN design system. Every component here is the real one the shop uses. */
+/** Living reference for the AK&VEN design system. Every component here is the real one the shop uses. */
 export function StyleGuide() {
   const { theme, toggle } = useTheme();
   const [qty, setQty] = useState(2);
@@ -88,7 +88,7 @@ export function StyleGuide() {
             <div><span className="av-eyebrow">Display · Onest 600</span><p className="av-display">Korean quality, <em>in every pair.</em></p></div>
             <div><span className="av-eyebrow">Heading 1</span><h1>Wool Crew Classic</h1></div>
             <div><span className="av-eyebrow">Heading 2</span><h2>Made in Korea, chosen in Bishkek</h2></div>
-            <div><span className="av-eyebrow">Body · Onest 400</span><p className="av-lead">Mid-weight crew socks knitted on our partner's machines for the AKVEN label. Soft, durable, and honest about the fabric.</p></div>
+            <div><span className="av-eyebrow">Body · Onest 400</span><p className="av-lead">Mid-weight crew socks knitted on our partner's machines for the AK&VEN label. Soft, durable, and honest about the fabric.</p></div>
             <div><span className="av-eyebrow">Numbers · Onest, tabular figures</span><p><Price amount={17.5} large /> <Price amount={12} was={15} /></p></div>
           </div>
         </Section>

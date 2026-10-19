@@ -46,7 +46,7 @@ export function VisitPage() {
               <span className="av-plate__market">{point.section ?? point.market}</span>
               <span className="av-plate__passage">{t("visit.passage")} {point.passage}</span>
               <strong className="av-plate__number">{point.container}</strong>
-              <span className="av-plate__brand">AKVEN</span>
+              <span className="av-plate__brand">AK&VEN</span>
             </figure>
           )}
         </div>

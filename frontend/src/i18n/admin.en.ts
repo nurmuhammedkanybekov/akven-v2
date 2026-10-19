@@ -4,7 +4,7 @@
  */
 export const adminEn = {
   // shared
-  "a.home": "AKVEN admin",
+  "a.home": "AK&VEN admin",
   "a.menu": "Admin",
   "a.crumbs": "Breadcrumb",
   "a.signOut": "Sign out",
@@ -91,7 +91,7 @@ export const adminEn = {
   // product form
   "a.pf.aria": "Product details",
   "a.pf.details": "Details",
-  "a.pf.nameEg": "e.g. AKVEN Mid-Long Socks",
+  "a.pf.nameEg": "e.g. AK&VEN Mid-Long Socks",
   "a.pf.who": "Who is it for?",
   "a.pf.audience": "Audience",
   "a.pf.sectionBundle": "Bundles sit outside the sections.",
@@ -297,7 +297,7 @@ export const adminEn = {
   "a.db.waitN": "{n} waiting",
   "a.db.backIn": "{n} back in stock",
   "a.db.told": "Mark as told",
-  "a.db.mailSubject": "{name} is back at AKVEN",
+  "a.db.mailSubject": "{name} is back at AK&VEN",
   "a.db.shopPart": "The shop",
   "a.db.assistantPart": "The price assistant",
   "a.db.sold": "Paid orders",
@@ -555,7 +555,7 @@ export const adminEn = {
   "chat.accept": "Add {pairs} at this price",
   "chat.onePair": "1 pair",
   "chat.nPairs": "{n} pairs",
-  "chat.who": "AKVEN assistant",
+  "chat.who": "AK&VEN assistant",
   "chat.offer": "Your offer",
   "chat.proposed": "Proposed",
   "chat.suggested": "assistant suggested {pct}%",

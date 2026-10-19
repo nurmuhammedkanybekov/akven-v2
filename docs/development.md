@@ -1,4 +1,4 @@
-# Running, configuring and testing AKVEN
+# Running, configuring and testing AK&VEN
 
 ## The quickest way: Docker
 

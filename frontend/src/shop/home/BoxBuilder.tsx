@@ -70,7 +70,7 @@ export function BoxBuilder({ minPairs, tiers }: { minPairs: number; tiers: Array
                   </span>
                 ))}
               </div>
-              <div className="av-crate__front"><span>AKVEN</span></div>
+              <div className="av-crate__front"><span>AK&VEN</span></div>
             </div>
 
             <div className="av-builder__sum" aria-live="polite">

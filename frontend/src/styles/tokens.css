@@ -1,7 +1,7 @@
 /*
- * AKVEN design tokens. Direction: plain and direct, after Wise and Bombas: one typeface, heavy tight headings,
- * flat blocks of colour, no ornaments. Ivory paper keeps the shop calm; navy carries the brand moments (top bar,
- * hero, footer); gold is for savings and the logo. Onest everywhere, with Cyrillic and Cyrillic Extended for
+ * AK&VEN design tokens. Direction: COS calm with MUJI ease: one typeface, heavy tight headings, a mostly ivory page
+ * with charcoal text, soft beige behind products, and navy for the brand moments (headings, buttons, the Dordoi
+ * night, the footer). Gold is used sparingly: the ampersand, savings and a few highlights. Onest everywhere, with Cyrillic and Cyrillic Extended for
  * Russian and Kyrgyz (ң ө ү).
  *
  * THIS FILE IS THE SOURCE OF TRUTH. src/test/contrast.test.ts reads it and fails the build if any
@@ -53,13 +53,15 @@
   --line: #e4dfd3;           /* hairlines */
   --line-strong: #c9bfab;    /* input borders, dividers that must be seen */
 
-  --ink: #121a2c;            /* primary text and primary buttons: navy ink */
+  --ink: #121a2c;            /* headings, primary buttons, selected states: navy ink */
+  --text: #262626;           /* running text: charcoal, warmer and softer than navy for long reading */
+  --sand: #e9dfd0;           /* soft beige behind product sections */
   --ink-2: #465068;          /* secondary text */
   --ink-3: #5f6678;          /* tertiary text, placeholders (still AA on every surface) */
   --on-ink: #f7f4ee;         /* text on an ink button */
 
   --accent: #cba862;         /* gold: fills, the hero button, small highlights */
-  --accent-ink: #7e5f1e;     /* gold as TEXT on light surfaces: eyebrows, savings */
+  --accent-ink: #785a1b;     /* gold as TEXT on light surfaces: eyebrows, savings */
   --on-accent: #121a2c;
 
   --success: #276a3c;
@@ -112,6 +114,8 @@
   --line-strong: #3a4766;
 
   --ink: #ece6d8;
+  --text: #e4ded1;
+  --sand: #18213a;
   --ink-2: #bdbab2;
   --ink-3: #9a9fae;
   --on-ink: #0d1424;
@@ -161,6 +165,8 @@
     --line-strong: #3a4766;
 
     --ink: #ece6d8;
+    --text: #e4ded1;
+    --sand: #18213a;
     --ink-2: #bdbab2;
     --ink-3: #9a9fae;
     --on-ink: #0d1424;

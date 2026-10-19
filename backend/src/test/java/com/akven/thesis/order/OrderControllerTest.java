@@ -175,6 +175,22 @@ class OrderControllerTest extends IntegrationTest {
     }
 
     @Test
+    void whatSellsBecomesABestsellerAndTheRestOfTheListIsOnlyTheNewest() throws Exception {
+        Variant v = data.variant(5);
+        paid(tokenForEmail(email(), Role.CUSTOMER), v, 2);
+        JsonNode best = json(getJson("/api/catalog/bestsellers?limit=24", null).andExpect(status().isOk()));
+        assertThat(best.get("sold").asInt()).isGreaterThanOrEqualTo(1);
+        List<String> slugs = new java.util.ArrayList<>();
+        best.get("items").forEach(i -> slugs.add(i.get("slug").asText()));
+        assertThat(slugs.subList(0, best.get("sold").asInt())).contains(v.getProduct().getSlug());
+        assertThat(slugs).doesNotHaveDuplicates();
+
+        String other = v.getProduct().getCategory() == com.akven.thesis.catalog.Category.KIDS ? "MEN" : "KIDS";
+        JsonNode elsewhere = json(getJson("/api/catalog/bestsellers?category=" + other, null).andExpect(status().isOk()));
+        elsewhere.get("items").forEach(i -> assertThat(i.get("slug").asText()).isNotEqualTo(v.getProduct().getSlug()));
+    }
+
+    @Test
     void theClientCannotChooseAPrice() throws Exception {
         Variant v = data.variant(5);
         Map<String, Object> sneaky = new LinkedHashMap<>(line(v.getSku(), 1, null));

@@ -69,6 +69,13 @@ public class CatalogController {
         return catalogService.terms();
     }
 
+    /** The socks people buy most (from paid orders), topped up with the newest; {@code sold} counts the real ones. */
+    @GetMapping("/catalog/bestsellers")
+    public CatalogService.Bestsellers bestsellers(@RequestParam(required = false) Category category,
+                                                  @RequestParam(defaultValue = "8") int limit) {
+        return catalogService.bestsellers(category, limit);
+    }
+
     @GetMapping("/products/{slug}")
     public ProductDetail detail(@PathVariable String slug) {
         return catalogService.detail(slug);
