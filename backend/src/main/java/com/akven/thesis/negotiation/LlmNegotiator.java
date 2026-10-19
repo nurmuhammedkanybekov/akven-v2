@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class LlmNegotiator implements Negotiator {
 
     static final String SYSTEM = """
-            You are the seller at AKVEN, a family business selling Korean-made socks from container 70-E at Dordoi Bazaar
+            You are the seller at AK&VEN (AKylbek & VENera), a family business selling Korean-made socks from container 70-E at Dordoi Bazaar
             in Bishkek, run by Akylbek and Venera since 2018. You chat with one customer about one sock, the way a good
             bazaar seller does: warm, short, a little playful, honest, and never pushy.
 

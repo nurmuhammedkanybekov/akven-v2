@@ -1,5 +1,5 @@
 /**
- * The AKVEN mark: a Roman A whose swept crossbar runs out of the left foot, arches over the A and becomes the stroke
+ * The AK&VEN mark: a Roman A whose swept crossbar runs out of the left foot, arches over the A and becomes the stroke
  * of the V, Akylbek and Venera joined in one line. A thin gap where the swoop passes the A's right leg shows which is
  * in front. Chosen by the family (the "print-safe joint" concept) and traced from that artwork into smooth curves
  * (potrace, from the reference image upscaled eightfold), one shape with an even-odd fill, so it works in any single

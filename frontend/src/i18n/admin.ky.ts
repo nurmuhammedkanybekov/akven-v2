@@ -2,7 +2,7 @@ import type { adminEn } from "./admin.en";
 
 /** Kyrgyz for the admin, the price chat and shared pieces. A draft for a native speaker to read. */
 export const adminKy: Record<keyof typeof adminEn, string> = {
-  "a.home": "AKVEN башкаруу",
+  "a.home": "AK&VEN башкаруу",
   "a.menu": "Башкаруу",
   "a.crumbs": "Жол",
   "a.signOut": "Чыгуу",
@@ -86,7 +86,7 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
 
   "a.pf.aria": "Товардын маалыматы",
   "a.pf.details": "Маалымат",
-  "a.pf.nameEg": "мисалы, AKVEN Mid-Long Socks",
+  "a.pf.nameEg": "мисалы, AK&VEN Mid-Long Socks",
   "a.pf.who": "Ким үчүн?",
   "a.pf.audience": "Ким үчүн",
   "a.pf.sectionBundle": "Топтомдор линияга кирбейт.",
@@ -285,7 +285,7 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
   "a.db.waitN": "{n} күтүп жатат",
   "a.db.backIn": "кайра бар: {n}",
   "a.db.told": "Кабарландык деп белгилөө",
-  "a.db.mailSubject": "{name} кайра AKVENде",
+  "a.db.mailSubject": "{name} кайра AK&VENде",
   "a.db.shopPart": "Дүкөн",
   "a.db.assistantPart": "Баа боюнча жардамчы",
   "a.db.sold": "Төлөнгөн буйрутмалар",
@@ -535,7 +535,7 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
   "chat.accept": "{pairs} ушул баада кошуу",
   "chat.onePair": "1 жуп",
   "chat.nPairs": "{n} жуп",
-  "chat.who": "AKVEN жардамчысы",
+  "chat.who": "AK&VEN жардамчысы",
   "chat.offer": "Сиздин сунуш",
   "chat.proposed": "Сунушталды",
   "chat.suggested": "жардамчы {pct}% сунуштады",

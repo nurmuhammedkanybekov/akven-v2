@@ -55,7 +55,7 @@ export function GiftBoxScene({ box, ribbon, socks, open, to }: { box: GiftBoxCol
           <circle cx="60" cy="34" r="7" />
         </svg>
       </div>
-      <div className={`av-gbox__tag${to ? " has-name" : ""}`}><span>{to || "AKVEN"}</span></div>
+      <div className={`av-gbox__tag${to ? " has-name" : ""}`}><span>{to || "AK&VEN"}</span></div>
     </div>
   );
 }

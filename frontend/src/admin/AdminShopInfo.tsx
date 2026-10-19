@@ -121,7 +121,7 @@ function ContactRow({ contact, onSave, onDelete }: { contact: ShopContact; onSav
   );
 }
 
-const emptyPoint = (): PickupPointInput => ({ name: "AKVEN at Dordoi", market: "Dordoi Bazaar", section: "", passage: "", container: "", city: "Bishkek", hours: "", directions: "", position: 0, active: true, opensAt: "08:00", closesAt: "16:00", openDays: 127 });
+const emptyPoint = (): PickupPointInput => ({ name: "AK&VEN at Dordoi", market: "Dordoi Bazaar", section: "", passage: "", container: "", city: "Bishkek", hours: "", directions: "", position: 0, active: true, opensAt: "08:00", closesAt: "16:00", openDays: 127 });
 
 /** "08:00:00" from the server → "08:00" for a time field. */
 const hhmm = (t: string | null) => (t ? t.slice(0, 5) : "");

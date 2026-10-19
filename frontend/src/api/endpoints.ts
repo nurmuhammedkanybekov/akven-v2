@@ -56,6 +56,9 @@ export const listProducts = (query: CatalogQuery, signal?: AbortSignal) =>
   api<PageResponse<ProductSummary>>(`/api/products${qs({ ...query })}`, { signal });
 export const getFacets = (query: CatalogQuery, signal?: AbortSignal) =>
   api<Facets>(`/api/products/facets${qs({ category: query.category, section: query.section, cut: query.cut, q: query.q, inStock: query.inStock })}`, { signal });
+/** The socks people buy most; `sold` says how many of the list really sold (the rest are the newest in stock). */
+export const getBestsellers = (category: Category | null, limit = 8, signal?: AbortSignal) =>
+  api<{ items: ProductSummary[]; sold: number }>(`/api/catalog/bestsellers${qs({ category, limit })}`, { signal });
 export const getTerms = () => api<TermsView>("/api/catalog/terms");
 export const getProduct = (slug: string) => api<ProductDetail>(`/api/products/${encodeURIComponent(slug)}`);
 

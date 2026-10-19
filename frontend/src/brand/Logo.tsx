@@ -3,7 +3,7 @@ import { MARK, markMarkup } from "./mark";
 import { LOGO } from "./logo.generated";
 
 interface LogoProps {
-  /** "full" = the mark and AKVEN on one line, "stacked" = the mark above AKVEN and the tagline, "mark" = the AV alone. */
+  /** "full" = the mark and AK&VEN on one line, "stacked" = the mark above AK&VEN and the tagline, "mark" = the AV alone. */
   variant?: "full" | "stacked" | "mark";
   /** Brushed-gold gradient, for large placements on dark backgrounds. Otherwise the logo takes the text colour. */
   metallic?: boolean;
@@ -13,12 +13,14 @@ interface LogoProps {
 }
 
 /**
- * The AKVEN logo as inline SVG outlines: no font, no network request, colours from CSS (currentColor). The markup is
- * built from the generated outlines and the mark's geometry only.
+ * The AK&VEN logo as inline SVG outlines: no font, no network request, colours from CSS (currentColor). The ampersand
+ * takes --logo-amp when a page sets it (gold in the header and footer), otherwise the same colour as the rest. The
+ * markup is built from the generated outlines and the mark's geometry only.
  */
 export function Logo({ variant = "full", metallic = false, height = 28, className }: LogoProps) {
   const id = `lg${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const fill = metallic ? `url(#${id}-g)` : "currentColor";
+  const amp = (t: string) => `<path transform="${t}" style="fill:${metallic ? fill : "var(--logo-amp, currentColor)"}" d="${LOGO.amp}"/>`;
   const defs = metallic
     ? `<defs><linearGradient id="${id}-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#edd79c"/><stop offset=".5" stop-color="#c9a24b"/><stop offset="1" stop-color="#9a772b"/></linearGradient></defs>`
     : "";
@@ -30,14 +32,14 @@ export function Logo({ variant = "full", metallic = false, height = 28, classNam
   } else if (variant === "stacked") {
     ({ viewBox, aspect } = LOGO.stacked);
     body = `<g transform="${LOGO.stacked.mark}">${markMarkup(fill, id)}</g>` +
-      `<path transform="${LOGO.stacked.word}" fill="${fill}" d="${LOGO.word}"/><path transform="${LOGO.stacked.tag}" fill="${fill}" d="${LOGO.tag}"/>`;
+      `<path transform="${LOGO.stacked.word}" fill="${fill}" d="${LOGO.word}"/>${amp(LOGO.stacked.word)}<path transform="${LOGO.stacked.tag}" fill="${fill}" d="${LOGO.tag}"/>`;
   } else {
     ({ viewBox, aspect } = LOGO.horizontal);
-    body = `<g transform="${LOGO.horizontal.mark}">${markMarkup(fill, id)}</g><path transform="${LOGO.horizontal.word}" fill="${fill}" d="${LOGO.word}"/>`;
+    body = `<g transform="${LOGO.horizontal.mark}">${markMarkup(fill, id)}</g><path transform="${LOGO.horizontal.word}" fill="${fill}" d="${LOGO.word}"/>${amp(LOGO.horizontal.word)}`;
   }
   const style = { height, width: typeof height === "number" ? height * aspect : `calc(${height} * ${aspect})` };
   return (
-    <svg role="img" aria-label="AKVEN" viewBox={viewBox} style={style} className={className} fill="none"
+    <svg role="img" aria-label="AK&VEN" viewBox={viewBox} style={style} className={className} fill="none"
       dangerouslySetInnerHTML={{ __html: defs + body }} />
   );
 }

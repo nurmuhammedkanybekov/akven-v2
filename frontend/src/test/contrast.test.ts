@@ -32,7 +32,13 @@ function ratio(a: string, b: string): number {
 
 // [foreground token, background token, minimum ratio, what it is]
 const PAIRS: Array<[string, string, number, string]> = [
-  ["ink", "paper", 7, "body text on page"],
+  ["ink", "paper", 7, "headings on page"],
+  ["text", "paper", 7, "body text on page"],
+  ["text", "surface", 7, "body text on cards"],
+  ["text", "sand", 7, "body text on product sections"],
+  ["ink", "sand", 7, "headings on product sections"],
+  ["ink-2", "sand", 4.5, "secondary text on product sections"],
+  ["accent-ink", "sand", 4.5, "gold text on product sections"],
   ["ink", "surface", 7, "text on cards"],
   ["ink", "surface-2", 7, "text on tinted blocks"],
   ["ink-2", "paper", 4.5, "secondary text"],
