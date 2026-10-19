@@ -5,6 +5,7 @@ import { Alert } from "./Alert";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { Switch } from "./Switch";
+import { useT } from "../i18n/I18n";
 
 const NAME: Record<PaymentMethod, string> = { APPLE_PAY: "Apple Pay", GOOGLE_PAY: "Google Pay" };
 
@@ -22,16 +23,17 @@ interface Props {
  * will be with a real provider. The "decline" switch exists so a failed payment can be shown in the demo.
  */
 export function WalletSheet({ method, total, busy, onCancel, onConfirm }: Props) {
+  const { t } = useT();
   const [declined, setDeclined] = useState(false);
   // Every time the sheet opens the demo switch starts off, so a normal payment is the default.
   useEffect(() => { if (method) setDeclined(false); }, [method]);
   return (
-    <Dialog open={method !== null} title={method ? `${NAME[method]} (demo)` : ""} onClose={onCancel}
-            actions={<><Button variant="ghost" onClick={onCancel} disabled={busy}>Cancel</Button>
-              <Button loading={busy} onClick={() => method && onConfirm(method, declined)}>Pay {formatPrice(total)}</Button></>}>
+    <Dialog open={method !== null} title={method ? t("ws.title", { name: NAME[method] }) : ""} onClose={onCancel}
+            actions={<><Button variant="ghost" onClick={onCancel} disabled={busy}>{t("ws.cancel")}</Button>
+              <Button loading={busy} onClick={() => method && onConfirm(method, declined)}>{t("ws.pay", { total: formatPrice(total) })}</Button></>}>
       <p>AKVEN · <strong>{formatPrice(total)}</strong></p>
-      <Alert>This is a demonstration wallet. No real money moves and no card is involved; the shop only receives a one-time token.</Alert>
-      <Switch checked={declined} onChange={setDeclined} label="Demo: make the bank decline this payment" />
+      <Alert>{t("ws.demo")}</Alert>
+      <Switch checked={declined} onChange={setDeclined} label={t("ws.decline")} />
     </Dialog>
   );
 }

@@ -43,9 +43,24 @@ public final class OrderDtos {
     /** The wallet token only. There is deliberately no field for a card number. */
     public record PaymentInput(@NotNull PaymentMethod method, @NotBlank @Size(max = 128) String token) {}
 
+    /** Pack the order as a gift. The card's words are plain text; they are shown as text and never as markup. */
+    public record GiftInput(@NotNull GiftBox box,
+                            @NotNull GiftRibbon ribbon,
+                            @Size(max = 60) String to,
+                            @Size(max = 60) String from,
+                            @Size(max = 300) String message,
+                            boolean hidePrices) {}
+
     public record CheckoutRequest(@NotEmpty @Size(max = 50) List<@Valid CartItem> items,
                                   @NotNull @Valid FulfillmentInput fulfillment,
-                                  @NotNull @Valid PaymentInput payment) {}
+                                  @NotNull @Valid PaymentInput payment,
+                                  @Valid GiftInput gift) {
+
+        /** An order that is not a gift. */
+        public CheckoutRequest(List<CartItem> items, FulfillmentInput fulfillment, PaymentInput payment) {
+            this(items, fulfillment, payment, null);
+        }
+    }
 
     // ---- cart quote (public) ----------------------------------------------------------------
 
@@ -78,12 +93,15 @@ public final class OrderDtos {
     /** The payment reference is shown shortened: enough for a support call, not the whole token of the provider. */
     public record PaymentView(String method, String reference) {}
 
+    public record GiftView(GiftBox box, GiftRibbon ribbon, String to, String from, String message, boolean hidePrices) {}
+
     /** code is shown to the customer only: at the stall the customer says it, staff do not read it off a screen. */
     public record PickupView(String code, PickupPointView point) {}
 
     public record OrderView(UUID id, String reference, OrderStatus status, BigDecimal total, Instant createdAt,
                             Instant paidAt, Instant fulfilledAt, Instant cancelledAt, FulfillmentView fulfillment,
-                            PaymentView payment, List<OrderItemView> items, String customerEmail, PickupView pickup) {}
+                            PaymentView payment, List<OrderItemView> items, String customerEmail, PickupView pickup,
+                            GiftView gift) {}
 
     /** Handing over at the stall: the code and the last four digits of the contact phone. */
     public record HandoverRequest(@NotBlank @Pattern(regexp = "[0-9]{6}", message = "six digits") String code,

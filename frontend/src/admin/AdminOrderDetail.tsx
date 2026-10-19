@@ -7,6 +7,7 @@ import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { OrderStatusBadge } from "../components/OrderStatusBadge";
 import { ProductImage } from "../components/ProductImage";
+import { GiftSummary } from "../components/GiftSummary";
 import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
 import { formatDateTime, formatPrice } from "../lib/format";
@@ -50,6 +51,12 @@ export function AdminOrderDetail() {
         <p><strong>{o.fulfillment.method === "PICKUP" ? t("a.od.pickup") : t("a.od.delivery")}</strong>{o.fulfillment.address ? `: ${o.fulfillment.address}` : ""}{o.fulfillment.note ? <><br />{t("a.od.note")}: {o.fulfillment.note}</> : null}</p>
         <p className="av-small av-muted">{o.payment ? t("a.od.paidWith", { method: o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay", ref: o.payment.reference }) : t("a.od.notPaid")}{o.paidAt ? `, ${formatDateTime(o.paidAt)}` : ""}</p>
       </div>
+      {o.gift && (
+        <div className="av-card-form av-card-form--gift">
+          <h2 className="av-formtitle">{t("a.od.gift")}</h2>
+          <GiftSummary gift={o.gift} />
+        </div>
+      )}
       <div className="av-card-form">
         <h2 className="av-formtitle">{t("a.orders.items")}</h2>
         <ul className="av-cartlines">

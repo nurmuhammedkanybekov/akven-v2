@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +29,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class StockRequestService {
+
+    /** Enough for a family's wishes; a bot cannot fill the owners' list with thousands of rows. */
+    static final int MAX_OPEN = 30;
 
     private final StockRequestRepository requests;
     private final VariantRepository variants;
@@ -53,8 +57,11 @@ public class StockRequestService {
         Variant variant = variants.findBySku(sku).filter(v -> v.isActive() && v.getProduct().isActive())
                 .orElseThrow(() -> new NotFoundException("No such option."));
         if (variant.available() > 0) throw new BusinessRuleException("This option is in stock: it can go in the bag now.");
-        requests.findByVariantIdAndUserId(variant.getId(), user.getId())
-                .ifPresentOrElse(StockRequest::reopen, () -> requests.save(new StockRequest(variant.getId(), user.getId())));
+        Optional<StockRequest> earlier = requests.findByVariantIdAndUserId(variant.getId(), user.getId());
+        if (earlier.isEmpty() && requests.countByUserIdAndNotifiedAtIsNull(user.getId()) >= MAX_OPEN) {
+            throw new BusinessRuleException("You are already waiting for " + MAX_OPEN + " options. Remove one you no longer need first.");
+        }
+        earlier.ifPresentOrElse(StockRequest::reopen, () -> requests.save(new StockRequest(variant.getId(), user.getId())));
         return mine(user);
     }
 

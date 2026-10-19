@@ -11,6 +11,7 @@ const NAV: Array<{ to: string; key: MessageKey }> = [
   { to: "/women", key: "nav.women" },
   { to: "/kids", key: "nav.kids" },
   { to: "/bundles", key: "nav.bundles" },
+  { to: "/gift", key: "nav.gift" },
   { to: "/wholesale", key: "nav.wholesale" },
 ];
 
@@ -90,7 +91,8 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
                 {savedCount > 0 && <span key={savedCount} className="av-icon-btn__count" aria-hidden="true">{savedCount}</span>}
               </Link>
               <Link className="av-icon-btn" to={accountTo} aria-label={accountLabel ?? t("nav.signin")}><UserIcon /></Link>
-              <Link className="av-icon-btn" to="/cart" aria-label={t("nav.bag", { n: cartCount })}>
+              <Link className="av-icon-btn" to="/cart" aria-label={t("nav.bag", { n: cartCount })} data-bag-target=""
+                    onAnimationEnd={(e) => { if (e.target === e.currentTarget) e.currentTarget.classList.remove("is-bump"); }}>
                 <BagIcon />
                 {cartCount > 0 && <span key={cartCount} className="av-icon-btn__count" aria-hidden="true">{cartCount}</span>}
               </Link>

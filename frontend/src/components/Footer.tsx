@@ -28,7 +28,7 @@ export function Footer() {
           </nav>
           <nav className="av-footer__col" aria-label={t("foot.help")}>
             <span className="av-footer__head">{t("foot.help")}</span>
-            <Link to="/sizes">{t("foot.sizes")}</Link><Link to="/visit#pickup">{t("foot.pickup")}</Link>
+            <Link to="/sizes">{t("foot.sizes")}</Link><Link to="/finder">{t("fd.eyebrow")}</Link><Link to="/visit#pickup">{t("foot.pickup")}</Link>
             <Link to="/visit">{t("foot.visit")}</Link><Link to="/orders">{t("foot.orders")}</Link>
           </nav>
           <nav className="av-footer__col" aria-label={t("foot.business")}>

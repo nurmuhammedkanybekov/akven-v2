@@ -13,4 +13,6 @@ public interface StockRequestRepository extends JpaRepository<StockRequest, UUID
     List<StockRequest> findByUserIdAndNotifiedAtIsNull(UUID userId);
 
     List<StockRequest> findByNotifiedAtIsNullOrderByCreatedAtAsc();
+
+    long countByUserIdAndNotifiedAtIsNull(UUID userId);
 }

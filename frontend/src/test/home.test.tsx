@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { sockBounds, sockMarkup, sockTop, type SockCut } from "../brand/sockDrawing";
 import { I18nProvider } from "../i18n/I18n";
 import { withMessage } from "../components/Contacts";
-import { sockSizeFor } from "../shop/home/FamilyPlanner";
+import { sockSizeFor } from "../shop/family";
 import { resetSavedCache, useSaved } from "../shop/useSaved";
 import { upcomingHolidays } from "../shop/home/GiftCalendar";
 import { HeightRuler } from "../shop/home/HeightRuler";
@@ -25,7 +25,7 @@ describe("the drawn sock", () => {
   it("escapes values and keeps ids to safe characters", () => {
     const svg = sockMarkup({ cut: "crew", main: '"><script>alert(1)</script>', accent: "#fff" }, 'a"b<c');
     expect(svg).not.toContain("<script>");
-    expect(svg).toContain("&quot;&gt;&lt;script&gt;");
+    expect(svg).toContain("#1f2a44");                     // not escaped but replaced: only a colour can reach the markup
     expect(svg).toContain('id="c-abc"');
   });
 

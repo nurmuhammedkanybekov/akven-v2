@@ -245,6 +245,7 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "a.od.pickup": "Самовывоз",
   "a.od.delivery": "Доставка",
   "a.od.note": "Комментарий",
+  "a.od.gift": "Упаковать как подарок",
   "a.od.paidWith": "Оплачено через {method} ({ref})",
   "a.od.notPaid": "Не оплачен",
   "a.od.discounted": "по договорённости: {price} минус {pct}%",

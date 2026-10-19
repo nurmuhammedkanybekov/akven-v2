@@ -245,6 +245,7 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
   "a.od.pickup": "Өзү алып кетет",
   "a.od.delivery": "Жеткирүү",
   "a.od.note": "Эскертүү",
+  "a.od.gift": "Белек катары таңгактоо",
   "a.od.paidWith": "{method} аркылуу төлөндү ({ref})",
   "a.od.notPaid": "Төлөнгөн эмес",
   "a.od.discounted": "соодалашуу менен: {price} минус {pct}%",

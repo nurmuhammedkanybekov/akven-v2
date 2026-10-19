@@ -31,3 +31,6 @@ export const HeartIcon = () => <Icon><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0
 export const ClockIcon = () => <Icon><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></Icon>;
 export const CopyIcon = () => <Icon><rect x="8" y="8" width="11" height="12" rx="1.5" /><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15" /></Icon>;
 export const PinIcon = () => <Icon><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" /><circle cx="12" cy="10" r="2.4" /></Icon>;
+export const GiftIcon = () => <Icon><rect x="4" y="9" width="16" height="11" rx="1" /><path d="M3 9h18v-2.5H3zM12 6.5V20" /><path d="M12 6.5C10.5 3.5 7 3.5 7.5 5.5c.3 1 2.5 1 4.5 1ZM12 6.5c1.5-3 5-3 4.5-1-.3 1-2.5 1-4.5 1Z" /></Icon>;
+export const ShareIcon = () => <Icon><circle cx="6" cy="12" r="2.5" /><circle cx="18" cy="6" r="2.5" /><circle cx="18" cy="18" r="2.5" /><path d="m8.2 10.9 7.6-3.8M8.2 13.1l7.6 3.8" /></Icon>;
+export const SparkIcon = () => <Icon><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6" /></Icon>;

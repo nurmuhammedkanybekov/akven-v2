@@ -39,6 +39,9 @@ const AdminCustomers = lazy(() => import("./admin/AdminCustomers").then((m) => (
 const ProductEditor = lazy(() => import("./admin/ProductEditor").then((m) => ({ default: m.ProductEditor })));
 const CheckoutPage = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.CheckoutPage })));
 const OrderDetailPage = lazy(() => import("./pages/OrderDetail").then((m) => ({ default: m.OrderDetailPage })));
+const AccountPage = lazy(() => import("./pages/Account").then((m) => ({ default: m.AccountPage })));
+const GiftPage = lazy(() => import("./pages/Gift").then((m) => ({ default: m.GiftPage })));
+const FinderPage = lazy(() => import("./pages/Finder").then((m) => ({ default: m.FinderPage })));
 const OrdersPage = lazy(() => import("./pages/Orders").then((m) => ({ default: m.OrdersPage })));
 const StyleGuide = lazy(() => import("./pages/StyleGuide").then((m) => ({ default: m.StyleGuide })));
 
@@ -68,6 +71,9 @@ export default function App() {
               <Route path="register" element={<RegisterPage />} />
               <Route path="cart" element={<CartPage />} />
               <Route path="saved" element={<SavedPage />} />
+              <Route path="gift" element={<GiftPage />} />
+              <Route path="finder" element={<FinderPage />} />
+              <Route path="account" element={<RequireAuth><AccountPage /></RequireAuth>} />
               <Route path="checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
               <Route path="orders" element={<RequireAuth><OrdersPage /></RequireAuth>} />
               <Route path="orders/:id" element={<RequireAuth><OrderDetailPage /></RequireAuth>} />

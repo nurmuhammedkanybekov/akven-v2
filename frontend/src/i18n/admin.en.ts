@@ -255,6 +255,7 @@ export const adminEn = {
   "a.od.pickup": "Pick up",
   "a.od.delivery": "Delivery",
   "a.od.note": "Note",
+  "a.od.gift": "Pack as a gift",
   "a.od.paidWith": "Paid with {method} ({ref})",
   "a.od.notPaid": "Not paid",
   "a.od.discounted": "negotiated: {price} less {pct}%",

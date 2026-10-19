@@ -130,10 +130,14 @@ public class OrderService {
         FulfillmentInputs f = new FulfillmentInputs(request);
         Order order = new Order(customer, idempotencyKey);
         order.setFulfillment(f.method, f.name, f.phone, f.address, f.note, f.country);
+        if (request.gift() != null) {
+            OrderDtos.GiftInput g = request.gift();
+            order.wrapAsGift(g.box(), g.ribbon(), cardText(g.to()), cardText(g.from()), cardText(g.message()), g.hidePrices());
+        }
         if (f.method == FulfillmentMethod.PICKUP) {
             shopInfo.defaultPickupPoint().ifPresent(order::collectAt);
         }
-        Map<String, String> cover = coverImages(locked);
+        Map<String, String> pictures = CartService.pictures(locked, images);
         for (Variant v : locked) {
             int qty = quantities.get(v.getSku());
             String name = v.getProduct().getName();
@@ -148,7 +152,7 @@ public class OrderService {
             }
             PricingService.PricedLine priced = pricing.price(v, offers.get(v.getSku()), customer, qty, collection.tierDiscountPct());
             OrderItem line = new OrderItem(order, v, qty, priced.listPrice(), priced.discountPct(), priced.unitPrice(), priced.sessionId(),
-                    name, v.getProduct().getSlug(), CartService.label(v), cover.get(v.getProduct().getId().toString()));
+                    name, v.getProduct().getSlug(), CartService.label(v), pictures.get(v.getSku()));
             line.recordReason(priced.tierDiscountPct(), priced.source(), priced.capped());
             order.addItem(line);
             v.reserve(qty);
@@ -314,13 +318,6 @@ public class OrderService {
         return OrderMapper.toView(o, asStaff);
     }
 
-    private Map<String, String> coverImages(List<Variant> vs) {
-        Set<UUID> ids = vs.stream().map(v -> v.getProduct().getId()).collect(Collectors.toSet());
-        Map<String, String> cover = new LinkedHashMap<>();
-        images.findByProductIdInOrderByPositionAsc(ids).forEach(i -> cover.putIfAbsent(i.getProductId().toString(), i.getUrl()));
-        return cover;
-    }
-
     private User requireUser(String email) {
         return users.findByEmail(email).orElseThrow(() -> new NotFoundException("Account not found."));
     }
@@ -332,6 +329,16 @@ public class OrderService {
         m.put("total", o.getTotal());
         m.put("items", o.getItems().stream().map(i -> i.getSku() + " x" + i.getQuantity() + " @ " + i.getUnitPrice()).toList());
         return m;
+    }
+
+    /**
+     * Words for the gift card: trimmed, with control characters (other than line breaks) removed and never more than one
+     * empty line in a row, since the family copies them onto a small card by hand. Empty means none.
+     */
+    static String cardText(String s) {
+        if (s == null) return null;
+        String clean = s.replace("\r\n", "\n").replaceAll("[\\p{Cc}&&[^\n]]", "").replaceAll("\n{3,}", "\n\n").strip();
+        return clean.isEmpty() ? null : clean;
     }
 
     /** Trims and normalises the free-text fulfilment fields once. */

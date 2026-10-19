@@ -140,6 +140,41 @@ class OrderControllerTest extends IntegrationTest {
     }
 
     @Test
+    void anOrderCanGoOutAsAGiftWithTheCardWordsKeptAsText() throws Exception {
+        Variant v = data.variant(5);
+        String me = tokenForEmail(email(), Role.CUSTOMER);
+        Map<String, Object> gift = new LinkedHashMap<>();
+        gift.put("box", "NAVY");
+        gift.put("ribbon", "GOLD");
+        gift.put("to", "  Aigerim ");
+        gift.put("from", "");
+        gift.put("message", "Happy birthday!\u0007\n\n\n\n<b>From all of us</b>");
+        gift.put("hidePrices", true);
+        Map<String, Object> payload = new LinkedHashMap<>(body(v.getSku(), 1));
+        payload.put("gift", gift);
+
+        JsonNode order = json(checkout(me, key(), payload).andExpect(status().isCreated()));
+        JsonNode g = order.get("gift");
+        assertThat(g.get("box").asText()).isEqualTo("NAVY");
+        assertThat(g.get("ribbon").asText()).isEqualTo("GOLD");
+        assertThat(g.get("to").asText()).isEqualTo("Aigerim");
+        assertThat(g.get("from").isNull()).isTrue();
+        assertThat(g.get("message").asText()).isEqualTo("Happy birthday!\n\n<b>From all of us</b>");   // kept as typed; shown as text
+        assertThat(g.get("hidePrices").asBoolean()).isTrue();
+        getJson("/api/admin/orders/" + order.get("id").asText(), tokenFor(Role.STAFF))
+                .andExpect(jsonPath("$.gift.to").value("Aigerim"));
+
+        assertThat(paid(me, v, 1).get("gift").isNull()).isTrue();                     // not a gift: no box
+
+        Map<String, Object> noRibbon = new LinkedHashMap<>(body(v.getSku(), 1));
+        noRibbon.put("gift", Map.of("box", "RED"));
+        checkout(me, key(), noRibbon).andExpect(status().isBadRequest());
+        Map<String, Object> tooLong = new LinkedHashMap<>(body(v.getSku(), 1));
+        tooLong.put("gift", Map.of("box", "RED", "ribbon", "WHITE", "message", "x".repeat(301)));
+        checkout(me, key(), tooLong).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void theClientCannotChooseAPrice() throws Exception {
         Variant v = data.variant(5);
         Map<String, Object> sneaky = new LinkedHashMap<>(line(v.getSku(), 1, null));

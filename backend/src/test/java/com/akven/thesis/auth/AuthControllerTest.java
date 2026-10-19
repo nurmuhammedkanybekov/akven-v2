@@ -73,6 +73,13 @@ class AuthControllerTest {
     }
 
     @Test
+    void aPasswordLongerThanBcryptReadsIsRefusedNotCut() throws Exception {
+        String body = objectMapper.writeValueAsString(new AuthController.RegisterRequest("long@example.com", "p".repeat(73)));
+        mockMvc.perform(post("/api/auth/register").contentType("application/json").content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void registeringTheSameEmailTwiceConflicts() throws Exception {
         String body = objectMapper.writeValueAsString(
                 new AuthController.RegisterRequest("dup@example.com", "correct-horse-battery"));

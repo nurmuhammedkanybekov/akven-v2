@@ -15,6 +15,8 @@ import type { MessageKey } from "../i18n/en";
 import { useMoney } from "../shop/useMoney";
 import { newId } from "../lib/ids";
 import { newWalletToken } from "../lib/wallet";
+import { GiftSummary } from "../components/GiftSummary";
+import { giftForCheckout, setGift, useGift } from "../shop/useGift";
 
 /**
  * One page: who to contact, how you get it, what it costs (from the server, never from the browser), and two wallet
@@ -26,6 +28,7 @@ export function CheckoutPage() {
   const { session } = useAuth();
   const navigate = useNavigate();
   const { quote, loading, offline } = useQuote(cart.lines, session?.email ?? null);
+  const gift = useGift();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -48,9 +51,9 @@ export function CheckoutPage() {
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = "Tell us who to ask for.";
-    if (!/^[0-9+()\-\s]{6,40}$/.test(phone.trim())) errs.phone = "Enter a phone number we can reach you on.";
-    if (method === "DELIVERY" && !address.trim()) errs.address = "Enter the delivery address, or choose pickup.";
+    if (!name.trim()) errs.name = t("co.errName");
+    if (!/^[0-9+()\-\s]{6,40}$/.test(phone.trim())) errs.phone = t("co.errPhone");
+    if (method === "DELIVERY" && !address.trim()) errs.address = t("co.errAddress");
     setFieldErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -68,40 +71,42 @@ export function CheckoutPage() {
         fulfillment: { method, contactName: name.trim(), contactPhone: phone.trim(), address: method === "DELIVERY" ? address.trim() : null, note: note.trim() || null,
           country: method === "DELIVERY" ? country : null },
         payment: { method: payment, token: newWalletToken(payment, declined) },
+        gift: giftForCheckout(gift),
       }, attemptKey.current);
       setPlaced(true);
       cart.clear();
+      setGift(null);
       navigate(`/orders/${order.id}`, { replace: true, state: { justPaid: true } });
     } catch (e) {
       setSheet(null);
       const api = e instanceof ApiError ? e : null;
       // Only a lost connection may reuse the key: the request might have gone through. Every answer from the server is final for its key.
       if (!api || api.status !== 0) attemptKey.current = newId();
-      setError(api ? api.message : "Something went wrong. Please try again.");
+      setError(api ? api.message : t("co.errGeneric"));
       if (api?.fieldErrors) setFieldErrors(Object.fromEntries(Object.entries(api.fieldErrors).map(([k, v]) => [k.split(".").pop()!, v])));
     } finally { setBusy(false); }
   }
 
   return (
     <div className="av-container av-page">
-      <header className="av-page__head"><span className="av-eyebrow">Checkout</span><h1>Almost there</h1></header>
-      {offline && <Alert tone="danger">You are offline. Reconnect to place your order.</Alert>}
-      {error && <Alert tone="danger">{error} {error.match(/left|sold out|no longer/i) && <Link to="/cart">Review your bag</Link>}</Alert>}
-      {quote && !quote.canCheckout && <Alert tone="danger">Something in your bag changed. <Link to="/cart">Review your bag</Link> before paying.</Alert>}
+      <header className="av-page__head"><span className="av-eyebrow">{t("co.eyebrow")}</span><h1>{t("co.title")}</h1></header>
+      {offline && <Alert tone="danger">{t("co.offline")}</Alert>}
+      {error && <Alert tone="danger">{error} {error.match(/left|sold out|no longer/i) && <Link to="/cart">{t("co.review")}</Link>}</Alert>}
+      {quote && !quote.canCheckout && <Alert tone="danger">{t("co.changed")} <Link to="/cart">{t("co.review")}</Link></Alert>}
 
       <div className="av-cart">
-        <form className="av-card-form" noValidate onSubmit={(e) => choose("APPLE_PAY", e)} aria-label="Contact and delivery">
-          <h2 className="av-formtitle">Contact</h2>
+        <form className="av-card-form" noValidate onSubmit={(e) => choose("APPLE_PAY", e)} aria-label={t("co.formLabel")}>
+          <h2 className="av-formtitle">{t("co.contact")}</h2>
           <div className="av-formgrid">
-            <Input label="Name" autoComplete="name" value={name} error={fieldErrors.name ?? fieldErrors.contactName} onChange={(e) => setName(e.target.value)} />
-            <Input label="Phone" type="tel" autoComplete="tel" value={phone} error={fieldErrors.phone ?? fieldErrors.contactPhone} hint="Only used about this order." onChange={(e) => setPhone(e.target.value)} />
+            <Input label={t("co.name")} autoComplete="name" value={name} error={fieldErrors.name ?? fieldErrors.contactName} onChange={(e) => setName(e.target.value)} />
+            <Input label={t("co.phone")} type="tel" autoComplete="tel" value={phone} error={fieldErrors.phone ?? fieldErrors.contactPhone} hint={t("co.phoneHint")} onChange={(e) => setPhone(e.target.value)} />
           </div>
 
           <fieldset className="av-option">
-            <legend className="av-label">How would you like to receive it?</legend>
-            <div className="av-row" role="radiogroup" aria-label="Fulfilment">
-              <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "PICKUP"} onChange={() => setMethod("PICKUP")} /><span><strong>Pick up</strong><br /><span className="av-small">Collect from our shop in Bishkek</span></span></label>
-              <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "DELIVERY"} onChange={() => setMethod("DELIVERY")} /><span><strong>Delivery</strong><br /><span className="av-small">We bring it to you</span></span></label>
+            <legend className="av-label">{t("co.how")}</legend>
+            <div className="av-row" role="radiogroup" aria-label={t("co.how")}>
+              <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "PICKUP"} onChange={() => setMethod("PICKUP")} /><span><strong>{t("co.pickup")}</strong><br /><span className="av-small">{t("co.pickupS")}</span></span></label>
+              <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "DELIVERY"} onChange={() => setMethod("DELIVERY")} /><span><strong>{t("co.delivery")}</strong><br /><span className="av-small">{t("co.deliveryS")}</span></span></label>
             </div>
           </fieldset>
           {method === "DELIVERY" && (
@@ -112,30 +117,31 @@ export function CheckoutPage() {
               </select>
             </label>
           )}
-          {method === "DELIVERY" && <Textarea label="Delivery address" rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
-          <Textarea label="Note (optional)" rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
+          {method === "DELIVERY" && <Textarea label={t("co.address")} rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
+          <Textarea label={t("co.note")} rows={2} maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} />
 
-          <h2 className="av-formtitle">Payment</h2>
-          <p className="av-small">Pay with your phone's wallet. We never see or store card details.</p>
+          <h2 className="av-formtitle">{t("co.payment")}</h2>
+          <p className="av-small">{t("co.paymentS")}</p>
           <div className="av-row">
-            <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy}>Pay with Apple Pay</Button>
-            <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy}>Pay with Google Pay</Button>
+            <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy}>{t("co.apple")}</Button>
+            <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy}>{t("co.google")}</Button>
           </div>
         </form>
 
-        <aside className="av-summary" aria-label="Order summary">
-          <h2>Your order</h2>
+        <aside className="av-summary" aria-label={t("co.summary")}>
+          <h2>{t("co.summary")}</h2>
           {loading && !quote ? <Skeleton height={80} /> : (
             <ul className="av-minilines">
               {(quote?.lines ?? []).map((l) => (
                 <li key={l.sku}>
-                  <span>{l.quantity} × {l.productName}<br /><span className="av-small av-muted">{l.variantLabel}{l.discountPct ? ` · ${l.discountPct}% off` : ""}</span></span>
+                  <span>{l.quantity} × {l.productName}<br /><span className="av-small av-muted">{l.variantLabel}{l.discountPct ? ` · ${t("co.off", { pct: l.discountPct })}` : ""}</span></span>
                   <span className="av-price">{l.lineTotal != null ? money(l.lineTotal) : "–"}</span>
                 </li>
               ))}
             </ul>
           )}
-          <dl className="av-totals"><div className="av-totals__grand"><dt>Total</dt><dd className="av-price av-price--lg">{money(total)}</dd></div></dl>
+          {gift && <GiftSummary gift={gift} edit />}
+          <dl className="av-totals"><div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(total)}</dd></div></dl>
           {shown === "KGS" && <p className="av-small av-muted">{t("price.chargedUsd", { usd: usd(total) })}</p>}
         </aside>
       </div>

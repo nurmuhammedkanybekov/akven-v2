@@ -17,6 +17,8 @@ import type { MessageKey } from "../i18n/en";
 import { formatDateTime } from "../lib/format";
 import { useMoney } from "../shop/useMoney";
 import { NotFoundPage } from "./NotFound";
+import { Confetti } from "../components/Confetti";
+import { GiftSummary } from "../components/GiftSummary";
 
 export function OrderDetailPage() {
   const { money } = useMoney();
@@ -30,28 +32,30 @@ export function OrderDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   if (order.loading && !order.data) return <div className="av-container av-page"><Skeleton height={320} /></div>;
-  if (order.error instanceof ApiError && order.error.status === 404) return <NotFoundPage what="That order" />;
-  if (order.error || !order.data) return <div className="av-container av-page"><Alert tone="danger">{order.error?.message ?? "Could not load the order."}</Alert></div>;
+  if (order.error instanceof ApiError && order.error.status === 404) return <NotFoundPage kind="order" />;
+  if (order.error || !order.data) return <div className="av-container av-page"><Alert tone="danger">{order.error?.message ?? t("od.loadError")}</Alert></div>;
   const o = order.data;
 
   async function cancel() {
     setBusy(true); setError(null);
-    try { await cancelMyOrder(o.id); toast(o.status === "PAID" ? "Order cancelled. Your payment will be returned." : "Order cancelled."); order.reload(); }
-    catch (e) { setError(e instanceof ApiError ? e.message : "Could not cancel the order."); }
+    try { await cancelMyOrder(o.id); toast(o.status === "PAID" ? t("od.cancelledPaid") : t("od.cancelled")); order.reload(); }
+    catch (e) { setError(e instanceof ApiError ? e.message : t("od.cancelError")); }
     finally { setBusy(false); setConfirm(false); }
   }
 
   return (
     <div className="av-container av-page">
-      <nav className="av-crumbs" aria-label="Breadcrumb"><Link to="/orders">Your orders</Link><span aria-hidden="true">/</span><span>{o.reference}</span></nav>
+      {justPaid && o.status === "PAID" && <Confetti />}
+      <nav className="av-crumbs" aria-label={t("pdp.crumbs")}><Link to="/orders">{t("od.yours")}</Link><span aria-hidden="true">/</span><span>{o.reference}</span></nav>
       {justPaid && o.status === "PAID" && (
-        <Alert tone="success">Thank you! Your order {o.reference} is paid. We will contact you on {o.fulfillment.contactPhone} about {o.fulfillment.method === "PICKUP" ? "collecting it" : "delivery"}.</Alert>
+        <Alert tone="success">{t(o.fulfillment.method === "PICKUP" ? "od.thanksPickup" : "od.thanksDelivery", { ref: o.reference, phone: o.fulfillment.contactPhone })}</Alert>
       )}
       {error && <Alert tone="danger">{error}</Alert>}
       <header className="av-admin__head">
-        <div><span className="av-eyebrow">Ordered {formatDateTime(o.createdAt)}</span><h1>Order {o.reference}</h1></div>
+        <div><span className="av-eyebrow">{t("od.ordered", { when: formatDateTime(o.createdAt) })}</span><h1>{t("od.title", { ref: o.reference })}</h1></div>
         <OrderStatusBadge status={o.status} />
       </header>
+      <Timeline order={o} />
 
       {o.pickup?.code && o.status === "PAID" && <PickupCode code={o.pickup.code} point={o.pickup.point} />}
 
@@ -70,26 +74,56 @@ export function OrderDetailPage() {
           ))}
         </ul>
         <aside className="av-summary">
-          <h2>Details</h2>
+          <h2>{t("od.details")}</h2>
           <dl className="av-specs">
-            <div><dt className="av-eyebrow">Total</dt><dd className="av-price av-price--lg">{money(o.total)}</dd></div>
-            <div><dt className="av-eyebrow">{o.fulfillment.method === "PICKUP" ? "Pick up" : "Delivery"}</dt><dd>{o.fulfillment.contactName}, {o.fulfillment.contactPhone}{o.fulfillment.address ? <><br />{o.fulfillment.address}</> : null}</dd></div>
+            <div><dt className="av-eyebrow">{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(o.total)}</dd></div>
+            <div><dt className="av-eyebrow">{o.fulfillment.method === "PICKUP" ? t("co.pickup") : t("co.delivery")}</dt><dd>{o.fulfillment.contactName}, {o.fulfillment.contactPhone}{o.fulfillment.address ? <><br />{o.fulfillment.address}</> : null}</dd></div>
             {o.fulfillment.country && <div><dt className="av-eyebrow">{t("order.country")}</dt><dd>{t(`country.${o.fulfillment.country}` as MessageKey)}</dd></div>}
-            {o.fulfillment.note && <div><dt className="av-eyebrow">Note</dt><dd>{o.fulfillment.note}</dd></div>}
-            {o.payment && <div><dt className="av-eyebrow">Paid with</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}
-            {o.fulfilledAt && <div><dt className="av-eyebrow">Completed</dt><dd>{formatDateTime(o.fulfilledAt)}</dd></div>}
-            {o.cancelledAt && <div><dt className="av-eyebrow">Cancelled</dt><dd>{formatDateTime(o.cancelledAt)}</dd></div>}
+            {o.fulfillment.note && <div><dt className="av-eyebrow">{t("od.note")}</dt><dd>{o.fulfillment.note}</dd></div>}
+            {o.payment && <div><dt className="av-eyebrow">{t("od.paidWith")}</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}
+            {o.fulfilledAt && <div><dt className="av-eyebrow">{t("od.completed")}</dt><dd>{formatDateTime(o.fulfilledAt)}</dd></div>}
+            {o.cancelledAt && <div><dt className="av-eyebrow">{t("od.cancelledAt")}</dt><dd>{formatDateTime(o.cancelledAt)}</dd></div>}
           </dl>
+          {o.gift && <GiftSummary gift={o.gift} />}
           <OrderAgain order={o} />
-          {(o.status === "PAID" || o.status === "PENDING") && <Button variant="secondary" onClick={() => setConfirm(true)}>Cancel this order</Button>}
+          {(o.status === "PAID" || o.status === "PENDING") && <Button variant="secondary" onClick={() => setConfirm(true)}>{t("od.cancel")}</Button>}
         </aside>
       </div>
 
-      <Dialog open={confirm} title="Cancel this order?" onClose={() => setConfirm(false)}
-              actions={<><Button variant="ghost" onClick={() => setConfirm(false)}>Keep it</Button><Button loading={busy} onClick={cancel}>Cancel the order</Button></>}>
-        <p>{o.status === "PAID" ? "Your payment will be returned and the socks go back on the shelf." : "The socks go back on the shelf."} You can place a new order any time.</p>
+      <Dialog open={confirm} title={t("od.cancelQ")} onClose={() => setConfirm(false)}
+              actions={<><Button variant="ghost" onClick={() => setConfirm(false)}>{t("od.keep")}</Button><Button loading={busy} onClick={cancel}>{t("od.cancelIt")}</Button></>}>
+        <p>{o.status === "PAID" ? t("od.cancelPaidS") : t("od.cancelS")}</p>
       </Dialog>
     </div>
+  );
+}
+
+/**
+ * Where the order is now, as four steps: placed, paid, ready (at the stall, or on its way), and handed over. The line
+ * between the steps fills up to the current one; a cancelled order shows where it stopped.
+ */
+function Timeline({ order: o }: { order: OrderView }) {
+  const { t } = useT();
+  const pickup = o.fulfillment.method === "PICKUP";
+  const steps: Array<{ key: MessageKey; at: string | null; done: boolean }> = o.status === "CANCELLED"
+    ? [{ key: "od.stepPlaced", at: o.createdAt, done: true }, ...(o.paidAt ? [{ key: "od.stepPaid" as MessageKey, at: o.paidAt, done: true }] : []),
+       { key: "od.stepCancelled", at: o.cancelledAt, done: true }]
+    : [{ key: "od.stepPlaced", at: o.createdAt, done: true },
+       { key: "od.stepPaid", at: o.paidAt, done: !!o.paidAt },
+       { key: pickup ? "od.stepReady" : "od.stepOnWay", at: null, done: !!o.paidAt },
+       { key: pickup ? "od.stepCollected" : "od.stepDelivered", at: o.fulfilledAt, done: !!o.fulfilledAt }];
+  const reached = steps.filter((s) => s.done).length;
+  return (
+    <ol className={`av-timeline${o.status === "CANCELLED" ? " is-cancelled" : ""}`} aria-label={t("od.progress")}
+        style={{ "--steps": steps.length, "--reached": reached } as React.CSSProperties}>
+      {steps.map((s, i) => (
+        <li key={s.key} className={s.done ? "is-done" : undefined} aria-current={i === reached - 1 ? "step" : undefined} style={{ "--i": i } as React.CSSProperties}>
+          <span className="av-timeline__dot" aria-hidden="true" />
+          <strong>{t(s.key)}</strong>
+          {s.at && <span className="av-small av-muted">{formatDateTime(s.at)}</span>}
+        </li>
+      ))}
+    </ol>
   );
 }
 

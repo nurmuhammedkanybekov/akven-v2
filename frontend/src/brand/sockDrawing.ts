@@ -309,11 +309,19 @@ function pattern(spec: SockSpec, top: number, sid: string): string {
  * The sock's SVG markup (no <svg> wrapper). `id` must be unique on the page: it names the clip path and the
  * texture patterns.
  */
-export function sockMarkup(spec: SockSpec, id: string): string {
+/** A colour as "#rgb" ... "#rrggbbaa", and nothing else: the drawing is markup, so no other text may reach it. */
+const HEX = /^#[0-9a-fA-F]{3,8}$/;
+const colour = (c: string | undefined, fallback: string) => (c && HEX.test(c) ? c : fallback);
+
+export function sockMarkup(raw: SockSpec, id: string): string {
+  // Colours can come from data (a cart line's colour), so they are checked before they are written into markup.
+  const main = colour(raw.main, "#1f2a44");
+  const spec: SockSpec = { ...raw, cut: TOP[raw.cut] === undefined ? "crew" : raw.cut, main, accent: colour(raw.accent, main),
+    second: colour(raw.second, "#f4efe4") };
   const top = TOP[spec.cut];
   const d = sockOutline(spec.cut);
-  const { main, accent } = spec;
-  const second = spec.second ?? "#f4efe4";
+  const { accent } = spec;
+  const second = spec.second!;
   const heel = spec.heel !== false;
   const sid = id.replace(/[^a-zA-Z0-9_-]/g, "");
   const behind: string[] = [];

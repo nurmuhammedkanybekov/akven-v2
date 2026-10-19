@@ -6,6 +6,6 @@ import { useAuth } from "../auth/AuthContext";
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { session } = useAuth();
   const location = useLocation();
-  if (!session) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
+  if (!session) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname + location.search)}`} replace />;
   return <>{children}</>;
 }
