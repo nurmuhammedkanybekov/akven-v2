@@ -3,6 +3,8 @@ import { Logo } from "../../brand/Logo";
 import { SOCK_COLOURS as C, SockArt, type SockSpec } from "../../brand/SockArt";
 import { Button } from "../../components/Button";
 import { useT } from "../../i18n/I18n";
+import { Link } from "react-router-dom";
+import { upcomingHolidays } from "./GiftCalendar";
 
 /** The pairs on the table: the everyday colours people buy by the dozen, lying where they were put down. */
 const LOOSE: Array<{ spec: SockSpec; x: number; y: number; r: number; w: number; z: number }> = [
@@ -17,6 +19,20 @@ const FOLDED: SockSpec[] = [
   { cut: "crew", main: C.navy, accent: C.gold, pattern: "argyle", second: C.cream },
   { cut: "crew", main: C.white, accent: C.white, pattern: "rib" },
 ];
+
+/** The next gift holiday, when it is within six weeks: a small live chip above the headline, linking to the gift sets. */
+function Season() {
+  const { t } = useT();
+  const next = upcomingHolidays()[0];
+  if (!next || next.days > 42) return null;
+  return (
+    <Link to="/gifts" className="av-season">
+      <span className="av-season__dot" aria-hidden="true" />
+      {next.days === 0 ? t("season.today", { name: t(next.key) }) : t("season.in", { name: t(next.key), n: next.days })}
+      <span aria-hidden="true">→</span>
+    </Link>
+  );
+}
 
 /**
  * The first screen: what AK&VEN sells, shown. The words on the left (who it is, what it is, two ways in, three
@@ -38,6 +54,7 @@ export function HeroEditorial() {
     <section className="av-hero6" aria-labelledby="hero-title">
       <div className="av-container av-hero6__grid">
         <div className="av-hero6__copy">
+          <Season />
           <p className="av-hero6__eyebrow">{t("hero6.eyebrow")}</p>
           <h1 id="hero-title" className="av-hero6__title">{t("hero6.title1")}<br /><span>{t("hero6.title2")}</span></h1>
           <p className="av-hero6__lead">{t("hero6.lead")}</p>

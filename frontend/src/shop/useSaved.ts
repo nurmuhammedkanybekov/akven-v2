@@ -1,4 +1,6 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { getSavedRemote, mergeSaved, saveRemote, unsaveRemote } from "../api/endpoints";
+import type { ProductSummary } from "../api/types";
 
 /**
  * Saved socks (the heart on a card): kept in this browser only, like the bag before checkout. Each entry keeps what
@@ -21,7 +23,12 @@ function read(): SavedItem[] {
   return cache;
 }
 
-function write(items: SavedItem[]) {
+function write(items: SavedItem[], send = true) {
+  if (send && remote) {
+    const before = new Set((cache ?? []).map((i) => i.slug)), after = new Set(items.map((i) => i.slug));
+    items.filter((i) => !before.has(i.slug)).forEach((i) => void saveRemote(i.slug).catch(() => undefined));
+    [...before].filter((s) => !after.has(s)).forEach((s) => void unsaveRemote(s).catch(() => undefined));
+  }
   cache = items;
   try { localStorage.setItem(KEY, JSON.stringify(items)); } catch { /* storage blocked: kept for this visit */ }
   listeners.forEach((l) => l());
@@ -32,6 +39,27 @@ function subscribe(l: () => void) {
   const onStorage = (e: StorageEvent) => { if (e.key === KEY) { cache = null; l(); } };
   window.addEventListener("storage", onStorage);
   return () => { listeners.delete(l); window.removeEventListener("storage", onStorage); };
+}
+
+/** While a customer is signed in, every change is also sent to the account (and a failure there keeps the local list). */
+let remote = false;
+const toItem = (p: ProductSummary): SavedItem => ({ slug: p.slug, name: p.name, image: p.image?.url ?? null, price: p.minPrice });
+
+/**
+ * Keeps the heart in step with the account: when a customer signs in, the browser's list is merged into the account's
+ * once, and the account's list (from any device) becomes the one shown. Signing out keeps the browser's copy.
+ */
+export function useSavedSync(email: string | null) {
+  useEffect(() => {
+    remote = !!email;
+    if (!email) return;
+    let stop = false;
+    const local = read().map((i) => i.slug);
+    (local.length ? mergeSaved(local) : getSavedRemote())
+      .then((list) => { if (!stop) write(list.map(toItem), false); })
+      .catch(() => { /* offline or the server is busy: the browser's list stays */ });
+    return () => { stop = true; };
+  }, [email]);
 }
 
 export function useSaved() {

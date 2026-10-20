@@ -17,6 +17,11 @@ public class AdminSummaryController {
         this.service = service;
     }
 
+    @GetMapping("/daily")
+    public java.util.List<ShopSummaryService.DayPoint> daily(@RequestParam(defaultValue = "30") int days) {
+        return service.daily(days);
+    }
+
     @GetMapping
     public ShopSummary summary(@RequestParam(defaultValue = "30") int days) {
         return service.summary(days);

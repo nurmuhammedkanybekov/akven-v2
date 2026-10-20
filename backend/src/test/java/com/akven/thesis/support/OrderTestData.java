@@ -48,6 +48,15 @@ public class OrderTestData {
         return variants.saveAndFlush(v);
     }
 
+    /** A product on a given shelf and in a given collection, with one variant in stock. */
+    public Variant variantIn(Category category, String collection, int stock) {
+        String id = UUID.randomUUID().toString().substring(0, 8);
+        Product p = products.save(new Product("order-it-" + id, "Order Test Sock " + id, category, null, null, collection, "d", "cotton"));
+        Variant v = new Variant(p, "OC-" + id.toUpperCase(), "M", "Navy", 1, new BigDecimal("10.00"), new BigDecimal("4.00"), new BigDecimal("15.00"));
+        v.setStockQty(stock);
+        return variants.saveAndFlush(v);
+    }
+
     public Variant reload(Variant v) {
         return variants.findById(v.getId()).orElseThrow();
     }

@@ -5,6 +5,7 @@ import { LanguageSwitch, useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
 import { BagIcon, CloseIcon, HeartIcon, MenuIcon, PinIcon, SearchIcon, UserIcon } from "./icons";
 import { CurrencySwitch } from "../shop/useMoney";
+import { SearchOverlay } from "./SearchOverlay";
 
 const NAV: Array<{ to: string; key: MessageKey }> = [
   { to: "/shop", key: "nav.shop" },
@@ -45,6 +46,18 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
   const msg = useRotation(MESSAGES.length, 5000);
   const headerRef = useRef<HTMLElement>(null);
   const [drawerTop, setDrawerTop] = useState(108);
+  const [searching, setSearching] = useState(false);
+  // "/" opens the search from anywhere, unless the visitor is typing in a field.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || el.closest("input, textarea, select, [contenteditable]")) return;
+      e.preventDefault();
+      setSearching(true);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
@@ -86,7 +99,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
             <div className="av-header__actions">
               <NavLink className="av-header__biz" to="/wholesale">{t("nav.wholesale")}</NavLink>
               <Link className="av-icon-btn av-hide-md" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>
-              <Link className="av-icon-btn" to="/shop" aria-label={t("nav.search")}><SearchIcon /></Link>
+              <button type="button" className="av-icon-btn" aria-label={t("nav.search")} aria-keyshortcuts="/" onClick={() => setSearching(true)}><SearchIcon /></button>
               <Link className="av-icon-btn av-hide-md" to="/saved" aria-label={t("nav.saved", { n: savedCount })}>
                 <HeartIcon />
                 {savedCount > 0 && <span key={savedCount} className="av-icon-btn__count" aria-hidden="true">{savedCount}</span>}
@@ -101,6 +114,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
           </div>
         </div>
       </header>
+      <SearchOverlay open={searching} onClose={() => setSearching(false)} />
       <nav id="mobile-nav" className={`av-drawer${open ? " is-open" : ""}`} style={{ top: drawerTop }} aria-label={t("nav.main")} aria-hidden={!open} {...({ inert: open ? undefined : "" } as object)}>
         <div className="av-drawer__links">
           {NAV.map((n, i) => (

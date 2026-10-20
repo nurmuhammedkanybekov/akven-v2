@@ -76,3 +76,14 @@ function messageFor(status: number): string {
   if (status === 429) return translateNow("err.429");
   return translateNow("err.other");
 }
+
+/** A file from the API (a CSV export), with the login token; the caller saves it. */
+export async function apiFile(path: string): Promise<Blob> {
+  const headers: Record<string, string> = {};
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  let response: Response;
+  try { response = await fetch(path, { headers }); } catch { throw new ApiError(0, translateNow("err.offline")); }
+  if (response.status === 401 && accessToken) onUnauthorized();
+  if (!response.ok) throw new ApiError(response.status, messageFor(response.status));
+  return response.blob();
+}

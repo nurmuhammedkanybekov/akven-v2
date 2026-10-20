@@ -7,6 +7,9 @@ import { GiftTeaser } from "../shop/home/GiftTeaser";
 import { HeroEditorial } from "../shop/home/HeroEditorial";
 import { TrustStrip } from "../shop/home/TrustStrip";
 import { TwoNames } from "../shop/home/TwoNames";
+import { FamiliesSay } from "../shop/home/FamiliesSay";
+import { ForYou } from "../shop/home/ForYou";
+import { UpClose } from "../shop/home/UpClose";
 import { usePricing } from "../shop/useShopInfo";
 
 /**
@@ -22,11 +25,14 @@ export function HomePage() {
     <>
       <HeroEditorial />
       <TrustStrip />
+      <ForYou />
       <CategoryTiles />
       <Bestsellers />
+      <UpClose />
       <TwoNames />
       <DordoiStory />
       <FamilyPlanner minPairs={min} tiers={tiers} />
+      <FamiliesSay />
       <GiftTeaser />
       <ForBusiness />
     </>

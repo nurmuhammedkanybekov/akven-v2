@@ -52,6 +52,8 @@ export interface VariantView {
 export type StockStatus = "IN_STOCK" | "FEW_LEFT" | "COMING_SOON" | "SOLD_OUT";
 
 export interface ProductDetail {
+  /** Pairs of this sock in paid orders over the last seven days (packs count their pairs). */
+  pairsSoldThisWeek?: number;
   slug: string;
   name: string;
   category: Category;
@@ -266,3 +268,12 @@ export interface FamilyMember extends FamilyMemberInput { id: string }
 export type GiftBoxColour = "KRAFT" | "NAVY" | "RED";
 export type GiftRibbon = "GOLD" | "RED" | "WHITE";
 export interface GiftInput { box: GiftBoxColour; ribbon: GiftRibbon; to: string | null; from: string | null; message: string | null; hidePrices: boolean }
+
+// ---- reviews, sales by day ----
+export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
+export interface ReviewView { id: string; rating: number; author: string | null; body: string; createdAt: string }
+export interface ProductReviews { count: number; average: number | null; counts: number[]; reviews: ReviewView[] }
+export interface MyReview { canReview: boolean; status: ReviewStatus | null; rating: number | null; author: string | null; body: string | null }
+export interface ShowcaseReview extends ReviewView { productSlug: string; productName: string }
+export interface ModerationLine extends ReviewView { status: ReviewStatus; productSlug: string | null; productName: string; customerEmail: string }
+export interface DayPoint { date: string; orders: number; revenue: number; pairs: number }

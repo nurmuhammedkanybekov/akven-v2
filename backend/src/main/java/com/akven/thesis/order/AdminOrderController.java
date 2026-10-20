@@ -15,9 +15,21 @@ import java.util.UUID;
 public class AdminOrderController {
 
     private final OrderService service;
+    private final OrderExport export;
 
-    public AdminOrderController(OrderService service) {
+    public AdminOrderController(OrderService service, OrderExport export) {
         this.service = service;
+        this.export = export;
+    }
+
+    /** The orders of the last N days as a spreadsheet file (ADMIN, audited). */
+    @GetMapping(value = "/export", produces = "text/csv")
+    public org.springframework.http.ResponseEntity<String> export(Authentication auth, @RequestParam(defaultValue = "90") int days) {
+        String file = "akven-orders-" + java.time.LocalDate.now(com.akven.thesis.catalog.CatalogService.SHOP_ZONE) + ".csv";
+        return org.springframework.http.ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + file + "\"")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(export.csv(auth.getName(), days));
     }
 
     @GetMapping

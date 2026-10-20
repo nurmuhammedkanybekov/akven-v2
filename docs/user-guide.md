@@ -79,7 +79,14 @@ the whole bag, and the bag says how many more pairs reach the next step. `/visit
    sees it on the order to pack it. The box, ribbon and card are free, and the receipt can be left out of the box.
 7. **Sock finder** (`/finder`). Three taps (who, how high, what for) and the socks on the shelf that match. If nothing
    matches all three, the page lets go of the last answers one by one and says so.
-8. **Saved socks** (the heart) can be shared as a link ("Share my list"); whoever opens it sees those socks and can save
+8. **Search** (the magnifier, or "/" anywhere): results appear while typing; arrow keys and Enter open one, or all
+   results in the catalogue. **The bag drawer** slides in when a sock is added: what went in, how far the bag is from
+   the next collection price, and the same design for someone else in the family.
+9. **Reviews.** After an order is handed over, the customer can review each sock in it on its page (stars, a first
+   name if they like, a few words). The family reads every review before it appears; product pages show the average,
+   how the stars spread and what people wrote, and the home page shows the best ones. Product pages also show **Match
+   the whole family** (the same design on the other shelves) and, when it is true, how many pairs sold this week.
+10. **Saved socks** (the heart) follow a signed-in customer from phone to laptop and can be shared as a link ("Share my list"); whoever opens it sees those socks and can save
    them all.
 
 ## The assistant and why it cannot lose money

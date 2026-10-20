@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { adminAnswerStockRequest, adminEvaluation, adminNegotiationStats, adminStockRequests, adminSummary } from "../api/endpoints";
+import { adminAnswerStockRequest, adminDaily, adminEvaluation, adminNegotiationStats, adminStockRequests, adminSummary, downloadOrdersCsv } from "../api/endpoints";
+import { useAuth } from "../auth/AuthContext";
+import { Button } from "../components/Button";
+import { useToast } from "../components/Toast";
+import { useMoney } from "../shop/useMoney";
 import type { EvaluationReport, NegotiationStats, ShopSummary, StockWaiting } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { Badge } from "../components/Badge";
@@ -31,6 +35,7 @@ export function AdminDashboard() {
       {summary.error && <Alert tone="danger">{summary.error.message}</Alert>}
       {summary.loading && !summary.data && <Skeleton height={200} />}
       {summary.data && <ShopNow s={summary.data} />}
+      <SalesChart days={days} />
       <WaitingList />
       <h2 className="av-formtitle av-db__part">{t("a.db.assistantPart")}</h2>
       {stats.error && <Alert tone="danger">{stats.error.message}</Alert>}
@@ -42,6 +47,64 @@ export function AdminDashboard() {
 }
 
 const LOCALES = { en: "en-GB", ru: "ru-RU", ky: "ky-KG" } as const;
+
+/**
+ * Sales per day (revenue in the visitor's currency, with orders and pairs in the tip), and for the owners the orders as
+ * a spreadsheet file. Days without a sale are shown as gaps, so a quiet week looks quiet.
+ */
+function SalesChart({ days }: { days: number }) {
+  const { t } = useT();
+  const { money } = useMoney();
+  const { isAdmin } = useAuth();
+  const toast = useToast();
+  const daily = useAsync(() => adminDaily(days), [days]);
+  const [hover, setHover] = useState<number | null>(null);
+  const [busy, setBusy] = useState(false);
+  const points = daily.data ?? [];
+  const max = Math.max(1, ...points.map((d) => d.revenue));
+  const W = 720, H = 180, pad = 24, gap = 2;
+  const bw = points.length ? (W - pad) / points.length - gap : 0;
+  const y = (n: number) => H - pad - (n / max) * (H - pad * 2);
+  const day = hover != null ? points[hover] : null;
+  async function csv() {
+    setBusy(true);
+    try { await downloadOrdersCsv(days); } catch { toast(t("a.err.generic"), "danger"); } finally { setBusy(false); }
+  }
+  return (
+    <section className="av-card-form" aria-labelledby="sales-h">
+      <div className="av-row av-between">
+        <h2 id="sales-h" className="av-formtitle">{t("a.db.salesPerDay")}</h2>
+        {isAdmin && <Button size="sm" variant="secondary" loading={busy} onClick={() => void csv()}>{t("a.db.csv")}</Button>}
+      </div>
+      {daily.loading && !daily.data ? <Skeleton height={180} /> : (
+        <div className="av-chart">
+          <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t("a.db.salesAria", { n: days })} onMouseLeave={() => setHover(null)}>
+            <line x1={pad} x2={W} y1={H - pad} y2={H - pad} className="av-chart__axis" />
+            {points.map((d, i) => {
+              const x = pad + i * (bw + gap);
+              const h = Math.max(d.revenue > 0 ? 2 : 0, H - pad - y(d.revenue));
+              return (
+                <g key={d.date} onMouseEnter={() => setHover(i)}>
+                  <rect x={x - gap / 2} y={0} width={bw + gap} height={H - pad} fill="transparent" />
+                  {h > 0 && <rect className={`av-chart__bar av-chart__bar--sales${hover === i ? " is-hover" : ""}`} x={x} y={H - pad - h} width={Math.max(1, bw)} height={h} rx={Math.min(3, bw / 2)} />}
+                </g>
+              );
+            })}
+            <text x={pad} y={H - 6} className="av-chart__tick">{points[0]?.date}</text>
+            <text x={W} y={H - 6} className="av-chart__tick" textAnchor="end">{points[points.length - 1]?.date}</text>
+          </svg>
+          {day && (
+            <div className="av-chart__tip" role="status">
+              <strong>{day.date}</strong>
+              <span className="av-num">{money(day.revenue)}</span>
+              <span className="av-num">{t("a.db.salesTip", { orders: day.orders, pairs: day.pairs })}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
 
 function ShopNow({ s }: { s: ShopSummary }) {
   const { t, lang } = useT();

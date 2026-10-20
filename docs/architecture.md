@@ -117,6 +117,11 @@ violation, margin-invariant violation, duplicate email by case, and
   own, and the card's cover is always a picture of the product as a whole. `stock_request` holds one row per customer
   and sold-out option (unique together); the owners close it when they have written to the customer, so the table is
   also a record of demand for what to reorder. `shop_policy` gained the rouble rate and rounding next to som.
+- **Reviews and saved socks (V30).** `product_review` is one row per customer and product (`unique`), with the
+  rating, the body (at least 10 characters, checked by the database too) and a status; a partial index serves the
+  approved reviews of a product, another the queue of waiting ones. Whether a customer may review is not stored: it is
+  read from their handed-over orders each time. `saved_item` keeps the heart with the account, one row per customer and
+  product.
 - **Family profiles and gift boxes (V29).** `family_member` belongs to one customer (`on delete cascade`) and keeps
   its place in the list (`unique (user_id, position)`, 0 to 11), so the API saves the whole list at once and reads it
   back in order; the role, shoe size and pairs are checked by the database as well as by the API. A gift is five
@@ -319,6 +324,15 @@ plan. Summary of what's already reflected in this codebase:
   bag, the gift box and saved socks kept in the browser are validated field
   by field when read back. The bag and the receipt now show the chosen
   colour's picture.
+
+- **The level-up round (V30).** Reviews come only from customers whose order
+  with that sock was handed over, are published only after the owners approve
+  them, never show an email, and are rendered as text. The orders file is for
+  owners only, audited, and defused against CSV injection: a customer who types
+  `=HYPERLINK(...)` as their name gets text in the owners' spreadsheet, not a
+  formula. Saved-sock and merge requests accept only well-formed slugs, at most
+  200. The bag drawer, search and "for you" rows read the same public endpoints
+  the shop already uses; nothing new is public that was private.
 
 ### Known limitations
 

@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2270 3222" width="2270" height="3222" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Entity-relationship diagram of the AKVEN schema after migration V29: 19 tables">
-<title>AKVEN data model after migration V29</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2270 3222" width="2270" height="3222" font-family="'Liberation Sans', Helvetica, Arial, sans-serif" role="img" aria-label="Entity-relationship diagram of the AKVEN schema after migration V30: 21 tables">
+<title>AKVEN data model after migration V30</title>
 <rect width="2270" height="3222" fill="#ffffff"/>
-<text x="22" y="52" font-size="34" font-weight="700" fill="#1b2340">AKVEN data model, all 19 tables after migration V29</text>
+<text x="22" y="52" font-size="34" font-weight="700" fill="#1b2340">AKVEN data model, all 21 tables after migration V30</text>
 <path d="M474,651.0 H508 V230.0 H474" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M488,651.0 L474,643.0 M488,651.0 L474,651.0 M488,651.0 L474,659.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M484,221.0 L484,239.0" stroke="#6b7390" stroke-width="2"/>
@@ -41,17 +41,29 @@
 <path d="M1642,1143.0 H1736 V566.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1656,1143.0 L1642,1135.0 M1656,1143.0 L1642,1143.0 M1656,1143.0 L1642,1151.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1652,557.0 L1652,575.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M474,1761.0 H544 V230.0 H474" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,1735.0 H544 V128 H1427.0 V546" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M488,1735.0 L474,1727.0 M488,1735.0 L474,1735.0 M488,1735.0 L474,1743.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M1418.0,536 L1436.0,536" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,1761.0 H556 V230.0 H474" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M488,1761.0 L474,1753.0 M488,1761.0 L474,1761.0 M488,1761.0 L474,1769.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M484,221.0 L484,239.0" stroke="#6b7390" stroke-width="2"/>
-<path d="M474,1735.0 H556 V128 H1427.0 V1322" fill="none" stroke="#6b7390" stroke-width="2"/>
-<path d="M488,1735.0 L474,1727.0 M488,1735.0 L474,1735.0 M488,1735.0 L474,1743.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,2071.0 H568 V116 H1427.0 V546" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M488,2071.0 L474,2063.0 M488,2071.0 L474,2071.0 M488,2071.0 L474,2079.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M1418.0,536 L1436.0,536" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,2045.0 H580 V230.0 H474" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M488,2045.0 L474,2037.0 M488,2045.0 L474,2045.0 M488,2045.0 L474,2053.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M484,221.0 L484,239.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,2251.0 H592 V230.0 H474" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M488,2251.0 L474,2243.0 M488,2251.0 L474,2251.0 M488,2251.0 L474,2259.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M484,221.0 L484,239.0" stroke="#6b7390" stroke-width="2"/>
+<path d="M474,2225.0 H604 V104 H1427.0 V1322" fill="none" stroke="#6b7390" stroke-width="2"/>
+<path d="M488,2225.0 L474,2217.0 M488,2225.0 L474,2225.0 M488,2225.0 L474,2233.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1418.0,1312 L1436.0,1312" stroke="#6b7390" stroke-width="2"/>
 <path d="M1642,1401.0 H1748 V566.0 H1642" fill="none" stroke="#6b7390" stroke-width="2"/>
 <path d="M1656,1401.0 L1642,1393.0 M1656,1401.0 L1642,1401.0 M1656,1401.0 L1642,1409.0" stroke="#6b7390" stroke-width="2"/>
 <path d="M1652,557.0 L1652,575.0" stroke="#6b7390" stroke-width="2"/>
 <text x="22" y="84" font-size="20" fill="#5f6678">PK primary key · FK foreign key · bold = NOT NULL · lines run from a foreign key (crow's foot, many) to the table it points at (bar, one)</text>
-<rect x="22" y="196" width="474" height="1656" rx="14" fill="#eef1f7" stroke="#9aa6c2" stroke-width="2"/>
+<rect x="22" y="196" width="474" height="2146" rx="14" fill="#eef1f7" stroke="#9aa6c2" stroke-width="2"/>
 <text x="44" y="186" font-size="22" font-weight="700" fill="#1b2340">Identity and system</text>
 <rect x="606" y="196" width="474" height="2956" rx="14" fill="#fbf5e3" stroke="#d9bc6a" stroke-width="2"/>
 <text x="628" y="186" font-size="22" font-weight="700" fill="#1b2340">Orders and pricing</text>
@@ -207,26 +219,75 @@
 <text x="58" y="1613" font-size="18" fill="#a07a1f" font-weight="700"></text>
 <text x="108" y="1613" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
 <text x="460" y="1613" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
-<rect x="44" y="1656" width="430" height="180" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<rect x="44" y="1656" width="430" height="284" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
 <path d="M44,1696 H474" stroke="#1b2340" stroke-width="1.5"/>
 <rect x="44" y="1656" width="430" height="40" rx="8" fill="#1b2340"/>
 <rect x="44" y="1686" width="430" height="10" fill="#1b2340"/>
-<text x="58" y="1683" font-size="21" font-weight="700" fill="#ffffff">stock_request</text>
+<text x="58" y="1683" font-size="21" font-weight="700" fill="#ffffff">product_review</text>
 <text x="58" y="1715" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
 <text x="108" y="1715" font-size="18" font-weight="700" fill="#1b2340">id</text>
 <text x="460" y="1715" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
 <text x="58" y="1741" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
-<text x="108" y="1741" font-size="18" font-weight="700" fill="#1b2340">variant_id</text>
+<text x="108" y="1741" font-size="18" font-weight="700" fill="#1b2340">product_id</text>
 <text x="460" y="1741" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
 <text x="58" y="1767" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
 <text x="108" y="1767" font-size="18" font-weight="700" fill="#1b2340">user_id</text>
 <text x="460" y="1767" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
 <text x="58" y="1793" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="108" y="1793" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
-<text x="460" y="1793" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="108" y="1793" font-size="18" font-weight="700" fill="#1b2340">rating</text>
+<text x="460" y="1793" font-size="17" fill="#5f6678" text-anchor="end">smallint</text>
 <text x="58" y="1819" font-size="18" fill="#a07a1f" font-weight="700"></text>
-<text x="108" y="1819" font-size="18" font-weight="400" fill="#1b2340">notified_at</text>
-<text x="460" y="1819" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="108" y="1819" font-size="18" font-weight="400" fill="#1b2340">author</text>
+<text x="460" y="1819" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
+<text x="58" y="1845" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="1845" font-size="18" font-weight="700" fill="#1b2340">body</text>
+<text x="460" y="1845" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
+<text x="58" y="1871" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="1871" font-size="18" font-weight="700" fill="#1b2340">status</text>
+<text x="460" y="1871" font-size="17" fill="#5f6678" text-anchor="end">varchar</text>
+<text x="58" y="1897" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="1897" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
+<text x="460" y="1897" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="58" y="1923" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="1923" font-size="18" font-weight="400" fill="#1b2340">moderated_at</text>
+<text x="460" y="1923" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<rect x="44" y="1966" width="430" height="154" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<path d="M44,2006 H474" stroke="#1b2340" stroke-width="1.5"/>
+<rect x="44" y="1966" width="430" height="40" rx="8" fill="#1b2340"/>
+<rect x="44" y="1996" width="430" height="10" fill="#1b2340"/>
+<text x="58" y="1993" font-size="21" font-weight="700" fill="#ffffff">saved_item</text>
+<text x="58" y="2025" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
+<text x="108" y="2025" font-size="18" font-weight="700" fill="#1b2340">id</text>
+<text x="460" y="2025" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="2051" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="108" y="2051" font-size="18" font-weight="700" fill="#1b2340">user_id</text>
+<text x="460" y="2051" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="2077" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="108" y="2077" font-size="18" font-weight="700" fill="#1b2340">product_id</text>
+<text x="460" y="2077" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="2103" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="2103" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
+<text x="460" y="2103" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<rect x="44" y="2146" width="430" height="180" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
+<path d="M44,2186 H474" stroke="#1b2340" stroke-width="1.5"/>
+<rect x="44" y="2146" width="430" height="40" rx="8" fill="#1b2340"/>
+<rect x="44" y="2176" width="430" height="10" fill="#1b2340"/>
+<text x="58" y="2173" font-size="21" font-weight="700" fill="#ffffff">stock_request</text>
+<text x="58" y="2205" font-size="18" fill="#a07a1f" font-weight="700">PK</text>
+<text x="108" y="2205" font-size="18" font-weight="700" fill="#1b2340">id</text>
+<text x="460" y="2205" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="2231" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="108" y="2231" font-size="18" font-weight="700" fill="#1b2340">variant_id</text>
+<text x="460" y="2231" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="2257" font-size="18" fill="#a07a1f" font-weight="700">FK</text>
+<text x="108" y="2257" font-size="18" font-weight="700" fill="#1b2340">user_id</text>
+<text x="460" y="2257" font-size="17" fill="#5f6678" text-anchor="end">uuid</text>
+<text x="58" y="2283" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="2283" font-size="18" font-weight="700" fill="#1b2340">created_at</text>
+<text x="460" y="2283" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
+<text x="58" y="2309" font-size="18" fill="#a07a1f" font-weight="700"></text>
+<text x="108" y="2309" font-size="18" font-weight="400" fill="#1b2340">notified_at</text>
+<text x="460" y="2309" font-size="17" fill="#5f6678" text-anchor="end">timestamptz</text>
 <rect x="628" y="210" width="430" height="778" rx="8" fill="#ffffff" stroke="#1b2340" stroke-width="2"/>
 <path d="M628,250 H1058" stroke="#1b2340" stroke-width="1.5"/>
 <rect x="628" y="210" width="430" height="40" rx="8" fill="#1b2340"/>

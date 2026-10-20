@@ -79,13 +79,14 @@ public final class CatalogViews {
     public record ProductDetail(String slug, String name, Category category, TermView section, TermView cut,
                                 String collection, String description, String fabricComposition,
                                 String quality, String care, String origin,
-                                List<ImageView> images, List<VariantView> variants) {
-        static ProductDetail of(Product p, List<Variant> sellableVariants, List<ProductImage> images, int fewLeftThreshold, LocalDate today) {
+                                List<ImageView> images, List<VariantView> variants, int pairsSoldThisWeek) {
+        static ProductDetail of(Product p, List<Variant> sellableVariants, List<ProductImage> images, int fewLeftThreshold, LocalDate today,
+                                int pairsSoldThisWeek) {
             return new ProductDetail(p.getSlug(), p.getName(), p.getCategory(), TermView.of(p.getSection()),
                     TermView.of(p.getCut()), p.getCollection(), p.getDescription(), p.getFabricComposition(),
                     p.getQuality(), p.getCare(), p.getOrigin(),
                     images.stream().map(ImageView::of).toList(),
-                    sellableVariants.stream().map(v -> VariantView.of(v, fewLeftThreshold, today)).toList());
+                    sellableVariants.stream().map(v -> VariantView.of(v, fewLeftThreshold, today)).toList(), pairsSoldThisWeek);
         }
     }
 }
