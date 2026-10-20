@@ -193,6 +193,44 @@ public class CatalogService {
         return ProductDetail.of(product,
                 variantRepository.findByProductIdAndActiveTrueOrderByPackSizeAscSizeAscColorAsc(product.getId()),
                 imageRepository.findByProductIdOrderByPositionAsc(product.getId()),
-                collections.policy().getFewLeftThreshold(), LocalDate.now(SHOP_ZONE));
+                collections.policy().getFewLeftThreshold(), LocalDate.now(SHOP_ZONE), pairsSoldSince(product.getId(), 7));
+    }
+
+    /** Pairs of this sock in paid and handed-over orders over the last days (a pack of 3 is 3 pairs). */
+    int pairsSoldSince(UUID productId, int days) {
+        java.time.Instant since = LocalDate.now(SHOP_ZONE).minusDays(days - 1L).atStartOfDay(SHOP_ZONE).toInstant();
+        Long n = entityManager.createQuery("""
+                select coalesce(sum(i.quantity * coalesce(v.packSize, 1)), 0) from OrderItem i join i.variant v join i.order o
+                where v.product.id = :p and o.paidAt >= :since
+                  and o.status in (com.akven.thesis.order.OrderStatus.PAID, com.akven.thesis.order.OrderStatus.FULFILLED)""", Long.class)
+                .setParameter("p", productId).setParameter("since", since).getSingleResult();
+        return n == null ? 0 : n.intValue();
+    }
+
+    /**
+     * The same design for the rest of the family: active products of the same collection on the other shelves (men,
+     * women, kids; not gift boxes), newest first. Empty when the design has no family.
+     */
+    public List<ProductSummary> matching(String slug, int limit) {
+        Product product = productRepository.findBySlugAndActiveTrue(slug)
+                .orElseThrow(() -> new NotFoundException("Product not found: " + slug));
+        if (product.getCollection() == null || product.getCollection().isBlank() || product.getCategory() == Category.BUNDLES) return List.of();
+        List<Product> found = entityManager.createQuery("""
+                select p from Product p where p.active = true and lower(p.collection) = lower(:c)
+                  and p.category <> :own and p.category <> com.akven.thesis.catalog.Category.BUNDLES
+                order by p.createdAt desc, p.slug""", Product.class)
+                .setParameter("c", product.getCollection()).setParameter("own", product.getCategory())
+                .setMaxResults(Math.max(1, Math.min(limit, 12))).getResultList();
+        return summariesOf(found.stream().map(Product::getId).toList());
+    }
+
+    /** Cards for these products, in this order; inactive or unknown ones are left out. */
+    public List<ProductSummary> summariesOf(List<UUID> ids) {
+        if (ids.isEmpty()) return List.of();
+        Map<UUID, Product> byId = productRepository.findAllById(ids).stream().filter(Product::isActive)
+                .collect(Collectors.toMap(Product::getId, p -> p));
+        List<Product> ordered = ids.stream().map(byId::get).filter(java.util.Objects::nonNull).toList();
+        Map<UUID, ProductSummary> cards = summaries(ordered);
+        return ordered.stream().map(p -> cards.get(p.getId())).toList();
     }
 }

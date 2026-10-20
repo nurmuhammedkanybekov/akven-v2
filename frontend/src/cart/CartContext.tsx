@@ -16,6 +16,8 @@ export interface CartLine {
 interface CartState {
   lines: CartLine[];
   count: number;
+  /** The line last put in the bag by a shopper, and when (the bag drawer opens on it). Null until something is added. */
+  lastAdded: { sku: string; quantity: number; at: number } | null;
   add: (line: Omit<CartLine, "quantity">, quantity: number, maxQuantity?: number) => void;
   setQuantity: (sku: string, quantity: number) => void;
   remove: (sku: string) => void;
@@ -52,6 +54,7 @@ function writeCart(lines: CartLine[]) {
  */
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>(readCart);
+  const [lastAdded, setLastAdded] = useState<CartState["lastAdded"]>(null);
 
   const update = useCallback((fn: (current: CartLine[]) => CartLine[]) => {
     setLines((current) => { const next = fn(current); writeCart(next); return next; });
@@ -65,6 +68,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const add = useCallback<CartState["add"]>((line, quantity, maxQuantity = MAX_PER_LINE) => {
+    setLastAdded({ sku: line.sku, quantity, at: Date.now() });
     update((current) => {
       const cap = Math.min(MAX_PER_LINE, Math.max(1, maxQuantity));
       const existing = current.find((l) => l.sku === line.sku);
@@ -80,8 +84,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clear = useCallback(() => update(() => []), [update]);
 
   const value = useMemo<CartState>(() => ({
-    lines, add, setQuantity, remove, clear, count: lines.reduce((n, l) => n + l.quantity, 0),
-  }), [lines, add, setQuantity, remove, clear]);
+    lines, add, setQuantity, remove, clear, lastAdded, count: lines.reduce((n, l) => n + l.quantity, 0),
+  }), [lines, add, setQuantity, remove, clear, lastAdded]);
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 

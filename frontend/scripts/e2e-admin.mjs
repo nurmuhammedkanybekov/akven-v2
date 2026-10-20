@@ -41,6 +41,14 @@ const CUSTOMER = `customer-${stamp}@akven.test`;
 const step = async (name, fn) => { process.stdout.write(`- ${name} ... `); await fn(); console.log("ok"); };
 const axeSource = fs.readFileSync(path.join(root, "node_modules/axe-core/axe.min.js"), "utf8");
 /** Runs the axe accessibility rules on the page as it is now; serious or critical findings fail the run. */
+/** Adding to the bag slides in the bag drawer (a modal); the journey carries on once it is closed. */
+async function closeBagDrawer() {
+  const drawer = page.locator("dialog.av-bagdrawer[open]");
+  await drawer.getByRole("heading", { name: "Added to your bag" }).waitFor();
+  await page.keyboard.press("Escape");
+  await drawer.waitFor({ state: "hidden" });
+}
+
 const a11y = async (label) => {
   await page.evaluate(axeSource);
   const bad = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ["violations"] })).violations
@@ -213,7 +221,7 @@ try {
     await page.getByRole("button", { name: "L", exact: true }).click();
     await page.getByRole("button", { name: "Increase quantity" }).click();
     await page.getByRole("button", { name: "Add to bag" }).click();
-    await page.getByText("Added to your bag").waitFor();
+    await closeBagDrawer();
     await page.getByRole("link", { name: /Bag, 2 items/ }).waitFor();
   });
   await step("the bag shows today's price and a visitor must sign in to check out; registering brings them back", async () => {
@@ -264,6 +272,7 @@ try {
   });
   await step("the last pair can be bought, then cancelling returns it to the shelf", async () => {
     await page.getByRole("button", { name: "Add to bag" }).click();
+    await closeBagDrawer();
     await page.getByRole("link", { name: /Bag, 1 items/ }).click();
     await page.getByRole("link", { name: "Check out" }).click();
     await page.getByLabel("Name", { exact: true }).fill("Aida Test");
@@ -295,6 +304,7 @@ try {
     await shot("shop-negotiation");
     await a11y("the product page with the chat");
     await page.getByRole("button", { name: /^Add 1 pair at this price/ }).click();
+    await closeBagDrawer();
     await page.getByText(/Added at .* off/).waitFor();
     await page.getByRole("link", { name: /Bag, 1 items/ }).click();
     await page.getByRole("heading", { name: "Bag (1)" }).waitFor();
@@ -443,6 +453,7 @@ try {
     await card.getByRole("button", { name: /^Quick view/ }).click();
     const dialog = page.locator("dialog.av-qv");
     await dialog.getByRole("button", { name: "Add to bag" }).click();
+    await closeBagDrawer();
     await dialog.waitFor({ state: "hidden" });
     await page.getByRole("link", { name: /Bag, \d+ items?/ }).waitFor();
     await page.getByRole("button", { name: "Kyrgyz som" }).click();
@@ -486,6 +497,39 @@ try {
     await page.getByRole("heading", { name: "Your socks", exact: true }).waitFor();
     await page.locator(".av-quiz__result .av-card").first().waitFor();
     await a11y("the sock finder");
+  });
+
+  await step("the customer who received the sock reviews it, the owner publishes it, and search finds the sock as you type", async () => {
+    await page.goto(productUrl);
+    await page.getByRole("button", { name: "Write a review" }).click();
+    await page.getByRole("radio", { name: "5 stars" }).check({ force: true });
+    await page.getByLabel("Name to show (optional)").fill("Aida");
+    await page.getByLabel("Your review").fill("Soft and warm, and they stay up all day.");
+    await page.getByRole("button", { name: "Send the review" }).click();
+    await page.getByText(/Your review will appear once the family has read it/).waitFor();
+    await page.goto(`${BASE}/account`);
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.goto(`${BASE}/login?next=%2Fadmin%2Freviews`);
+    await page.getByLabel("Email").fill("admin@akven.test");
+    await page.getByLabel("Password").fill("changeme-admin");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/admin/reviews`);
+    await page.getByText("Soft and warm, and they stay up all day.").waitFor();
+    await a11y("review moderation");
+    await page.getByRole("button", { name: "Publish", exact: true }).first().click();
+    await page.getByText("The review is in the shop.").waitFor();
+    await page.goto(productUrl);
+    await page.locator(".av-reviews__list").getByText("Soft and warm, and they stay up all day.").waitFor();
+    await page.getByText("1 review", { exact: true }).waitFor();
+    await a11y("the product page with a review");
+    await page.goto(`${BASE}/`);
+    await page.getByRole("button", { name: "Browse and search" }).click();
+    await page.getByRole("combobox", { name: "Search the shop" }).fill("Mid-Long");
+    await page.getByRole("option").first().waitFor();
+    await a11y("the search");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+    await page.waitForURL(/\/products\//);
   });
 
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);

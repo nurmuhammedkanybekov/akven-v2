@@ -17,7 +17,7 @@ about 6.5 pt there.
 | 1 | `01-architecture-overview` | Three layers, one API, one database, plus the two external systems | System architecture of AKVEN |
 | 2 | `02-negotiation-validation-path` | Trust boundary: untrusted model proposal vs. trusted Policy Validator | The Policy Validator as the trust boundary for every discount |
 | 3 | `03-sequence-negotiation-turn` | UML sequence diagram of one negotiation turn | Sequence of one negotiation turn (proposed 25 %, validated 15 %) |
-| 4 | `04-er-data-model` | Appendix: all 19 tables after migration V29, every column with type, PK/FK and NOT NULL, crow's-foot relationships. **Generated from the migrated database** by `tools/er_from_db.py` (see below), so it always matches the schema | Full entity-relationship diagram of the AKVEN schema (migrations V1–V29) |
+| 4 | `04-er-data-model` | Appendix: all 21 tables after migration V30, every column with type, PK/FK and NOT NULL, crow's-foot relationships. **Generated from the migrated database** by `tools/er_from_db.py` (see below), so it always matches the schema | Full entity-relationship diagram of the AKVEN schema (migrations V1–V30) |
 | 4b | `04b-er-core` | Body: the seven core tables with their keys and 3–4 key columns each (still correct: the later migrations add tables around this core, not inside it) | Core data model: users, catalog, orders and negotiation sessions |
 | 5a | `05a-use-cases-customer` | Customer use cases, AI Negotiation Agent and Payment Provider as system actors | Use cases: customer side |
 | 5b | `05b-use-cases-staff-admin` | Staff/Admin use cases, Admin-inherits-Staff generalization | Use cases: staff and admin side |

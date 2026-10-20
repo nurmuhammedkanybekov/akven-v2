@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api, apiFile } from "./client";
 import type {
   StockWaiting,
   ShopSummary,
@@ -6,7 +6,7 @@ import type {
   ProductInput, ProductSummary, TermKind, TermsView, VariantCreateInput, VariantUpdateInput, Category,
   CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote, NegotiateResponse, NegotiationSessionView,
   PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
-  FamilyMember, FamilyMemberInput,
+  FamilyMember, FamilyMemberInput, ProductReviews, ShowcaseReview, MyReview, ModerationLine, ReviewStatus, DayPoint,
   SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
 } from "./types";
 
@@ -172,6 +172,40 @@ export const adminTryAssistant = (body: { sku: string; message: string; quantity
 export const adminLiveEvaluation = () => api<EvaluationReport>("/api/admin/assistant/evaluation", { method: "POST", body: {} });
 
 // ---- "tell me when it is back" ----
+// ---- reviews ----
+export const getReviews = (slug: string, signal?: AbortSignal) => api<ProductReviews>(`/api/products/${encodeURIComponent(slug)}/reviews`, { signal });
+export const getShowcaseReviews = (limit = 6, signal?: AbortSignal) => api<ShowcaseReview[]>(`/api/catalog/reviews${qs({ limit })}`, { signal });
+export const getMyReview = (slug: string) => api<MyReview>(`/api/reviews/${encodeURIComponent(slug)}/mine`);
+export const writeReview = (slug: string, body: { rating: number; author: string | null; body: string }) =>
+  api<MyReview>(`/api/reviews/${encodeURIComponent(slug)}`, { method: "PUT", body });
+export const adminReviews = (status?: ReviewStatus) => api<ModerationLine[]>(`/api/admin/reviews${qs({ status })}`);
+export const adminModerateReview = (id: string, status: ReviewStatus) => api<void>(`/api/admin/reviews/${id}`, { method: "PUT", body: { status } });
+
+// ---- catalogue extras ----
+export const getMatching = (slug: string, signal?: AbortSignal) => api<ProductSummary[]>(`/api/products/${encodeURIComponent(slug)}/matching`, { signal });
+export const searchProducts = (q: string, signal?: AbortSignal) => api<PageResponse<ProductSummary>>(`/api/products${qs({ q, pageSize: 6 })}`, { signal });
+
+// ---- saved socks in the account ----
+export const getSavedRemote = () => api<ProductSummary[]>("/api/saved");
+export const saveRemote = (slug: string) => api<ProductSummary[]>(`/api/saved/${encodeURIComponent(slug)}`, { method: "PUT", body: {} });
+export const unsaveRemote = (slug: string) => api<ProductSummary[]>(`/api/saved/${encodeURIComponent(slug)}`, { method: "DELETE", body: {} });
+export const mergeSaved = (slugs: string[]) => api<ProductSummary[]>("/api/saved/merge", { method: "POST", body: { slugs } });
+
+// ---- owners: sales by day and the orders file ----
+/** Downloads the orders of the last N days as a CSV file (owners only). */
+export async function downloadOrdersCsv(days = 90) {
+  const blob = await apiFile(`/api/admin/orders/export${qs({ days })}`);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `akven-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+export const adminDaily = (days = 30) => api<DayPoint[]>(`/api/admin/summary/daily${qs({ days })}`);
+
 // ---- the customer's family ----
 export const getFamily = () => api<FamilyMember[]>("/api/family");
 export const saveFamily = (members: FamilyMemberInput[]) => api<FamilyMember[]>("/api/family", { method: "PUT", body: { members } });

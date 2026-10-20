@@ -27,6 +27,9 @@ import { useVariantChoice } from "../shop/useVariantChoice";
 import { CATEGORY_PATH, productMeta } from "../lib/labels";
 import { NotFoundPage } from "./NotFound";
 import { flyToBag } from "../lib/flyToBag";
+import { Reviews } from "../components/Reviews";
+import { getMatching } from "../api/endpoints";
+import { SparkIcon } from "../components/icons";
 import { categoryFor, useFamily } from "../shop/family";
 import { openStatus, weekdayNames } from "../lib/hours";
 
@@ -96,6 +99,9 @@ function ProductView({ product }: { product: ProductDetail }) {
             </button>
           </div>
           {current ? <Price amount={current.price} large /> : <Price amount={null} />}
+          {(product.pairsSoldThisWeek ?? 0) >= 5 && (
+            <p className="av-hot"><SparkIcon /> {t("pdp.soldWeek", { n: product.pairsSoldThisWeek! })}</p>
+          )}
           {steps.length > 0 && (
             <p className="av-pdp__ladder">
               <span>{t("pdp.ladder")}</span>{" "}
@@ -153,7 +159,6 @@ function ProductView({ product }: { product: ProductDetail }) {
               flyToBag(document.querySelector(".av-pdp__main img"));
               cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
                 colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, current.availableQty), current.availableQty);
-              toast(t("pdp.added"));
             }}>{current && current.availableQty <= 0 ? t("pdp.soldOut") : t("pdp.add")}</Button>
             {current && current.availableQty <= 0 && <NotifyMe sku={current.sku} />}
             {cart.count > 0 && <p className="av-small"><Link to="/cart">{t("pdp.viewBag", { n: cart.count })}</Link></p>}
@@ -192,6 +197,8 @@ function ProductView({ product }: { product: ProductDetail }) {
           </div>
         </div>
       </div>
+      <MatchFamily product={product} />
+      <Reviews slug={product.slug} />
       <MoreLikeThis product={product} />
       <RecentlyViewed current={product.slug} />
     </div>
@@ -220,6 +227,27 @@ function PickupWhen() {
     return <strong className="av-pickupwhen">{t("pdp.collectFrom", { when, time: s.opens })}</strong>;
   }
   return null;
+}
+
+/**
+ * The same design for the rest of the family: the products of this collection on the other shelves (men, women,
+ * kids), so a family can wear the same socks. Hidden when the design has no family.
+ */
+function MatchFamily({ product }: { product: ProductDetail }) {
+  const { t } = useT();
+  const match = useAsync((signal) => getMatching(product.slug, signal), [product.slug]);
+  const items = match.data ?? [];
+  if (items.length === 0) return null;
+  return (
+    <section className="av-block av-match" aria-labelledby="match-title">
+      <header className="av-block__head">
+        <span className="av-eyebrow">{product.collection}</span>
+        <h2 id="match-title">{t("pdp.match")}</h2>
+        <p className="av-small">{t("pdp.matchS")}</p>
+      </header>
+      <div className="av-grid-products">{items.slice(0, 4).map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={((i + 1) % 6) + 1} />)}</div>
+    </section>
+  );
 }
 
 /** More from the same shelf, so a family can fill the set without going back to the catalogue. */

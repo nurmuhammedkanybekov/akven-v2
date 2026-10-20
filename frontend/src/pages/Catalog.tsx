@@ -61,10 +61,11 @@ export function CatalogPage({ category }: { category?: Category }) {
   const sort = params.get("sort") ?? "newest";
   const inStock = params.get("inStock") === "1";
   const page = Math.max(0, Number(params.get("page") ?? 0) || 0);
+  const q = (params.get("q") ?? "").trim().slice(0, 80) || undefined;
 
-  const query: CatalogQuery = { category, section, cut, inStock, sort, page, pageSize: 12 };
+  const query: CatalogQuery = { category, section, cut, q, inStock, sort, page, pageSize: 12 };
   const products = useAsync((signal) => listProducts(query, signal), [JSON.stringify(query)]);
-  const facetQuery = { category, section, cut, inStock };
+  const facetQuery = { category, section, cut, q, inStock };
   const facets = useAsync((signal) => getFacets(facetQuery, signal), [JSON.stringify(facetQuery)]);
 
   function set(key: string, value: string | null) {
@@ -74,7 +75,7 @@ export function CatalogPage({ category }: { category?: Category }) {
     setParams(next, { replace: false });
   }
   const toggle = (key: "section" | "cut", slug: string, current?: string) => set(key, current === slug ? null : slug);
-  const anyFilter = Boolean(section || cut || inStock);
+  const anyFilter = Boolean(section || cut || inStock || q);
   const total = products.data?.totalItems;
 
   const options = (key: "section" | "cut", list: FacetOption[] | undefined, current?: string) =>
@@ -96,6 +97,12 @@ export function CatalogPage({ category }: { category?: Category }) {
           <h1 id="shop-title">{t(`shop.title.${key}` as MessageKey)}</h1>
           <p className="av-shophead__lead">{t(`shop.lead.${key}` as MessageKey)}</p>
           {total !== undefined && <p className="av-small" aria-live="polite">{t(total === 1 ? "shop.count1" : "shop.count", { n: total })}</p>}
+          {q && (
+            <p className="av-searchfor">
+              <span>{t("search.resultsFor", { q })}</span>
+              <button type="button" className="av-linkbtn" onClick={() => set("q", null)}>{t("search.clear")}</button>
+            </p>
+          )}
           <p className="av-small"><Link to="/finder">{t("fd.cta")}</Link></p>
         </div>
         <div className="av-shophead__art" aria-hidden="true">

@@ -15,7 +15,6 @@ import { Price } from "./Price";
 import { NotifyMe } from "./NotifyMe";
 import { ProductImage } from "./ProductImage";
 import { QuantityStepper } from "./QuantityStepper";
-import { useToast } from "./Toast";
 import { flyToBag } from "../lib/flyToBag";
 
 /**
@@ -43,7 +42,6 @@ function QuickViewBody({ slug, onDone }: { slug: string; onDone: () => void }) {
 function Chooser({ product, onDone }: { product: ProductDetail; onDone: () => void }) {
   const { t } = useT();
   const cart = useCart();
-  const toast = useToast();
   const { current, colors, sizes, pick, label, images } = useVariantChoice(product);
   const [image, setImage] = useState(0);
   // A new colour starts on its first picture.
@@ -56,7 +54,6 @@ function Chooser({ product, onDone }: { product: ProductDetail; onDone: () => vo
     flyToBag(document.querySelector(".av-qv img"));
     cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
       colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, available), available);
-    toast(t("pdp.added"));
     onDone();
   }
 

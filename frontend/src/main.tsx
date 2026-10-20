@@ -26,6 +26,7 @@ import "./styles/home.css";
 import "./styles/motion.css";
 import "./styles/features.css";
 import "./styles/editorial.css";
+import "./styles/levelup.css";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

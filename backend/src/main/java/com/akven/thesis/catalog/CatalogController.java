@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Public catalog browsing (FR-1). Anonymous access is allowed by SecurityConfig for GET.
@@ -74,6 +75,12 @@ public class CatalogController {
     public CatalogService.Bestsellers bestsellers(@RequestParam(required = false) Category category,
                                                   @RequestParam(defaultValue = "8") int limit) {
         return catalogService.bestsellers(category, limit);
+    }
+
+    /** The same design on the other shelves, so the whole family can match. */
+    @GetMapping("/products/{slug}/matching")
+    public List<ProductSummary> matching(@PathVariable String slug, @RequestParam(defaultValue = "6") int limit) {
+        return catalogService.matching(slug, limit);
     }
 
     @GetMapping("/products/{slug}")

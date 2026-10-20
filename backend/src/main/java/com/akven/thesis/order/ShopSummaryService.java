@@ -56,6 +56,31 @@ public class ShopSummaryService {
     public record ShopSummary(int days, Sales sales, int toHandOver, int fewLeftThreshold, int soldOut,
                               List<LowStockLine> lowStock) {}
 
+    /** One day of sales in Bishkek time: paid orders, their total, and pairs. */
+    public record DayPoint(LocalDate date, int orders, BigDecimal revenue, int pairs) {}
+
+    /** Sales per day for the last N days, every day present (zero when nothing sold), oldest first, for the chart. */
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    @Transactional(readOnly = true)
+    public List<DayPoint> daily(int days) {
+        if (days < 1 || days > 365) throw new BusinessRuleException("Choose between 1 and 365 days.");
+        LocalDate today = LocalDate.now(CatalogService.SHOP_ZONE);
+        Instant since = today.minusDays(days - 1L).atStartOfDay(CatalogService.SHOP_ZONE).toInstant();
+        List<OrderItem> sold = orderItems.findSoldSince(List.of(OrderStatus.PAID, OrderStatus.FULFILLED), since);
+        Map<LocalDate, List<OrderItem>> byDay = sold.stream()
+                .collect(Collectors.groupingBy(i -> i.getOrder().getPaidAt().atZone(CatalogService.SHOP_ZONE).toLocalDate()));
+        List<DayPoint> out = new java.util.ArrayList<>();
+        for (int d = days - 1; d >= 0; d--) {
+            LocalDate date = today.minusDays(d);
+            List<OrderItem> lines = byDay.getOrDefault(date, List.of());
+            Map<UUID, Order> dayOrders = lines.stream().map(OrderItem::getOrder).collect(Collectors.toMap(Order::getId, Function.identity(), (a, b) -> a));
+            out.add(new DayPoint(date, dayOrders.size(),
+                    dayOrders.values().stream().map(Order::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add),
+                    lines.stream().mapToInt(i -> CollectionPricing.pairs(i.getVariant(), i.getQuantity())).sum()));
+        }
+        return out;
+    }
+
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @Transactional(readOnly = true)
     public ShopSummary summary(int days) {

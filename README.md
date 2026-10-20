@@ -124,6 +124,7 @@ super admin can repeat that run at any time.
   case sizes.
 - Orders (a gift order says how to pack it: box, ribbon, card), and a hand-over screen for the stall (pickup code, typed or scanned from the customer's QR code, plus the
   end of the customer's phone number).
+- Review moderation; sales per day as a chart, and the orders as a spreadsheet file (owners).
 - A dashboard: paid orders, revenue and pairs sold, orders waiting at the stall, socks running out with what is on
   the way, customers waiting for a sold-out option (to write to when it is back); and for the assistant, offers per day, how often the limit stepped in, offers that became orders, best sellers.
 - The rule-based against AI comparison, for the evaluation chapter.
@@ -207,10 +208,10 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 220 tests, **97% line coverage**; the build fails below 80% |
+| Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 225 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints (gift boxes and families too), the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 161 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
-| End to end, in a real browser | `cd frontend && npm run e2e` | 26 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
+| Frontend | `cd frontend && npm test && npm run build` | 167 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| End to end, in a real browser | `cd frontend && npm run e2e` | 27 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:
 
