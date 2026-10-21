@@ -2,6 +2,13 @@ import { useMemo, useState } from "react";
 import type { ImageView, ProductDetail, VariantView } from "../api/types";
 import { useT } from "../i18n/I18n";
 
+/** Sizes in the order people read them: XS, S, M, L, XL, then numbers low to high, then anything else. */
+const ORDER = ["XXS", "XS", "S", "M", "L", "XL", "XXL"];
+export function bySize(a: string, b: string): number {
+  const rank = (s: string) => { const i = ORDER.indexOf(s.toUpperCase()); if (i >= 0) return i; const n = parseFloat(s); return Number.isFinite(n) ? 100 + n : 1000; };
+  return rank(a) - rank(b) || a.localeCompare(b);
+}
+
 /**
  * Choosing a colour, size and pack for one product, shared by the product page and the quick view so both behave the
  * same. Starts on the first option in stock; picking one option keeps the others where possible, so changing colour
@@ -24,7 +31,7 @@ export function useVariantChoice(product: ProductDetail, initialHex?: string | n
     return [...seen.values()];
   }, [variants]);
   const sameColor = variants.filter((v) => v.color === current?.color && v.colorHex === current?.colorHex);
-  const sizes = [...new Set(sameColor.map((v) => v.size).filter((s): s is string => !!s))];
+  const sizes = [...new Set(sameColor.map((v) => v.size).filter((s): s is string => !!s))].sort(bySize);
   const packs = [...new Set(sameColor.filter((v) => v.size === current?.size).map((v) => v.packSize).filter((p): p is number => p !== null))];
 
   function pick(change: Partial<Pick<VariantView, "color" | "colorHex" | "size" | "packSize">>) {

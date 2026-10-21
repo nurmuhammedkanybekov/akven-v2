@@ -3,7 +3,12 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ProductDetail } from "../api/types";
+import { AuthProvider } from "../auth/AuthContext";
 import { Logo } from "../brand/Logo";
+import { stepAt } from "../components/PriceLadder";
+import { bySize } from "../shop/useVariantChoice";
+import { colourDistance, MATCH_DISTANCE, TROUSERS } from "../shop/fitting/FittingRoom";
+import { CaseBuilder } from "../shop/wholesale/CaseBuilder";
 import { Seal } from "../brand/Seal";
 import { I18nProvider } from "../i18n/I18n";
 import { CUTS, FIT, FittingRoom, SHOE_LIST } from "../shop/fitting/FittingRoom";
@@ -12,7 +17,7 @@ import { specFor, type SockSpecs } from "../shop/fitting/specs";
 import { StallNotes } from "../shop/home/StallNotes";
 import { useVariantChoice } from "../shop/useVariantChoice";
 
-const wrap = (ui: React.ReactNode) => render(<MemoryRouter><I18nProvider>{ui}</I18nProvider></MemoryRouter>);
+const wrap = (ui: React.ReactNode) => render(<MemoryRouter><I18nProvider><AuthProvider>{ui}</AuthProvider></I18nProvider></MemoryRouter>);
 const card = (slug: string, name: string, colors: string[]) => ({ slug, name, category: "MEN", section: null, cut: { slug: "crew", name: "Crew" }, collection: null,
   minPrice: 5, minPairPrice: 5, variantCount: 2, inStock: true, colors, image: null, hoverImage: null });
 const SPECS: SockSpecs = {
@@ -56,7 +61,7 @@ describe("the fitting room", () => {
     // only socks with a drawing are offered
     expect(screen.queryByRole("button", { name: /Mystery/ })).not.toBeInTheDocument();
     expect(urls.some((u) => u.includes("cut=crew") && u.includes("category=MEN"))).toBe(true);
-    expect(screen.getByText(/Crew with trainers: just right/)).toBeInTheDocument();
+    expect(screen.getByText(/Crew with sneakers: just right/)).toBeInTheDocument();
     expect(await screen.findByText("Men")).toBeInTheDocument();          // shoe size 42 -> men's socks
 
     const user = userEvent.setup();
@@ -125,5 +130,58 @@ describe("the family's own touches", () => {
     expect(renderHook(() => useVariantChoice(product, "#1f2a44"), { wrapper }).result.current.current?.sku).toBe("b");
     expect(renderHook(() => useVariantChoice(product, "#8a8d91"), { wrapper }).result.current.current?.sku).toBe("c");
     expect(renderHook(() => useVariantChoice(product, "#000000"), { wrapper }).result.current.current?.sku).toBe("a");
+  });
+});
+
+describe("plural forms", () => {
+  it("says 1 pair and 5 pairs, and in Russian 1 пара, 3 пары, 5 пар", async () => {
+    const { useT } = await import("../i18n/I18n");
+    function Show({ n }: { n: number }) { const { t } = useT(); return <p>{t("bag.pairs", { n })}</p>; }
+    const { rerender } = render(<I18nProvider><Show n={1} /></I18nProvider>);
+    expect(screen.getByText("1 pair")).toBeInTheDocument();
+    rerender(<I18nProvider><Show n={5} /></I18nProvider>);
+    expect(screen.getByText("5 pairs")).toBeInTheDocument();
+    localStorage.setItem("akven-lang", "ru");
+    for (const [n, text] of [[1, "1 пара"], [3, "3 пары"], [5, "5 пар"], [21, "21 пара"], [12, "12 пар"]] as const) {
+      const r = render(<I18nProvider><Show n={n} /></I18nProvider>);
+      expect(r.getByText(text)).toBeInTheDocument();
+      r.unmount();
+    }
+  });
+});
+
+describe("the new helpers", () => {
+  it("finds the collection step for a number of pairs", () => {
+    const tiers = [{ minPairs: 20, discountPct: 3 }, { minPairs: 30, discountPct: 5 }, { minPairs: 50, discountPct: 8 }];
+    expect(stepAt(tiers, 1)).toBe(0);
+    expect(stepAt(tiers, 20)).toBe(3);
+    expect(stepAt(tiers, 49)).toBe(5);
+    expect(stepAt(tiers, 120)).toBe(8);
+  });
+
+  it("orders sizes the way people read them", () => {
+    expect(["L", "M", "XS", "S"].sort(bySize)).toEqual(["XS", "S", "M", "L"]);
+    expect(["42", "38", "One size"].sort(bySize)).toEqual(["38", "42", "One size"]);
+  });
+
+  it("says navy socks go with navy trousers and not with beige ones", () => {
+    const navy = TROUSERS.find((x) => x.key === "navy")!.hex, beige = TROUSERS.find((x) => x.key === "beige")!.hex;
+    expect(colourDistance("#1F2A44", navy)).toBeLessThan(MATCH_DISTANCE);
+    expect(colourDistance("#1F2A44", beige)).toBeGreaterThan(MATCH_DISTANCE);
+  });
+
+  it("builds a case by the dozen and hands the mix to the request", async () => {
+    vi.mocked(fetch).mockImplementation(async (url) => new Response(JSON.stringify(String(url).startsWith("/api/catalog/terms")
+      ? { sections: [{ slug: "classic", name: "Classic" }, { slug: "sport", name: "Sport" }], cuts: [] } : {}), { status: 200 }));
+    const onUse = vi.fn();
+    wrap(<CaseBuilder onUse={onUse} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Twelve more: Classic, Men" }));
+    await user.click(screen.getByRole("button", { name: "Twelve more: Classic, Men" }));
+    await user.click(screen.getByRole("button", { name: "Twelve more: Sport, Kids" }));
+    expect(screen.getByText("36 pairs")).toBeInTheDocument();
+    expect(screen.getByText(/204 to a full case/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Put this mix in my request" }));
+    expect(onUse).toHaveBeenCalledWith("Classic · Men: 24; Sport · Kids: 12", 36);
   });
 });

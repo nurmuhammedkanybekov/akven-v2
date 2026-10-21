@@ -13,7 +13,10 @@ export function YarnProgress() {
       const el = ref.current, doc = document.documentElement;
       if (!el) return;
       const max = doc.scrollHeight - window.innerHeight;
-      el.style.setProperty("--p", max > 200 ? Math.min(1, Math.max(0, window.scrollY / max)).toFixed(4) : "0");
+      const p = max > 200 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      el.style.setProperty("--p", p.toFixed(4));
+      // At the very top there is no thread yet, so no ball either.
+      el.dataset.top = p < 0.004 ? "true" : "false";
       el.dataset.on = max > 200 ? "true" : "false";
     };
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };

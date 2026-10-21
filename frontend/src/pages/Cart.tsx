@@ -1,4 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { getBestsellers } from "../api/endpoints";
+import { SOCK_COLOURS, SockArt } from "../brand/SockArt";
+import { PairMeter } from "../components/PairMeter";
+import { ProductCard } from "../components/ProductCard";
+import { useAsync } from "../hooks/useAsync";
 import { useAuth } from "../auth/AuthContext";
 import { MAX_PER_LINE, useCart, type CartLine } from "../cart/CartContext";
 import { useQuote } from "../cart/useQuote";
@@ -31,6 +37,11 @@ export function CartPage() {
   if (cart.lines.length === 0) {
     return (
       <div className="av-container av-page av-empty av-empty--bag">
+        <div className="av-emptybox" aria-hidden="true">
+          <span className="av-emptybox__box" />
+          <SockArt cut="crew" main={SOCK_COLOURS.navy} accent={SOCK_COLOURS.gold} pattern="oimo" second={SOCK_COLOURS.cream} className="av-emptybox__sock" />
+          <span className="av-hand av-emptybox__note">{t("cart.emptyNote")}</span>
+        </div>
         <h1>{t("cart.empty")}</h1>
         <p className="av-lead">{t("cart.emptyS")}</p>
         <div className="av-row"><Button to="/shop">{t("cart.browse")}</Button><Button to="/saved" variant="secondary">{t("nav.savedTitle")}</Button></div>
@@ -51,9 +62,13 @@ export function CartPage() {
       {offline && <Alert>{t("cart.offline")}</Alert>}
 
       <div className="av-cart">
-        <ul className="av-cartlines">
-          {rows.map(({ line, q }) => <CartRow key={line.sku} line={line} q={q} loading={loading && !q} />)}
-        </ul>
+        <div className="av-cart__main">
+          <ul className="av-cartlines">
+            {rows.map(({ line, q }) => <CartRow key={line.sku} line={line} q={q} loading={loading && !q} />)}
+          </ul>
+          <FillTheBox pairsToGo={quote?.collection?.nextTier?.pairsToGo ?? (quote?.collection?.minimumMessage ? Math.max(0, quote.collection.minimumPairs - quote.collection.totalPairs) : 0)}
+                      pct={quote?.collection?.nextTier ? Number(quote.collection.nextTier.discountPct) : 0} inBag={cart.lines.map((l) => l.productSlug)} />
+        </div>
 
         <aside className="av-summary" aria-label={t("cart.summaryLabel")}>
           {quote?.collection && <CollectionProgress c={quote.collection} />}
@@ -101,6 +116,7 @@ function CollectionProgress({ c }: { c: CollectionView }) {
         <span className="av-eyebrow">{t("bag.collection")}</span>
         <strong className="av-num">{t("bag.pairs", { n: c.totalPairs })}</strong>
       </div>
+      {target ? <PairMeter total={c.totalPairs} target={target} /> : null}
       {target && <div className="av-collection__bar" aria-hidden="true"><i style={{ width: `${pct}%` }} /></div>}
       {c.minimumMessage && <p className="av-small">{t("bag.min", { n: c.minimumPairs })}</p>}
       {!c.minimumMessage && c.tierDiscountPct > 0 && <p className="av-small av-price__save">{t("bag.tier", { pct: Number(c.tierDiscountPct) })}</p>}
@@ -113,13 +129,20 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
   const { money } = useMoney();
   const cart = useCart();
   const { t } = useT();
+  // A removed line folds away before it leaves the list.
+  const [leaving, setLeaving] = useState(false);
+  const remove = () => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { cart.remove(line.sku); return; }
+    setLeaving(true);
+    window.setTimeout(() => cart.remove(line.sku), 320);
+  };
   const problem = q && q.problem !== "NONE";
   const unitPrice = q?.unitPrice ?? line.unitPrice;
   const max = q ? Math.max(1, Math.min(MAX_PER_LINE, q.availableQty)) : MAX_PER_LINE;
   const priceChanged = q?.unitPrice != null && !q.discountPct && Math.abs(q.unitPrice - line.unitPrice) > 0.004;
 
   return (
-    <li className="av-cartline">
+    <li className={`av-cartline${leaving ? " is-leaving" : ""}`}>
       <Link to={`/products/${line.productSlug}`} className="av-cartline__img" aria-hidden="true" tabIndex={-1}><ProductImage image={(q?.imageUrl ?? line.imageUrl) ? { url: (q?.imageUrl ?? line.imageUrl)!, alt: "" } : null} /></Link>
       <div className="av-cartline__body">
         <Link to={`/products/${line.productSlug}`} className="av-cartline__name">{line.productName}</Link>
@@ -137,9 +160,29 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
       </div>
       <div className="av-cartline__qty">
         <QuantityStepper value={line.quantity} min={1} max={max} label={t("cart.qtyOf", { name: line.productName })} onChange={(n) => cart.setQuantity(line.sku, n)} />
-        <Button size="sm" variant="ghost" aria-label={t("cart.removeName", { name: line.productName })} onClick={() => cart.remove(line.sku)}>{t("cart.remove")}</Button>
+        <Button size="sm" variant="ghost" aria-label={t("cart.removeName", { name: line.productName })} onClick={remove}>{t("cart.remove")}</Button>
       </div>
       <div className="av-cartline__total av-price">{q?.lineTotal != null ? money(q.lineTotal) : money(line.unitPrice * line.quantity)}</div>
     </li>
+  );
+}
+
+/**
+ * Under the bag: socks to fill it up to the next price step, the ones people buy most that are not in the bag yet.
+ * Each card has its quick view, so a pair goes in without leaving the bag.
+ */
+function FillTheBox({ pairsToGo, pct, inBag }: { pairsToGo: number; pct: number; inBag: string[] }) {
+  const { t } = useT();
+  const best = useAsync((signal) => getBestsellers(null, 12, signal), []);
+  const items = (best.data?.items ?? []).filter((p) => !inBag.includes(p.slug)).slice(0, 4);
+  if (items.length === 0) return null;
+  return (
+    <section className="av-fillbox" aria-labelledby="fill-title">
+      <span className="av-hand">{t("fill.eyebrow")}</span>
+      <h2 id="fill-title">{pairsToGo > 0 && pct > 0 ? t("fill.title", { n: pairsToGo, pct }) : t("fill.titlePlain")}</h2>
+      <div className="av-grid-products av-fillbox__grid">
+        {items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={(i % 6) + 1} />)}
+      </div>
+    </section>
   );
 }

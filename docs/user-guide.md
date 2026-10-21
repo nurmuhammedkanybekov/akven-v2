@@ -58,8 +58,23 @@ height from no-show to knee-high: the shop's own socks of that height are drawn 
 the shoe over the foot, so it is clear what shows and what stays hidden. Every height is marked "best", "works" or
 "better not" for those shoes, with the reason (a boot needs a sock taller than itself; dress shoes want the shin
 covered when you sit). The shoe size gives the sock size from the shop's chart, and "See this pair" opens the sock in
-that colour. The choices are remembered in the browser for next time, nowhere else. In the shop, the height filters
-carry a small leg showing each height.
+that colour. A switch takes the shoes off and puts them back. Under "With which trousers" the drawn trousers take the
+visitor's colour, and "Match my trousers" puts on the sock, in the colour, that goes with them best (socks that do
+are marked "goes with them"); the socks inside the gift boxes are on the rail too. Signed in, the saved family appears
+under "Who is trying on": one tap sets who and the shoe size. The choices are remembered in the browser for next
+time, nowhere else. In the shop, the height filters carry a small leg showing each height.
+
+**How the price falls** on every sock's page: a slider of pairs with the collection steps marked on it, the price of
+one pair and of all of them, what is saved, and a button that puts that many pairs in the bag (as many as are on the
+shelf). The steps count across the whole bag, and the server works out the final price.
+
+**Quick view** shows the colours, sizes and packs, saves the sock, opens the fitting room, and says "Added to your
+bag" before the bag slides in. The bag (the drawer and the page) counts the pairs as little socks filling up towards
+the next price step, and the bag page suggests socks to fill it up.
+
+**Build a case** on the wholesale page: a shop chooses dozens from each shelf for men, women and children, the case
+(about 240 pairs) fills up as it goes, and "Put this mix in my request" writes the mix into the request below, which
+the shop still checks and sends itself.
 
 1. **Bag.** "Add to bag" on any product. The bag lives in the browser: no account needed, it survives a reload, works
    offline and is shared between tabs. It remembers which item and how many; prices are always asked from the server.

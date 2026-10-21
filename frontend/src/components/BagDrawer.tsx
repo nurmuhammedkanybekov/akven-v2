@@ -9,6 +9,7 @@ import { useT } from "../i18n/I18n";
 import { useMoney } from "../shop/useMoney";
 import { Button } from "./Button";
 import { CheckIcon, CloseIcon } from "./icons";
+import { PairMeter } from "./PairMeter";
 import { Price } from "./Price";
 import { ProductImage } from "./ProductImage";
 
@@ -53,7 +54,6 @@ export function BagDrawer() {
 
   const c = quote?.collection;
   const target = c ? (c.minimumMessage ? c.minimumPairs : c.nextTier?.minPairs) : undefined;
-  const pct = c && target ? Math.min(100, Math.round((c.totalPairs / target) * 100)) : 100;
 
   return (
     <dialog ref={ref} className="av-bagdrawer" aria-labelledby="bag-drawer-title" onClose={() => setOpen(false)} onCancel={() => setOpen(false)}
@@ -77,7 +77,7 @@ export function BagDrawer() {
           {c && (
             <section className="av-bagdrawer__collection" aria-label={t("bag.collection")}>
               <div className="av-row av-between"><span className="av-eyebrow">{t("bag.collection")}</span><strong className="av-num">{t("bag.pairs", { n: c.totalPairs })}</strong></div>
-              {target && <div className="av-collection__bar" aria-hidden="true"><i style={{ width: `${pct}%` }} /></div>}
+              {target ? <PairMeter total={c.totalPairs} target={target} /> : null}
               <p className="av-small">
                 {c.minimumMessage ? t("bag.min", { n: c.minimumPairs })
                   : c.nextTier ? t("bag.next", { n: c.nextTier.pairsToGo, pct: Number(c.nextTier.discountPct) })
@@ -101,8 +101,23 @@ export function BagDrawer() {
               </ul>
             </section>
           )}
+          {cart.lines.length > 1 && (
+            <section className="av-bagdrawer__all" aria-label={t("bag.inBag")}>
+              <div className="av-row av-between"><span className="av-eyebrow">{t("bag.inBag")}</span><span className="av-small">{t("bag.lines", { n: cart.lines.length })}</span></div>
+              <ul>
+                {cart.lines.filter((l) => l.sku !== line?.sku).slice(0, 4).map((l, i) => (
+                  <li key={l.sku} style={{ "--i": i } as React.CSSProperties}>
+                    <span className="av-bagdrawer__mini"><ProductImage image={l.imageUrl ? { url: l.imageUrl, alt: "" } : null} /></span>
+                    <span className="av-small">{l.productName} ×{l.quantity}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
           <div className="av-bagdrawer__actions">
-            <Button to="/cart" block>{t("bag.view", { n: cart.count })}</Button>
+            {quote && <p className="av-bagdrawer__total"><span>{t("cart.subtotal")}</span><strong className="av-price">{money(quote.total)}</strong></p>}
+            {quote?.canCheckout && <Button to="/checkout" variant="accent" block>{t("cart.checkout")}</Button>}
+            <Button to="/cart" block variant={quote?.canCheckout ? "secondary" : "primary"}>{t("bag.view", { n: cart.count })}</Button>
             <Button variant="ghost" block onClick={() => setOpen(false)}>{t("cart.continue")}</Button>
           </div>
         </div>
