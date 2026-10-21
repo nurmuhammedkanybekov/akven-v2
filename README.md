@@ -90,8 +90,14 @@ super admin can repeat that run at any time.
   story** have pages of their own.
 - **The fitting room:** pick who is trying on, the shoes and a height, and the shop's own socks of that height are drawn
   on a leg in the colour you choose, with the shoe over the foot, so you see what shows and what stays hidden. Each
-  height is rated for those shoes, with the reason, and the shoe size gives the sock size. It opens from every sock's
-  page too ("Try it on").
+  height is rated for those shoes, with the reason, and the shoe size gives the sock size. Shoes can be taken off,
+  the trousers changed to your colour ("match my trousers" finds our socks that go with them), the socks inside the
+  gift boxes tried on too, and a saved family member chosen in one tap. It opens from every sock's page and from quick
+  view ("Try it on").
+- **How the price falls:** a slider on every sock's page shows the price of one pair and of all of them as the pairs
+  add up, with the shop's own collection steps marked on it.
+- **Build a case** (for shops): dozens from each shelf, the case filling up as you go, and the mix written into the
+  wholesale request.
 - **The family's own hand:** headings in a Garamond serif, their handwriting on tags and on a board of notes from the
   stall, a turning stamp, a thread of yarn that unwinds as you scroll, and a logo whose heart writes itself.
 - **English, Russian and Kyrgyz**, prices in **US dollars, Kyrgyz som or Russian roubles** (at the rates the owners
@@ -101,7 +107,8 @@ super admin can repeat that run at any time.
   shop's real ladder.
 - **Collections:** a minimum order and a price ladder counted in pairs across the whole bag, with "add 4 more pairs
   to save 5%" hints in the bag. Packs show their price per pair.
-- **About 120 drawn designs and over 600 options** in the demo catalogue: a classic line of plain and ribbed socks in
+- **About 220 drawn socks and gift boxes and over 1,200 options** in the demo catalogue, every shelf doubled in the
+  last round: a classic line of plain and ribbed socks in
   every height and up to ten colours, and patterns from argyle and cable knit to the Kyrgyz oimo and shyrdak, cats,
   bunnies and football socks. **The picture follows the colour** you choose, on the product page and in quick view.
 - **The family planner and family profiles:** add each person and their shoe size; the sock size comes from the size
@@ -218,7 +225,7 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 |---|---|---|
 | Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 225 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints (gift boxes and families too), the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 176 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| Frontend | `cd frontend && npm test && npm run build` | 181 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
 | End to end, in a real browser | `cd frontend && npm run e2e` | 27 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:

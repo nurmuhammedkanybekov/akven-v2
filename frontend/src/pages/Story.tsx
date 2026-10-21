@@ -4,6 +4,7 @@ import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
 import { DordoiStory } from "../shop/home/DordoiStory";
 import { TwoNames } from "../shop/home/TwoNames";
+import { StoryJourney } from "../shop/story/StoryJourney";
 
 /** A family's worth of socks, one for each of them. */
 const FAMILY: SockSpec[] = [
@@ -15,7 +16,7 @@ const FAMILY: SockSpec[] = [
 ];
 
 /**
- * Our story: the two names, the stall at Dordoi as the scene that plays on scroll, and the plain facts (since when,
+ * Our story: the two names, the family's years and the journey of a pair, the stall at Dordoi as the scene that plays on scroll, and the plain facts (since when,
  * where the socks are made, where they are sold, who runs it), with the way to the stall.
  */
 export function StoryPage() {
@@ -24,6 +25,7 @@ export function StoryPage() {
   return (
     <>
       <TwoNames page />
+      <StoryJourney />
       <DordoiStory />
       <section className="av-block" aria-labelledby="facts-title">
         <div className="av-container av-story2">

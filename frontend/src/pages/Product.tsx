@@ -28,6 +28,7 @@ import { CATEGORY_PATH, productMeta } from "../lib/labels";
 import { NotFoundPage } from "./NotFound";
 import { flyToBag } from "../lib/flyToBag";
 import { Reviews } from "../components/Reviews";
+import { PriceLadder } from "../components/PriceLadder";
 import { getMatching } from "../api/endpoints";
 import { SparkIcon } from "../components/icons";
 import { categoryFor, useFamily } from "../shop/family";
@@ -62,7 +63,8 @@ function ProductView({ product }: { product: ProductDetail }) {
   const [search] = useSearchParams();
   const colourParam = search.get("colour");
   const { current, colors, sizes, packs, pick, label, images } = useVariantChoice(product, colourParam && /^[0-9a-fA-F]{6}$/.test(colourParam) ? `#${colourParam}` : null);
-  const [fitting, setFitting] = useState(false);
+  // "?try=1" (from quick view) opens the fitting room straight away.
+  const [fitting, setFitting] = useState(() => search.get("try") === "1");
   const cut = product.cut?.slug as SockCut | undefined;
   const canTry = !!cut && CUTS.includes(cut) && product.category !== "BUNDLES";
   const [imageIndex, setImageIndex] = useState(0);
@@ -74,7 +76,6 @@ function ProductView({ product }: { product: ProductDetail }) {
 
   const image = images[Math.min(imageIndex, images.length - 1)];
   const details: Array<[MessageKey, string | null]> = [["pdp.fabric", product.fabricComposition], ["pdp.quality", product.quality], ["pdp.madeIn", product.origin], ["pdp.care", product.care]];
-  const steps = pricing?.tiers ?? [];
 
   return (
     <div className="av-container av-page">
@@ -124,12 +125,6 @@ function ProductView({ product }: { product: ProductDetail }) {
           {(product.pairsSoldThisWeek ?? 0) >= 5 && (
             <p className="av-hot"><SparkIcon /> {t("pdp.soldWeek", { n: product.pairsSoldThisWeek! })}</p>
           )}
-          {steps.length > 0 && (
-            <p className="av-pdp__ladder">
-              <span>{t("pdp.ladder")}</span>{" "}
-              {steps.map((x, i) => <span key={x.minPairs} className="av-num">{i > 0 && " · "}{t("pdp.ladderStep", { n: x.minPairs, pct: Number(x.discountPct) })}</span>)}
-            </p>
-          )}
           {product.description && <p className="av-lead">{product.description}</p>}
 
           {variants.length === 0 && <p className="av-small">{t("pdp.noVariants")}</p>}
@@ -169,6 +164,13 @@ function ProductView({ product }: { product: ProductDetail }) {
               <StockBadge available={current.availableQty} status={current.stockStatus} restockInDays={current.restockInDays} />
               {current.casePairs && <span className="av-small">{t("pdp.case", { n: current.casePairs })}</span>}
             </div>
+          )}
+          {current && pricing && pricing.tiers.length > 0 && current.availableQty > 0 && (
+            <PriceLadder pricing={pricing} variant={current} onAdd={(packs) => {
+              flyToBag(document.querySelector(".av-pdp__main img"));
+              cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
+                colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(packs, current.availableQty), current.availableQty);
+            }} />
           )}
           <FamilyFits category={product.category} />
           <SizeFinder />

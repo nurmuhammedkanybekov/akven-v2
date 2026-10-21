@@ -273,7 +273,7 @@ try {
   await step("the last pair can be bought, then cancelling returns it to the shelf", async () => {
     await page.getByRole("button", { name: "Add to bag" }).click();
     await closeBagDrawer();
-    await page.getByRole("link", { name: /Bag, 1 items/ }).click();
+    await page.getByRole("link", { name: /Bag, 1 item$/ }).click();
     await page.getByRole("link", { name: "Check out" }).click();
     await page.getByLabel("Name", { exact: true }).fill("Aida Test");
     await page.getByLabel("Phone").fill("+996 700 123 456");
@@ -306,7 +306,7 @@ try {
     await page.getByRole("button", { name: /^Add 1 pair at this price/ }).click();
     await closeBagDrawer();
     await page.getByText(/Added at .* off/).waitFor();
-    await page.getByRole("link", { name: /Bag, 1 items/ }).click();
+    await page.getByRole("link", { name: /Bag, 1 item$/ }).click();
     await page.getByRole("heading", { name: "Bag (1)" }).waitFor();
     const saved = JSON.parse(await page.evaluate(() => localStorage.getItem("akven-cart-v1")));
     assert.ok(saved[0].negotiationSessionId, "the line carries the offer");
@@ -401,7 +401,7 @@ try {
     await page.goto(`${BASE}/products/classic-rib-crew-men?colour=8A8D91`);
     await page.getByRole("button", { name: "Try it on" }).click();
     const dialog = page.getByRole("dialog", { name: "Try them on before you buy" });
-    await dialog.getByText("Classic Rib Crew", { exact: true }).waitFor();
+    await dialog.locator("strong", { hasText: "Classic Rib Crew" }).first().waitFor();
     assert.equal(await dialog.getByRole("button", { name: "Colour #8A8D91" }).getAttribute("aria-pressed"), "true");
     await a11y("the fitting room on a product page");
     await page.keyboard.press("Escape");
@@ -484,6 +484,24 @@ try {
     await page.getByText(/8:00–16:00/).first().waitFor();
     await page.locator(".av-open").waitFor();
     await a11y("the visit page");
+    // how the price falls: 30 pairs of this sock reach the −5% step
+    await page.goto(`${BASE}/products/classic-rib-crew-men`);
+    const ladder = page.getByRole("region", { name: "How the price falls" });
+    await ladder.getByRole("slider", { name: "Pairs" }).fill("30");
+    await ladder.getByText("−5%", { exact: true }).waitFor();
+    // a shop builds a case and the mix goes into its request
+    await page.goto(`${BASE}/wholesale`);
+    for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Twelve more: Classic, Men" }).click();
+    await page.getByRole("button", { name: "Twelve more: Sport, Kids" }).click();
+    await page.getByText(/204 to a full case/).waitFor();
+    await page.getByRole("button", { name: "Put this mix in my request" }).click();
+    await page.locator(".av-casebuild__chosen").getByText(/Classic · Men: 24; Sport · Kids: 12/).waitFor();
+    await a11y("the wholesale page with a case");
+    // the story: the years and the journey of a pair
+    await page.goto(`${BASE}/story`);
+    await page.getByRole("heading", { name: "Our years at Dordoi" }).waitFor();
+    await page.getByRole("heading", { name: "The journey of a pair" }).waitFor();
+    await a11y("the story page");
   });
 
   await step("a customer saves the family, builds a gift box, and the sock finder answers in three taps", async () => {

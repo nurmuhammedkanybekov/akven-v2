@@ -123,7 +123,10 @@ family's facts. The fitting room is also on the size guide and on every product 
 Sections slide in as they scroll into view, and their handwritten labels are written left to right; the logo's heart
 writes itself; the stamp turns; the yarn unwinds with the scroll; in the fitting room the sock is pulled up the leg and
 the shoe steps in; the stall notes swing onto their pins; a drawn sock on a card sways from its cuff; the hero's pairs
-settle onto the table; AK and VEN meet and the heart is written between them;
+settle onto the table; AK and VEN meet and the heart is written between them; buttons fill with colour from the point
+where the pointer came in, with a sheen of gold light on the main ones; icons lift on a soft disc; section headings
+rise out of a mask; quick view rises in part by part and the button turns green with "added"; in the bag the pairs fill
+in as little gold socks and removed lines fold away; on the story page a sock walks the route of a pair as you scroll;
 the Dordoi scene plays with the scroll; the socks on the rail sway and lean away from the pointer; the gift box opens and
 closes; a picture flies into the bag when a sock is added. Motion
 never fades text, so it keeps full contrast at every moment, and all of it stops for visitors who ask for less motion.

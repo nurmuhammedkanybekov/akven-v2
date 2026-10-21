@@ -38,6 +38,28 @@ function useRotation(count: number, ms: number) {
   return i;
 }
 
+/**
+ * The top bar's message on one line. When it is wider than its room (a long Russian or Kyrgyz message on a phone), it
+ * glides along once while it is shown, so it never wraps onto three lines or runs under the language switch.
+ */
+function AnnText({ text }: { text: string }) {
+  const box = useRef<HTMLParagraphElement>(null);
+  const run = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const measure = () => {
+      const b = box.current, r = run.current;
+      if (!b || !r) return;
+      const over = r.scrollWidth - b.clientWidth;
+      b.classList.toggle("is-long", over > 2);
+      b.style.setProperty("--shift", `${-Math.max(0, over + 24)}px`);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [text]);
+  return <p ref={box} className="av-ann__text"><span ref={run} className="av-ann__run">{text}</span></p>;
+}
+
 export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", accountLabel, extra }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -76,7 +98,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
     <>
       <div className="av-ann">
         <div className="av-container av-ann__bar">
-          <p className="av-ann__text" key={msg}>{t(MESSAGES[msg])}</p>
+          <AnnText key={msg} text={t(MESSAGES[msg])} />
           <div className="av-ann__langs">
             <CurrencySwitch />
             <span className="av-ann__sep" aria-hidden="true" />

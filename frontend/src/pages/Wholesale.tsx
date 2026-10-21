@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { CaseBuilder } from "../shop/wholesale/CaseBuilder";
 import { listProducts } from "../api/endpoints";
 import { Button } from "../components/Button";
 import { ContactCards, withMessage } from "../components/Contacts";
@@ -27,13 +28,15 @@ export function WholesalePage() {
   const boxes = useAsync((signal) => listProducts({ category: "BUNDLES", pageSize: 4, sort: "newest" }, signal), []);
   const [kind, setKind] = useState<Kind>(() => (typeof window !== "undefined" && window.location.hash === "#gifts" ? "gifts" : "wholesale"));
   const [form, setForm] = useState({ name: "", city: "", pairs: "200", note: "" });
+  const [mix, setMix] = useState<{ text: string; pairs: number } | null>(null);
   const [ready, setReady] = useState(false);
 
   const message = [
     t(kind === "gifts" ? "quote.msgGifts" : "quote.msgWholesale"),
     form.name && `${t("quote.name")}: ${form.name}`,
     form.city && `${t("quote.city")}: ${form.city}`,
-    `${t("quote.pairs")}: ${form.pairs}`,
+    `${t("quote.pairs")}: ${mix ? mix.pairs : form.pairs}`,
+    mix && `${t("case.mixLine")}: ${mix.text}`,
     form.note && `${t("quote.note")}: ${form.note}`,
   ].filter(Boolean).join("\n");
 
@@ -82,6 +85,13 @@ export function WholesalePage() {
         )}
       </section>
 
+      <section className="av-container av-block" data-reveal>
+        <CaseBuilder onUse={(text, pairs) => {
+          setMix({ text, pairs }); setKind("wholesale"); setReady(false);
+          document.getElementById("quote")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }} />
+      </section>
+
       <section id="quote" className="av-container av-block" aria-labelledby="quote-title" data-reveal>
         <div className="av-quote">
           <div className="av-stack">
@@ -101,9 +111,17 @@ export function WholesalePage() {
             </div>
             <Input label={t("quote.name")} autoComplete="organization" {...field("name")} />
             <Input label={t("quote.city")} autoComplete="address-level2" {...field("city")} />
-            <Select label={t("quote.pairs")} {...field("pairs")}>
-              {["50", "100", "200", "500", "1000", "2000+"].map((v) => <option key={v} value={v}>{v}</option>)}
-            </Select>
+            {mix ? (
+              <div className="av-casebuild__chosen">
+                <span className="av-label">{t("case.mixLine")}</span>
+                <p><strong>{t("bag.pairs", { n: mix.pairs })}</strong> — {mix.text}</p>
+                <button type="button" className="av-linkbtn" onClick={() => { setMix(null); setReady(false); }}>{t("case.clear")}</button>
+              </div>
+            ) : (
+              <Select label={t("quote.pairs")} {...field("pairs")}>
+                {["50", "100", "200", "500", "1000", "2000+"].map((v) => <option key={v} value={v}>{v}</option>)}
+              </Select>
+            )}
             <Input label={t("quote.note")} {...field("note")} />
             <Button type="submit" size="lg" block>{t("quote.prepare")}</Button>
             {ready && (

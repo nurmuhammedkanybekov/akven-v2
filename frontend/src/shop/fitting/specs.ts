@@ -1,8 +1,8 @@
 import type { SockSpec } from "../../brand/SockArt";
 
 /** The drawing behind each sock product (written by scripts/generate-product-art.mjs): the sock, and per colour hex
- * the main and accent colours that change. */
-export type SockSpecs = Record<string, { s: SockSpec; c: Record<string, [string, string]> }>;
+ * the main and accent colours that change; for a gift box, the socks inside it. */
+export type SockSpecs = Record<string, { s?: SockSpec; c?: Record<string, [string, string]>; b?: SockSpec[] }>;
 
 let loading: Promise<SockSpecs> | null = null;
 
@@ -18,7 +18,7 @@ export function loadSockSpecs(): Promise<SockSpecs> {
  * when the sock is drawn, so nothing from the file reaches the markup unchecked. */
 export function specFor(specs: SockSpecs, slug: string, hex: string | null | undefined): SockSpec | undefined {
   const entry = specs[slug];
-  if (!entry) return undefined;
-  const colour = hex ? entry.c[hex.toUpperCase()] : undefined;
+  if (!entry?.s) return undefined;
+  const colour = hex ? entry.c?.[hex.toUpperCase()] : undefined;
   return colour ? { ...entry.s, main: colour[0], accent: colour[1] } : entry.s;
 }

@@ -12,6 +12,7 @@ import { MARK, markMarkup } from "../src/brand/mark.ts";
 import { SOCK_COLOURS as C, sockBounds, sockMarkup } from "../src/brand/sockDrawing.ts";
 import { COLLECTION_2 } from "./collection-2.mjs";
 import { COLLECTION_3 } from "./collection-3.mjs";
+import { COLLECTION_4 } from "./collection-4.mjs";
 import { LEGACY_COLOURS, collectionColours, colourSlug, colourise } from "./colours.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -142,13 +143,13 @@ const PRODUCTS = {
     socks: [S("crew", C.navy, C.navy, "rib", { heel: false }), S("crew", C.black, C.gold, "pinstripe", { heel: false }), S("crew", C.charcoal, C.charcoal, "rib", { heel: false }), S("crew", C.navy, C.gold, "argyle", { second: C.cream })] } },
 };
 
-for (const p of COLLECTION_2) PRODUCTS[p.slug] = p.box ? { tint: p.tint, box: p.box } : { tint: p.tint, sock: p.sock };
+for (const p of [...COLLECTION_2, ...COLLECTION_4]) PRODUCTS[p.slug] = p.box ? { tint: p.tint, box: p.box } : { tint: p.tint, sock: p.sock };
 // The classics are drawn in their first colour by default.
 for (const p of COLLECTION_3) PRODUCTS[p.slug] = { tint: p.tint, sock: colourise(p.sock, collectionColours(p)[0][1]) };
 
 /** Every sock product's colours, for the pictures that change with the colour chosen. */
 const COLOURS = { ...LEGACY_COLOURS };
-for (const p of [...COLLECTION_2, ...COLLECTION_3]) if (!p.box) COLOURS[p.slug] = collectionColours(p);
+for (const p of [...COLLECTION_2, ...COLLECTION_3, ...COLLECTION_4]) if (!p.box) COLOURS[p.slug] = collectionColours(p);
 const BASE = Object.fromEntries([...COLLECTION_3].map((p) => [p.slug, p.sock]));
 
 const outDir = path.join(root, "public/media/products");
@@ -174,14 +175,15 @@ for (const [slug, p] of Object.entries(PRODUCTS)) {
 }
 
 // The drawing behind every sock product, for the fitting room, which draws the chosen sock on a leg: the sock as
-// drawn, and per colour (by its hex, as the shop lists it) the main and accent colours that change.
+// drawn, and per colour (by its hex, as the shop lists it) the main and accent colours that change; for a gift box,
+// the socks inside it.
 const specs = {};
 for (const [slug, p] of Object.entries(PRODUCTS)) {
-  if (!p.sock) continue;
+  if (p.box) { specs[slug] = { b: p.box.socks.map(({ solid, ...spec }) => spec) }; continue; }
   const c = {};
   for (const [, hex] of COLOURS[slug] ?? []) { const s = colourise(BASE[slug] ?? p.sock, hex); c[hex.toUpperCase()] = [s.main, s.accent]; }
   const { solid, ...spec } = p.sock;
   specs[slug] = { s: spec, c };
 }
 fs.writeFileSync(path.join(outDir, "specs.json"), JSON.stringify(specs) + "\n");
-console.log(`wrote ${files} product images and the drawings of ${Object.keys(specs).length} socks to public/media/products`);
+console.log(`wrote ${files} product images and the drawings of ${Object.keys(specs).length} socks and boxes to public/media/products`);

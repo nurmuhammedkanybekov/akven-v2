@@ -20,9 +20,25 @@ const KEY = "akven-lang";
 
 export type Translate = (key: MessageKey, vars?: Record<string, string | number>) => string;
 
+/**
+ * Plural forms: "{n:pair|pairs}" in English, "{n:пара|пары|пар}" (one, few, many) in Russian, chosen by the
+ * language's own rules, so "1 pair", "2 pairs", "1 пара", "3 пары", "5 пар". Kyrgyz does not change the noun after a
+ * number, so its texts need none.
+ */
+const PLURAL_FORM: Record<string, number> = { one: 0, few: 1, many: 2, other: 2 };
+function plural(lang: Lang, value: number, forms: string[]): string {
+  const cat = new Intl.PluralRules(lang === "ky" ? "ru" : lang).select(value);
+  const i = lang === "en" ? (cat === "one" ? 0 : 1) : PLURAL_FORM[cat] ?? forms.length - 1;
+  return forms[Math.min(i, forms.length - 1)];
+}
+
 function translate(lang: Lang, key: MessageKey, vars?: Record<string, string | number>): string {
   let text = DICTS[lang][key] ?? en[key] ?? key;
-  if (vars) for (const [k, v] of Object.entries(vars)) text = text.split(`{${k}}`).join(String(v));
+  if (vars) {
+    text = text.replace(/\{(\w+):([^{}]+)\}/g, (all, name: string, forms: string) =>
+      name in vars ? plural(lang, Number(vars[name]), forms.split("|")) : all);
+    for (const [k, v] of Object.entries(vars)) text = text.split(`{${k}}`).join(String(v));
+  }
   return text;
 }
 
