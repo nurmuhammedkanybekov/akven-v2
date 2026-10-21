@@ -1,0 +1,58 @@
+# Keeps the graded copy on the ELTE GitLab up to date: whenever CI is green on `nurmss` or `dev`, the same commit is
+# pushed to GitLab (`nurmss` -> `nurmss`, `dev` -> `master`). Fast-forward only: if GitLab has commits of its own, the
+# push is refused and nothing is overwritten.
+#
+# Needs one repository secret, GITLAB_TOKEN: a GitLab access token with the `write_repository` scope, created on
+# szofttech.inf.elte.hu (Preferences -> Access tokens, or the project's Settings -> Access tokens). It is never printed.
+# Without the secret the job explains what is missing and stops.
+name: Mirror to ELTE GitLab
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [nurmss, dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-gitlab-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      GITLAB_REPO: szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed.git
+      BRANCH: ${{ github.event.workflow_run.head_branch }}
+      SHA: ${{ github.event.workflow_run.head_sha }}
+      TOKEN: ${{ secrets.GITLAB_TOKEN }}
+    steps:
+      - name: Check the token is set
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::GITLAB_TOKEN is not set, so nothing was pushed. Add it under Settings -> Secrets and variables -> Actions."
+            exit 0
+          fi
+          echo "HAS_TOKEN=1" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+        if: env.HAS_TOKEN == '1'
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push the green commit to GitLab
+        if: env.HAS_TOKEN == '1'
+        run: |
+          case "$BRANCH" in
+            dev) TARGET=master ;;
+            *) TARGET="$BRANCH" ;;
+          esac
+          git remote add gitlab "https://oauth2:${TOKEN}@${GITLAB_REPO}"
+          # No --force: GitLab only moves forward to commits that already passed CI here.
+          git push gitlab "${SHA}:refs/heads/${TARGET}"
+          echo "Pushed ${SHA} to GitLab ${TARGET}"

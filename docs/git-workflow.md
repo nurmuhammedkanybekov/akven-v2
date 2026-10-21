@@ -93,6 +93,19 @@ that, hard-refresh it (Cmd+Shift+R), because the installed app keeps its files i
 
 ## 3. Publish to GitLab
 
+**Automatically (recommended).** `.github/workflows/mirror-gitlab.yml` pushes every commit that passed CI on GitHub to
+GitLab: `nurmss` to `nurmss`, and `dev` to `master`. It only moves GitLab forward (no force push), so it can never
+overwrite anything. It needs a token once:
+
+1. On https://szofttech.inf.elte.hu, open the project, then Settings → Access tokens (or your avatar → Preferences →
+   Access tokens if project tokens are not available). Create a token with the scope `write_repository` (role
+   Maintainer for a project token) and an expiry date after the defence. Copy it.
+2. On GitHub, open the repository, then Settings → Secrets and variables → Actions → New repository secret. Name it
+   `GITLAB_TOKEN` and paste the token. Never put it in a file or a message.
+3. From then on, every green push reaches GitLab by itself. The run is under Actions → "Mirror to ELTE GitLab".
+
+**By hand**, from a laptop that can sign in to GitLab:
+
 First make sure the `gitlab` remote exists (once per laptop):
 
 ```bash
