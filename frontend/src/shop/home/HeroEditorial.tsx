@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { Logo } from "../../brand/Logo";
+import { Seal } from "../../brand/Seal";
 import { SOCK_COLOURS as C, SockArt, type SockSpec } from "../../brand/SockArt";
 import { Button } from "../../components/Button";
 import { useT } from "../../i18n/I18n";
@@ -38,7 +39,7 @@ function Season() {
  * The first screen: what AK&VEN sells, shown. The words on the left (who it is, what it is, two ways in, three
  * promises); on the right a still life on warm beige in afternoon light: an open AK&VEN box of folded pairs on tissue,
  * its lid beside it, loose pairs in cream, navy, white and charcoal. It is drawn, not photographed, until the family's
- * own photographs replace it, and it moves a little with the pointer (by depth) and settles into place on arrival.
+ * own photographs replace it, with the shop's round stamp turning in the corner, and it moves a little with the pointer (by depth) and settles into place on arrival.
  */
 export function HeroEditorial() {
   const { t } = useT();
@@ -55,7 +56,10 @@ export function HeroEditorial() {
       <div className="av-container av-hero6__grid">
         <div className="av-hero6__copy">
           <Season />
-          <p className="av-hero6__eyebrow">{t("hero6.eyebrow")}</p>
+          <p className="av-hero6__eyebrow av-hand">
+            {t("hero6.eyebrow")}
+            <svg viewBox="0 0 60 24" aria-hidden="true"><path d="M2 6C18 2 34 6 44 16M44 16l-9-1M44 16l1-9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+          </p>
           <h1 id="hero-title" className="av-hero6__title">{t("hero6.title1")}<br /><span>{t("hero6.title2")}</span></h1>
           <p className="av-hero6__lead">{t("hero6.lead")}</p>
           <div className="av-row av-hero6__ctas">
@@ -71,6 +75,7 @@ export function HeroEditorial() {
 
         <div ref={still} className="av-still" aria-hidden="true" onPointerMove={onMove} onPointerLeave={() => { still.current?.style.setProperty("--mx", "0"); still.current?.style.setProperty("--my", "0"); }}>
           <div className="av-still__light" />
+          <Seal className="av-still__seal" />
           {LOOSE.map((s, i) => (
             <span key={i} className="av-still__sock" style={{ "--x": `${s.x}%`, "--y": `${s.y}%`, "--r": `${s.r}deg`, "--w": `${s.w}%`, "--z": s.z, "--i": i } as React.CSSProperties}>
               <SockArt {...s.spec} />

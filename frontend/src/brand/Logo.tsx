@@ -10,6 +10,8 @@ interface LogoProps {
   /** Rendered height in px or any CSS length. Width follows the logo's proportions. */
   height?: number | string;
   className?: string;
+  /** The heart ampersand writes itself with the pen when the logo appears (still under reduced motion). */
+  write?: boolean;
 }
 
 /**
@@ -17,10 +19,14 @@ interface LogoProps {
  * takes --logo-amp when a page sets it (gold in the header and footer), otherwise the same colour as the rest. The
  * markup is built from the generated outlines and the mark's geometry only.
  */
-export function Logo({ variant = "full", metallic = false, height = 28, className }: LogoProps) {
+export function Logo({ variant = "full", metallic = false, height = 28, className, write = false }: LogoProps) {
   const id = `lg${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const fill = metallic ? `url(#${id}-g)` : "currentColor";
-  const amp = (t: string) => `<path transform="${t}" style="fill:${metallic ? fill : "var(--logo-amp, currentColor)"}" d="${LOGO.amp}"/>`;
+  // Writing: the filled heart is shown through a mask, a wide stroke along the pen's own path that draws itself in.
+  const pen = write && LOGO.ampLine;
+  const amp = (t: string) =>
+    (pen ? `<mask id="${id}-w" maskUnits="userSpaceOnUse" x="-1000" y="-400" width="3000" height="800"><path class="av-logo-pen" d="${LOGO.ampLine}" pathLength="1" fill="none" stroke="#fff" stroke-width="17" stroke-linecap="round"/></mask>` : "") +
+    `<path transform="${t}" style="fill:${metallic ? fill : "var(--logo-amp, currentColor)"}" d="${LOGO.amp}"${pen ? ` mask="url(#${id}-w)"` : ""}/>`;
   const defs = metallic
     ? `<defs><linearGradient id="${id}-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#edd79c"/><stop offset=".5" stop-color="#c9a24b"/><stop offset="1" stop-color="#9a772b"/></linearGradient></defs>`
     : "";

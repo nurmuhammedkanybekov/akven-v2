@@ -1,0 +1,279 @@
+/*
+ * AK&VEN's own hand: the serif headings, the family's handwriting on tags and notes, paper with a little grain, the
+ * Kyrgyz ornament as a rule between things, a thread of yarn, and the fitting room. Loaded last.
+ */
+
+/* ---------- type ---------- */
+
+/* Headings that were set heavy in the sans now take the serif's own weight. */
+.av-hero6__title, .av-dordoi__intro h2, .av-hero5__title { letter-spacing: -0.015em; }
+.av-hero6__title span { font-weight: 500; font-style: italic; letter-spacing: -0.01em; color: var(--accent-ink); }
+.av-drawer__links a, .av-footer__line, .av-promo strong, .av-whole2__cards strong, .av-sizes__tips strong, .av-cat__name, .av-biz__card strong {
+  font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em;
+}
+.av-footer__line { font-size: clamp(1.8rem, 1.3rem + 1.8vw, 2.7rem); line-height: 1.05; }
+.av-biz__card strong { font-size: clamp(2rem, 1.4rem + 1.8vw, 2.9rem); }
+.av-cat2__name { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; letter-spacing: -0.005em; }
+
+/* The family's handwriting: notes, tags, signatures. */
+.av-hand { font-family: var(--font-hand); font-weight: 600; font-size: 1.45em; line-height: 1.05; letter-spacing: 0; color: var(--accent-ink); }
+
+/* A kraft label on a string, as the stall prices its bundles. */
+.av-kraft {
+  position: relative; display: inline-flex; align-items: center; gap: 0.4em;
+  padding: 0.35em 0.9em 0.35em 1.5em; border-radius: 3px 10px 10px 3px;
+  background: #d8bf94 linear-gradient(180deg, rgb(255 255 255 / 0.18), rgb(0 0 0 / 0.04));
+  color: #3c2a14; font-family: var(--font-hand); font-weight: 600; font-size: 1.3rem; line-height: 1;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.08), 0 8px 18px -10px rgb(60 42 20 / 0.5);
+  clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%);
+}
+.av-kraft::before { content: ""; position: absolute; left: 10px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--paper); box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.25); }
+
+/* ---------- paper ---------- */
+
+/* A little grain on the page, like the paper of a price card. Barely there, and none in print or high contrast. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.35; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .28 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#root { position: relative; z-index: 1; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body::before { mix-blend-mode: screen; opacity: 0.18; } }
+:root[data-theme="dark"] body::before { mix-blend-mode: screen; opacity: 0.18; }
+@media print, (forced-colors: active), (prefers-contrast: more) { body::before { display: none; } }
+
+/* ---------- the logo writes its heart ---------- */
+
+.av-logo-pen { stroke-dasharray: 1 1; stroke-dashoffset: 1; animation: av-pen 1.5s 0.35s cubic-bezier(0.55, 0.1, 0.3, 1) forwards; }
+@keyframes av-pen { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .av-logo-pen { animation: none; stroke-dashoffset: 0; } }
+
+/* ---------- the fitting room ---------- */
+
+.av-fitroom { position: relative; overflow: clip; }
+.av-fitroom__head { display: grid; gap: var(--space-3); max-width: 46rem; margin-bottom: var(--space-7); }
+.av-fitroom__head .av-hand { font-size: 1.7rem; transform: rotate(-2deg); transform-origin: left; }
+
+.av-fr { display: grid; gap: var(--space-7); align-items: start; }
+@media (min-width: 960px) { .av-fr { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); } }
+
+.av-fr__controls { display: grid; gap: var(--space-5); }
+.av-fr__step { margin: 0; padding: 0; border: 0; min-width: 0; display: grid; gap: var(--space-3); }
+.av-fr__step legend { display: flex; align-items: center; gap: var(--space-3); padding: 0; margin-bottom: var(--space-3); font-weight: 600; color: var(--ink); }
+.av-fr__step legend b {
+  display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--accent);
+  font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: var(--accent-ink);
+}
+.av-fr__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.av-fr__chip, .av-fr__height { position: relative; }
+.av-fr__chip input, .av-fr__height input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.av-fr__chip span {
+  display: block; padding: 9px 16px; border-radius: 999px; border: 1.5px solid var(--line-strong); font-weight: 500; font-size: 0.9375rem;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.av-fr__chip:hover span { border-color: var(--ink); }
+.av-fr__chip.is-on span { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.av-fr__chip:has(input:focus-visible) span, .av-fr__height:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.av-fr__heights { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.av-fr__height {
+  display: grid; gap: 4px; padding: 10px 8px; border-radius: var(--radius-sm); border: 1.5px solid var(--line-strong); background: var(--surface);
+  text-align: center; transition: border-color var(--dur-fast) var(--ease), transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.av-fr__height:hover { border-color: var(--ink); transform: translateY(-2px); }
+.av-fr__height.is-on { border-color: var(--ink); background: var(--ink); color: var(--on-ink); }
+.av-fr__hname { font-weight: 600; font-size: 0.875rem; line-height: 1.15; }
+.av-fr__hfit { font-size: 0.75rem; font-weight: 600; border-radius: 999px; padding: 1px 6px; justify-self: center; }
+.av-fr__height[data-fit="2"] .av-fr__hfit { background: var(--success-bg); color: var(--success); }
+.av-fr__height[data-fit="1"] .av-fr__hfit { background: var(--surface-2); color: var(--ink-2); }
+.av-fr__height[data-fit="0"] .av-fr__hfit { background: var(--danger-bg); color: var(--danger); }
+.av-fr__height[data-fit="0"]:not(.is-on) { border-style: dashed; }
+@media (max-width: 520px) { .av-fr__heights { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.av-fr__advice { margin: 0; padding: var(--space-3) var(--space-4); border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 0.9375rem; color: var(--text); animation: av-fr-note 0.45s var(--ease) both; }
+.av-fr__advice[data-fit="0"] { border-left-color: var(--danger); }
+.av-fr__advice[data-fit="2"] { border-left-color: var(--success); }
+@keyframes av-fr-note { from { transform: translateY(6px); } }
+
+.av-fr__size { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-4); }
+.av-fr__size .av-field { width: 9rem; }
+.av-fr__sizeout { margin: 0 0 10px; }
+.av-fr__skins { display: flex; align-items: center; gap: 8px; }
+.av-fr__skin { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--paper); box-shadow: 0 0 0 1.5px var(--line-strong); cursor: pointer; padding: 0; transition: transform var(--dur-fast) var(--ease); }
+.av-fr__skin:hover { transform: scale(1.1); }
+.av-fr__skin[aria-checked="true"] { box-shadow: 0 0 0 2px var(--ink); }
+
+.av-fr__room { display: grid; gap: var(--space-4); min-width: 0; }
+.av-fr__stage {
+  position: relative; padding: var(--space-5) var(--space-4) var(--space-3) 6.5rem; border-radius: var(--radius-lg);
+  background: radial-gradient(ellipse at 55% 30%, rgb(255 255 255 / 0.7), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--sand));
+  overflow: hidden;
+}
+/* The curtain of the stall's fitting corner, on the right. */
+.av-fr__stage::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 16%;
+  background: repeating-linear-gradient(90deg, #8e2f2b 0 14px, #a8413a 14px 22px, #7c2725 22px 30px);
+  box-shadow: inset 12px 0 18px -10px rgb(0 0 0 / 0.45); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; opacity: 0.92;
+  mask: linear-gradient(90deg, transparent, #000 30%);
+}
+.av-fr__svg { width: min(100%, 330px); height: auto; margin-inline: 0 auto; position: relative; z-index: 1; filter: drop-shadow(0 18px 18px rgb(60 42 20 / 0.12)); }
+.av-fr__tape rect { fill: #e9c75a; }
+.av-fr__tape path { stroke: #3c2a14; stroke-width: 1.4; }
+.av-fr__marks { position: absolute; left: var(--space-3); top: var(--space-5); bottom: var(--space-3); width: 6rem; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+.av-fr__marks li {
+  position: absolute; left: 0; transform: translateY(-50%); font-size: 0.75rem; font-weight: 600; color: var(--ink-3);
+  display: flex; align-items: center; gap: 6px; transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.av-fr__marks li::after { content: ""; width: 14px; height: 1.5px; background: currentColor; }
+.av-fr__marks li.is-on { color: var(--ink); transform: translateY(-50%) translateX(4px); }
+.av-fr__marks li.is-on::before { content: ""; position: absolute; left: -10px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* Pulling the sock on: up from the foot, the knit stretching into place. The shoe steps in from the side. */
+.av-fr__sock { transform-box: fill-box; transform-origin: 50% 100%; animation: av-fr-pull 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.15) both; }
+@keyframes av-fr-pull { from { opacity: 0; transform: translateY(16%) scaleY(0.7); } 60% { opacity: 1; } }
+.av-fr__shoe { transform-box: fill-box; transform-origin: 30% 100%; animation: av-fr-shoe 0.6s 0.15s cubic-bezier(0.2, 0.8, 0.3, 1.1) both; }
+@keyframes av-fr-shoe { from { opacity: 0; transform: translate(26%, -6%) rotate(8deg); } }
+
+.av-fr__on { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.av-fr__now { display: grid; gap: 2px; }
+.av-fr__tag { font-family: var(--font-hand); font-size: 1.3rem; font-weight: 600; line-height: 1; color: var(--accent-ink); }
+.av-fr__colours { display: flex; flex-wrap: wrap; gap: 6px; }
+.av-fr__dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--line-strong); padding: 0; cursor: pointer; transition: transform var(--dur-fast) var(--ease); }
+.av-fr__dot:hover { transform: scale(1.12); }
+.av-fr__dot[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink); }
+
+.av-fr__rail { display: flex; gap: var(--space-2); margin: 0; padding: 2px 2px var(--space-2); list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.av-fr__rail li { flex: 0 0 92px; scroll-snap-align: start; }
+.av-fr__rail button { display: grid; gap: 4px; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+.av-fr__thumb { display: block; aspect-ratio: 4 / 5; border-radius: var(--radius-sm); overflow: hidden; border: 2px solid transparent; transition: border-color var(--dur-fast) var(--ease), transform var(--dur) var(--ease); }
+.av-fr__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.av-fr__rail button:hover .av-fr__thumb { transform: translateY(-3px); }
+.av-fr__rail button[aria-pressed="true"] .av-fr__thumb { border-color: var(--ink); }
+.av-fr__thumbname { font-size: 0.75rem; line-height: 1.25; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (max-width: 520px) { .av-fr__stage { padding-left: 5.2rem; } .av-fr__marks { width: 5rem; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .av-fr__sock, .av-fr__shoe, .av-fr__advice { animation: none; }
+}
+
+/* "Try it on" over the product picture, and the fitting room as a dialog. */
+.av-pdp__main { position: relative; }
+.av-pdp__try {
+  position: absolute; left: var(--space-4); bottom: var(--space-4); z-index: 2; display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px 10px 12px; border: 0; border-radius: 999px; background: var(--paper); color: var(--ink); font-weight: 600; cursor: pointer;
+  box-shadow: 0 10px 24px -12px rgb(15 25 48 / 0.45); transition: transform 0.35s var(--ease-spring);
+}
+.av-pdp__try:hover { transform: translateY(-2px); }
+.av-pdp__tryicon { width: 22px; height: 22px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 4h6v8l4 3a3 3 0 0 1-2 5H9a3 3 0 0 1-3-3V4z' fill='none' stroke='%23121a2c' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+.av-frdialog { width: min(1180px, calc(100% - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 0; border-radius: var(--radius-lg); background: var(--paper); color: var(--text); }
+.av-frdialog::backdrop { background: rgb(15 25 48 / 0.55); backdrop-filter: blur(3px); }
+.av-frdialog[open] { animation: av-frd-in 0.45s var(--ease-out); }
+@keyframes av-frd-in { from { transform: translateY(24px) scale(0.98); } }
+.av-frdialog__panel { padding: var(--space-6) clamp(1rem, 3vw, 2.5rem) var(--space-6); }
+.av-frdialog__head { display: flex; align-items: start; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-5); }
+.av-frdialog__head h2 { font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.6rem); }
+.av-sizes__fit { display: grid; gap: var(--space-3); margin-block: var(--space-6); }
+.av-sizes__fit > .av-fr { margin-top: var(--space-4); }
+
+/* The heart in "two names" is written with the pen once the letters have met. */
+.reveal .av-names .av-names__part--amp { transform: none; transition: none; }
+.reveal .av-names:not(.is-in) .av-names__pen { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.reveal .av-names.is-in .av-names__pen { stroke-dasharray: 1 1; animation: av-pen-in 1.7s 0.9s cubic-bezier(0.55, 0.1, 0.3, 1) both; }
+@keyframes av-pen-in { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* ---------- hero: the note in the family's hand, and the turning stamp ---------- */
+
+.av-hero6__eyebrow.av-hand { display: inline-flex; align-items: end; gap: 4px; font-size: 1.65rem; letter-spacing: 0; text-transform: none; transform: rotate(-2deg); transform-origin: left bottom; }
+.av-hero6__eyebrow svg { width: 46px; height: 20px; margin-bottom: -6px; transform: rotate(16deg); }
+.av-hero6__title { font-size: clamp(2.8rem, 1.4rem + 4.2vw, 5.4rem); line-height: 0.98; }
+.av-hero6__title span { display: inline-block; }
+
+.av-seal { width: 100%; height: 100%; overflow: visible; }
+.av-seal__ring { fill: #f7f1e3; stroke: #b08a4a; stroke-width: 1.5; }
+.av-seal__inner { fill: none; stroke: #b08a4a; stroke-width: 1; stroke-dasharray: 2 4; }
+.av-seal__text { font: 600 15px/1 var(--font-sans); letter-spacing: 0.18em; fill: #6b4f1e; }
+.av-seal__heart { fill: #b8913f; }
+.av-seal__turn { transform-origin: 100px 100px; animation: av-seal-turn 40s linear infinite; }
+@keyframes av-seal-turn { to { transform: rotate(360deg); } }
+.av-still__seal { position: absolute; z-index: 6; left: 3%; top: auto; bottom: 4%; width: clamp(96px, 17%, 150px); height: auto; rotate: -10deg; filter: drop-shadow(0 6px 10px rgb(60 42 20 / 0.18)); }
+@media (prefers-reduced-motion: reduce) { .av-seal__turn { animation: none; } }
+
+/* ---------- notes from the stall ---------- */
+
+.av-notes { background: linear-gradient(180deg, transparent, var(--sand) 18%, var(--sand) 82%, transparent); }
+.av-notes__head { display: grid; gap: var(--space-3); max-width: 40rem; margin-bottom: var(--space-7); }
+.av-notes__head .av-hand { font-size: 1.7rem; transform: rotate(-2deg); transform-origin: left; }
+.av-notes__board {
+  list-style: none; margin: 0; padding: clamp(1.25rem, 3vw, 2.5rem); display: grid; gap: clamp(1rem, 2.4vw, 2rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  border-radius: var(--radius-md); background: #b48f62 radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.12), transparent 40%);
+  box-shadow: inset 0 0 0 10px #8a6a44, inset 0 0 0 12px #6f5434, 0 24px 40px -28px rgb(60 42 20 / 0.6);
+  background-image: radial-gradient(rgb(0 0 0 / 0.09) 1px, transparent 1.4px), radial-gradient(rgb(255 255 255 / 0.08) 1px, transparent 1.4px);
+  background-size: 7px 7px, 11px 11px;
+}
+.av-note {
+  position: relative; display: grid; gap: var(--space-3); align-content: space-between; min-height: 11rem; padding: 1.6rem 1.2rem 1rem;
+  background: #fffdf6; color: #2b2418; rotate: var(--r); box-shadow: 0 2px 0 rgb(0 0 0 / 0.04), 0 14px 22px -14px rgb(40 28 10 / 0.55);
+  transition: rotate 0.5s var(--ease-spring), translate 0.5s var(--ease-spring);
+}
+.av-note p { margin: 0; font-family: var(--font-hand); font-weight: 600; font-size: 1.45rem; line-height: 1.15; }
+.av-note__by { justify-self: end; font-family: var(--font-hand); font-weight: 600; font-size: 1.25rem; color: #6a420c; }
+.av-note--kraft { background: #dcc49a; }
+.av-note--yellow { background: #f6e7a5; }
+.av-note--lined { background: #fffdf6 repeating-linear-gradient(180deg, transparent 0 27px, rgb(80 120 170 / 0.22) 27px 28px); background-position: 0 14px; }
+.av-note__pin { position: absolute; top: 8px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #e98b7c, #a8322a 60%); box-shadow: 0 3px 4px rgb(0 0 0 / 0.3); }
+@media (hover: hover) { .av-note:hover { rotate: 0deg; translate: 0 -4px; } }
+.reveal .av-notes .av-note { translate: 0 -30px; rotate: calc(var(--r) - 12deg); transform-origin: 50% 8px; transition: rotate 1s var(--ease-spring), translate 0.8s var(--ease-out); transition-delay: calc(var(--i) * 0.09s); }
+.reveal .av-notes.is-in .av-note { translate: 0 0; rotate: var(--r); }
+@media (prefers-reduced-motion: reduce) { .av-note, .reveal .av-notes .av-note { transition: none; translate: none; rotate: var(--r); } }
+:root[data-theme="dark"] .av-note, :root[data-theme="dark"] .av-note p { color: #2b2418; }
+
+/* ---------- the yarn thread ---------- */
+
+.av-yarn { position: fixed; z-index: 60; top: 0; left: 0; right: 0; height: 3px; pointer-events: none; }
+.av-yarn[data-on="false"] { display: none; }
+.av-yarn__thread {
+  position: absolute; inset: 0 auto 0 0; width: calc(var(--p, 0) * 100%);
+  background: repeating-linear-gradient(115deg, #c9a24b 0 4px, #e6c983 4px 6px, #a88232 6px 9px);
+}
+.av-yarn__ball {
+  position: absolute; top: -5px; left: calc(var(--p, 0) * 100%); width: 13px; height: 13px; margin-left: -6px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f0d796, #c9a24b 55%, #8f6c25);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12); rotate: calc(var(--p, 0) * 2160deg);
+  background-image: repeating-linear-gradient(60deg, transparent 0 2px, rgb(120 90 27 / 0.45) 2px 3px), radial-gradient(circle at 35% 35%, #f0d796, #c9a24b 55%, #8f6c25);
+}
+
+/* Section labels in the shop are the family's handwriting, like the tags on their shelves. */
+.av-shopmain .av-eyebrow { font-family: var(--font-hand); font-size: 1.45rem; font-weight: 600; line-height: 1.05; letter-spacing: 0; display: inline-block; rotate: -1.5deg; transform-origin: left bottom; }
+.av-shopmain .av-dordoi .av-eyebrow, .av-shopmain .av-on-dark .av-eyebrow { color: var(--accent); }
+
+/* A drawn sock on a product card sways from its cuff when you point at it, as if it hung on the line. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .av-card:hover .av-card__media img { transform-origin: 50% 12%; animation: av-sway 1.4s var(--ease-out); }
+}
+@keyframes av-sway { 0% { rotate: 0deg; scale: 1.05; } 25% { rotate: -2.2deg; } 55% { rotate: 1.4deg; } 80% { rotate: -0.5deg; } 100% { rotate: 0deg; scale: 1.05; } }
+
+/* Height chips carry a little leg with the sock at that height. */
+.av-heighticon { width: auto; height: 1.75em; margin-block: -0.2em; margin-right: 6px; flex: none; }
+.av-heighticon__leg { fill: currentColor; opacity: 0.25; }
+.av-heighticon__sock { fill: currentColor; }
+.av-chip:has(.av-heighticon) { display: inline-flex; align-items: center; }
+
+/* The gift card is written by hand. */
+.av-giftcard p { font-family: var(--font-hand); font-style: normal; font-weight: 600; font-size: 1.5rem; line-height: 28px; }
+
+/* Handwriting is written, left to right, as its section arrives. */
+.reveal [data-reveal] :is(.av-hand, .av-eyebrow) { clip-path: inset(-0.3em 100% -0.3em 0); transition: clip-path 1.1s cubic-bezier(0.55, 0.1, 0.3, 1) 0.15s; }
+.reveal [data-reveal].is-in :is(.av-hand, .av-eyebrow) { clip-path: inset(-0.3em -0.5em -0.3em 0); }
+
+/* The menu's underline is a strand of gold yarn. */
+.av-nav a::after { height: 2px; border-radius: 2px; background: repeating-linear-gradient(115deg, #c9a24b 0 4px, #e6c983 4px 6px, #a88232 6px 9px); }
+
+/* Dark: a dimmer lamp over the fitting corner. */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-fr__stage { background: radial-gradient(ellipse at 55% 30%, rgb(255 255 255 / 0.07), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--sand)); } }
+:root[data-theme="dark"] .av-fr__stage { background: radial-gradient(ellipse at 55% 30%, rgb(255 255 255 / 0.07), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--sand)); }
+
+/* Phones: the top bar's message keeps clear of the language switch, in every language. */
+@media (max-width: 799px) {
+  .av-ann__bar { justify-content: flex-start; }
+  .av-ann__text { padding: 4px 11.5rem 4px 0; text-align: left; letter-spacing: 0.02em; line-height: 1.3; }
+}

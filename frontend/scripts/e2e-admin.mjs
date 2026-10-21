@@ -351,24 +351,35 @@ try {
   await step("the site speaks Russian and Kyrgyz, and remembers the choice", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("button", { name: "Русский" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Комфорт каждый день/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Носки, выбранные пара за парой/ }).waitFor();
     await page.reload();
-    await page.getByRole("heading", { level: 1, name: /Комфорт каждый день/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Носки, выбранные пара за парой/ }).waitFor();
     await a11y("the home page in Russian");
     await page.getByRole("button", { name: "Кыргызча" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Күн сайын ыңгайлуу/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Жуп-жубу менен тандалган/ }).waitFor();
     await page.getByRole("button", { name: "English" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Everyday comfort/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Socks chosen pair by pair/ }).waitFor();
   });
 
   await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting is on the size guide", async () => {
     await page.goto(`${BASE}/`);
-    await page.getByRole("heading", { name: /Everyday comfort/ }).waitFor();
+    await page.getByRole("heading", { name: /Socks chosen pair by pair/ }).waitFor();
     await page.locator(".av-still__box").waitFor();
     await page.getByRole("link", { name: /For her/ }).waitFor();
     await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
     await page.getByRole("group", { name: "Show socks for" }).getByRole("button", { name: "Women" }).click();
     await page.locator(".av-shelf .av-card").first().waitFor();
+    // the fitting room: boots and a no-show is advised against, and our own knee-highs go on the leg
+    await page.getByRole("heading", { name: "Try them on before you buy" }).scrollIntoViewIfNeeded();
+    const fitting = page.locator("#fitting");
+    await fitting.getByRole("radio", { name: "Boots" }).check({ force: true });
+    await fitting.getByRole("radio", { name: /^No-show/ }).check({ force: true });
+    await fitting.getByText(/No-show with boots: better not/).waitFor();
+    await fitting.getByRole("radio", { name: /^Knee-high/ }).check({ force: true });
+    await fitting.getByText(/Knee-high with boots: just right/).waitFor();
+    await fitting.getByRole("link", { name: "See this pair" }).waitFor();
+    await fitting.getByText("Men", { exact: true }).waitFor();
+    await page.getByRole("heading", { name: "Notes from the stall" }).waitFor();
     await page.getByRole("heading", { name: "Two names. One family. One story." }).waitFor();
     await page.locator(".av-dordoi").scrollIntoViewIfNeeded();
     await page.evaluate(() => { const el = document.querySelector(".av-dordoi"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + el.offsetHeight - window.innerHeight); });
@@ -384,8 +395,16 @@ try {
     await page.getByRole("heading", { name: "Socks for every holiday" }).waitFor();
     await a11y("the gift sets page");
     await page.goto(`${BASE}/sizes`);
-    await page.getByRole("radio", { name: "Knee-high" }).check();
+    await page.getByRole("radio", { name: /^Knee-high/ }).check({ force: true });
     await page.getByRole("link", { name: "Shop knee-high socks" }).waitFor();
+    // try a sock on from its own page, in the colour the link asked for
+    await page.goto(`${BASE}/products/classic-rib-crew-men?colour=8A8D91`);
+    await page.getByRole("button", { name: "Try it on" }).click();
+    const dialog = page.getByRole("dialog", { name: "Try them on before you buy" });
+    await dialog.getByText("Classic Rib Crew", { exact: true }).waitFor();
+    assert.equal(await dialog.getByRole("button", { name: "Colour #8A8D91" }).getAttribute("aria-pressed"), "true");
+    await a11y("the fitting room on a product page");
+    await page.keyboard.press("Escape");
   });
   await step("the owners' screens open and pass the accessibility rules; staff cannot change prices", async () => {
     await page.goto(`${BASE}/orders`);

@@ -4,6 +4,7 @@ import { useCart } from "../cart/CartContext";
 import { BagDrawer } from "../components/BagDrawer";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
+import { YarnProgress } from "../components/YarnProgress";
 import { ThemeToggle, useTheme } from "../components/useTheme";
 import { useT } from "../i18n/I18n";
 import { useReveal } from "../shop/useReveal";
@@ -20,6 +21,7 @@ export function ShopLayout() {
   return (
     <>
       <a className="av-skip-link" href="#main">{t("skip")}</a>
+      <YarnProgress />
       <Header
         cartCount={cart.count}
         savedCount={saved.items.length}
@@ -27,7 +29,7 @@ export function ShopLayout() {
         accountLabel={session ? (isStaff ? t("nav.admin") : t("nav.account")) : t("nav.signin")}
         extra={<ThemeToggle theme={theme} onToggle={toggle} className="av-ann__theme" />}
       />
-      <main id="main"><Outlet /></main>
+      <main id="main" className="av-shopmain"><Outlet /></main>
       <BagDrawer />
       <Footer />
     </>

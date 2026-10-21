@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { MAX_PER_LINE, useCart } from "../cart/CartContext";
 import { QuantityStepper } from "../components/QuantityStepper";
 import { useToast } from "../components/Toast";
@@ -32,6 +32,9 @@ import { getMatching } from "../api/endpoints";
 import { SparkIcon } from "../components/icons";
 import { categoryFor, useFamily } from "../shop/family";
 import { openStatus, weekdayNames } from "../lib/hours";
+import type { SockCut } from "../brand/SockArt";
+import { CUTS } from "../shop/fitting/FittingRoom";
+import { FittingDialog } from "../shop/fitting/FittingDialog";
 
 export function ProductPage() {
   const { slug = "" } = useParams();
@@ -56,7 +59,12 @@ function ProductView({ product }: { product: ProductDetail }) {
   const minPrice = product.variants.length ? Math.min(...product.variants.map((v) => v.price)) : null;
   useEffect(() => { rememberViewed({ slug: product.slug, name: product.name, image: product.images[0]?.url ?? null, price: minPrice }); }, [product.slug, product.name, product.images, minPrice]);
   const variants = product.variants;
-  const { current, colors, sizes, packs, pick, label, images } = useVariantChoice(product);
+  const [search] = useSearchParams();
+  const colourParam = search.get("colour");
+  const { current, colors, sizes, packs, pick, label, images } = useVariantChoice(product, colourParam && /^[0-9a-fA-F]{6}$/.test(colourParam) ? `#${colourParam}` : null);
+  const [fitting, setFitting] = useState(false);
+  const cut = product.cut?.slug as SockCut | undefined;
+  const canTry = !!cut && CUTS.includes(cut) && product.category !== "BUNDLES";
   const [imageIndex, setImageIndex] = useState(0);
   // A new colour starts on its first picture.
   useEffect(() => { setImageIndex(0); }, [current?.color]);
@@ -70,13 +78,27 @@ function ProductView({ product }: { product: ProductDetail }) {
 
   return (
     <div className="av-container av-page">
+      {canTry && fitting && (
+        <FittingDialog onClose={() => setFitting(false)}
+          initial={{ slug: product.slug, cut: cut!, hex: current?.colorHex ?? null, category: product.category, product: {
+            slug: product.slug, name: product.name, category: product.category, section: product.section, cut: product.cut, collection: null,
+            minPrice, inStock: variants.some((v) => v.availableQty > 0), variantCount: variants.length, image: product.images[0] ?? null,
+            colors: colors.map((c) => c.colorHex).filter((h): h is string => !!h) } }} />
+      )}
       <nav className="av-crumbs" aria-label={t("pdp.crumbs")}>
         <Link to={CATEGORY_PATH[product.category]}>{t(`nav.${product.category.toLowerCase()}` as MessageKey)}</Link>
         {product.section && <><span aria-hidden="true">/</span><Link to={`${CATEGORY_PATH[product.category]}?section=${product.section.slug}`}>{product.section.name}</Link></>}
       </nav>
       <div className="av-pdp">
         <div className="av-pdp__gallery">
-          <div className="av-pdp__main"><ProductImage key={image?.url} image={image} eager /></div>
+          <div className="av-pdp__main">
+            <ProductImage key={image?.url} image={image} eager />
+            {canTry && (
+              <button type="button" className="av-pdp__try" onClick={() => setFitting(true)}>
+                <span className="av-pdp__tryicon" aria-hidden="true" />{t("fr.try")}
+              </button>
+            )}
+          </div>
           {images.length > 1 && (
             <div className="av-pdp__thumbs" role="group" aria-label={t("pdp.photos")}>
               {images.map((img, i) => (

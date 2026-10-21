@@ -16,7 +16,7 @@ export function Footer() {
       <OimoBand className="av-footer__band" />
       <div className="av-container">
         <div className="av-footer__top">
-          <Logo variant="stacked" height={150} className="av-footer__logo" />
+          <Logo variant="stacked" height={150} className="av-footer__logo" write />
           <p className="av-footer__line">{t("foot.line")}</p>
         </div>
         <div className="av-footer__grid">

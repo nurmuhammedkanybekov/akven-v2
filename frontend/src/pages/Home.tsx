@@ -1,12 +1,14 @@
 import { Bestsellers } from "../shop/home/Bestsellers";
 import { CategoryTiles } from "../shop/home/CategoryTiles";
 import { DordoiStory } from "../shop/home/DordoiStory";
+import { FittingSection } from "../shop/home/FittingSection";
 import { FamilyPlanner } from "../shop/home/FamilyPlanner";
 import { ForBusiness } from "../shop/home/ForBusiness";
 import { GiftTeaser } from "../shop/home/GiftTeaser";
 import { HeroEditorial } from "../shop/home/HeroEditorial";
 import { TrustStrip } from "../shop/home/TrustStrip";
 import { TwoNames } from "../shop/home/TwoNames";
+import { StallNotes } from "../shop/home/StallNotes";
 import { FamiliesSay } from "../shop/home/FamiliesSay";
 import { ForYou } from "../shop/home/ForYou";
 import { UpClose } from "../shop/home/UpClose";
@@ -27,12 +29,14 @@ export function HomePage() {
       <TrustStrip />
       <ForYou />
       <CategoryTiles />
+      <FittingSection />
       <Bestsellers />
       <UpClose />
       <TwoNames />
       <DordoiStory />
       <FamilyPlanner minPairs={min} tiers={tiers} />
       <FamiliesSay />
+      <StallNotes />
       <GiftTeaser />
       <ForBusiness />
     </>

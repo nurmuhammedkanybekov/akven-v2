@@ -16,7 +16,7 @@ export function AuthShell({ eyebrow, title, lead, children }: { eyebrow: string;
   return (
     <div className="av-auth">
       <aside className="av-auth__brand">
-        <Logo variant="stacked" metallic height={170} className="av-auth__logo" />
+        <Logo variant="stacked" metallic height={170} className="av-auth__logo" write />
         <div className="av-auth__socks" aria-hidden="true">
           <SockArt cut="crew" main={C.navy} accent={C.gold} pattern="argyle" second={C.cream} />
           <SockArt cut="knee-high" main={C.cream} accent={C.navy} pattern="oimo" second={C.gold} />

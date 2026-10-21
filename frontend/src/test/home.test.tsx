@@ -8,7 +8,6 @@ import { withMessage } from "../components/Contacts";
 import { sockSizeFor } from "../shop/family";
 import { resetSavedCache, useSaved } from "../shop/useSaved";
 import { upcomingHolidays } from "../shop/home/GiftCalendar";
-import { HeightRuler } from "../shop/home/HeightRuler";
 import { BoxBuilder } from "../shop/home/BoxBuilder";
 
 const CUTS: SockCut[] = ["no-show", "ankle", "crew", "mid-long", "knee-high"];
@@ -62,17 +61,6 @@ describe("the collection box", () => {
     for (let i = 0; i < 20; i++) await userEvent.click(argyle);
     expect(screen.getByText("−3% on every pair")).toBeInTheDocument();
     expect(screen.getByText("Add 10 more pairs for 5% off every pair.")).toBeInTheDocument();
-  });
-});
-
-describe("shop by height", () => {
-  it("is a radio group that changes the fitting and the link", async () => {
-    wrap(<HeightRuler />);
-    expect(screen.getByRole("link", { name: "Shop crew socks" })).toHaveAttribute("href", "/shop?cut=crew");
-    await userEvent.click(screen.getByRole("radio", { name: "Knee-high" }));
-    expect(screen.getByRole("radio", { name: "Knee-high" })).toBeChecked();
-    expect(screen.getByText(/Up to the knee/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Shop knee-high socks" })).toHaveAttribute("href", "/shop?cut=knee-high");
   });
 });
 

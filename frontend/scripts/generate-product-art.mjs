@@ -172,4 +172,16 @@ for (const [slug, p] of Object.entries(PRODUCTS)) {
     write(`${slug}-2.svg`, frame(p.tint, fan));
   }
 }
-console.log(`wrote ${files} product images to public/media/products`);
+
+// The drawing behind every sock product, for the fitting room, which draws the chosen sock on a leg: the sock as
+// drawn, and per colour (by its hex, as the shop lists it) the main and accent colours that change.
+const specs = {};
+for (const [slug, p] of Object.entries(PRODUCTS)) {
+  if (!p.sock) continue;
+  const c = {};
+  for (const [, hex] of COLOURS[slug] ?? []) { const s = colourise(BASE[slug] ?? p.sock, hex); c[hex.toUpperCase()] = [s.main, s.accent]; }
+  const { solid, ...spec } = p.sock;
+  specs[slug] = { s: spec, c };
+}
+fs.writeFileSync(path.join(outDir, "specs.json"), JSON.stringify(specs) + "\n");
+console.log(`wrote ${files} product images and the drawings of ${Object.keys(specs).length} socks to public/media/products`);

@@ -4,6 +4,7 @@ import { getFacets, listProducts, type CatalogQuery } from "../api/endpoints";
 import type { Category, FacetOption } from "../api/types";
 import { Skeleton } from "../components/Alert";
 import { Button } from "../components/Button";
+import { HeightIcon, isCut } from "../shop/fitting/HeightIcon";
 import { Chip } from "../components/Chip";
 import { Select } from "../components/Field";
 import { Pagination } from "../components/Pagination";
@@ -83,7 +84,8 @@ export function CatalogPage({ category }: { category?: Category }) {
       <div className="av-filter-group" role="group" aria-label={key === "section" ? t("shop.sections") : t("shop.cuts")}>
         <span className="av-eyebrow">{key === "section" ? t("shop.section") : t("shop.cut")}</span>
         <div className="av-row">
-          {list.map((o) => <Chip key={o.slug} label={o.name} count={o.count} pressed={current === o.slug} onToggle={() => toggle(key, o.slug, current)} />)}
+          {list.map((o) => <Chip key={o.slug} label={o.name} count={o.count} pressed={current === o.slug} onToggle={() => toggle(key, o.slug, current)}
+            icon={key === "cut" && isCut(o.slug) ? <HeightIcon cut={o.slug} /> : undefined} />)}
         </div>
       </div>
     );
