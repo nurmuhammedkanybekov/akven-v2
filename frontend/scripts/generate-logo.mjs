@@ -12,13 +12,17 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MARK, markMarkup } from "../src/brand/mark.ts";
+import { HEART, nib } from "./calligraphy.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const load = (file) => { const b = fs.readFileSync(path.join(root, "node_modules/@fontsource", file)); return opentype.parse(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)); };
 // Cinzel 600: heavy enough to stand next to the mark's thick strokes, still a Roman capital.
 const font = load("cinzel/files/cinzel-latin-600-normal.woff");
-// The ampersand is lighter and a little smaller, so it reads as the link between AKylbek and VENera, not a letter.
-const light = load("cinzel/files/cinzel-latin-400-normal.woff");
+// The ampersand is a heart written with a broad pen (scripts/calligraphy.mjs): Akylbek and Venera, the stroke running
+// on through the heart as the leg of the &. Drawn by hand, in gold, while the capitals are carved. The other design the
+// family looked at, the italic "Et" of Cormorant Garamond, is one switch away: AMP_STYLE = "italic".
+const AMP_STYLE = "heart";
+const italic = load("cormorant-garamond/files/cormorant-garamond-latin-600-italic.woff");
 const sans = load("onest/files/onest-latin-400-normal.woff");
 
 const SIZE = 100;
@@ -32,27 +36,41 @@ function outline(text, size, tracking, face = font) {
   return { d: p.toPathData(2), x1: bb.x1, x2: bb.x2, y1: bb.y1, y2: bb.y2 };
 }
 
-// AK & VEN on one baseline: the ampersand gets the same space either side as the letters have between them.
-const TRACK = 0.3, AMP = 0.98;
+// AK & VEN on one baseline: the ampersand rises a little above the capitals and dips below the line, as an italic does.
+const TRACK = 0.3, AMP = AMP_STYLE === "heart" ? 1.02 : 1.32;
+/** The ampersand with its left edge at x and the baseline at 0, and the pen's centreline when it is the heart. */
+function ampAt(x) {
+  if (AMP_STYLE === "heart") {
+    const probe = nib(HEART, { scale: SIZE * AMP });
+    const left = Math.min(...probe.d.match(/M-?[\d.]+|L-?[\d.]+/g).map((m) => +m.slice(1)));
+    return nib(HEART, { scale: SIZE * AMP, dx: x - left });
+  }
+  const p = italic.getPath("&", 0, 0, SIZE * AMP);
+  return { d: italic.getPath("&", x - p.getBoundingBox().x1, 0, SIZE * AMP).toPathData(2), line: null };
+}
+const boxOf = (d) => {
+  const n = d.match(/-?\d+(\.\d+)?/g).map(Number);
+  const xs = n.filter((_, i) => i % 2 === 0), ys = n.filter((_, i) => i % 2 === 1);
+  return { x1: Math.min(...xs), x2: Math.max(...xs), y1: Math.min(...ys), y2: Math.max(...ys) };
+};
 const ak = font.getPath("AK", 0, 0, SIZE, { letterSpacing: TRACK, kerning: true });
 const akBox = ak.getBoundingBox();
-const space = SIZE * 0.17;
-const ampProbe = light.getPath("&", 0, 0, SIZE * AMP).getBoundingBox();
-const ampX = akBox.x2 + space - ampProbe.x1;
-const ampPath = light.getPath("&", ampX, 0, SIZE * AMP);
-const ampBox = ampPath.getBoundingBox();
+const space = SIZE * 0.12;
+const ampShape = ampAt(akBox.x2 + space);
+const ampBox = boxOf(ampShape.d);
 const venProbe = font.getPath("VEN", 0, 0, SIZE, { letterSpacing: TRACK, kerning: true }).getBoundingBox();
 const ven = font.getPath("VEN", ampBox.x2 + space - venProbe.x1, 0, SIZE, { letterSpacing: TRACK, kerning: true });
 const venBox = ven.getBoundingBox();
 const word = { d: ak.toPathData(2) + ven.toPathData(2), x1: akBox.x1, x2: venBox.x2, y1: Math.min(akBox.y1, venBox.y1), y2: Math.max(akBox.y2, venBox.y2) };
-const amp = { d: ampPath.toPathData(2) };
+const amp = { d: ampShape.d, line: ampShape.line };
+if (/NaN/.test(word.d + amp.d)) throw new Error("a glyph came out with NaN coordinates; try another weight");
 
 // The three parts on their own, each starting at x = 0 on the baseline, for the story section where AK and VEN meet
 // at the ampersand.
 const part = (p) => { const b = p.getBoundingBox(); return { d: p.toPathData(2), x: f(b.x1), w: f(b.x2 - b.x1) }; };
 const parts = {
   ak: part(font.getPath("AK", 0, 0, SIZE, { letterSpacing: TRACK, kerning: true })),
-  amp: part(light.getPath("&", 0, 0, SIZE * AMP)),
+  amp: (() => { const a = ampAt(0), b = boxOf(a.d); return { d: a.d, line: a.line, x: f(b.x1), w: f(b.x2 - b.x1) }; })(),
   ven: part(font.getPath("VEN", 0, 0, SIZE, { letterSpacing: TRACK, kerning: true })),
   top: f(-CAP), cap: f(CAP),
 };
@@ -111,6 +129,7 @@ fs.writeFileSync(path.join(root, "src/brand/logo.generated.ts"),
 export const LOGO = {
   word: ${JSON.stringify(word.d)},
   amp: ${JSON.stringify(amp.d)},
+  ampLine: ${JSON.stringify(amp.line)},
   parts: ${JSON.stringify(parts)},
   tag: ${JSON.stringify(tag.d)},
   horizontal: ${JSON.stringify(horizontal)},

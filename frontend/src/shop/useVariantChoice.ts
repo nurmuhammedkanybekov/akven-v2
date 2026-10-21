@@ -8,10 +8,14 @@ import { useT } from "../i18n/I18n";
  * does not reset the size. The pictures follow the colour: the chosen colour's own pictures when it has some, the
  * product's general pictures otherwise.
  */
-export function useVariantChoice(product: ProductDetail) {
+export function useVariantChoice(product: ProductDetail, initialHex?: string | null) {
   const { t } = useT();
   const variants = product.variants;
-  const [sku, setSku] = useState(() => (variants.find((v) => v.availableQty > 0) ?? variants[0])?.sku);
+  // A link may ask for a colour (the fitting room's "see this pair"): its first option in stock, if the product has it.
+  const [sku, setSku] = useState(() => {
+    const want = initialHex ? variants.filter((v) => v.colorHex?.toUpperCase() === initialHex.toUpperCase()) : [];
+    return (want.find((v) => v.availableQty > 0) ?? want[0] ?? variants.find((v) => v.availableQty > 0) ?? variants[0])?.sku;
+  });
   const current: VariantView | undefined = variants.find((v) => v.sku === sku);
 
   const colors = useMemo(() => {

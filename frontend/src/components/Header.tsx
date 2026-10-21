@@ -95,7 +95,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
             <nav className="av-nav" aria-label={t("nav.main")}>
               {NAV.map((n) => <NavLink key={n.to} to={n.to}>{t(n.key)}</NavLink>)}
             </nav>
-            <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={38} /></Link>
+            <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={38} write /></Link>
             <div className="av-header__actions">
               <NavLink className="av-header__biz" to="/wholesale">{t("nav.wholesale")}</NavLink>
               <Link className="av-icon-btn av-hide-md" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>

@@ -14,10 +14,25 @@ import "@fontsource/onest/cyrillic-ext-600.css";
 import "@fontsource/onest/latin-700.css";
 import "@fontsource/onest/cyrillic-700.css";
 import "@fontsource/onest/cyrillic-ext-700.css";
-// Headings are Onest too, heavy and tight: one typeface, the way Wise and Bombas set theirs.
+// Onest 800 for the big figures (prices, counts) that stay in the sans.
 import "@fontsource/onest/latin-800.css";
 import "@fontsource/onest/cyrillic-800.css";
 import "@fontsource/onest/cyrillic-ext-800.css";
+// Headings in Cormorant Garamond, a Garamond cut for display sizes: the serif of a family label, next to the Cinzel
+// capitals of the logo. Italic for the words a heading leans on.
+import "@fontsource/cormorant-garamond/latin-500.css";
+import "@fontsource/cormorant-garamond/cyrillic-500.css";
+import "@fontsource/cormorant-garamond/cyrillic-ext-500.css";
+import "@fontsource/cormorant-garamond/latin-600.css";
+import "@fontsource/cormorant-garamond/cyrillic-600.css";
+import "@fontsource/cormorant-garamond/cyrillic-ext-600.css";
+import "@fontsource/cormorant-garamond/latin-500-italic.css";
+import "@fontsource/cormorant-garamond/cyrillic-500-italic.css";
+import "@fontsource/cormorant-garamond/cyrillic-ext-500-italic.css";
+// Caveat, a handwriting face, for the notes the family writes on tags and cards at the stall.
+import "@fontsource/caveat/latin-600.css";
+import "@fontsource/caveat/cyrillic-600.css";
+import "@fontsource/caveat/cyrillic-ext-600.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/components.css";
@@ -27,6 +42,7 @@ import "./styles/motion.css";
 import "./styles/features.css";
 import "./styles/editorial.css";
 import "./styles/levelup.css";
+import "./styles/identity.css";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

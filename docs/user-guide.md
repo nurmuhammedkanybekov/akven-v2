@@ -52,6 +52,15 @@ and add a sock without leaving the shelf. Collections are mixed freely: the mini
 the whole bag, and the bag says how many more pairs reach the next step. `/visit` explains how to find container
 70-E at Dordoi, `/sizes` has the size chart and a size finder, and `/wholesale` explains packs and cases.
 
+**The fitting room** (on the home page, on the size guide, and "Try it on" over every sock's picture) answers "which
+height should I buy?". Choose who is trying on, the shoes (trainers, dress shoes, loafers, boots or at home) and a
+height from no-show to knee-high: the shop's own socks of that height are drawn on a leg, in the colour picked, with
+the shoe over the foot, so it is clear what shows and what stays hidden. Every height is marked "best", "works" or
+"better not" for those shoes, with the reason (a boot needs a sock taller than itself; dress shoes want the shin
+covered when you sit). The shoe size gives the sock size from the shop's chart, and "See this pair" opens the sock in
+that colour. The choices are remembered in the browser for next time, nowhere else. In the shop, the height filters
+carry a small leg showing each height.
+
 1. **Bag.** "Add to bag" on any product. The bag lives in the browser: no account needed, it survives a reload, works
    offline and is shared between tabs. It remembers which item and how many; prices are always asked from the server.
 2. **Negotiating.** Signed-in customers can chat on a product page ("Want a better price?"), in their own language. It

@@ -23,8 +23,8 @@ Nurmuhammed Kanybekov · supervised by Walid Guettala
 
 ## The project in short
 
-AK&VEN is my family's brand of Korean-made socks: **AK** from Akylbek, **VEN** from Venera, and the ampersand for what
-they built together. My parents have traded at Dordoi Bazaar in
+AK&VEN is my family's brand of Korean-made socks: **AK** from Akylbek, **VEN** from Venera, and the ampersand, drawn
+as a heart, for what they built together. My parents have traded at Dordoi Bazaar in
 Bishkek, Kyrgyzstan, since the early 2000s and have sold socks there since 2018, from container 70-E. At the bazaar
 nobody pays the label price: customers bargain, buy for the whole family, and shops from the regions buy by the case.
 
@@ -77,6 +77,8 @@ super admin can repeat that run at any time.
 </tr>
 </table>
 
+![The fitting room: our own crew socks on the leg with trainers, each height rated for the shoes](docs/design/readme-fitting.jpg)
+
 ![From Dordoi, with love: container 70-E opens as the visitor scrolls](docs/design/readme-dordoi.jpg)
 
 **For customers**
@@ -86,6 +88,12 @@ super admin can repeat that run at any time.
   shelf"). Then the family behind it ("Two names. One family. One story.") and the stall at Dordoi as a short scene
   that plays as you scroll: 70-E's sign lights up, the view moves in and its doors open. **Gift sets** and **Our
   story** have pages of their own.
+- **The fitting room:** pick who is trying on, the shoes and a height, and the shop's own socks of that height are drawn
+  on a leg in the colour you choose, with the shoe over the foot, so you see what shows and what stays hidden. Each
+  height is rated for those shoes, with the reason, and the shoe size gives the sock size. It opens from every sock's
+  page too ("Try it on").
+- **The family's own hand:** headings in a Garamond serif, their handwriting on tags and on a board of notes from the
+  stall, a turning stamp, a thread of yarn that unwinds as you scroll, and a logo whose heart writes itself.
 - **English, Russian and Kyrgyz**, prices in **US dollars, Kyrgyz som or Russian roubles** (at the rates the owners
   set), light and dark, on phone, tablet and laptop. The site can be installed as an app
   (PWA), and the bag works offline.
@@ -210,7 +218,7 @@ The brand (logo, colours, type, motion) is described in [`docs/brand.md`](docs/b
 |---|---|---|
 | Backend unit and integration tests, in-memory database | `cd backend && mvn verify` | 225 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints (gift boxes and families too), the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 167 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
+| Frontend | `cd frontend && npm test && npm run build` | 176 tests, including colour-contrast checks and a check that every text exists in Russian and Kyrgyz |
 | End to end, in a real browser | `cd frontend && npm run e2e` | 27 steps: the owner's, the customer's and the super admin's whole journey in three languages, with accessibility rules on every page |
 
 Safety properties that the tests demonstrate:
