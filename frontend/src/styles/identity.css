@@ -719,7 +719,7 @@ body::before {
   font-family: var(--font-body); font-size: 1.5rem; font-weight: 800; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; transform: rotate(-4deg);
   animation: av-stamp 0.5s var(--ease-spring) backwards;
 }
-@keyframes av-stamp { from { transform: rotate(-4deg) scale(1.6); opacity: 0; } }
+@keyframes av-stamp { from { transform: rotate(-4deg) scale(1.5); } }
 
 /* What shops ask most: the question on the left, the answers on the right. */
 .av-whole3__faq { display: grid; gap: var(--space-5); }
