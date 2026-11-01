@@ -1,7 +1,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
-import { checkout } from "../api/endpoints";
+import { checkout, getDeliveryZones } from "../api/endpoints";
 import type { Country, FulfillmentMethod, PaymentMethod } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { useCart } from "../cart/CartContext";
@@ -14,6 +14,8 @@ import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
 import { useMoney } from "../shop/useMoney";
 import { newId } from "../lib/ids";
+import { deliveryFee, toFreeDelivery } from "../lib/delivery";
+import { useAsync } from "../hooks/useAsync";
 import { newWalletToken } from "../lib/wallet";
 import { GiftSummary } from "../components/GiftSummary";
 import { giftForCheckout, setGift, useGift } from "../shop/useGift";
@@ -35,6 +37,8 @@ export function CheckoutPage() {
   const [method, setMethod] = useState<FulfillmentMethod>("PICKUP");
   const [address, setAddress] = useState("");
   const [country, setCountry] = useState<Country>("KG");
+  const [zoneId, setZoneId] = useState<string | null>(null);
+  const zones = useAsync((signal) => getDeliveryZones(signal), []);
   const { t } = useT();
   const [note, setNote] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -47,7 +51,17 @@ export function CheckoutPage() {
   const attemptKey = useRef(newId());
 
   if (cart.lines.length === 0 && !placed) return <Navigate to="/cart" replace />;
-  const total = quote?.total ?? cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
+  const itemsTotal = quote?.total ?? cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
+  const allZones = zones.data ?? [];
+  const countries = (["KG", "KZ", "UZ", "RU"] as const).filter((c) => allZones.some((z) => z.country === c));
+  const inCountry = allZones.filter((z) => z.country === country);
+  const zone = method === "DELIVERY" ? inCountry.find((z) => z.id === zoneId) ?? inCountry[0] ?? null : null;
+  const fee = zone ? deliveryFee(zone, itemsTotal) : 0;
+  const toFree = zone ? toFreeDelivery(zone, itemsTotal) : null;
+  const total = Math.round((itemsTotal + fee) * 100) / 100;
+  const noDelivery = method === "DELIVERY" && zones.data !== undefined && allZones.length === 0;
+  const days = (z: { daysMin: number | null; daysMax: number | null }) => z.daysMin == null ? t("co.daysAgreed")
+    : z.daysMax == null || z.daysMax === z.daysMin ? t("co.day", { n: z.daysMin }) : t("co.days", { min: z.daysMin, max: z.daysMax });
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
@@ -69,7 +83,7 @@ export function CheckoutPage() {
       const order = await checkout({
         items: cart.lines.map((l) => ({ sku: l.sku, quantity: l.quantity, negotiationSessionId: l.negotiationSessionId })),
         fulfillment: { method, contactName: name.trim(), contactPhone: phone.trim(), address: method === "DELIVERY" ? address.trim() : null, note: note.trim() || null,
-          country: method === "DELIVERY" ? country : null },
+          country: method === "DELIVERY" ? zone?.country ?? country : null, zoneId: method === "DELIVERY" ? zone?.id ?? null : null },
         payment: { method: payment, token: newWalletToken(payment, declined) },
         gift: giftForCheckout(gift),
       }, attemptKey.current);
@@ -109,13 +123,32 @@ export function CheckoutPage() {
               <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "DELIVERY"} onChange={() => setMethod("DELIVERY")} /><span><strong>{t("co.delivery")}</strong><br /><span className="av-small">{t("co.deliveryS")}</span></span></label>
             </div>
           </fieldset>
-          {method === "DELIVERY" && (
+          {noDelivery && <Alert tone="danger">{t("co.noDelivery")}</Alert>}
+          {method === "DELIVERY" && countries.length > 0 && (
             <label className="av-field">
               <span className="av-label">{t("order.country")}</span>
-              <select className="av-select" value={country} onChange={(e) => setCountry(e.target.value as Country)}>
-                {(["KG", "KZ", "UZ", "RU"] as const).map((c) => <option key={c} value={c}>{t(`country.${c}` as MessageKey)}</option>)}
+              <select className="av-select" value={country} onChange={(e) => { setCountry(e.target.value as Country); setZoneId(null); }}>
+                {countries.map((c) => <option key={c} value={c}>{t(`country.${c}` as MessageKey)}</option>)}
               </select>
             </label>
+          )}
+          {method === "DELIVERY" && inCountry.length > 0 && (
+            <fieldset className="av-option av-zones">
+              <legend className="av-label">{t("co.area")}</legend>
+              {inCountry.map((z) => {
+                const f = deliveryFee(z, itemsTotal);
+                return (
+                  <label key={z.id} className="av-radiocard av-zone">
+                    <input type="radio" name="zone" checked={zone?.id === z.id} onChange={() => setZoneId(z.id)} />
+                    <span className="av-zone__name"><strong>{z.name}</strong><span className="av-small">{days(z)}</span></span>
+                    <span className="av-zone__fee">
+                      <strong>{f === 0 ? t("co.free") : money(f)}</strong>
+                      {z.freeFrom != null && f > 0 && <span className="av-small">{t("co.freeFrom", { amount: money(z.freeFrom) })}</span>}
+                    </span>
+                  </label>
+                );
+              })}
+            </fieldset>
           )}
           {method === "DELIVERY" && <Textarea label={t("co.address")} rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
           <Textarea label={t("co.note")} rows={2} maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} />
@@ -123,8 +156,8 @@ export function CheckoutPage() {
           <h2 className="av-formtitle">{t("co.payment")}</h2>
           <p className="av-small">{t("co.paymentS")}</p>
           <div className="av-row">
-            <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy}>{t("co.apple")}</Button>
-            <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy}>{t("co.google")}</Button>
+            <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.apple")}</Button>
+            <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.google")}</Button>
           </div>
         </form>
 
@@ -141,7 +174,12 @@ export function CheckoutPage() {
             </ul>
           )}
           {gift && <GiftSummary gift={gift} edit />}
-          <dl className="av-totals"><div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(total)}</dd></div></dl>
+          <dl className="av-totals">
+            {zone && <div><dt>{t("co.socks")}</dt><dd className="av-price">{money(itemsTotal)}</dd></div>}
+            {zone && <div><dt>{t("co.deliveryLine")} · {zone.name}</dt><dd className="av-price">{fee === 0 ? t("co.free") : money(fee)}</dd></div>}
+            <div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(total)}</dd></div>
+          </dl>
+          {toFree != null && <p className="av-small av-zones__hint">{t("co.toFree", { amount: money(toFree) })}</p>}
           {shown === "KGS" && <p className="av-small av-muted">{t("price.chargedUsd", { usd: usd(total) })}</p>}
         </aside>
       </div>

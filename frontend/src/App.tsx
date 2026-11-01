@@ -31,6 +31,7 @@ const AdminTerms = lazy(() => import("./admin/AdminTerms").then((m) => ({ defaul
 const AdminDashboard = lazy(() => import("./admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard })));
 const AdminHandover = lazy(() => import("./admin/AdminHandover").then((m) => ({ default: m.AdminHandover })));
 const AdminPricing = lazy(() => import("./admin/AdminPricing").then((m) => ({ default: m.AdminPricing })));
+const AdminDelivery = lazy(() => import("./admin/AdminDelivery").then((m) => ({ default: m.AdminDelivery })));
 const AdminShopInfo = lazy(() => import("./admin/AdminShopInfo").then((m) => ({ default: m.AdminShopInfo })));
 const AdminSizes = lazy(() => import("./admin/AdminSizes").then((m) => ({ default: m.AdminSizes })));
 const AdminAccounts = lazy(() => import("./admin/AdminAccounts").then((m) => ({ default: m.AdminAccounts })));
@@ -99,6 +100,7 @@ export default function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="handover" element={<AdminHandover />} />
               <Route path="pricing" element={<AdminPricing />} />
+              <Route path="delivery" element={<AdminDelivery />} />
               <Route path="shop" element={<AdminShopInfo />} />
               <Route path="sizes" element={<AdminSizes />} />
               <Route path="customers" element={<AdminCustomers />} />

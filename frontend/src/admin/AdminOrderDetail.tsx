@@ -48,7 +48,7 @@ export function AdminOrderDetail() {
       <div className="av-card-form">
         <h2 className="av-formtitle">{t("a.orders.customer")}</h2>
         <p>{o.customerEmail}<br />{o.fulfillment.contactName}, {o.fulfillment.contactPhone}</p>
-        <p><strong>{o.fulfillment.method === "PICKUP" ? t("a.od.pickup") : t("a.od.delivery")}</strong>{o.fulfillment.address ? `: ${o.fulfillment.address}` : ""}{o.fulfillment.note ? <><br />{t("a.od.note")}: {o.fulfillment.note}</> : null}</p>
+        <p><strong>{o.fulfillment.method === "PICKUP" ? t("a.od.pickup") : t("a.od.delivery")}</strong>{o.fulfillment.address ? `: ${o.fulfillment.address}` : ""}{o.fulfillment.delivery ? ` · ${o.fulfillment.delivery.zone ?? ""} · $${o.fulfillment.delivery.fee.toFixed(2)}` : ""}{o.fulfillment.note ? <><br />{t("a.od.note")}: {o.fulfillment.note}</> : null}</p>
         <p className="av-small av-muted">{o.payment ? t("a.od.paidWith", { method: o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay", ref: o.payment.reference }) : t("a.od.notPaid")}{o.paidAt ? `, ${formatDateTime(o.paidAt)}` : ""}</p>
       </div>
       {o.gift && (

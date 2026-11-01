@@ -18,7 +18,9 @@ final class OrderMapper {
         return new OrderView(o.getId(), o.getReference(), o.getStatus(), o.getTotal(), o.getCreatedAt(), o.getPaidAt(),
                 o.getFulfilledAt(), o.getCancelledAt(),
                 new FulfillmentView(o.getFulfillmentMethod(), o.getContactName(), o.getContactPhone(), o.getDeliveryAddress(), o.getNote(),
-                        o.getDeliveryCountry()),
+                        o.getDeliveryCountry(),
+                        o.getFulfillmentMethod() != FulfillmentMethod.DELIVERY ? null
+                                : new OrderDtos.DeliveryView(o.getDeliveryZoneName(), o.getDeliveryFee(), o.getDeliveryDaysMin(), o.getDeliveryDaysMax())),
                 o.getPaymentRef() == null ? null : new PaymentView(o.getPaymentMethod(), shorten(o.getPaymentRef())),
                 o.getItems().stream().map(i -> new OrderItemView(i.getSku(), i.getProductName(), i.getProductSlug(), i.getVariantLabel(),
                         i.getColorHex(), i.getImageUrl(), i.getQuantity(), i.getListPrice(), i.getDiscountPct(), i.getUnitPrice(), i.lineTotal(),

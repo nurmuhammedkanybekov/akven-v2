@@ -78,6 +78,10 @@ export function OrderDetailPage() {
           <dl className="av-specs">
             <div><dt className="av-eyebrow">{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(o.total)}</dd></div>
             <div><dt className="av-eyebrow">{o.fulfillment.method === "PICKUP" ? t("co.pickup") : t("co.delivery")}</dt><dd>{o.fulfillment.contactName}, {o.fulfillment.contactPhone}{o.fulfillment.address ? <><br />{o.fulfillment.address}</> : null}</dd></div>
+            {o.fulfillment.delivery && <div><dt className="av-eyebrow">{t("co.area")}</dt><dd>{o.fulfillment.delivery.zone}{" · "}
+              {o.fulfillment.delivery.fee === 0 ? t("co.free") : money(o.fulfillment.delivery.fee)}
+              {o.fulfillment.delivery.daysMin != null && <><br />{t("od.arrives")}: {o.fulfillment.delivery.daysMax != null && o.fulfillment.delivery.daysMax !== o.fulfillment.delivery.daysMin
+                ? t("co.days", { min: o.fulfillment.delivery.daysMin, max: o.fulfillment.delivery.daysMax }) : t("co.day", { n: o.fulfillment.delivery.daysMin })}</>}</dd></div>}
             {o.fulfillment.country && <div><dt className="av-eyebrow">{t("order.country")}</dt><dd>{t(`country.${o.fulfillment.country}` as MessageKey)}</dd></div>}
             {o.fulfillment.note && <div><dt className="av-eyebrow">{t("od.note")}</dt><dd>{o.fulfillment.note}</dd></div>}
             {o.payment && <div><dt className="av-eyebrow">{t("od.paidWith")}</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}

@@ -43,14 +43,15 @@ public class OrderExport {
                 .filter(o -> o.getCreatedAt() != null && !o.getCreatedAt().isBefore(since)).toList();
         StringBuilder out = new StringBuilder("\uFEFF");                    // so Excel reads Cyrillic names correctly
         out.append(String.join(",", "Reference", "Placed (Bishkek)", "Status", "Total USD", "Customer email", "Contact name", "Phone",
-                "Receive", "Country", "Address", "Items", "Gift box", "Gift card", "Note")).append("\r\n");
+                "Receive", "Country", "Delivery area", "Delivery USD", "Address", "Items", "Gift box", "Gift card", "Note")).append("\r\n");
         for (Order o : list) {
             String items = o.getItems().stream().map(i -> i.getQuantity() + " x " + i.getProductName() + " (" + i.getVariantLabel() + ")")
                     .collect(Collectors.joining("; "));
             String gift = o.getGiftBox() == null ? "" : o.getGiftBox() + " / " + o.getGiftRibbon() + (o.getGiftTo() == null ? "" : " / to " + o.getGiftTo());
             out.append(String.join(",", List.of(o.getReference(), WHEN.format(o.getCreatedAt()), o.getStatus().name(), o.getTotal().toPlainString(),
                     o.getCustomer().getEmail(), nz(o.getContactName()), nz(o.getContactPhone()), o.getFulfillmentMethod().name(),
-                    o.getDeliveryCountry() == null ? "" : o.getDeliveryCountry().name(), nz(o.getDeliveryAddress()), items, gift,
+                    o.getDeliveryCountry() == null ? "" : o.getDeliveryCountry().name(), nz(o.getDeliveryZoneName()),
+                    o.getDeliveryZoneName() == null ? "" : o.getDeliveryFee().toPlainString(), nz(o.getDeliveryAddress()), items, gift,
                     nz(o.getGiftMessage()), nz(o.getNote())).stream().map(OrderExport::cell).toList())).append("\r\n");
         }
         audit.record(actorEmail, "ORDERS_EXPORTED", "ORDER_EXPORT", new java.util.UUID(0L, 0L), null, Map.of("days", days, "orders", list.size()));
