@@ -8,7 +8,7 @@ import type {
   PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
   FamilyMember, FamilyMemberInput, ProductReviews, ShowcaseReview, MyReview, ModerationLine, ReviewStatus, DayPoint,
   SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
-  WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
+  DeliveryZone, DeliveryZoneInput, WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -221,3 +221,9 @@ export const sendWholesaleRequest = (body: WholesaleRequestInput) => api<Wholesa
 export const adminWholesale = (status?: WholesaleStatus) => api<WholesaleInbox>(`/api/admin/wholesale${qs({ status })}`);
 export const adminHandleWholesale = (id: string, status: WholesaleStatus, staffNote: string | null) =>
   api<WholesaleLine>(`/api/admin/wholesale/${id}`, { method: "PUT", body: { status, staffNote } });
+
+export const getDeliveryZones = (signal?: AbortSignal) => api<DeliveryZone[]>("/api/shop/delivery-zones", { signal });
+export const adminDeliveryZones = () => api<DeliveryZone[]>("/api/admin/delivery-zones");
+export const adminCreateDeliveryZone = (body: DeliveryZoneInput) => api<DeliveryZone>("/api/admin/delivery-zones", { method: "POST", body });
+export const adminUpdateDeliveryZone = (id: string, body: DeliveryZoneInput) => api<DeliveryZone>(`/api/admin/delivery-zones/${id}`, { method: "PUT", body });
+export const adminDeleteDeliveryZone = (id: string) => api<void>(`/api/admin/delivery-zones/${id}`, { method: "DELETE" });

@@ -777,3 +777,14 @@ body::before {
 .av-privacy__list h2 { margin: 0 0 var(--space-2); font-size: 1.4rem; }
 .av-privacy__list p { margin: 0; color: var(--ink-2); }
 .av-footer .av-footer__legal a { font-size: inherit; color: var(--on-black-2); }
+
+/* ---------- delivery areas ---------- */
+.av-zones { display: grid; gap: var(--space-2); }
+.av-zone { display: grid !important; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-3); width: 100%; }
+.av-zone__name, .av-zone__fee { display: grid; gap: 2px; }
+.av-zone__fee { text-align: right; }
+.av-zones__hint { margin: var(--space-2) 0 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--ink); }
+.av-dzones { display: grid; gap: var(--space-4); max-width: 60rem; }
+.av-dzone { display: grid; gap: var(--space-3); }
+.av-dzone__grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+@media (min-width: 1100px) { .av-dzone__grid { grid-template-columns: minmax(8rem, 1.1fr) minmax(9rem, 1.6fr) repeat(4, minmax(5.5rem, 0.8fr)); align-items: end; } }

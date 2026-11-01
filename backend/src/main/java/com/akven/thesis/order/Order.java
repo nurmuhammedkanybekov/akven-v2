@@ -69,6 +69,21 @@ public class Order extends AuditableEntity {
     @Column(length = 2)
     private Country deliveryCountry;
 
+    @Column(name = "delivery_zone_id")
+    private UUID deliveryZoneId;
+
+    @Column(name = "delivery_zone_name", length = 60)
+    private String deliveryZoneName;
+
+    @Column(name = "delivery_fee", nullable = false, precision = 12, scale = 2)
+    private BigDecimal deliveryFee = BigDecimal.ZERO;
+
+    @Column(name = "delivery_days_min")
+    private Integer deliveryDaysMin;
+
+    @Column(name = "delivery_days_max")
+    private Integer deliveryDaysMax;
+
     @Column(length = 64)
     private String idempotencyKey;
 
@@ -121,6 +136,25 @@ public class Order extends AuditableEntity {
         this.deliveryAddress = deliveryAddress;
         this.note = note;
     }
+
+    /**
+     * The delivery area, copied onto the order so a later change to the area never changes this receipt. Called once,
+     * after the socks are added: the fee is added to the total the customer pays.
+     */
+    public void deliverIn(UUID zoneId, String zoneName, BigDecimal fee, Integer daysMin, Integer daysMax) {
+        if (fulfillmentMethod != FulfillmentMethod.DELIVERY || deliveryZoneName != null) {
+            throw new IllegalStateException("Delivery is set once, on a delivery order.");
+        }
+        this.deliveryZoneId = zoneId;
+        this.deliveryZoneName = zoneName;
+        this.deliveryFee = fee;
+        this.deliveryDaysMin = daysMin;
+        this.deliveryDaysMax = daysMax;
+        this.total = total.add(fee);
+    }
+
+    /** What the socks cost, without delivery. */
+    public BigDecimal getItemsTotal() { return total.subtract(deliveryFee); }
 
     /** Packs the order as a gift: a box, a ribbon and a card with the words exactly as typed. */
     public void wrapAsGift(GiftBox box, GiftRibbon ribbon, String to, String from, String message, boolean hidePrices) {
@@ -188,6 +222,11 @@ public class Order extends AuditableEntity {
     public String getDeliveryAddress() { return deliveryAddress; }
     public String getNote() { return note; }
     public Country getDeliveryCountry() { return deliveryCountry; }
+    public UUID getDeliveryZoneId() { return deliveryZoneId; }
+    public String getDeliveryZoneName() { return deliveryZoneName; }
+    public BigDecimal getDeliveryFee() { return deliveryFee; }
+    public Integer getDeliveryDaysMin() { return deliveryDaysMin; }
+    public Integer getDeliveryDaysMax() { return deliveryDaysMax; }
     public String getIdempotencyKey() { return idempotencyKey; }
     public PickupPoint getPickupPoint() { return pickupPoint; }
     public String getPickupCode() { return pickupCode; }

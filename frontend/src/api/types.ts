@@ -156,7 +156,9 @@ export type Country = "KG" | "KZ" | "UZ" | "RU";
 export interface OrderView {
   id: string; reference: string; status: OrderStatus; total: number; createdAt: string; paidAt: string | null;
   fulfilledAt: string | null; cancelledAt: string | null;
-  fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null };
+  fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null;
+    /** Delivery orders: the area, fee and days as they were when the order was placed. */
+    delivery?: { zone: string | null; fee: number; daysMin: number | null; daysMax: number | null } | null };
   payment: { method: string; reference: string } | null;
   items: OrderItemView[];
   customerEmail: string | null;
@@ -167,7 +169,7 @@ export interface OrderView {
 }
 export interface CheckoutBody {
   items: CartLineRequest[];
-  fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null };
+  fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null; zoneId?: string | null };
   payment: { method: PaymentMethod; token: string };
   gift?: GiftInput | null;
 }
@@ -292,3 +294,9 @@ export interface WholesaleLine {
   staffNote: string | null; createdAt: string; updatedAt: string;
 }
 export interface WholesaleInbox { waiting: number; requests: WholesaleLine[] }
+
+export interface DeliveryZone {
+  id: string; country: Country; name: string; fee: number; freeFrom: number | null; daysMin: number | null; daysMax: number | null;
+  active: boolean; position: number;
+}
+export type DeliveryZoneInput = Omit<DeliveryZone, "id">;

@@ -8,6 +8,8 @@ import com.akven.thesis.common.BusinessRuleException;
 import com.akven.thesis.common.ConflictException;
 import com.akven.thesis.common.NotFoundException;
 import com.akven.thesis.common.PageResponse;
+import com.akven.thesis.delivery.DeliveryService;
+import com.akven.thesis.delivery.DeliveryZone;
 import com.akven.thesis.order.OrderDtos.CartItem;
 import com.akven.thesis.order.OrderDtos.CheckoutRequest;
 import com.akven.thesis.order.OrderDtos.OrderView;
@@ -67,10 +69,11 @@ public class OrderService {
     private final CollectionPricing collections;
     private final ShopInfoService shopInfo;
     private final PickupCodes pickupCodes;
+    private final DeliveryService delivery;
 
     public OrderService(OrderRepository orders, VariantRepository variants, UserRepository users, PricingService pricing,
                         PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections,
-                        ShopInfoService shopInfo, PickupCodes pickupCodes) {
+                        ShopInfoService shopInfo, PickupCodes pickupCodes, DeliveryService delivery) {
         this.orders = orders;
         this.variants = variants;
         this.users = users;
@@ -81,6 +84,7 @@ public class OrderService {
         this.collections = collections;
         this.shopInfo = shopInfo;
         this.pickupCodes = pickupCodes;
+        this.delivery = delivery;
     }
 
     private final ProductImageRepository images;
@@ -128,8 +132,10 @@ public class OrderService {
         }
 
         FulfillmentInputs f = new FulfillmentInputs(request);
+        // The area decides the fee; the browser only says which area. Its country wins over a country sent alongside.
+        DeliveryZone zone = f.method == FulfillmentMethod.DELIVERY ? delivery.zoneFor(request.fulfillment().zoneId(), request.fulfillment().zoneId() == null ? f.country : null) : null;
         Order order = new Order(customer, idempotencyKey);
-        order.setFulfillment(f.method, f.name, f.phone, f.address, f.note, f.country);
+        order.setFulfillment(f.method, f.name, f.phone, f.address, f.note, zone == null ? f.country : zone.getCountry());
         if (request.gift() != null) {
             OrderDtos.GiftInput g = request.gift();
             order.wrapAsGift(g.box(), g.ribbon(), cardText(g.to()), cardText(g.from()), cardText(g.message()), g.hidePrices());
@@ -159,6 +165,9 @@ public class OrderService {
         }
         if (order.getTotal().signum() <= 0) {
             throw new BusinessRuleException("There is nothing to pay for in this order.");
+        }
+        if (zone != null) {
+            order.deliverIn(zone.getId(), zone.getName(), zone.feeFor(order.getTotal()), zone.getDaysMin(), zone.getDaysMax());
         }
 
         try {
@@ -327,6 +336,7 @@ public class OrderService {
         m.put("reference", o.getReference());
         m.put("status", o.getStatus());
         m.put("total", o.getTotal());
+        if (o.getDeliveryZoneName() != null) m.put("delivery", o.getDeliveryZoneName() + " " + o.getDeliveryFee());
         m.put("items", o.getItems().stream().map(i -> i.getSku() + " x" + i.getQuantity() + " @ " + i.getUnitPrice()).toList());
         return m;
     }

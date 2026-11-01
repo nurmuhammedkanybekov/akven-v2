@@ -38,7 +38,14 @@ public final class OrderDtos {
                                    @NotBlank @Pattern(regexp = "[0-9+()\\-\\s]{6,40}", message = "enter a phone number") String contactPhone,
                                    @Size(max = 300) String address,
                                    @Size(max = 500) String note,
-                                   Country country) {}
+                                   Country country,
+                                   UUID zoneId) {
+
+        /** Without a delivery area: the first area of the country is used. */
+        public FulfillmentInput(FulfillmentMethod method, String contactName, String contactPhone, String address, String note, Country country) {
+            this(method, contactName, contactPhone, address, note, country, null);
+        }
+    }
 
     /** The wallet token only. There is deliberately no field for a card number. */
     public record PaymentInput(@NotNull PaymentMethod method, @NotBlank @Size(max = 128) String token) {}
@@ -88,7 +95,10 @@ public final class OrderDtos {
                                 BigDecimal unitPrice, BigDecimal lineTotal, DiscountSource discountSource) {}
 
     public record FulfillmentView(FulfillmentMethod method, String contactName, String contactPhone, String address, String note,
-                                  Country country) {}
+                                  Country country, DeliveryView delivery) {}
+
+    /** The delivery as it was when the order was placed: the area's name, what it cost and how long it takes. */
+    public record DeliveryView(String zone, BigDecimal fee, Integer daysMin, Integer daysMax) {}
 
     /** The payment reference is shown shortened: enough for a support call, not the whole token of the provider. */
     public record PaymentView(String method, String reference) {}
