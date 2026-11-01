@@ -8,7 +8,7 @@ import type {
   PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
   FamilyMember, FamilyMemberInput, ProductReviews, ShowcaseReview, MyReview, ModerationLine, ReviewStatus, DayPoint,
   SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
-  DeliveryZone, DeliveryZoneInput, WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
+  CustomerDetails, DeliveryZone, DeliveryZoneInput, WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -227,3 +227,7 @@ export const adminDeliveryZones = () => api<DeliveryZone[]>("/api/admin/delivery
 export const adminCreateDeliveryZone = (body: DeliveryZoneInput) => api<DeliveryZone>("/api/admin/delivery-zones", { method: "POST", body });
 export const adminUpdateDeliveryZone = (id: string, body: DeliveryZoneInput) => api<DeliveryZone>(`/api/admin/delivery-zones/${id}`, { method: "PUT", body });
 export const adminDeleteDeliveryZone = (id: string) => api<void>(`/api/admin/delivery-zones/${id}`, { method: "DELETE" });
+
+export const getMyDetails = () => api<CustomerDetails>("/api/account/details");
+export const saveMyDetails = (body: CustomerDetails) => api<CustomerDetails>("/api/account/details", { method: "PUT", body });
+export const forgetMyDetails = () => api<void>("/api/account/details", { method: "DELETE" });

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ApiError } from "../api/client";
-import { cancelStockRequest, getSizeChart, listMyOrders, myStockRequests } from "../api/endpoints";
-import type { FamilyMemberInput, FamilyRole } from "../api/types";
+import { cancelStockRequest, forgetMyDetails, getMyDetails, getSizeChart, listMyOrders, myStockRequests, saveMyDetails } from "../api/endpoints";
+import type { CustomerDetails, FamilyMemberInput, FamilyRole } from "../api/types";
+import { Input, Textarea } from "../components/Field";
 import { useAuth } from "../auth/AuthContext";
 import { SockArt } from "../brand/SockArt";
 import { Alert, Skeleton } from "../components/Alert";
@@ -48,6 +49,7 @@ export function AccountPage() {
           <p className="av-small">{t("acc.familyLead")}</p>
           {family.members === null ? <Skeleton height={160} /> : <FamilyEditor initial={family.members} save={family.save} />}
         </section>
+        <MyDetails />
         <Waiting />
         <RecentOrders />
       </div>
@@ -222,6 +224,54 @@ function RecentOrders() {
         </ul>
       )}
       <Link to="/orders" className="av-small">{t("acc.allOrders")}</Link>
+    </section>
+  );
+}
+
+/** The details kept for the next order: shown, changed, or forgotten in one tap. */
+function MyDetails() {
+  const { t } = useT();
+  const toast = useToast();
+  const loaded = useAsync(() => getMyDetails(), []);
+  const [d, setD] = useState<CustomerDetails | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => { if (loaded.data) setD(loaded.data); }, [loaded.data]);
+  const empty = d && !d.contactName && !d.contactPhone && !d.address;
+  async function save() {
+    if (!d) return;
+    setBusy(true); setError(null);
+    try {
+      const blank = (v: string | null) => (v && v.trim() ? v.trim() : null);
+      setD(await saveMyDetails({ ...d, contactName: blank(d.contactName), contactPhone: blank(d.contactPhone), address: blank(d.address) }));
+      toast(t("acc.saved"));
+    }
+    catch (e) { setError(e instanceof ApiError ? e.message : t("a.err.generic")); }
+    finally { setBusy(false); }
+  }
+  async function forget() {
+    setBusy(true); setError(null);
+    try { await forgetMyDetails(); setD({ contactName: null, contactPhone: null, address: null, country: null, zoneId: null }); toast(t("acc.forgotten")); }
+    catch (e) { setError(e instanceof ApiError ? e.message : t("a.err.generic")); }
+    finally { setBusy(false); }
+  }
+  return (
+    <section className="av-account__card" aria-labelledby="acc-details">
+      <h2 id="acc-details">{t("acc.details")}</h2>
+      <p className="av-small">{t("acc.detailsLead")}</p>
+      {!d ? <Skeleton height={140} /> : (
+        <div className="av-stack">
+          {empty && <p className="av-small av-muted">{t("acc.detailsNone")}</p>}
+          <Input label={t("co.name")} autoComplete="name" maxLength={120} value={d.contactName ?? ""} onChange={(e) => setD({ ...d, contactName: e.target.value })} />
+          <Input label={t("co.phone")} type="tel" autoComplete="tel" maxLength={40} value={d.contactPhone ?? ""} onChange={(e) => setD({ ...d, contactPhone: e.target.value })} />
+          <Textarea label={t("co.address")} rows={2} maxLength={300} value={d.address ?? ""} onChange={(e) => setD({ ...d, address: e.target.value })} />
+          {error && <Alert tone="danger">{error}</Alert>}
+          <div className="av-row">
+            <Button size="sm" loading={busy} onClick={() => void save()}>{t("acc.saveDetails")}</Button>
+            {!empty && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void forget()}>{t("acc.forget")}</Button>}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
