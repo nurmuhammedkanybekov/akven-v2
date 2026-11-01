@@ -51,12 +51,12 @@ export const adminListNegotiations = (p: { page?: number; pageSize?: number }) =
 // ---- shop ----
 export interface CatalogQuery {
   category?: Category; section?: string; cut?: string; q?: string; inStock?: boolean;
-  sort?: string; page?: number; pageSize?: number;
+  size?: string; color?: string; sort?: string; page?: number; pageSize?: number;
 }
 export const listProducts = (query: CatalogQuery, signal?: AbortSignal) =>
   api<PageResponse<ProductSummary>>(`/api/products${qs({ ...query })}`, { signal });
 export const getFacets = (query: CatalogQuery, signal?: AbortSignal) =>
-  api<Facets>(`/api/products/facets${qs({ category: query.category, section: query.section, cut: query.cut, q: query.q, inStock: query.inStock })}`, { signal });
+  api<Facets>(`/api/products/facets${qs({ category: query.category, section: query.section, cut: query.cut, q: query.q, inStock: query.inStock, size: query.size, color: query.color })}`, { signal });
 /** The socks people buy most; `sold` says how many of the list really sold (the rest are the newest in stock). */
 export const getBestsellers = (category: Category | null, limit = 8, signal?: AbortSignal) =>
   api<{ items: ProductSummary[]; sold: number }>(`/api/catalog/bestsellers${qs({ category, limit })}`, { signal });

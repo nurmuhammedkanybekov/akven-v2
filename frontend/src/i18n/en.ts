@@ -1005,6 +1005,17 @@ const shop = {
   "cats2.giftsTag": "packed by hand at 70-E",
   "door.open": "OPEN",
   "door.closed": "CLOSED",
+  "shop.sizeIs": "Size {size}",
+  "shop.countN": "{n} {n:product|products}",
+  "shop.filters": "Filters",
+  "shop.sizes": "Sizes",
+  "shop.size": "Size",
+  "shop.colours": "Colours",
+  "shop.chosen": "Chosen filters",
+  "shop.remove": "Remove {what}",
+  "shop.shown": "You have seen {shown} of {total}",
+  "shop.more": "Show {n} more",
+  "recent.clear": "Clear",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

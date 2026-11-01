@@ -150,7 +150,63 @@ public class CatalogService {
                 .forEach((value, n) -> categories.put((Category) value, n));
         return new Facets(categories,
                 options(TermKind.SECTION, "section", ProductSpecifications.storefront(filter.withoutSection())),
-                options(TermKind.CUT, "cut", ProductSpecifications.storefront(filter.withoutCut())));
+                options(TermKind.CUT, "cut", ProductSpecifications.storefront(filter.withoutCut())),
+                sizes(filter.withoutSize()), colors(filter.withoutColor()));
+    }
+
+    /** The order sizes are shown in; anything else (a pack, "One size") comes after, alphabetically. */
+    private static final List<String> SIZE_ORDER = List.of("XXS", "XS", "S", "M", "L", "XL", "XXL");
+
+    /** How many colours the filter offers at most: the most common first. */
+    static final int MAX_COLORS = 16;
+
+    /**
+     * Sizes on the shelf, with how many products come in each. A variant counts only when it is for sale (and in stock
+     * or of the chosen colour, when those are chosen), so "M" means a product you can buy in M.
+     */
+    private List<FacetOption> sizes(CatalogFilter filter) {
+        List<UUID> ids = matching(filter);
+        if (ids.isEmpty()) return List.of();
+        var query = entityManager.createQuery("select v.size, count(distinct v.product.id) from Variant v "
+                        + "where v.active = true and v.product.id in :ids and v.size is not null and v.size <> '' "
+                        + (filter.inStock() ? "and v.stockQty > v.reservedQty " : "")
+                        + (filter.color() != null ? "and lower(v.color) = :color " : "")
+                        + "group by v.size", Object[].class)
+                .setParameter("ids", ids);
+        if (filter.color() != null) query.setParameter("color", filter.color().toLowerCase(java.util.Locale.ROOT));
+        List<Object[]> rows = query.getResultList();
+        return rows.stream()
+                .map(r -> new FacetOption((String) r[0], (String) r[0], (Long) r[1]))
+                .sorted(java.util.Comparator.<FacetOption>comparingInt(o -> {
+                    int i = SIZE_ORDER.indexOf(o.slug().toUpperCase(java.util.Locale.ROOT));
+                    return i < 0 ? SIZE_ORDER.size() : i;
+                }).thenComparing(FacetOption::slug))
+                .toList();
+    }
+
+    /** Colours on the shelf, most common first, each with a swatch. Same rules as sizes. */
+    private List<CatalogViews.ColorOption> colors(CatalogFilter filter) {
+        List<UUID> ids = matching(filter);
+        if (ids.isEmpty()) return List.of();
+        var query = entityManager.createQuery("select min(v.color), max(v.colorHex), count(distinct v.product.id) from Variant v "
+                        + "where v.active = true and v.product.id in :ids and v.color is not null and v.color <> '' "
+                        + (filter.inStock() ? "and v.stockQty > v.reservedQty " : "")
+                        + (filter.size() != null ? "and lower(v.size) = :size " : "")
+                        + "group by lower(v.color) order by count(distinct v.product.id) desc, lower(v.color)", Object[].class)
+                .setParameter("ids", ids)
+                .setMaxResults(MAX_COLORS);
+        if (filter.size() != null) query.setParameter("size", filter.size().toLowerCase(java.util.Locale.ROOT));
+        List<Object[]> rows = query.getResultList();
+        return rows.stream().map(r -> new CatalogViews.ColorOption((String) r[0], (String) r[1], (Long) r[2])).toList();
+    }
+
+    /** The ids of the storefront products a filter matches. */
+    private List<UUID> matching(CatalogFilter filter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UUID> cq = cb.createQuery(UUID.class);
+        Root<Product> root = cq.from(Product.class);
+        cq.select(root.get("id")).where(ProductSpecifications.storefront(filter).toPredicate(root, cq, cb));
+        return entityManager.createQuery(cq).getResultList();
     }
 
     public TermsView terms() {

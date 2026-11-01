@@ -11,7 +11,9 @@ function read(): SavedItem[] {
   if (cache) return cache;
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    cache = Array.isArray(raw) ? raw.filter((x) => x && typeof x.slug === "string").slice(0, MAX) : [];
+    // Only well-formed entries: a path-safe slug, a name, and a picture from the shop's own media folder.
+    cache = Array.isArray(raw) ? raw.filter((x) => x && typeof x.slug === "string" && /^[a-z0-9-]{1,120}$/.test(x.slug)
+      && typeof x.name === "string" && (x.image == null || (typeof x.image === "string" && /^\/media\/[\w./-]+$/.test(x.image)))).slice(0, MAX) : [];
   } catch {
     cache = [];
   }
@@ -23,6 +25,13 @@ export function rememberViewed(item: SavedItem) {
   if (read()[0]?.slug === item.slug && read()[0]?.name === item.name) return;
   cache = next;
   try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* storage blocked */ }
+  listeners.forEach((l) => l());
+}
+
+/** Forgets what this visitor looked at. */
+export function forgetViewed() {
+  cache = [];
+  try { localStorage.removeItem(KEY); } catch { /* storage blocked */ }
   listeners.forEach((l) => l());
 }
 

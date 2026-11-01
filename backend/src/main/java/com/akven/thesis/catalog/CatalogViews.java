@@ -42,7 +42,11 @@ public final class CatalogViews {
     /** One filter choice and how many products it would show, given the other active filters. */
     public record FacetOption(String slug, String name, long count) {}
 
-    public record Facets(Map<Category, Long> category, List<FacetOption> section, List<FacetOption> cut) {}
+    public record Facets(Map<Category, Long> category, List<FacetOption> section, List<FacetOption> cut,
+                         List<FacetOption> size, List<ColorOption> color) {}
+
+    /** A colour the shelf has, its swatch, and how many products come in it. */
+    public record ColorOption(String name, String hex, long count) {}
 
     /** restockInDays is set only while COMING_SOON: "arrives in about N days". */
     public record VariantView(String sku, String size, String color, String colorHex, Integer packSize, Integer casePairs,

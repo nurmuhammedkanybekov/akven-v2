@@ -152,6 +152,34 @@ class CatalogControllerTest extends IntegrationTest {
     }
 
     @Test
+    void sizesAndColoursAreCountedForWhatCanBeBought() throws Exception {
+        // M (Black, in stock), S (Rose, sold out), One size (Mixed, no swatch): sizes in shop order, the pack last.
+        getJson("/api/products/facets?collection=" + COLLECTION, null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size[0].slug").value("S"))
+                .andExpect(jsonPath("$.size[1].slug").value("M"))
+                .andExpect(jsonPath("$.size[2].slug").value("One size"))
+                .andExpect(jsonPath("$.color[?(@.name=='Black')].hex").value("#1F1D1A"))
+                .andExpect(jsonPath("$.color[?(@.name=='Rose')].count").value(1));
+        // In stock only: the sold-out S and its colour drop out.
+        getJson("/api/products/facets?collection=" + COLLECTION + "&inStock=true", null)
+                .andExpect(jsonPath("$.size[?(@.slug=='S')]").isEmpty())
+                .andExpect(jsonPath("$.color[?(@.name=='Rose')]").isEmpty());
+        // A chosen colour narrows the sizes, and a chosen size narrows the colours; each keeps its own alternatives.
+        getJson("/api/products/facets?collection=" + COLLECTION + "&color=rose", null)
+                .andExpect(jsonPath("$.size.length()").value(1))
+                .andExpect(jsonPath("$.size[0].slug").value("S"))
+                .andExpect(jsonPath("$.color[?(@.name=='Black')].count").value(1));
+        getJson("/api/products/facets?collection=" + COLLECTION + "&size=m", null)
+                .andExpect(jsonPath("$.color.length()").value(1))
+                .andExpect(jsonPath("$.color[0].name").value("Black"));
+        // Nothing matches: empty lists, not an error.
+        getJson("/api/products/facets?collection=" + COLLECTION + "&q=nothing-like-this", null)
+                .andExpect(jsonPath("$.size").isEmpty())
+                .andExpect(jsonPath("$.color").isEmpty());
+    }
+
+    @Test
     void detailCarriesQualityCareOriginAndColourSwatches() throws Exception {
         getJson("/api/products/it-men-sport-crew", null)
                 .andExpect(jsonPath("$.quality").value("Premium test cotton"))
