@@ -63,10 +63,37 @@ function AnnText({ text }: { text: string }) {
 export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", accountLabel, extra }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { t } = useT();
+  const { t, lang } = useT();
   const { pathname } = useLocation();
   const msg = useRotation(MESSAGES.length, 5000);
   const headerRef = useRef<HTMLElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const logoRef = useRef<HTMLAnchorElement>(null);
+  // The menu links must never be cut off: when they do not fit beside the logo (a long language, a narrow window),
+  // the header switches to the menu button instead.
+  // 0: the links as designed, 1: a little tighter, 2: the menu button.
+  const [fit, setFit] = useState<0 | 1 | 2>(0);
+  useEffect(() => {
+    const nav = navRef.current, bar = nav?.parentElement, logo = logoRef.current;
+    if (!nav || !bar || !logo || typeof ResizeObserver === "undefined") return;
+    const check = () => {
+      if (getComputedStyle(nav).display === "none") { setFit(0); return; }
+      // The links' own widths (the same whether the menu is shown or hidden) against the column beside the logo.
+      const gap = parseFloat(getComputedStyle(nav).columnGap) || 0;
+      const links = Array.from(nav.children) as HTMLElement[];
+      const need = links.reduce((w, a) => w + a.scrollWidth, 0) + gap * Math.max(0, links.length - 1);
+      const room = (bar.clientWidth - logo.offsetWidth - 2 * (parseFloat(getComputedStyle(bar).columnGap) || 0)) / 2;
+      // Measured at the current size; the tight style is about 12% narrower.
+      const scale = nav.classList.contains("is-tight") ? 1 / 0.88 : 1;
+      const full = need * scale;
+      setFit(full <= room - 2 ? 0 : full * 0.88 <= room - 2 ? 1 : 2);
+    };
+    const ro = new ResizeObserver(check);
+    ro.observe(bar);
+    check();
+    document.fonts?.ready.then(check).catch(() => undefined);
+    return () => ro.disconnect();
+  }, [lang]);
   const [drawerTop, setDrawerTop] = useState(108);
   const [searching, setSearching] = useState(false);
   // "/" opens the search from anywhere, unless the visitor is typing in a field.
@@ -109,15 +136,15 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
       </div>
       <header ref={headerRef} className={`av-header${scrolled ? " is-scrolled" : ""}`}>
         <div className="av-container">
-          <div className="av-header__bar">
+          <div className={`av-header__bar${fit === 2 ? " is-compact" : ""}`}>
             <button type="button" className="av-icon-btn av-menu-btn" aria-expanded={open} aria-controls="mobile-nav"
                     aria-label={open ? t("nav.close") : t("nav.open")} onClick={() => setOpen(!open)}>
               {open ? <CloseIcon /> : <MenuIcon />}
             </button>
-            <nav className="av-nav" aria-label={t("nav.main")}>
+            <nav ref={navRef} className={`av-nav${fit === 1 ? " is-tight" : ""}`} aria-label={t("nav.main")}>
               {NAV.map((n) => <NavLink key={n.to} to={n.to}>{t(n.key)}</NavLink>)}
             </nav>
-            <Link to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={38} write /></Link>
+            <Link ref={logoRef} to="/" className="av-header__logo" aria-label={t("nav.home")}><Logo height={38} write /></Link>
             <div className="av-header__actions">
               <NavLink className="av-header__biz" to="/wholesale">{t("nav.wholesale")}</NavLink>
               <Link className="av-icon-btn av-hide-md" to="/visit" aria-label={t("nav.visit")} title={t("nav.visit")}><PinIcon /></Link>

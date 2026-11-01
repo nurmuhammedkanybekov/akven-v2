@@ -277,3 +277,18 @@ export interface MyReview { canReview: boolean; status: ReviewStatus | null; rat
 export interface ShowcaseReview extends ReviewView { productSlug: string; productName: string }
 export interface ModerationLine extends ReviewView { status: ReviewStatus; productSlug: string | null; productName: string; customerEmail: string }
 export interface DayPoint { date: string; orders: number; revenue: number; pairs: number }
+
+export type WholesaleKind = "WHOLESALE" | "GIFTS";
+export type WholesaleContactKind = "WHATSAPP" | "TELEGRAM" | "EMAIL" | "PHONE";
+export type WholesaleStatus = "NEW" | "IN_PROGRESS" | "ANSWERED" | "CLOSED";
+export interface WholesaleRequestInput {
+  kind: WholesaleKind; company: string; city: string | null; contactKind: WholesaleContactKind; contact: string;
+  pairs: number; mix: string | null; note: string | null; website: string;
+}
+export interface WholesaleReceived { reference: string; createdAt: string }
+export interface WholesaleLine {
+  id: string; reference: string; kind: WholesaleKind; company: string; city: string | null; contactKind: WholesaleContactKind;
+  contact: string; pairs: number; mix: string | null; note: string | null; accountEmail: string | null; status: WholesaleStatus;
+  staffNote: string | null; createdAt: string; updatedAt: string;
+}
+export interface WholesaleInbox { waiting: number; requests: WholesaleLine[] }

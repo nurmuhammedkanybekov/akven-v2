@@ -36,6 +36,7 @@ const AdminAccounts = lazy(() => import("./admin/AdminAccounts").then((m) => ({ 
 const AdminAssistant = lazy(() => import("./admin/AdminAssistant").then((m) => ({ default: m.AdminAssistant })));
 const AdminAudit = lazy(() => import("./admin/AdminAudit").then((m) => ({ default: m.AdminAudit })));
 const AdminReviews = lazy(() => import("./admin/AdminReviews").then((m) => ({ default: m.AdminReviews })));
+const AdminWholesale = lazy(() => import("./admin/AdminWholesale").then((m) => ({ default: m.AdminWholesale })));
 const AdminCustomers = lazy(() => import("./admin/AdminCustomers").then((m) => ({ default: m.AdminCustomers })));
 const ProductEditor = lazy(() => import("./admin/ProductEditor").then((m) => ({ default: m.ProductEditor })));
 const CheckoutPage = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.CheckoutPage })));
@@ -100,6 +101,7 @@ export default function App() {
               <Route path="sizes" element={<AdminSizes />} />
               <Route path="customers" element={<AdminCustomers />} />
               <Route path="reviews" element={<AdminReviews />} />
+              <Route path="wholesale" element={<AdminWholesale />} />
               <Route path="accounts" element={<AdminAccounts />} />
               <Route path="assistant" element={<AdminAssistant />} />
               <Route path="audit" element={<AdminAudit />} />

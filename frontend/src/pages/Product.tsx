@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { MAX_PER_LINE, useCart } from "../cart/CartContext";
 import { QuantityStepper } from "../components/QuantityStepper";
@@ -72,6 +73,22 @@ function ProductView({ product }: { product: ProductDetail }) {
   useEffect(() => { setImageIndex(0); }, [current?.color]);
   const [quantity, setQuantity] = useState(1);
   const cart = useCart();
+  // The sticky bar at the bottom shows once the main "Add to bag" has scrolled out of view.
+  const buyRef = useRef<HTMLDivElement>(null);
+  const [buyHidden, setBuyHidden] = useState(false);
+  useEffect(() => {
+    const el = buyRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setBuyHidden(!e.isIntersecting && e.boundingClientRect.top < 0), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  function addToBag() {
+    if (!current) return;
+    flyToBag(document.querySelector(".av-pdp__main img"));
+    cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
+      colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, current.availableQty), current.availableQty);
+  }
   const toast = useToast();
 
   const image = images[Math.min(imageIndex, images.length - 1)];
@@ -165,25 +182,15 @@ function ProductView({ product }: { product: ProductDetail }) {
               {current.casePairs && <span className="av-small">{t("pdp.case", { n: current.casePairs })}</span>}
             </div>
           )}
-          {current && pricing && pricing.tiers.length > 0 && current.availableQty > 0 && (
-            <PriceLadder pricing={pricing} variant={current} onAdd={(packs) => {
-              flyToBag(document.querySelector(".av-pdp__main img"));
-              cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
-                colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(packs, current.availableQty), current.availableQty);
-            }} />
-          )}
-          <FamilyFits category={product.category} />
-          <SizeFinder />
-          <div className="av-stack">
-            {current && current.availableQty > 0 && (
-              <div className="av-row"><QuantityStepper value={Math.min(quantity, current.availableQty)} max={Math.min(MAX_PER_LINE, current.availableQty)} label={t("pdp.quantity")} onChange={setQuantity} /></div>
-            )}
-            <Button size="lg" block disabled={!current || current.availableQty <= 0} onClick={() => {
-              if (!current) return;
-              flyToBag(document.querySelector(".av-pdp__main img"));
-              cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
-                colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(quantity, current.availableQty), current.availableQty);
-            }}>{current && current.availableQty <= 0 ? t("pdp.soldOut") : t("pdp.add")}</Button>
+          <div className="av-stack av-pdp__buy" ref={buyRef}>
+            <div className="av-pdp__buyrow">
+              {current && current.availableQty > 0 && (
+                <QuantityStepper value={Math.min(quantity, current.availableQty)} max={Math.min(MAX_PER_LINE, current.availableQty)} label={t("pdp.quantity")} onChange={setQuantity} />
+              )}
+              <Button size="lg" block disabled={!current || current.availableQty <= 0} onClick={addToBag}>
+                {current && current.availableQty <= 0 ? t("pdp.soldOut") : t("pdp.add")}
+              </Button>
+            </div>
             {current && current.availableQty <= 0 && <NotifyMe sku={current.sku} />}
             {cart.count > 0 && <p className="av-small"><Link to="/cart">{t("pdp.viewBag", { n: cart.count })}</Link></p>}
           </div>
@@ -193,6 +200,16 @@ function ProductView({ product }: { product: ProductDetail }) {
             <li><StackIcon /><span>{t("pdp.p3")}</span></li>
           </ul>
 
+          {current && pricing && pricing.tiers.length > 0 && current.availableQty > 0 && (
+            <PriceLadder pricing={pricing} variant={current} onAdd={(packs) => {
+              flyToBag(document.querySelector(".av-pdp__main img"));
+              cart.add({ sku: current.sku, productSlug: product.slug, productName: product.name, variantLabel: label(current),
+                colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: current.price }, Math.min(packs, current.availableQty), current.availableQty);
+            }} />
+          )}
+          <FamilyFits category={product.category} />
+          <SizeFinder />
+
           {current && current.availableQty > 0 && (
             <NegotiationChat sku={current.sku} quantity={Math.min(quantity, current.availableQty)} onAccept={(offer, offeredQty) => {
               const qty = Math.min(offeredQty, current.availableQty);
@@ -200,6 +217,16 @@ function ProductView({ product }: { product: ProductDetail }) {
                 colorHex: current.colorHex, imageUrl: images[0]?.url ?? null, unitPrice: offer.offerPrice, negotiationSessionId: offer.sessionId }, qty, current.availableQty);
               toast(t("pdp.addedAt", { pct: offer.validatedDiscountPct }));
             }} />
+          )}
+
+          {current && current.availableQty > 0 && typeof document !== "undefined" && createPortal(
+            <div className={`av-stickybuy${buyHidden ? " is-on" : ""}`} aria-hidden={!buyHidden}>
+              <span className="av-stickybuy__img"><ProductImage image={images[0] ? { ...images[0], alt: "" } : null} /></span>
+              <span className="av-stickybuy__text"><strong>{product.name}</strong><span className="av-small av-muted">{label(current)}</span></span>
+              <Price amount={current.price} />
+              <Button onClick={addToBag} tabIndex={buyHidden ? 0 : -1}>{t("pdp.add")}</Button>
+            </div>,
+            document.body,
           )}
 
           <div className="av-accordion">

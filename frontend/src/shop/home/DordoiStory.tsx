@@ -34,7 +34,9 @@ const ease = (p: number, a: number, b: number) => { const x = Math.min(1, Math.m
  * "From Dordoi, with love": the family's stall as a short scene that plays as the visitor scrolls. A passage at night,
  * containers on two floors; 70-E's sign lights up in gold, the view moves in towards it, its doors open on a rail of
  * socks, and the way to the family's story appears. The section is pinned while it plays (taller than the screen, with
- * a sticky stage), and only transforms and opacity change, set once per frame. With reduced motion it is simply the
+ * a sticky stage). The view never zooms (that blurs): the neighbours step aside and the upper floor rises away while
+ * ours grows only a little, below its sharp size. Only transforms and opacity change, set once per frame, and the
+ * socks sway only once the doors are open. With reduced motion it is simply the
  * finished scene. The scene is decoration (aria-hidden); the words and links carry the meaning.
  */
 export function DordoiStory() {
@@ -55,13 +57,16 @@ export function DordoiStory() {
       const r = el.getBoundingClientRect();
       const travel = Math.max(1, r.height - window.innerHeight);
       const p = Math.min(1, Math.max(0, -r.top / travel));
-      el.style.setProperty("--glow", ease(p, 0.08, 0.3).toFixed(3));
-      el.style.setProperty("--zoom", ease(p, 0.22, 0.62).toFixed(3));
-      el.style.setProperty("--doors", ease(p, 0.5, 0.8).toFixed(3));
-      const cta = ease(p, 0.78, 0.95);
+      // The sign lights up, the neighbours step aside as the view walks in, the doors open, and the way in appears.
+      el.style.setProperty("--glow", ease(p, 0.04, 0.24).toFixed(3));
+      el.style.setProperty("--zoom", ease(p, 0.2, 0.62).toFixed(3));
+      const doors = ease(p, 0.42, 0.72);
+      el.style.setProperty("--doors", doors.toFixed(3));
+      el.classList.toggle("is-open", doors > 0.6);
+      const cta = ease(p, 0.72, 0.9);
       el.style.setProperty("--cta", cta.toFixed(3));
       el.classList.toggle("is-done", cta > 0.5);
-      el.style.setProperty("--intro", (1 - ease(p, 0.18, 0.34)).toFixed(3));
+      el.style.setProperty("--intro", (1 - ease(p, 0.22, 0.4)).toFixed(3));
     };
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
     update();
@@ -122,6 +127,7 @@ export function DordoiStory() {
                   </div>
                   <div className="av-yard__door av-yard__door--l"><span className="av-box__bars" /><Logo variant="mark" height="26%" className="av-yard__emboss" /></div>
                   <div className="av-yard__door av-yard__door--r"><span className="av-box__bars" /><Logo variant="mark" height="26%" className="av-yard__emboss" /></div>
+                  <span className="av-yard__tag"><span className="av-yard__string" />{t("dordoi.tag")}</span>
                 </div>
               </div>
               {RIGHT.map((b, i) => <Closed key={b.n} {...b} side="r" i={i + 1} />)}
