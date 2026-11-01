@@ -984,6 +984,12 @@ const shop: Partial<Record<MessageKey, string>> = {
   "a.dz.confirm": "Удалить зону? Старые заказы сохранят свою доставку.",
   "a.dz.hidden": "скрыта",
   "a.dz.new": "Новая зона",
+  "cats2.himTag": "офис · спорт · тепло",
+  "cats2.herTag": "мягкие · кружево · уют",
+  "cats2.kidsTag": "школа · игры · антискользящие",
+  "cats2.giftsTag": "собраны вручную в 70-E",
+  "door.open": "ОТКРЫТО",
+  "door.closed": "ЗАКРЫТО",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

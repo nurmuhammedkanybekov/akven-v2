@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MARK, markMarkup } from "../src/brand/mark.ts";
-import { SOCK_COLOURS as C, sockBounds, sockMarkup } from "../src/brand/sockDrawing.ts";
+import { SOCK_COLOURS as C, sockBounds, sockMarkup, sockTop } from "../src/brand/sockDrawing.ts";
 import { COLLECTION_2 } from "./collection-2.mjs";
 import { COLLECTION_3 } from "./collection-3.mjs";
 import { COLLECTION_4 } from "./collection-4.mjs";
@@ -28,22 +28,60 @@ function placed(spec, id, { cx, cy, fit, rotate = 0, flip = false }) {
   return `<g transform="rotate(${rotate} ${cx} ${cy}) translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${flip ? -s : s} ${s})">${sockMarkup(spec, id)}</g>`;
 }
 
-function frame(tint, body, { floor = 870 } = {}) {
+/** The washing line every sock hangs from: a gentle sag, y = 128 + 100 t (1 - t) along x = -10 + 820 t. */
+const lineY = (x, base) => { const t = (x + 10) / 820; return base + 100 * t * (1 - t); };
+
+/** How large a sock is drawn: as wide as `fit`, but never taller than the picture allows; short socks a little larger. */
+const scaleFor = (spec, fit) => { const b = sockBounds(spec.cut); const short = b.h < 160 ? 1.4 : b.h < 220 ? 1.15 : 1; return Math.min((fit * short) / b.w, 640 / b.h); };
+
+/** Where the line runs so the hanging sock sits in the middle of the picture. */
+const baseFor = (spec, fit) => { const b = sockBounds(spec.cut); const hPx = (b.h - 22) * scaleFor(spec, fit); return Math.round(Math.min(330, Math.max(110, 470 - hPx / 2 - 25))); };
+
+/**
+ * The backdrop: the product's tint, woven like linen, with soft light from above. Socks hang from a washing line
+ * on wooden pegs, the way the stall dries and shows them; boxes stand on the floor.
+ */
+function frame(tint, body, { line = null, floor = 870 } = {}) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img">
-  <defs><radialGradient id="light" cx=".5" cy=".42" r=".62"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <defs>
+    <radialGradient id="light" cx=".5" cy=".38" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".7" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".06"/></radialGradient>
+    <pattern id="weave" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 1.5H6M1.5 0V6" stroke="#000" stroke-opacity=".035" stroke-width="1"/><path d="M0 4.5H6" stroke="#fff" stroke-opacity=".18" stroke-width="1"/></pattern>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="12" dy="18" stdDeviation="11" flood-color="#2a1d10" flood-opacity=".16"/></filter>
+  </defs>
   <rect width="${W}" height="${H}" fill="${tint}"/>
+  <rect width="${W}" height="${H}" fill="url(#weave)"/>
   <rect width="${W}" height="${H}" fill="url(#light)"/>
-  <ellipse cx="400" cy="${floor}" rx="260" ry="20" fill="#000" fill-opacity=".08"/>
+  ${line != null ? `<path d="M-10 ${line + 4}Q400 ${line + 108} 810 ${line + 4}" fill="none" stroke="#000" stroke-opacity=".08" stroke-width="5"/><path d="M-10 ${line}Q400 ${line + 100} 810 ${line}" fill="none" stroke="#9a8569" stroke-width="3"/><path d="M-10 ${line - 1}Q400 ${line + 99} 810 ${line - 1}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>`
+    : `<ellipse cx="400" cy="${floor}" rx="270" ry="22" fill="#000" fill-opacity=".09"/>`}
   ${body}
   <g transform="translate(716 936) scale(${(40 / MARK.h).toFixed(4)})" opacity=".55">${markMarkup("#b08d57", "wm")}</g>
 </svg>
 `;
 }
 
-const single = (slug, spec) => placed(spec, `${slug}-a`, { cx: 400, cy: 500, fit: 560, rotate: -6 });
+/** A wooden clothes peg, centred on (x, y), turned with the sock. */
+const peg = (x, y, r) => `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r})">
+    <rect x="-11" y="-30" width="22" height="66" rx="5" fill="#c99d66"/><rect x="-11" y="-30" width="11" height="66" rx="5" fill="#fff" fill-opacity=".18"/>
+    <path d="M0 -28V34" stroke="#7a5532" stroke-opacity=".55" stroke-width="1.6"/><rect x="-13" y="-4" width="26" height="7" rx="2.5" fill="#8f9396"/>
+    <rect x="-11" y="-30" width="22" height="66" rx="5" fill="none" stroke="#6d4a2b" stroke-opacity=".35"/></g>`;
+
+/** One sock hanging by its cuff at line position x, sized to `fit`, turned by `rotate`. */
+function hung(spec, id, { x, fit, rotate = 0, base }) {
+  const s = scaleFor(spec, fit);
+  const top = spec.cut === "no-show" ? sockTop(spec.cut) - 4 : sockTop(spec.cut);
+  const px = x, py = lineY(x, base) + 6;
+  const tx = px - 50 * s, ty = py - top * s - 4;
+  return `<g filter="url(#sh)"><g transform="rotate(${rotate} ${px.toFixed(1)} ${py.toFixed(1)}) translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${s.toFixed(4)})">${sockMarkup(spec, id)}</g></g>` + peg(px, py, rotate);
+}
+
+/** Where to peg a sock so that, hanging, it sits in the middle of the picture. */
+const centreFor = (spec, fit) => { const b = sockBounds(spec.cut); return 400 - (b.x + b.w / 2 - 50) * scaleFor(spec, fit); };
+
+const SINGLE = 540, PAIR = 340;
+const single = (slug, spec) => hung(spec, `${slug}-a`, { x: centreFor(spec, SINGLE), fit: SINGLE, rotate: -2, base: baseFor(spec, SINGLE) });
 const pair = (slug, spec) =>
-  placed(spec, `${slug}-b`, { cx: 330, cy: 470, fit: 470, rotate: -12 }) +
-  placed(spec, `${slug}-c`, { cx: 470, cy: 540, fit: 470, rotate: 4 });
+  hung(spec, `${slug}-b`, { x: centreFor(spec, PAIR) - 165, fit: PAIR, rotate: 3, base: baseFor(spec, PAIR) }) +
+  hung(spec, `${slug}-c`, { x: centreFor(spec, PAIR) + 150, fit: PAIR, rotate: -3, base: baseFor(spec, PAIR) });
 
 /** A gift box, open at the top, with pairs standing inside and an emblem on the band. */
 function box(slug, { colour, ribbon, emblem, socks }) {
@@ -158,13 +196,13 @@ let files = 0;
 const write = (name, svg) => { fs.writeFileSync(path.join(outDir, name), svg); files++; };
 for (const [slug, p] of Object.entries(PRODUCTS)) {
   if (p.sock) {
-    write(`${slug}-1.svg`, frame(p.tint, single(slug, p.sock)));
-    write(`${slug}-2.svg`, frame(p.tint, pair(slug, p.sock)));
+    write(`${slug}-1.svg`, frame(p.tint, single(slug, p.sock), { line: baseFor(p.sock, SINGLE) }));
+    write(`${slug}-2.svg`, frame(p.tint, pair(slug, p.sock), { line: baseFor(p.sock, PAIR) }));
     for (const [name, hex] of COLOURS[slug] ?? []) {
       const spec = colourise(BASE[slug] ?? p.sock, hex);
       const c = colourSlug(name);
-      write(`${slug}--${c}-1.svg`, frame(p.tint, single(`${slug}-${c}`, spec)));
-      write(`${slug}--${c}-2.svg`, frame(p.tint, pair(`${slug}-${c}`, spec)));
+      write(`${slug}--${c}-1.svg`, frame(p.tint, single(`${slug}-${c}`, spec), { line: baseFor(spec, SINGLE) }));
+      write(`${slug}--${c}-2.svg`, frame(p.tint, pair(`${slug}-${c}`, spec), { line: baseFor(spec, PAIR) }));
     }
   } else {
     write(`${slug}-1.svg`, frame(p.tint, box(slug, p.box)));

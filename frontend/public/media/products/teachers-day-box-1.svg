@@ -1,8 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img">
-  <defs><radialGradient id="light" cx=".5" cy=".42" r=".62"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <defs>
+    <radialGradient id="light" cx=".5" cy=".38" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".7" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".06"/></radialGradient>
+    <pattern id="weave" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 1.5H6M1.5 0V6" stroke="#000" stroke-opacity=".035" stroke-width="1"/><path d="M0 4.5H6" stroke="#fff" stroke-opacity=".18" stroke-width="1"/></pattern>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="12" dy="18" stdDeviation="11" flood-color="#2a1d10" flood-opacity=".16"/></filter>
+  </defs>
   <rect width="800" height="1000" fill="#ece6da"/>
+  <rect width="800" height="1000" fill="url(#weave)"/>
   <rect width="800" height="1000" fill="url(#light)"/>
-  <ellipse cx="400" cy="870" rx="260" ry="20" fill="#000" fill-opacity=".08"/>
+  <ellipse cx="400" cy="870" rx="270" ry="22" fill="#000" fill-opacity=".09"/>
   
   <defs>
     <linearGradient id="bx" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient>

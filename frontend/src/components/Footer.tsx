@@ -8,6 +8,7 @@ import { useShopInfo } from "../shop/useShopInfo";
 import { ContactIcon, contactValue } from "./Contacts";
 import { ArrowUpIcon, PinIcon, StackIcon, StoreIcon, TruckIcon, WalletIcon } from "./icons";
 import { OpenNow } from "./OpenNow";
+import { StallDoor } from "./StallDoor";
 
 const PROMISES = [
   { n: 1, icon: <StoreIcon /> },
@@ -42,6 +43,8 @@ export function Footer() {
             <p className="av-footer__sign">{t("foot.sign")}</p>
           </div>
           <section className="av-footer__stall" aria-label={t("foot.stall")}>
+            <StallDoor point={point} />
+            <div className="av-footer__stallinfo">
             <span className="av-footer__head">{t("foot.stall")}</span>
             {point && <OpenNow point={point} className="av-footer__open" />}
             {address && <address className="av-footer__address"><PinIcon /><span>{address}</span></address>}
@@ -50,12 +53,13 @@ export function Footer() {
               <a href={`https://2gis.kg/bishkek/search/${encodeURIComponent("Дордой")}`} target="_blank" rel="noopener noreferrer">{t("visit.twoGis")}</a>
               <Link to="/visit">{t("foot.howTo")}</Link>
             </div>
+            </div>
           </section>
         </div>
 
         <ul className="av-footer__promises">
           {PROMISES.map(({ n, icon }) => (
-            <li key={n}>
+            <li key={n} style={{ "--i": n } as React.CSSProperties}>
               <span className="av-footer__picon">{icon}</span>
               <span><strong>{t(`foot.p${n}`)}</strong><small>{t(`foot.p${n}s`)}</small></span>
             </li>

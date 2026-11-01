@@ -999,6 +999,12 @@ const shop = {
   "a.dz.confirm": "Delete this area? Old orders keep their delivery.",
   "a.dz.hidden": "hidden",
   "a.dz.new": "New area",
+  "cats2.himTag": "office · sport · warm",
+  "cats2.herTag": "soft · lace · cosy",
+  "cats2.kidsTag": "school · play · grip",
+  "cats2.giftsTag": "packed by hand at 70-E",
+  "door.open": "OPEN",
+  "door.closed": "CLOSED",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;
