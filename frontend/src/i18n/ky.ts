@@ -990,6 +990,17 @@ const shop: Partial<Record<MessageKey, string>> = {
   "cats2.giftsTag": "70-Eде кол менен топтолгон",
   "door.open": "АЧЫК",
   "door.closed": "ЖАБЫК",
+  "shop.sizeIs": "Өлчөм {size}",
+  "shop.countN": "{n} товар",
+  "shop.filters": "Чыпкалар",
+  "shop.sizes": "Өлчөмдөр",
+  "shop.size": "Өлчөм",
+  "shop.colours": "Түстөр",
+  "shop.chosen": "Тандалган чыпкалар",
+  "shop.remove": "«{what}» алып салуу",
+  "shop.shown": "{total} ичинен {shown} көрдүңүз",
+  "shop.more": "Дагы {n} көрсөтүү",
+  "recent.clear": "Тазалоо",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

@@ -23,6 +23,14 @@ public record CatalogFilter(Category category, String section, String cut, Strin
         return new CatalogFilter(category, section, null, collection, q, inStock, size, color, minPrice, maxPrice);
     }
 
+    CatalogFilter withoutSize() {
+        return new CatalogFilter(category, section, cut, collection, q, inStock, null, color, minPrice, maxPrice);
+    }
+
+    CatalogFilter withoutColor() {
+        return new CatalogFilter(category, section, cut, collection, q, inStock, size, null, minPrice, maxPrice);
+    }
+
     /** True when at least one condition has to be checked against a product's variants. */
     boolean hasVariantConditions() {
         return inStock || size != null || color != null || minPrice != null || maxPrice != null;

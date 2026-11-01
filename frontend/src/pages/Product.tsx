@@ -18,8 +18,9 @@ import { ProductImage } from "../components/ProductImage";
 import { ProductCard } from "../components/ProductCard";
 import { HeartIcon, PinIcon, StackIcon, TruckIcon } from "../components/icons";
 import { useSaved } from "../shop/useSaved";
-import { rememberViewed, useViewed } from "../shop/useViewed";
+import { rememberViewed } from "../shop/useViewed";
 import { useAsync } from "../hooks/useAsync";
+import { RecentlyViewed } from "../shop/RecentlyViewed";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
@@ -251,7 +252,7 @@ function ProductView({ product }: { product: ProductDetail }) {
       <MatchFamily product={product} />
       <Reviews slug={product.slug} />
       <MoreLikeThis product={product} />
-      <RecentlyViewed current={product.slug} />
+      <RecentlyViewed except={product.slug} />
     </div>
   );
 }
@@ -311,28 +312,6 @@ function MoreLikeThis({ product }: { product: ProductDetail }) {
     <section className="av-block" aria-labelledby="more-title">
       <header className="av-block__head"><span className="av-eyebrow">{t("ladder.eyebrow")}</span><h2 id="more-title">{t("pdp.more")}</h2></header>
       <div className="av-grid-products">{items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={((i + 3) % 6) + 1} />)}</div>
-    </section>
-  );
-}
-
-/** What this visitor looked at before, kept in this browser only. */
-function RecentlyViewed({ current }: { current: string }) {
-  const { t } = useT();
-  const items = useViewed().filter((v) => v.slug !== current).slice(0, 6);
-  if (items.length === 0) return null;
-  return (
-    <section className="av-block" aria-labelledby="recent-title">
-      <h2 id="recent-title" className="av-recent__title">{t("pdp.recent")}</h2>
-      <ul className="av-recent">
-        {items.map((v, i) => (
-          <li key={v.slug}>
-            <Link to={`/products/${v.slug}`}>
-              <span className="av-recent__img" style={{ background: `var(--tint-${(i % 6) + 1})` }}>{v.image && <img src={v.image} alt="" loading="lazy" width={160} height={200} />}</span>
-              <span className="av-recent__name">{v.name}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

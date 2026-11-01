@@ -9,7 +9,8 @@ export interface TermView { slug: string; name: string }
 export interface TermInfo { slug: string; name: string; description: string | null }
 export interface TermsView { sections: TermInfo[]; cuts: TermInfo[] }
 export interface FacetOption { slug: string; name: string; count: number }
-export interface Facets { category: Record<Category, number>; section: FacetOption[]; cut: FacetOption[] }
+export interface ColorOption { name: string; hex: string | null; count: number }
+export interface Facets { category: Record<Category, number>; section: FacetOption[]; cut: FacetOption[]; size?: FacetOption[]; color?: ColorOption[] }
 
 export interface PageResponse<T> { items: T[]; page: number; size: number; totalItems: number; totalPages: number }
 
