@@ -987,3 +987,33 @@ body::before {
 .av-seen__photo img, .av-seen__blank { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; background: #eee6d8; }
 .av-seen__peg { position: absolute; top: -20px; left: 50%; width: 14px; height: auto; transform: translateX(-50%); }
 .av-seen__name { font-family: var(--font-hand); font-size: 1.05rem; line-height: 1.1; padding-inline: 2px; }
+
+/* ---------- the trust line as a woven ribbon, the family list as a pegged sheet ---------- */
+.av-trust { position: relative; border: 0; background: #1f2a44; color: #f4ecdc;
+  background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.03) 0 2px, transparent 2px 5px); }
+.av-trust::before, .av-trust::after { content: ""; position: absolute; left: 0; right: 0; height: 0; border-top: 1.5px dashed rgb(201 162 75 / 0.6); }
+.av-trust::before { top: 7px; } .av-trust::after { bottom: 7px; }
+.av-trust__list { padding-block: var(--space-5); }
+.av-trust__list li > svg { color: #c9a24b; }
+.av-trust__list li > span, .av-trust .av-open, .av-trust .av-open strong { color: #c9c3b6; }
+.av-trust__list strong { color: #f4ecdc; }
+.av-trust a { color: #e6c983; }
+
+.av-family__sheet { position: relative; background-color: #fffdf8; background-image: repeating-linear-gradient(transparent 0 31px, rgb(31 42 68 / 0.035) 31px 32px);
+  border: 0; border-radius: 6px; box-shadow: 0 30px 60px -30px rgb(40 28 14 / 0.35); transform: rotate(-0.5deg); }
+:root[data-theme="dark"] .av-family__sheet { background-color: var(--surface); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-family__sheet { background-color: var(--surface); } }
+.av-family__peg { position: absolute; top: -24px; left: 50%; width: 20px; height: auto; transform: translateX(-50%) rotate(3deg); filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.2)); }
+
+/* ---------- product page: the photo stays with you; haggling on kraft; reviews on a pegged note ---------- */
+@media (min-width: 900px) { .av-pdp__gallery { position: sticky; top: 96px; align-self: start; } }
+.av-chat { position: relative; background: #ead9b8; color: #2e2212; border: 0; border-radius: 6px;
+  outline: 1.5px dashed rgb(60 42 20 / 0.35); outline-offset: -8px;
+  background-image: radial-gradient(rgb(255 255 255 / 0.25) 1px, transparent 1.5px); background-size: 9px 9px; }
+.av-chat__title { font-family: var(--font-hand); font-weight: 700; font-size: 1.9rem; color: #3c2a14; transform: rotate(-1.5deg); transform-origin: 0 50%; }
+.av-chat a { color: #3c2a14; }
+.av-reviews__summary { position: relative; background: #fffdf8; border: 0; border-radius: 4px; box-shadow: 0 24px 40px -28px rgb(40 28 14 / 0.4); transform: rotate(-0.8deg);
+  background-image: repeating-linear-gradient(transparent 0 27px, rgb(31 42 68 / 0.04) 27px 28px); }
+.av-reviews__summary::before { content: ""; position: absolute; top: -10px; left: 50%; width: 46px; height: 20px; transform: translateX(-50%) rotate(-3deg); background: rgb(233 220 190 / 0.85); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+:root[data-theme="dark"] .av-reviews__summary { background-color: var(--surface); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-reviews__summary { background-color: var(--surface); } }

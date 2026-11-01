@@ -301,3 +301,6 @@ export interface DeliveryZone {
   active: boolean; position: number;
 }
 export type DeliveryZoneInput = Omit<DeliveryZone, "id">;
+
+/** The contact and delivery details a customer keeps for the next order. */
+export interface CustomerDetails { contactName: string | null; contactPhone: string | null; address: string | null; country: Country | null; zoneId: string | null }

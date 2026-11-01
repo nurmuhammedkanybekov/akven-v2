@@ -1,3 +1,4 @@
+import { Peg } from "../../components/Clothesline";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { getSizeChart } from "../../api/endpoints";
@@ -91,6 +92,7 @@ export function FamilyPlanner({ minPairs, tiers }: { minPairs: number; tiers: Ar
           </div>
 
           <div className="av-family__sheet">
+            <Peg className="av-family__peg" />
             <ul className="av-family__list">
               {members.map((m) => {
                 const size = sockSizeFor(rows, m.shoe, m.role);

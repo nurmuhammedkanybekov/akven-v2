@@ -1,7 +1,7 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
-import { checkout, getDeliveryZones } from "../api/endpoints";
+import { checkout, getDeliveryZones, getMyDetails, saveMyDetails } from "../api/endpoints";
 import type { Country, FulfillmentMethod, PaymentMethod } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { useCart } from "../cart/CartContext";
@@ -39,6 +39,24 @@ export function CheckoutPage() {
   const [country, setCountry] = useState<Country>("KG");
   const [zoneId, setZoneId] = useState<string | null>(null);
   const zones = useAsync((signal) => getDeliveryZones(signal), []);
+  // The details the customer asked us to remember: filled in once, never over what they have typed.
+  const [remember, setRemember] = useState(false);
+  const [hadDetails, setHadDetails] = useState(false);
+  useEffect(() => {
+    if (!session) return;
+    let live = true;
+    getMyDetails().then((d) => {
+      if (!live || !(d.contactName || d.contactPhone || d.address)) return;
+      setHadDetails(true); setRemember(true);
+      setName((v) => v || d.contactName || "");
+      setPhone((v) => v || d.contactPhone || "");
+      setAddress((v) => v || d.address || "");
+      if (d.address || d.zoneId) setMethod((m) => (m === "PICKUP" && d.zoneId ? "DELIVERY" : m));
+      if (d.country) setCountry(d.country);
+      if (d.zoneId) setZoneId(d.zoneId);
+    }).catch(() => undefined);
+    return () => { live = false; };
+  }, [session]);
   const { t } = useT();
   const [note, setNote] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -89,6 +107,11 @@ export function CheckoutPage() {
         gift: giftForCheckout(gift),
       }, attemptKey.current);
       setPlaced(true);
+      // Keep (or update) the details for next time only when asked; a failure here never spoils the order.
+      if (remember) {
+        void saveMyDetails({ contactName: name.trim(), contactPhone: phone.trim(), address: method === "DELIVERY" ? address.trim() : null,
+          country: method === "DELIVERY" ? zone?.country ?? country : null, zoneId: method === "DELIVERY" ? zone?.id ?? null : null }).catch(() => undefined);
+      }
       cart.clear();
       setGift(null);
       navigate(`/orders/${order.id}`, { replace: true, state: { justPaid: true } });
@@ -153,6 +176,7 @@ export function CheckoutPage() {
           )}
           {method === "DELIVERY" && <Textarea label={t("co.address")} rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
           <Textarea label={t("co.note")} rows={2} maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} />
+          <label className="av-check"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> {t(hadDetails ? "co.rememberAgain" : "co.remember")}</label>
 
           <h2 className="av-formtitle">{t("co.payment")}</h2>
           <p className="av-small">{t("co.paymentS")}</p>

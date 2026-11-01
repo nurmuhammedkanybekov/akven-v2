@@ -1,3 +1,5 @@
+import { useToast } from "../components/Toast";
+import { useSaved } from "../shop/useSaved";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { getBestsellers } from "../api/endpoints";
@@ -136,6 +138,16 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
     setLeaving(true);
     window.setTimeout(() => cart.remove(line.sku), 320);
   };
+  // Not now, but not forgotten: the sock goes to the saved list (with the heart) and leaves the bag.
+  const saved = useSaved();
+  const toast = useToast();
+  const later = () => {
+    if (!saved.has(line.productSlug)) {
+      saved.toggle({ slug: line.productSlug, name: line.productName, image: q?.imageUrl ?? line.imageUrl ?? null, price: q?.unitPrice ?? line.unitPrice });
+    }
+    toast(t("cart.savedLater", { name: line.productName }));
+    remove();
+  };
   const problem = q && q.problem !== "NONE";
   const unitPrice = q?.unitPrice ?? line.unitPrice;
   const max = q ? Math.max(1, Math.min(MAX_PER_LINE, q.availableQty)) : MAX_PER_LINE;
@@ -161,6 +173,7 @@ function CartRow({ line, q, loading }: { line: CartLine; q?: QuoteLine; loading:
       <div className="av-cartline__qty">
         <QuantityStepper value={line.quantity} min={1} max={max} label={t("cart.qtyOf", { name: line.productName })} onChange={(n) => cart.setQuantity(line.sku, n)} />
         <Button size="sm" variant="ghost" aria-label={t("cart.removeName", { name: line.productName })} onClick={remove}>{t("cart.remove")}</Button>
+        <Button size="sm" variant="ghost" aria-label={t("cart.laterName", { name: line.productName })} onClick={later}>{t("cart.later")}</Button>
       </div>
       <div className="av-cartline__total av-price">{q?.lineTotal != null ? money(q.lineTotal) : money(line.unitPrice * line.quantity)}</div>
     </li>
