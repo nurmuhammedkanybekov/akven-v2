@@ -16,6 +16,11 @@ const ORDER = { id: "11111111-1111-1111-1111-111111111111", reference: "AV-11111
   fulfilledAt: null, cancelledAt: null, fulfillment: { method: "PICKUP", contactName: "Aida", contactPhone: "+996 700 123 456", address: null, note: null },
   payment: { method: "APPLE_PAY", reference: "…abcd1234" }, items: [], customerEmail: null };
 
+const ZONES = [
+  { id: "z-bishkek", country: "KG", name: "Bishkek", fee: 2, freeFrom: 40, daysMin: 1, daysMax: 2, active: true, position: 1 },
+  { id: "z-almaty", country: "KZ", name: "Almaty", fee: 8, freeFrom: null, daysMin: 2, daysMax: 4, active: true, position: 2 },
+];
+
 interface Call { url: string; method: string; headers: Record<string, string>; body: any }
 let calls: Call[] = [];
 function mockServer(handler: (c: Call) => Response | Promise<Response> | Error) {
@@ -23,6 +28,7 @@ function mockServer(handler: (c: Call) => Response | Promise<Response> | Error) 
   vi.spyOn(globalThis, "fetch").mockImplementation(async (url, init) => {
     const call: Call = { url: String(url), method: init?.method ?? "GET", headers: (init?.headers ?? {}) as Record<string, string>, body: init?.body ? JSON.parse(String(init.body)) : null };
     calls.push(call);
+    if (call.url === "/api/shop/delivery-zones") return json(ZONES);
     const r = handler(call);
     if (r instanceof Error) throw r;
     return r;
@@ -99,6 +105,25 @@ describe("checkout", () => {
     expect(order.body.items).toEqual([{ sku: "SOCK-1", quantity: 2 }]);            // which item and how many: no price anywhere
     expect(JSON.stringify(order.body)).not.toMatch(/price|total|card/i);
     expect(readCart()).toEqual([]);
+  });
+
+  it("charges delivery by the area the server knows, and sends only the area, never a fee", async () => {
+    mockServer((c) => (c.url === "/api/cart/quote" ? json(QUOTE_OK) : json(ORDER, 201)));
+    renderCheckout();
+    const user = userEvent.setup();
+    await screen.findByText("Mid-Long Sock", { exact: false });
+    await fillContact(user);
+    await user.click(screen.getByRole("radio", { name: /Delivery/ }));
+    await screen.findByText("Add $21.00 more and delivery is free.");
+    await user.selectOptions(screen.getByLabelText("Country"), "KZ");
+    await screen.findByText("Delivery · Almaty");
+    await user.type(screen.getByLabelText("Delivery address"), "Abay 1, Almaty");
+    await user.click(screen.getByRole("button", { name: "Pay with Apple Pay" }));
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /Pay \$27\.00/ }));
+    await screen.findByText("order page");
+    const [order] = orderCalls();
+    expect(order.body.fulfillment).toMatchObject({ method: "DELIVERY", country: "KZ", zoneId: "z-almaty" });
+    expect(JSON.stringify(order.body)).not.toMatch(/price|total|card|fee/i);
   });
 
   it("keeps the bag after a declined payment and uses a NEW key for the next attempt", async () => {

@@ -41,4 +41,14 @@ class WholesaleRateLimiterTest {
         limiter.check(null);
         assertThatThrownBy(() -> limiter.check("d")).isInstanceOf(TooManyRequestsException.class);
     }
+
+    @Test
+    void addressesWhoseHourPassedAreForgotten() {
+        Hand clock = new Hand();
+        WholesaleRateLimiter limiter = new WholesaleRateLimiter(5, Integer.MAX_VALUE, clock);
+        for (int i = 0; i <= WholesaleRateLimiter.SWEEP_AT; i++) limiter.check("10.0." + (i / 250) + "." + (i % 250));
+        clock.now = clock.now.plus(Duration.ofMinutes(61));
+        limiter.check("fresh");
+        org.assertj.core.api.Assertions.assertThat(limiter.remembered()).isLessThanOrEqualTo(3);
+    }
 }

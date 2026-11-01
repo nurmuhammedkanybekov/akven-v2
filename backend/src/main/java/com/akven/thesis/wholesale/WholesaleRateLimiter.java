@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WholesaleRateLimiter {
 
     static final String EVERYONE = "*";
+    /** Above this many remembered addresses, the ones with nothing left in their hour are forgotten. */
+    static final int SWEEP_AT = 10_000;
 
     private final Map<String, Deque<Instant>> hits = new ConcurrentHashMap<>();
     private final int perAddress;
@@ -47,6 +49,7 @@ public class WholesaleRateLimiter {
         Deque<Instant> mine = hits.computeIfAbsent(address == null ? "?" : address, k -> new ArrayDeque<>());
         Deque<Instant> all = hits.computeIfAbsent(EVERYONE, k -> new ArrayDeque<>());
         synchronized (this) {
+            if (hits.size() > SWEEP_AT) sweep(now);
             trim(mine, now);
             trim(all, now);
             if (mine.size() >= perAddress) {
@@ -58,6 +61,19 @@ public class WholesaleRateLimiter {
             mine.addLast(now);
             all.addLast(now);
         }
+    }
+
+    /** Many different addresses must not grow memory without end: drop those whose hour has passed. */
+    private void sweep(Instant now) {
+        hits.entrySet().removeIf(e -> {
+            if (e.getKey().equals(EVERYONE)) return false;
+            trim(e.getValue(), now);
+            return e.getValue().isEmpty();
+        });
+    }
+
+    int remembered() {
+        return hits.size();
     }
 
     private void trim(Deque<Instant> q, Instant now) {
