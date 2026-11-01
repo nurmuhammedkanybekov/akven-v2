@@ -8,6 +8,7 @@ import type {
   PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
   FamilyMember, FamilyMemberInput, ProductReviews, ShowcaseReview, MyReview, ModerationLine, ReviewStatus, DayPoint,
   SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
+  WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -215,3 +216,8 @@ export const requestStock = (sku: string) => api<string[]>(`/api/stock-requests/
 export const cancelStockRequest = (sku: string) => api<string[]>(`/api/stock-requests/${encodeURIComponent(sku)}`, { method: "DELETE", body: {} });
 export const adminStockRequests = () => api<StockWaiting[]>("/api/admin/stock-requests");
 export const adminAnswerStockRequest = (id: string) => api<void>(`/api/admin/stock-requests/${id}/answered`, { method: "PUT", body: {} });
+
+export const sendWholesaleRequest = (body: WholesaleRequestInput) => api<WholesaleReceived>("/api/wholesale/requests", { method: "POST", body });
+export const adminWholesale = (status?: WholesaleStatus) => api<WholesaleInbox>(`/api/admin/wholesale${qs({ status })}`);
+export const adminHandleWholesale = (id: string, status: WholesaleStatus, staffNote: string | null) =>
+  api<WholesaleLine>(`/api/admin/wholesale/${id}`, { method: "PUT", body: { status, staffNote } });

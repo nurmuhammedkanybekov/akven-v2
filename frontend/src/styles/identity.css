@@ -31,14 +31,15 @@
 
 /* ---------- paper ---------- */
 
-/* A little grain on the page, like the paper of a price card. Barely there, and none in print or high contrast. */
+/* A little grain on the page, like the paper of a price card: a still, pre-drawn layer laid over the page (no blending,
+   which would make the browser repaint the whole screen on every scroll). None in print or high contrast. */
 body::before {
-  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.35; mix-blend-mode: multiply;
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.35; will-change: transform; transform: translateZ(0);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .28 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 #root { position: relative; z-index: 1; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body::before { mix-blend-mode: screen; opacity: 0.18; } }
-:root[data-theme="dark"] body::before { mix-blend-mode: screen; opacity: 0.18; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body::before { opacity: 0.12; } }
+:root[data-theme="dark"] body::before { opacity: 0.12; }
 @media print, (forced-colors: active), (prefers-contrast: more) { body::before { display: none; } }
 
 /* ---------- the logo writes its heart ---------- */
@@ -549,3 +550,189 @@ body::before {
   .av-casebuild__cell button { width: 28px; height: 28px; }
   .av-casebuild__sum .av-pairs svg { width: 11px; height: 18px; }
 }
+
+/* When the menu links do not fit beside the logo, the header shows the menu button instead (never a cut-off link). */
+.av-header__bar.is-compact .av-nav { visibility: hidden; position: absolute; pointer-events: none; }
+.av-header__bar.is-compact .av-menu-btn { display: inline-flex; }
+.av-nav.is-tight { gap: var(--space-3); }
+.av-nav.is-tight a { font-size: 0.84rem; letter-spacing: -0.015em; }
+
+/* ---------- From Dordoi, with love: the scene, smoother and sharper ----------
+   No zoom of the whole view (an enlarged layer is blurry) and no animated filters or shadows (each repaints the
+   screen on every frame). Instead: the neighbours step aside and darken by opacity, the upper floor rises away,
+   ours grows a little from below its sharp size, lights fade in as layers, and the socks only sway once open. */
+.av-dordoi { height: 230svh; }
+.av-dordoi .av-dordoi__view { transform: none; will-change: auto; }
+.av-dordoi .av-yard__floor--down > .av-yard__box, .av-dordoi .av-yard__sign, .av-dordoi .av-yard__door--l, .av-dordoi .av-yard__door--r { filter: none; }
+.av-dordoi .av-yard__floor--down > .av-yard__box { filter: brightness(0.62) saturate(0.85); }
+.av-dordoi .av-yard__box--l, .av-dordoi .av-yard__box--r {
+  will-change: transform, opacity;
+  transform: translateX(calc(var(--zoom) * var(--cw) * (0.42 + var(--d, 1) * 0.16) * var(--dir)));
+  opacity: calc(1 - var(--glow) * 0.28 - var(--zoom) * 0.22);
+}
+.av-dordoi .av-yard__box--l { --dir: -1; }
+.av-dordoi .av-yard__box--r { --dir: 1; }
+.av-dordoi .av-yard__floor--up { will-change: transform, opacity; transform: translateY(calc(var(--zoom) * -38%)); opacity: calc(1 - var(--zoom) * 0.75); }
+.av-dordoi .av-yard__walk { transform: translateY(calc(var(--zoom) * -60%)); opacity: calc(1 - var(--zoom) * 0.6); }
+.av-dordoi .av-yard__floor--down { align-items: flex-end; }
+/* Ours is drawn at its final, larger size and starts scaled down, so it is never enlarged past sharp. */
+.av-dordoi .av-yard__ours { width: calc(var(--cw) * 1.45); will-change: transform; transform-origin: 50% 100%; transform: scale(calc(0.7 + var(--zoom) * 0.3)); }
+.av-dordoi .av-yard__ours .av-yard__sign { height: calc(var(--cw) * 0.27); }
+.av-dordoi .av-yard__ours::before { opacity: calc(0.25 + var(--glow) * 0.75); }
+/* The sign: dark, then lit — the glow is its own layer, faded in. */
+.av-dordoi .av-yard__sign { animation: none; box-shadow: none; color: color-mix(in srgb, var(--accent) calc(35% + var(--glow) * 65%), #3a4560); }
+.av-dordoi .av-yard__sign::before { content: ""; position: absolute; inset: -2px; border-radius: inherit; pointer-events: none; opacity: var(--glow);
+  box-shadow: 0 0 46px -6px rgba(212, 179, 115, 0.6), inset 0 0 18px -6px rgba(212, 179, 115, 0.45); }
+.av-dordoi .av-box { box-shadow: 0 40px 70px -40px rgba(0, 0, 0, 0.8); }
+.av-dordoi .av-yard__ours::after { content: ""; position: absolute; left: -40%; right: -40%; bottom: -30%; height: 80%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 205, 130, 0.45), transparent); opacity: var(--doors); }
+/* The doors darken as they turn away from the light: an overlay, not a filter. */
+.av-dordoi .av-yard__door { will-change: transform; }
+.av-dordoi .av-yard__door::after { content: ""; position: absolute; inset: 0; background: #050a16; opacity: calc(var(--doors) * 0.42); pointer-events: none; }
+.av-dordoi .av-yard__ground::before { opacity: calc(0.15 + var(--doors) * 0.85); }
+/* The socks: no shadows to repaint, and still until the doors are open. */
+.av-dordoi .av-hang svg { filter: none; }
+.av-dordoi .av-hang__sway { animation-play-state: paused; }
+.av-dordoi.is-open .av-hang__sway { animation-play-state: running; }
+/* A kraft tag on the right door's handle, written by the family, swinging in as the doors open. */
+.av-yard__tag { position: absolute; z-index: 6; right: -6%; top: 46%; translate: 0 0; padding: 3px 10px 3px 16px; border-radius: 3px 8px 8px 3px;
+  background: #d8bf94; color: #3c2a14; font: 600 clamp(0.8rem, 1.2vw, 1.05rem)/1.1 var(--font-hand); white-space: nowrap;
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%); transform-origin: 0 50%;
+  opacity: var(--doors); transform: rotate(calc(18deg - var(--doors) * 14deg)) translateX(calc(var(--doors) * 40%)); }
+.av-dordoi:not(.is-still) .av-yard__tag { will-change: transform, opacity; }
+/* The words and the way in come at the top, where the title was, so they never cover the socks. */
+.av-dordoi .av-dordoi__end { top: clamp(5.5rem, 13svh, 8rem); bottom: auto; padding: 0 var(--gutter); background: none; }
+.av-dordoi__end .av-row { justify-content: center; }
+.av-dordoi .av-dordoi__where { font-family: var(--font-display); font-size: clamp(1.4rem, 1rem + 1.4vw, 2.2rem); font-weight: 600; line-height: 1.15; max-width: 30ch; }
+@media (max-width: 767px) {
+  .av-dordoi { height: 200svh; }
+  .av-dordoi .av-dordoi__view { transform: none; }
+  .av-yard__tag { right: -2%; top: 50%; }
+}
+.av-dordoi.is-still .av-yard__ours { transform: none; }
+
+/* The header keeps one height (changing it would re-lay-out the whole page on the first scroll, a visible freeze);
+   once scrolled, the logo settles a little smaller by a transform instead. */
+.av-header__logo svg { transition: transform 0.35s var(--ease-out); transform-origin: 50% 50%; }
+.av-header.is-scrolled .av-header__logo svg { transform: scale(0.9); }
+
+
+/* ---------- product page: the buy row, and the sticky bar ---------- */
+.av-pdp__buyrow { display: flex; gap: var(--space-3); align-items: stretch; }
+.av-pdp__buyrow .av-btn { flex: 1; }
+.av-stickybuy {
+  position: fixed; z-index: 40; left: 50%; bottom: 12px; width: min(760px, calc(100% - 24px)); display: flex; align-items: center; gap: var(--space-3);
+  padding: 8px 8px 8px 10px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(10px);
+  box-shadow: 0 18px 40px -18px rgb(15 25 48 / 0.45), 0 0 0 1px var(--line);
+  transform: translate(-50%, 140%); transition: transform 0.45s var(--ease-out), visibility 0s linear 0.45s; visibility: hidden;
+}
+.av-stickybuy.is-on { transform: translate(-50%, 0); visibility: visible; transition-delay: 0s; }
+.av-stickybuy__img { flex: none; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--surface-2); }
+.av-stickybuy__img img { width: 100%; height: 100%; object-fit: cover; }
+.av-stickybuy__text { display: grid; min-width: 0; flex: 1; line-height: 1.2; }
+.av-stickybuy__text strong, .av-stickybuy__text span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.av-stickybuy .av-btn { min-height: 44px; }
+@media (max-width: 520px) { .av-stickybuy .av-price { display: none; } }
+@media (prefers-reduced-motion: reduce) { .av-stickybuy { transition: none; } }
+
+/* ---------- the collection price, said once ---------- */
+.av-ladderstrip { padding-block: clamp(2.5rem, 6vw, 4.5rem); background: var(--black-deep); color: var(--on-black); position: relative; overflow: hidden; }
+.av-ladderstrip::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 120% at 85% 50%, rgb(212 179 115 / 0.16), transparent 70%); pointer-events: none; }
+.av-ladderstrip__inner { position: relative; display: grid; gap: var(--space-5); align-items: center; }
+@media (min-width: 960px) { .av-ladderstrip__inner { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto; gap: var(--space-7); } }
+.av-ladderstrip__copy { display: grid; gap: var(--space-2); }
+.av-ladderstrip__copy .av-hand { color: var(--accent); font-size: 1.5rem; }
+.av-ladderstrip h2 { color: var(--on-black); font-size: clamp(1.8rem, 1.3rem + 1.6vw, 2.8rem); }
+.av-ladderstrip p { margin: 0; color: var(--on-black-2); max-width: 44ch; }
+.av-ladderstrip__steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.av-ladderstrip__steps li { display: grid; justify-items: start; gap: 6px; color: var(--on-black-2); font-size: var(--text-small); }
+.av-ladderstrip__steps .av-kraft { font-size: 1.6rem; padding-block: 0.3em; }
+.reveal .av-ladderstrip .av-ladderstrip__steps li { transform: translateY(16px) rotate(-3deg); transition: transform 0.7s var(--ease-spring); transition-delay: calc(0.15s + var(--i) * 0.1s); }
+.reveal .av-ladderstrip.is-in .av-ladderstrip__steps li { transform: none; }
+/* The page slides in, and leaves no transform behind (one would trap anything fixed or sticky inside the page). */
+#main > :first-child { animation-fill-mode: backwards; }
+
+/* ---------- wholesale: the stall as a buyer meets it ---------- */
+.av-whole3 { --kraft: #c99d66; --kraft-2: #b98a52; --kraft-3: #a47843; }
+.av-whole3__hero {
+  position: relative; overflow: hidden; display: grid; gap: var(--space-6) var(--space-7); align-items: center;
+  padding: clamp(1.75rem, 5vw, 4rem); border-radius: var(--radius-lg); color: var(--on-black);
+  background: radial-gradient(90% 120% at 0% 0%, var(--black-glow) 0%, var(--black) 55%, var(--black-deep) 100%);
+}
+@media (min-width: 900px) { .av-whole3__hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
+.av-whole3__copy { display: grid; gap: var(--space-4); justify-items: start; position: relative; z-index: 1; }
+.av-whole3__copy .av-hand { color: var(--accent); font-size: 1.8rem; }
+.av-whole3__copy h1 { color: var(--on-black); font-size: clamp(2.4rem, 5.2vw, 4.4rem); line-height: 0.98; max-width: 14ch; margin: 0; }
+.av-whole3__copy .av-lead { color: var(--on-black-2); max-width: 34rem; margin: 0; }
+.av-whole3__facts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding-top: var(--space-5); border-top: 1px solid color-mix(in srgb, var(--on-black) 18%, transparent); }
+@media (min-width: 700px) { .av-whole3__facts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.av-whole3__facts div { display: grid; gap: 2px; }
+.av-whole3__facts dt { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 2.6vw, 2.25rem); line-height: 1; color: var(--accent); font-variant-numeric: lining-nums; }
+.av-whole3__facts dd { margin: 0; font-size: var(--text-small); color: var(--on-black-2); }
+
+/* The open case: back wall, packs, front wall, all in one 360 × 300 frame. */
+.av-case { position: relative; width: min(100%, 440px); aspect-ratio: 360 / 300; justify-self: center; }
+.av-case > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.av-case__front { filter: drop-shadow(0 22px 26px rgb(0 0 0 / 0.35)); }
+.av-case__hand { font-family: var(--font-hand); font-size: 17px; font-weight: 600; fill: #3c2a14; }
+.av-case__hand--big { font-size: 22px; fill: #1f2a44; }
+.av-case__packs { position: absolute; left: 14%; width: 60%; top: 0; height: 47%; display: flex; justify-content: center; align-items: flex-end; }
+.av-case__packs svg { height: 100%; width: auto; margin-inline: -4.2%; transform-origin: 50% 100%; transform: rotate(calc((var(--k) - 2) * 5deg)); animation: av-case-in 0.9s var(--ease-out) backwards; animation-delay: calc(0.25s + var(--k) * 0.09s); }
+@keyframes av-case-in { from { transform: translateY(70%) rotate(0deg); opacity: 0; } }
+@media (max-width: 899px) { .av-case { width: min(78%, 360px); } }
+
+/* Who orders: three cards, each with its own little fan of socks. */
+.av-whole3__who { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+@media (min-width: 820px) { .av-whole3__who { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.av-whole3__who li { display: grid; gap: var(--space-2); align-content: start; padding: var(--space-6); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); transition: transform 0.35s var(--ease-out); }
+.av-whole3__who li:hover { transform: translateY(-4px); }
+.av-whole3__who strong { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; line-height: 1.05; color: var(--ink); }
+.av-whole3__who span { color: var(--ink-2); }
+.av-whole3__fan { display: flex; height: 112px; margin-bottom: var(--space-3); align-items: flex-end; }
+.av-whole3__fan svg { height: 100%; width: auto; margin-right: -22px; transform-origin: 50% 100%; transform: rotate(calc((var(--k) - 1) * 9deg)); transition: transform 0.45s var(--ease-spring); }
+.av-whole3__who li:hover .av-whole3__fan svg { transform: rotate(calc((var(--k) - 1) * 14deg)) translateY(-3px); }
+.av-whole3__more { display: inline-flex; align-items: center; gap: 6px; margin-top: var(--space-2); font-weight: 600; color: var(--accent-ink); text-decoration: none; }
+.av-whole3__more svg { width: 18px; height: 18px; transition: transform 0.25s var(--ease-out); }
+.av-whole3__more:hover svg { transform: translateX(4px); }
+
+/* How a case is made: four steps on a strip of packing tape. */
+.av-whole3__way { margin-block: clamp(2rem, 5vw, 3.5rem); background: color-mix(in srgb, #d8bf94 28%, var(--paper)); padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+.av-whole3__way h2 { margin: var(--space-1) 0 var(--space-6); }
+.av-whole3__way .av-hand { font-size: 1.6rem; }
+.av-whole3__steps { position: relative; list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-5); }
+@media (min-width: 820px) {
+  .av-whole3__steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .av-whole3__steps::before { content: ""; position: absolute; left: 2%; right: 2%; top: 1.15rem; height: 0; border-top: 2px dashed color-mix(in srgb, #8a6a3e 55%, transparent); }
+}
+.av-whole3__steps li { position: relative; display: grid; gap: var(--space-2); align-content: start; }
+.av-whole3__steps .av-kraft { justify-self: start; font-size: 1.4rem; }
+.av-whole3__steps strong { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; line-height: 1.1; color: var(--ink); margin-top: var(--space-2); }
+.av-whole3__steps span:last-child { color: var(--ink-2); font-size: var(--text-small); }
+
+/* The request: a contact block, and a stamped reference once it is in. */
+.av-quote__contact { border: 0; margin: 0; padding: 0; display: grid; gap: var(--space-3); min-width: 0; }
+.av-quote__done { text-align: left; }
+.av-quote__done h3 { margin: 0; font-size: 1.6rem; }
+.av-quote__done p { margin: 0; color: var(--ink-2); }
+.av-quote__stamp {
+  justify-self: start; padding: 0.15em 0.6em; border: 3px solid var(--accent-ink); border-radius: 8px; color: var(--accent-ink);
+  font-family: var(--font-body); font-size: 1.5rem; font-weight: 800; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; transform: rotate(-4deg);
+  animation: av-stamp 0.5s var(--ease-spring) backwards;
+}
+@keyframes av-stamp { from { transform: rotate(-4deg) scale(1.6); opacity: 0; } }
+
+/* What shops ask most: the question on the left, the answers on the right. */
+.av-whole3__faq { display: grid; gap: var(--space-5); }
+@media (min-width: 900px) { .av-whole3__faq { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); align-items: start; } }
+.av-whole3__faq header { display: grid; gap: var(--space-2); }
+.av-whole3__faq h2 { margin: 0; }
+.av-whole3__faq details { border-bottom: 1px solid var(--line); }
+.av-whole3__faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: var(--space-4); padding: var(--space-4) 0; font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--ink); }
+.av-whole3__faq summary::-webkit-details-marker { display: none; }
+.av-whole3__faq summary::after { content: "+"; flex: none; font-family: var(--font-body); font-weight: 400; font-size: 1.5rem; line-height: 1; color: var(--accent-ink); transition: transform 0.3s var(--ease-out); }
+.av-whole3__faq details[open] summary::after { transform: rotate(45deg); }
+.av-whole3__faq details p { margin: 0 0 var(--space-4); color: var(--ink-2); max-width: 46rem; animation: av-qv-rise 0.35s var(--ease-out); }
+.av-whinbox { display: grid; gap: var(--space-2); }
+.av-whinbox__ref { font-weight: 800; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; color: var(--accent-ink); }
+.av-whinbox__who { margin: 0; }
+.av-whinbox__mix { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--surface-2); }

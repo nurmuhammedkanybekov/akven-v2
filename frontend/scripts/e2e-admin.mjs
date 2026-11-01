@@ -208,7 +208,7 @@ try {
 
   // ---------------------------------------------------------------- the customer's journey
   await step("the public pages pass the accessibility rules", async () => {
-    for (const [url, heading] of [["/", null], ["/shop", null], ["/login", "Sign in"], ["/visit", "Find us at Dordoi"], ["/sizes", "Find your sock size"], ["/wholesale", "For shops, teams and businesses"]]) {
+    for (const [url, heading] of [["/", null], ["/shop", null], ["/login", "Sign in"], ["/visit", "Find us at Dordoi"], ["/sizes", "Find your sock size"], ["/wholesale", "Socks by the case, from our container to your shelf"]]) {
       await page.goto(`${BASE}${url}`);
       if (heading) await page.getByRole("heading", { name: heading }).waitFor();
       else await page.locator("main h1, main h2").first().waitFor();
@@ -496,6 +496,13 @@ try {
     await page.getByText(/204 to a full case/).waitFor();
     await page.getByRole("button", { name: "Put this mix in my request" }).click();
     await page.locator(".av-casebuild__chosen").getByText(/Classic · Men: 24; Sport · Kids: 12/).waitFor();
+    await page.getByLabel("Shop or company name").fill("Ak-Jol Market");
+    await page.getByLabel("Your number, Telegram or email").fill("call me");
+    await page.getByRole("button", { name: "Send the request" }).click();
+    await page.getByText("Write the phone number with its country code", { exact: false }).waitFor();
+    await page.getByLabel("Your number, Telegram or email").fill("+996 700 123 456");
+    await page.getByRole("button", { name: "Send the request" }).click();
+    await page.locator(".av-quote__stamp").getByText(/^W-[0-9A-F]{8}$/).waitFor();
     await a11y("the wholesale page with a case");
     // the story: the years and the journey of a pair
     await page.goto(`${BASE}/story`);

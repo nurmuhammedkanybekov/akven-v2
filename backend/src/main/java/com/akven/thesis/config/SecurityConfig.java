@@ -109,7 +109,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/catalog/**", "/api/pricing", "/api/shop/info", "/api/sizes", "/api/sizes/find", "/media/uploads/**").permitAll()
                 // Registration and login must be reachable without a token; everything else
                 // under /api/auth/** (e.g. /api/auth/me) stays behind anyRequest().authenticated().
-                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/cart/quote").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/cart/quote", "/api/wholesale/requests").permitAll()
                 .requestMatchers("/api/admin/**").hasAnyRole("STAFF", "ADMIN")   // SUPER_ADMIN through the role hierarchy
                 .anyRequest().authenticated()
             )
