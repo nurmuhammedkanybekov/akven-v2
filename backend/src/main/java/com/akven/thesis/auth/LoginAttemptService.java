@@ -54,11 +54,23 @@ public class LoginAttemptService {
         return Math.max(1, Duration.between(clock.instant(), unlocksAt).toSeconds());
     }
 
+    /** Above this many remembered keys, those whose window has passed are forgotten, so memory cannot grow without end. */
+    static final int SWEEP_AT = 10_000;
+
     public void recordFailure(String key) {
-        failures.computeIfAbsent(key, k -> new ArrayDeque<>());
-        synchronized (failures.get(key)) {
-            failures.get(key).addLast(clock.instant());
+        if (failures.size() > SWEEP_AT) {
+            for (String k : failures.keySet()) prune(k);
         }
+        // Use the deque computeIfAbsent returns: a second lookup could find it pruned away by another thread.
+        Deque<Instant> recent = failures.computeIfAbsent(key, k -> new ArrayDeque<>());
+        synchronized (recent) {
+            recent.addLast(clock.instant());
+            failures.putIfAbsent(key, recent);
+        }
+    }
+
+    int remembered() {
+        return failures.size();
     }
 
     public void recordSuccess(String key) {

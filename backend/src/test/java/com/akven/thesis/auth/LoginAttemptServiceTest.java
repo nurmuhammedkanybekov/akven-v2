@@ -59,4 +59,14 @@ class LoginAttemptServiceTest {
         service.recordSuccess(mine);
         assertThat(service.secondsUntilAllowed(mine)).isZero();
     }
+
+    @org.junit.jupiter.api.Test
+    void failuresWhoseWindowPassedAreForgottenUnderManyKeys() {
+        MutableClock clock = new MutableClock();
+        LoginAttemptService service = new LoginAttemptService(5, Duration.ofMinutes(15), clock);
+        for (int i = 0; i <= LoginAttemptService.SWEEP_AT; i++) service.recordFailure("1.2.3.4|user" + i + "@x.kg");
+        clock.now = clock.now.plus(Duration.ofMinutes(16));
+        service.recordFailure("1.2.3.4|last@x.kg");
+        org.assertj.core.api.Assertions.assertThat(service.remembered()).isEqualTo(1);
+    }
 }

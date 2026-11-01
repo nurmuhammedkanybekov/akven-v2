@@ -52,14 +52,15 @@ export function CheckoutPage() {
 
   if (cart.lines.length === 0 && !placed) return <Navigate to="/cart" replace />;
   const itemsTotal = quote?.total ?? cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
-  const allZones = zones.data ?? [];
+  // Anything but a list (an old server, a proxy page) counts as not known yet, never as a crash.
+  const allZones = Array.isArray(zones.data) ? zones.data : [];
   const countries = (["KG", "KZ", "UZ", "RU"] as const).filter((c) => allZones.some((z) => z.country === c));
   const inCountry = allZones.filter((z) => z.country === country);
   const zone = method === "DELIVERY" ? inCountry.find((z) => z.id === zoneId) ?? inCountry[0] ?? null : null;
   const fee = zone ? deliveryFee(zone, itemsTotal) : 0;
   const toFree = zone ? toFreeDelivery(zone, itemsTotal) : null;
   const total = Math.round((itemsTotal + fee) * 100) / 100;
-  const noDelivery = method === "DELIVERY" && zones.data !== undefined && allZones.length === 0;
+  const noDelivery = method === "DELIVERY" && Array.isArray(zones.data) && allZones.length === 0;
   const days = (z: { daysMin: number | null; daysMax: number | null }) => z.daysMin == null ? t("co.daysAgreed")
     : z.daysMax == null || z.daysMax === z.daysMin ? t("co.day", { n: z.daysMin }) : t("co.days", { min: z.daysMin, max: z.daysMax });
 
