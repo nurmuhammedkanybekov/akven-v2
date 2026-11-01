@@ -76,22 +76,32 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
   useEffect(() => {
     const nav = navRef.current, bar = nav?.parentElement, logo = logoRef.current;
     if (!nav || !bar || !logo || typeof ResizeObserver === "undefined") return;
-    const check = () => {
+    let lastWidth = -1;
+    const check = (force = false) => {
       if (getComputedStyle(nav).display === "none") { setFit(0); return; }
-      // The links' own widths (the same whether the menu is shown or hidden) against the column beside the logo.
+      // Only a change of width matters: the header's height changes with the menu's own size, and reacting to that
+      // made the menu flip between two sizes on every frame.
+      if (!force && bar.clientWidth === lastWidth) return;
+      lastWidth = bar.clientWidth;
+      // Measure the links at their designed size, whatever size they are shown at now: take the tighter and compact
+      // styles off for the measurement and put them back before the browser paints.
+      const tight = nav.classList.contains("is-tight"), compact = bar.classList.contains("is-compact");
+      nav.classList.remove("is-tight"); bar.classList.remove("is-compact");
       const gap = parseFloat(getComputedStyle(nav).columnGap) || 0;
       const links = Array.from(nav.children) as HTMLElement[];
-      const need = links.reduce((w, a) => w + a.scrollWidth, 0) + gap * Math.max(0, links.length - 1);
+      const full = links.reduce((w, a) => w + a.scrollWidth, 0) + gap * Math.max(0, links.length - 1);
+      nav.classList.add("is-tight");
+      const tgap = parseFloat(getComputedStyle(nav).columnGap) || 0;
+      const tightW = links.reduce((w, a) => w + a.scrollWidth, 0) + tgap * Math.max(0, links.length - 1);
+      if (!tight) nav.classList.remove("is-tight");
+      if (compact) bar.classList.add("is-compact");
       const room = (bar.clientWidth - logo.offsetWidth - 2 * (parseFloat(getComputedStyle(bar).columnGap) || 0)) / 2;
-      // Measured at the current size; the tight style is about 12% narrower.
-      const scale = nav.classList.contains("is-tight") ? 1 / 0.88 : 1;
-      const full = need * scale;
-      setFit(full <= room - 2 ? 0 : full * 0.88 <= room - 2 ? 1 : 2);
+      setFit(full <= room - 2 ? 0 : tightW <= room - 2 ? 1 : 2);
     };
-    const ro = new ResizeObserver(check);
+    const ro = new ResizeObserver(() => check());
     ro.observe(bar);
-    check();
-    document.fonts?.ready.then(check).catch(() => undefined);
+    check(true);
+    document.fonts?.ready.then(() => check(true)).catch(() => undefined);
     return () => ro.disconnect();
   }, [lang]);
   const [drawerTop, setDrawerTop] = useState(108);

@@ -984,6 +984,12 @@ const shop: Partial<Record<MessageKey, string>> = {
   "a.dz.confirm": "Аймакты өчүрөсүзбү? Эски заказдар жеткирүүсүн сакташат.",
   "a.dz.hidden": "жашырылган",
   "a.dz.new": "Жаңы аймак",
+  "cats2.himTag": "кеңсе · спорт · жылуу",
+  "cats2.herTag": "жумшак · тор · жылуу",
+  "cats2.kidsTag": "мектеп · оюн · тайгаланбас",
+  "cats2.giftsTag": "70-Eде кол менен топтолгон",
+  "door.open": "АЧЫК",
+  "door.closed": "ЖАБЫК",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };
