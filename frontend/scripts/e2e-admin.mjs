@@ -504,6 +504,15 @@ try {
     await page.getByRole("button", { name: "Send the request" }).click();
     await page.locator(".av-quote__stamp").getByText(/^W-[0-9A-F]{8}$/).waitFor();
     await a11y("the wholesale page with a case");
+    // the women's shelf: a size and a colour narrow it, each choice is a tag that takes it off again
+    await page.goto(`${BASE}/women`);
+    await page.getByRole("group", { name: "Sizes" }).getByRole("button", { name: "M", exact: true }).click();
+    await page.getByRole("button", { name: "Remove Size M" }).waitFor();
+    await page.locator(".av-swatch").first().click();
+    await page.waitForURL(/size=M&color=/);
+    await a11y("the women's shelf with a size and a colour");
+    await page.getByRole("button", { name: "Remove Size M" }).click();
+    await page.waitForURL((u) => !u.search.includes("size="));
     // the story: the years and the journey of a pair
     await page.goto(`${BASE}/story`);
     await page.getByRole("heading", { name: "Our years at Dordoi" }).waitFor();
