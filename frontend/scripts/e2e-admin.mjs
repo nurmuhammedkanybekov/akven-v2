@@ -283,7 +283,7 @@ try {
     await page.goto(productUrl);
     await page.getByRole("button", { name: "Cream" }).click();
     await page.getByText("Sold out", { exact: true }).first().waitFor();
-    await page.getByRole("link", { name: /Your account/ }).click();      // recent orders are on the account page
+    await page.getByRole("banner").getByRole("link", { name: /Your account/ }).click();      // recent orders are on the account page
     await page.getByRole("link", { name: /AV-/ }).first().click();       // the newest order (1 pair)
     await page.getByRole("button", { name: "Cancel this order" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Cancel the order" }).click();
@@ -384,7 +384,7 @@ try {
     await page.locator(".av-dordoi").scrollIntoViewIfNeeded();
     await page.evaluate(() => { const el = document.querySelector(".av-dordoi"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + el.offsetHeight - window.innerHeight); });
     await page.locator(".av-dordoi.is-done").waitFor();
-    await page.getByRole("link", { name: "How to find us" }).waitFor();
+    await page.getByRole("main").getByRole("link", { name: "How to find us" }).waitFor();
     await a11y("the home page after using it");
     await page.goto(`${BASE}/story`);
     await page.getByRole("heading", { name: "From Dordoi, with love." }).waitFor();
@@ -414,7 +414,7 @@ try {
     await page.getByLabel("Password").fill("changeme-admin");
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL(`${BASE}/admin`);
-    for (const [link, heading] of [["Dashboard", "Dashboard"], ["Pricing", "Pricing"], ["Contacts and the stall", "Contacts and the stall"], ["Size chart", "Size chart"], ["Hand over an order", "Hand over an order"]]) {
+    for (const [link, heading] of [["Dashboard", "Dashboard"], ["Pricing", "Pricing"], ["Contacts and the stall", "Contacts and the stall"], ["Size chart", "Size chart"], ["Hand over an order", "Hand over an order"], ["Delivery areas", "Delivery areas"], ["Wholesale requests", "Wholesale requests"]]) {
       await page.getByRole("link", { name: link, exact: true }).click();
       await page.getByRole("heading", { level: 1, name: heading }).waitFor();
       if (heading === "Dashboard") await page.getByRole("heading", { name: "Running out" }).waitFor();
@@ -475,14 +475,14 @@ try {
     await closeBagDrawer();
     await dialog.waitFor({ state: "hidden" });
     await page.getByRole("link", { name: /Bag, \d+ items?/ }).waitFor();
-    await page.getByRole("button", { name: "Kyrgyz som" }).click();
+    await page.getByRole("button", { name: "Kyrgyz som" }).first().click();
     await page.locator(".av-card .av-price").first().filter({ hasText: /\d som$/ }).waitFor();
     await a11y("the catalog in som");
-    await page.getByRole("button", { name: "US dollars" }).click();
+    await page.getByRole("button", { name: "US dollars" }).first().click();
     await page.goto(`${BASE}/visit`);
     await page.getByText("Every day").waitFor();
     await page.getByText(/8:00–16:00/).first().waitFor();
-    await page.locator(".av-open").waitFor();
+    await page.locator("main .av-open").waitFor();
     await a11y("the visit page");
     // how the price falls: 30 pairs of this sock reach the −5% step
     await page.goto(`${BASE}/products/classic-rib-crew-men`);
