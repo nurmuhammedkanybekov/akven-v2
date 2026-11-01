@@ -736,3 +736,44 @@ body::before {
 .av-whinbox__ref { font-weight: 800; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; color: var(--accent-ink); }
 .av-whinbox__who { margin: 0; }
 .av-whinbox__mix { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--surface-2); }
+
+/* ---------- footer: the stall, the promises, everything else ---------- */
+.av-footer__top { grid-template-columns: 1fr; justify-items: stretch; text-align: left; gap: var(--space-6); padding-block: var(--space-8) var(--space-7); }
+@media (min-width: 900px) { .av-footer__top { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; } }
+.av-footer__brand { display: grid; gap: var(--space-3); justify-items: start; }
+@media (max-width: 899px) { .av-footer__brand { justify-items: center; text-align: center; } }
+.av-footer__brand .av-footer__line { margin: 0; }
+.av-footer__sign { margin: 0; font-family: var(--font-hand); font-size: 1.6rem; color: var(--accent); transform: rotate(-2deg); }
+.av-footer__stall { display: grid; gap: var(--space-3); padding: var(--space-6); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--on-black) 6%, transparent); border: 1px solid color-mix(in srgb, var(--on-black) 14%, transparent); }
+.av-footer__stall .av-footer__head { margin: 0; }
+.av-footer__open { color: var(--on-black); }
+.av-footer .av-footer__address { display: flex; gap: var(--space-2); align-items: flex-start; margin: 0; max-width: none; color: var(--on-black-2); }
+.av-footer__address svg { flex: none; width: 20px; height: 20px; color: var(--accent); }
+.av-footer__go { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.av-footer .av-footer__go a { padding: 0.45em 1em; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--on-black) 30%, transparent); background: none; font-size: var(--text-small); transition: border-color 0.25s var(--ease), color 0.25s var(--ease), background-color 0.25s var(--ease); }
+.av-footer .av-footer__go a:hover { border-color: var(--accent); color: var(--black-deep); background: var(--accent); }
+.av-footer__promises { list-style: none; margin: 0; padding: var(--space-6) 0; display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); border-bottom: 1px solid color-mix(in srgb, var(--on-black) 14%, transparent); }
+.av-footer__promises li { display: flex; gap: var(--space-3); align-items: flex-start; }
+.av-footer__promises strong { display: block; font-weight: 600; color: var(--on-black); font-size: 0.9375rem; }
+.av-footer__promises small { display: block; color: var(--on-black-2); font-size: var(--text-micro); margin-top: 2px; }
+.av-footer__picon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.av-footer__picon svg { width: 22px; height: 22px; }
+@media (min-width: 900px) { .av-footer__grid { grid-template-columns: repeat(4, minmax(0, 0.8fr)) minmax(0, 1.2fr); } }
+.av-footer__legal { align-items: center; }
+.av-footer__prefs { display: flex; gap: var(--space-4); align-items: center; }
+.av-footer__prefs button, .av-footer__prefs a { color: var(--on-black-2); }
+.av-footer__up { display: inline-flex; align-items: center; gap: 6px; padding: 0.4em 0.9em; border: 1px solid color-mix(in srgb, var(--on-black) 30%, transparent); border-radius: 999px; background: none; color: var(--on-black); font: inherit; cursor: pointer; transition: border-color 0.25s var(--ease), transform 0.25s var(--ease-out); }
+.av-footer__up svg { width: 16px; height: 16px; transition: transform 0.3s var(--ease-out); }
+.av-footer__up:hover { border-color: var(--accent); }
+.av-footer__up:hover svg { transform: translateY(-3px); }
+.av-footer__fine { flex-basis: 100%; margin: 0; color: var(--on-black-2); opacity: 0.8; }
+
+/* ---------- privacy ---------- */
+.av-privacy { display: grid; gap: var(--space-7); padding-block: var(--space-8); max-width: 60rem; }
+.av-privacy h1 { margin: 0; }
+.av-privacy__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+@media (min-width: 760px) { .av-privacy__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.av-privacy__list li { padding: var(--space-5) var(--space-6); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+.av-privacy__list h2 { margin: 0 0 var(--space-2); font-size: 1.4rem; }
+.av-privacy__list p { margin: 0; color: var(--ink-2); }
+.av-footer .av-footer__legal a { font-size: inherit; color: var(--on-black-2); }

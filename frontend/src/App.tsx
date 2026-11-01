@@ -17,6 +17,7 @@ import { SavedPage } from "./pages/Saved";
 import { SizesPage } from "./pages/Sizes";
 import { VisitPage } from "./pages/Visit";
 import { WholesalePage } from "./pages/Wholesale";
+import { PrivacyPage } from "./pages/Privacy";
 
 // Rarely used screens (admin, checkout, order history, style guide) load on demand, so the shop opens faster.
 import { RouteTitle } from "./components/RouteTitle";
@@ -69,6 +70,7 @@ export default function App() {
               <Route path="bundles" element={<CatalogPage category="BUNDLES" />} />
               <Route path="products/:slug" element={<ProductPage />} />
               <Route path="visit" element={<VisitPage />} />
+              <Route path="privacy" element={<PrivacyPage />} />
               <Route path="sizes" element={<SizesPage />} />
               <Route path="wholesale" element={<WholesalePage />} />
               <Route path="login" element={<LoginPage />} />

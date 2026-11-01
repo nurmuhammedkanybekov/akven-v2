@@ -5,7 +5,7 @@ import { en, type MessageKey } from "../i18n/en";
 
 const SHOP: Record<string, MessageKey> = {
   "/shop": "title.shop", "/men": "nav.men", "/women": "nav.women", "/kids": "nav.kids", "/bundles": "nav.bundles",
-  "/visit": "nav.visit", "/sizes": "title.sizes", "/wholesale": "nav.wholesale", "/login": "nav.signin",
+  "/visit": "nav.visit", "/privacy": "foot.privacy", "/sizes": "title.sizes", "/wholesale": "nav.wholesale", "/login": "nav.signin",
   "/register": "title.register", "/cart": "title.bag", "/saved": "nav.savedTitle", "/checkout": "title.checkout",
   "/orders": "nav.orders",
 };
