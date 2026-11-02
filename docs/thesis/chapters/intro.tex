@@ -1,0 +1,117 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+\section{Background}
+
+AK\&VEN is a family brand of Korean-made socks. The name joins the first letters of my parents' names, \textbf{AK}ylbek
+and \textbf{VEN}era, with an ampersand drawn as a heart. My family has traded at Dordoi Bazaar in Bishkek since the
+early 2000s and has sold socks there since 2018, from a shipping container numbered 70-E. Dordoi is one of the largest
+markets in Central Asia: thousands of containers stacked in long rows, where families shop for the season and traders
+from the regions of Kyrgyzstan, from Kazakhstan, Uzbekistan and Russia buy goods for their own shops.
+
+Three habits shape how socks are sold there, and every one of them is missing from an ordinary online shop:
+\begin{itemize}
+	\item \textbf{The price is agreed, not read.} A customer asks, the seller answers, and the price moves with the
+	quantity, the season and the relationship. A fixed price tag feels cold, and a discount code feels like a trick.
+	\item \textbf{People buy for the whole family.} One visit covers the father, the mother and the children, each in
+	a different size; the larger the set, the lower the price per pair.
+	\item \textbf{Shops buy by the case.} A case holds about 240 pairs in packs of 10 or 12, often mixed, and the price
+	is given on request because it follows the dollar rate, the factory price and the delivery.
+\end{itemize}
+
+This thesis builds the brand's online shop so that these habits can continue online: a customer can ask for a better
+price in a conversation, plan one order for the whole family, mix any socks to reach a lower price step, and collect
+the order at the container or have it delivered. Shops and companies can build a case and send a request that the
+family answers.
+
+\section{Related work}
+\label{sec:related}
+
+\paragraph{E-commerce platforms.} General platforms such as the open-source Shopizer~\cite{shopizer},
+Medusa~\cite{medusa} and Saleor~\cite{saleor} offer catalogues, carts, orders and an administration interface. Their
+architecture was a model for this project in two respects: a single API serves both the shop and the administration,
+and the administration is only another client of that API with more rights. They assume fixed prices, however, with
+discounts expressed as coupons or price lists; none of them treats the price as the result of a conversation, and they
+are built for multi-tenant scale that a single family stall does not need.
+
+\paragraph{Negotiation dialogue.} Automated negotiation has been studied in natural-language processing for years.
+Lewis et al.~\cite{lewis2017deal} trained end-to-end models to negotiate the division of items and found that they
+learned to deceive; He et al.~\cite{he2018decoupling} separated the negotiation \emph{strategy} from the
+\emph{generation} of the sentences, which made the agents' behaviour more controllable. This thesis follows the same
+separation in an engineering setting: the strategy (how much may be given) is fixed by deterministic code and the
+owners' settings, and the language model is used for the conversation and a proposal only.
+
+\paragraph{Reliability of language-model applications.} Large language models follow instructions that arrive in their
+input, including instructions hidden in user text. Greshake et al.~\cite{greshake2023} showed that applications which
+let model output drive actions can be taken over by such prompt injection, and the OWASP Top 10 for LLM
+applications~\cite{owaspllm} lists prompt injection, sensitive information disclosure and excessive agency among the
+main risks. The common advice is to treat model output as untrusted input, to keep secrets out of the prompt and to
+limit what the model can cause. AK\&VEN applies all three to money: the model never sees the limit or the cost price,
+its proposal is validated by code, and it cannot state a price in its own words.
+
+\paragraph{Grounding.} Retrieval-augmented generation~\cite{lewis2020rag} grounds model answers in retrieved documents
+rather than in the model's general knowledge. The assistant here receives the facts of the product being discussed
+(fabric, care, origin, pack size, stock, the public price ladder) selected for the question; the database already has a
+vector table (pgvector~\cite{pgvector}) prepared for embedding-based retrieval in future work.
+
+\paragraph{Progressive web applications.} A progressive web application~\cite{pwa} is a website that can be installed
+like an app and can keep working offline with a service worker. For customers at a bazaar with an unreliable mobile
+connection this matters more than a native app store presence, and one application can serve customers and staff.
+
+\section{Motivation}
+
+The motivation is practical and personal. My parents' customers already write to them on WhatsApp and Telegram to ask
+for prices, sizes and whether a model is still in stock; the answers depend on who is free to reply, and nothing is
+kept in one place. An online shop would let customers see the whole assortment, choose sizes from the shop's own size
+chart and pay in advance, and let the family see orders, stock and requests in one list.
+
+The difficulty is that bargaining is part of the brand, and a language model is the obvious tool for a conversation in
+three languages, but it is not safe to let a model decide prices. A shop that can be talked into a 90\% discount loses
+money; a shop that refuses to talk is not Dordoi. The thesis is about resolving that tension with a design in which
+the model may talk freely while the price stays under the owners' control.
+
+\section{Thesis objective}
+
+The objective is to design, implement, test and evaluate a complete online shop for AK\&VEN in which:
+\begin{itemize}
+	\item customers can browse, choose sizes and colours, plan a family set, ask for a better price, pay and collect or
+	receive their order, in English, Russian or Kyrgyz, on a phone, a tablet or a laptop;
+	\item the owners and staff manage the catalogue, stock, prices, orders, requests and settings in an administration
+	interface in the same three languages;
+	\item no price below the owners' limit can ever reach an order, whatever the assistant says, and this guarantee is
+	shown by automated tests and by an evaluation on simulated customers.
+\end{itemize}
+
+\section{Research questions}
+\label{sec:rq}
+
+\begin{enumerate}[\bfseries RQ1.]
+	\item Can a language model hold a price negotiation for a real shop while a deterministic component guarantees that
+	no discount above the owners' limit is ever applied?
+	\item How does a language-model negotiator compare with a rule-based one on the same simulated customers, in terms of
+	discounts given, sales made and how often the limit had to step in?
+	\item Can the bazaar's habits (bargaining, family sets, price steps by quantity, wholesale by the case) be expressed
+	in an online shop without making it harder to use than an ordinary one?
+\end{enumerate}
+
+\section{Scope}
+
+Built in this thesis: the shop and the administration as one progressive web application; the REST API with
+authentication and four roles; the catalogue with sections, cuts, colours, sizes, pictures and stock; collection
+pricing; the negotiation assistant with a rule-based and a language-model implementation; cart, checkout with a
+\emph{simulated} Apple Pay and Google Pay wallet, pickup with a code and delivery areas with fees and times; family
+profiles, gift boxes, reviews, saved socks, wholesale requests and saved customer details; an audit log; the test suite;
+and deployment with Docker Compose and continuous integration.
+
+Not built, on purpose: a real payment provider (no money moves), e-mail and SMS notifications, taxes, a second payment
+rail through a Kyrgyz bank, demand forecasting and synchronisation with the family's messenger chats. These are
+discussed as future work in Chapter~\ref{ch:sum}.
+
+\section{Structure of the thesis}
+
+Chapter~\ref{ch:spec} specifies the system: its users, use cases, and functional and non-functional requirements.
+Chapter~\ref{ch:user} is the user documentation: how to install and start the shop, and how customers, staff, owners and
+the super admin use it. Chapter~\ref{ch:dev} is the developer documentation: the architecture, the data model, the API,
+security, the pricing and negotiation logic, and the design of the frontend. Chapter~\ref{ch:test} describes how the
+system is tested and presents the evaluation of the two assistants. Chapter~\ref{ch:sum} answers the research questions
+and lists future work.

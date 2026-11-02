@@ -1,0 +1,22 @@
+\chapter*{Abstract}
+\thispagestyle{plain}
+
+This thesis presents AK\&VEN, the online shop of a family business that has sold Korean-made socks from container
+70-E at Dordoi Bazaar in Bishkek, Kyrgyzstan, since 2018. At the bazaar the price is agreed rather than read from a
+label, families buy for everyone at once, and shops from the regions buy by the case. The shop brings these habits
+online instead of replacing them with a fixed price tag: customers mix any socks and the price per pair falls with the
+size of the whole bag, plan one set for the whole family, ask for a better price in a chat, and collect their order at
+the stall with a pickup code or have it delivered to four countries.
+
+The central technical question is how a language model can be allowed to talk about money without being trusted with
+it. The design separates talking from deciding. The assistant, either a rule-based negotiator or a large language
+model, only proposes a discount; a small deterministic component, the \texttt{PolicyValidator}, clamps every proposal
+to a limit the owners set for each product, which the model never sees. The check is repeated at checkout and by
+the database, and every proposal is recorded beside the discount allowed. A model that is confused, flattered or manipulated therefore cannot change what a customer pays.
+
+The system is a single installable progressive web application in English, Russian and Kyrgyz, built with React and
+TypeScript, on top of one Spring Boot API with role-based access for customers, staff, owners and a super admin, and a
+PostgreSQL database whose constraints repeat the most important business rules. The thesis documents the requirements,
+the interface for each role, the architecture, the data model, the pricing and negotiation logic, security, and more
+than 470 automated tests. A recorded run of a live model on sixteen simulated customers shows that neither assistant
+ever priced a sock below the owners' limit.
