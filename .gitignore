@@ -26,3 +26,18 @@ frontend/dist/
 
 # Backups made by scripts/backup.sh (customer data)
 backups/
+
+# LaTeX build files of the thesis (the PDF itself is kept)
+docs/thesis/*.aux
+docs/thesis/*.bbl
+docs/thesis/*.bcf
+docs/thesis/*.blg
+docs/thesis/*.fdb_latexmk
+docs/thesis/*.fls
+docs/thesis/*.lof
+docs/thesis/*.lot
+docs/thesis/*.lol
+docs/thesis/*.out
+docs/thesis/*.run.xml
+docs/thesis/*.toc
+docs/thesis/*.synctex.gz
