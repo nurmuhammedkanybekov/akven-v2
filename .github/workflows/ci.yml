@@ -209,6 +209,12 @@ jobs:
       - name: Run the customer's path in WebKit and Firefox
         working-directory: frontend
         run: npm run e2e:browsers
+      - name: Keep the pictures of any WebKit or Firefox failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failures
+          path: frontend/browser-failures/
       - name: Keep the screenshots
         if: always()
         uses: actions/upload-artifact@v4

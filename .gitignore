@@ -41,3 +41,4 @@ docs/thesis/*.out
 docs/thesis/*.run.xml
 docs/thesis/*.toc
 docs/thesis/*.synctex.gz
+frontend/browser-failures/

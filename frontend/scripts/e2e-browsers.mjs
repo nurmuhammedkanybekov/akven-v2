@@ -8,6 +8,7 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASE = "http://localhost:4173";
@@ -28,13 +29,18 @@ for (const [engineName, engine] of engines) {
   const browser = await engine.launch();
   for (const screen of screens) {
     // Firefox has no mobile emulation; it still gets the phone's width.
-    const ctx = await browser.newContext({ viewport: screen.viewport, ...(screen.mobile && engineName !== "Firefox" ? { isMobile: true, hasTouch: true } : {}) });
+    const ctx = await browser.newContext({ viewport: screen.viewport, ...(screen.mobile && engineName !== "Firefox" && !process.env.E2E_NO_MOBILE ? { isMobile: true, hasTouch: true } : {}) });
     const page = await ctx.newPage();
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     const step = async (name, fn) => {
       try { await fn(); console.log(`- ${engineName}, ${screen.name}: ${name} ... ok`); }
-      catch (e) { failed++; console.log(`- ${engineName}, ${screen.name}: ${name} ... FAILED\n    ${String(e.message).split("\n")[0]}`); }
+      catch (e) {
+        failed++;
+        // A picture of the moment it failed, kept by CI as an artifact (browser-failures/ is not in git).
+        fs.mkdirSync(path.join(root, "browser-failures"), { recursive: true });
+        await page.screenshot({ path: path.join(root, "browser-failures", `${engineName}-${screen.name}-${failed}.png`) }).catch(() => {});
+        console.log(`- ${engineName}, ${screen.name}: ${name} ... FAILED\n    ${String(e.message).split("\n").slice(0, 12).join("\n    ")}`); }
     };
     const fits = async () => {
       const [inner, scroll] = await page.evaluate(() => [window.innerWidth, document.documentElement.scrollWidth]);
@@ -62,7 +68,8 @@ for (const [engineName, engine] of engines) {
       await page.locator(".av-grid-products .av-card").first().waitFor();
       await fits();
       if (screen.mobile) await page.locator("[data-scroll-end]").first().waitFor({ state: "attached" });
-      await page.locator(".av-grid-products .av-card").first().click();
+      // Click the sock's name: where the picture is, a pointer brings up "Quick view" (which is meant to catch the click).
+      await page.locator(".av-grid-products .av-card__name").first().click();
       await page.getByRole("button", { name: /^Add to bag/ }).first().click();
       await page.getByText(/Added to your bag/).waitFor();
       await page.goto(`${BASE}/cart`, { waitUntil: "networkidle" });
