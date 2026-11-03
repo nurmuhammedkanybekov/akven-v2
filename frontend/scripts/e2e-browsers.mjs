@@ -54,9 +54,20 @@ for (const [engineName, engine] of engines) {
       await page.getByRole("heading", { name: /Socks chosen pair by pair/ }).waitFor();
       await fits();
       const teaser = page.locator("#fitting");
+      // Choose like a person does, then check what the page made of it: the choice itself, then the advice it gives.
+      const state = () => page.evaluate(() => ({
+        who: document.querySelector("#fitting input[name=ft-who]:checked")?.closest("label")?.textContent,
+        cut: document.querySelector("#fitting input[name=ft-cut]:checked")?.closest("label")?.textContent,
+        advice: document.querySelector("#fitting .av-fr__advice")?.textContent,
+      }));
+      await teaser.scrollIntoViewIfNeeded();
       await teaser.locator("label", { hasText: /^Her$/ }).click();
       await teaser.locator("label", { hasText: /^Ankle/ }).click();
-      await teaser.getByText(/Ankle with sneakers/).waitFor();
+      try {
+        await page.waitForFunction(() => document.querySelector("#fitting input[name=ft-cut]:checked")?.closest("label")?.textContent?.startsWith("Ankle"), null, { timeout: 5000 });
+      } catch { throw new Error(`the Ankle choice did not take: ${JSON.stringify(await state())}`); }
+      try { await teaser.getByText(/Ankle with sneakers/).waitFor({ timeout: 5000 }); }
+      catch { throw new Error(`Ankle is chosen but the advice did not follow: ${JSON.stringify(await state())}`); }
       await teaser.getByRole("link", { name: /Open the fitting room/ }).click();
       await page.waitForURL(/\/fitting\?who=WOMEN&cut=ankle/);
       await page.getByRole("heading", { level: 1, name: "Try them on before you buy" }).waitFor();
