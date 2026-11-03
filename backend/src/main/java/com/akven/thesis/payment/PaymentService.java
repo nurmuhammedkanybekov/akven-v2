@@ -1,6 +1,8 @@
 package com.akven.thesis.payment;
 
 import com.akven.thesis.common.BusinessRuleException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,8 +23,27 @@ public class PaymentService {
 
     private final List<PaymentProvider> providers;
 
+    @Autowired
+    public PaymentService(ObjectProvider<PaymentProvider> providers) {
+        this(providers.orderedStream().toList());
+    }
+
     public PaymentService(List<PaymentProvider> providers) {
-        this.providers = providers;
+        this.providers = List.copyOf(providers);
+    }
+
+    /** How this installation takes payments, for the shop to tell its customers: none set up, a demo, or real. */
+    public PaymentMode mode() {
+        if (providers.isEmpty()) return PaymentMode.NONE;
+        return providers.stream().anyMatch(PaymentProvider::simulated) ? PaymentMode.SIMULATED : PaymentMode.LIVE;
+    }
+
+    /** Refuses a checkout before anything is reserved when no provider can take this method. */
+    public void requireAvailable(PaymentMethod method) {
+        if (providers.isEmpty()) {
+            throw new BusinessRuleException("Online payment is not set up in this shop yet.");
+        }
+        providerFor(method);
     }
 
     public PaymentResult charge(PaymentRequest request) {

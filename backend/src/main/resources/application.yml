@@ -7,11 +7,9 @@ spring:
   application:
     name: akven-thesis-backend
 
-  # Local development convenience: the `demo` profile loads demo accounts and a demo catalog
-  # (application-demo.yml). Anything shared or real must run with SPRING_PROFILES_ACTIVE=prod
-  # (or any profile other than demo): no seed data or demo accounts.
-  profiles:
-    active: demo
+  # Safe by default: started without a profile, the shop has no demo catalog, its demo accounts are switched off and
+  # it takes no payments (no provider is configured). Demo mode is chosen explicitly with SPRING_PROFILES_ACTIVE=demo
+  # (application-demo.yml): demo catalog and accounts, and the simulated wallet. docker-compose.yml does that for you.
 
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/akven}
@@ -76,8 +74,12 @@ akven:
     email: ${SUPER_ADMIN_EMAIL:}
     password: ${SUPER_ADMIN_PASSWORD:}
     name: ${SUPER_ADMIN_NAME:}
-  # With a super admin set above, the @akven.test demo accounts are switched off at start; "on" keeps them.
+  # Outside demo mode, and in demo mode once a super admin is set above, the @akven.test demo accounts are switched
+  # off at start; "on" keeps them.
   demo-accounts: ${DEMO_ACCOUNTS:off}
   payments:
+    # none = no payments are taken (the default; a real provider is future work). simulated = the demo wallet, which
+    # moves no money: set by the demo profile only.
+    provider: ${PAYMENT_PROVIDER:none}
     apple-pay-merchant-id: ${APPLE_PAY_MERCHANT_ID:}
     google-pay-merchant-id: ${GOOGLE_PAY_MERCHANT_ID:}

@@ -1,6 +1,7 @@
 package com.akven.thesis.shop;
 
 import com.akven.thesis.audit.AuditService;
+import com.akven.thesis.payment.PaymentService;
 import com.akven.thesis.common.BusinessRuleException;
 import com.akven.thesis.common.NotFoundException;
 import com.akven.thesis.shop.ShopDtos.ContactRequest;
@@ -26,17 +27,19 @@ public class ShopInfoService {
     private final ShopContactRepository contacts;
     private final PickupPointRepository points;
     private final AuditService audit;
+    private final PaymentService payments;
 
-    public ShopInfoService(ShopContactRepository contacts, PickupPointRepository points, AuditService audit) {
+    public ShopInfoService(ShopContactRepository contacts, PickupPointRepository points, AuditService audit, PaymentService payments) {
         this.contacts = contacts;
         this.points = points;
         this.audit = audit;
+        this.payments = payments;
     }
 
     @Transactional(readOnly = true)
     public ShopInfo publicInfo() {
         return new ShopInfo(contacts.findByActiveTrueOrderByPositionAscKindAsc().stream().map(ContactView::of).toList(),
-                points.findByActiveTrueOrderByPositionAscNameAsc().stream().map(PickupPointView::of).toList());
+                points.findByActiveTrueOrderByPositionAscNameAsc().stream().map(PickupPointView::of).toList(), payments.mode());
     }
 
     /** The point new pickup orders are assigned to: the first active one, if the owners have entered any. */

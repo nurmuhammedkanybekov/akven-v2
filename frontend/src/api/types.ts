@@ -211,7 +211,9 @@ export interface PickupPoint {
   /** "08:00:00", Bishkek time; null until the owners set them. openDays: a bit per day, Monday = 1 ... Sunday = 64. */
   opensAt: string | null; closesAt: string | null; openDays: number;
 }
-export interface ShopInfo { contacts: ShopContact[]; pickupPoints: PickupPoint[] }
+/** payments: NONE = no provider (checkout takes no payment), SIMULATED = the demo wallet (no money moves), LIVE = real. */
+export type PaymentMode = "NONE" | "SIMULATED" | "LIVE";
+export interface ShopInfo { contacts: ShopContact[]; pickupPoints: PickupPoint[]; payments?: PaymentMode }
 
 export type SizeSystem = "FOOT_CM" | "KR_MM" | "LOCAL" | "EU";
 export interface SizeRange { min: number; max: number }

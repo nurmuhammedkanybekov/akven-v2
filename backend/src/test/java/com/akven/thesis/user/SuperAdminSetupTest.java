@@ -55,9 +55,29 @@ class SuperAdminSetupTest extends IntegrationTest {
     }
 
     @Test
-    void withoutASuperAdminTheDemoAccountsStay() {
+    void inDemoModeWithoutASuperAdminTheDemoAccountsStayAndComeBackAfterAStartWithoutIt() {
         UserRepository repo = mock(UserRepository.class);
+        User demoOwner = new User("admin@akven.test", "hash", Role.ADMIN);
+        demoOwner.setActive(false);                                   // switched off by a start outside demo mode
+        when(repo.findByEmailEndingWithAndActiveFalse("@akven.test")).thenReturn(List.of(demoOwner));
         new SuperAdminSetup(repo, encoder, "", "", null, "off").run(null);
-        verifyNoInteractions(repo);
+        assertThat(demoOwner.isActive()).isTrue();
+        verify(repo, never()).findByEmailEndingWithAndActiveTrue(any());
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void outsideDemoModeTheDemoAccountsAreSwitchedOffEvenWithoutASuperAdmin() {
+        UserRepository repo = mock(UserRepository.class);
+        User demoOwner = new User("admin@akven.test", "hash", Role.ADMIN);
+        when(repo.findByEmailEndingWithAndActiveTrue("@akven.test")).thenReturn(List.of(demoOwner));
+
+        new SuperAdminSetup(repo, encoder, "", "", null, "off", false).run(null);
+        assertThat(demoOwner.isActive()).isFalse();
+
+        User keptOwner = new User("staff@akven.test", "hash", Role.STAFF);
+        when(repo.findByEmailEndingWithAndActiveTrue("@akven.test")).thenReturn(List.of(keptOwner));
+        new SuperAdminSetup(repo, encoder, "", "", null, "on", false).run(null);
+        assertThat(keptOwner.isActive()).isTrue();
     }
 }

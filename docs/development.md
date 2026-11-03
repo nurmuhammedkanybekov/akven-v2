@@ -21,6 +21,7 @@ You need PostgreSQL 16 or newer with the `pgvector` extension available.
 # backend, http://localhost:8080
 cd backend
 export DB_URL=jdbc:postgresql://localhost:5432/akven DB_USER=akven DB_PASSWORD=akven
+export SPRING_PROFILES_ACTIVE=demo   # demo catalog, demo accounts and the simulated wallet; leave out for a safe start
 mvn spring-boot:run
 
 # shop and admin, http://localhost:5173 (forwards /api and uploaded photos to the backend)
@@ -31,11 +32,13 @@ npm run dev
 
 ### Profiles
 
-`demo` is active by default. It loads the demo accounts, a demo catalog and placeholder images (the files in
-`db/seed/`) on top of the real migrations in `db/migration/`. Anything shared or real must run with
-`SPRING_PROFILES_ACTIVE=prod`: no seed data. Login tokens are signed with `JWT_SECRET` when it is set, otherwise with a
-random key the installation makes on its first start and keeps in its database; a key written in the repository is
-never used.
+Started **without a profile**, the shop is safe by default: no demo catalog, every `@akven.test` demo account
+switched off, and no payment provider, so checkout refuses to take a payment ("Online payment is not set up in this
+shop yet"). **Demo mode is chosen explicitly** with `SPRING_PROFILES_ACTIVE=demo` (Docker Compose does it for you): it
+loads the demo accounts, a demo catalog and placeholder images (the files in `db/seed/`) on top of the real migrations
+in `db/migration/`, switches the demo accounts back on, and turns on the **simulated wallet**, which moves no money and
+says so in the shop. Login tokens are signed with `JWT_SECRET` when it is set, otherwise with a random key the
+installation makes on its first start and keeps in its database; a key written in the repository is never used.
 
 ### Settings (environment variables)
 
@@ -52,14 +55,15 @@ never used.
 | `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL` | Gemini defaults | Any OpenAI-compatible API (for a free local model use Ollama: `LLM_BASE_URL=http://localhost:11434/v1`, no key) |
 | `SHOP_CONTACTS` | empty | The real contacts, `KIND\|label\|value` separated by `;`, in display order. Applied on start whenever the list changes; phone numbers live here and in the database, never in the repository |
 | `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`, `SUPER_ADMIN_NAME` | empty | Create the super admin on the first start of a real installation (password at least 12 characters). An existing account is never changed |
-| `DEMO_ACCOUNTS` | `off` | With a super admin set, every `@akven.test` demo account is switched off at start. `on` keeps them, for presenting the project |
+| `DEMO_ACCOUNTS` | `off` | Outside demo mode, and in demo mode once a super admin is set, every `@akven.test` demo account is switched off at start. `on` keeps them |
+| `PAYMENT_PROVIDER` | `none` | `none`: no payments are taken. `simulated`: the demo wallet (set by the demo profile; no money moves). A real provider is future work |
 | `AKVEN_DEMO_EXPOSE_PROPOSAL` | `false` | When `true`, the chat also shows the assistant's raw proposal next to the validated discount (for demonstrations) |
 
 Copy `.env.example` to `.env` for local values; git ignores `.env`, and secrets are never committed.
 
 ## Running it for real
 
-1. In `.env`: `SPRING_PROFILES_ACTIVE=prod`, `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD`, `SHOP_CONTACTS`, and change
+1. In `.env`: leave `SPRING_PROFILES_ACTIVE` unset (or any profile but `demo`), `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD`, `SHOP_CONTACTS`, and change
    `DB_PASSWORD` (a long random value, set before the very first start: the database keeps the password it was
    created with).
 2. Put the shop behind HTTPS (for example Caddy or nginx with a Let's Encrypt certificate) that forwards to

@@ -6,7 +6,8 @@ import java.math.BigDecimal;
  * What the shop needs from a payment service. The wallet hands the browser a one-time TOKEN; only that token ever
  * reaches our server, so card numbers never do. A real integration (an acquirer with Apple Pay and Google Pay
  * merchant accounts) would implement this interface; the rest of the application would not change.
- * Real merchant integration is out of scope for the thesis, so SimulatedWalletProvider is the only implementation.
+ * Real merchant integration is out of scope for the thesis, so SimulatedWalletProvider is the only implementation, and
+ * it is switched on only in demo mode (akven.payments.provider=simulated). Without a provider the shop takes no payments.
  */
 public interface PaymentProvider {
 
@@ -17,4 +18,7 @@ public interface PaymentProvider {
 
     /** Returns the money of an earlier charge. */
     void refund(String paymentReference, BigDecimal amount);
+
+    /** True for a stand-in that moves no money, so the shop can say so to its customers. */
+    default boolean simulated() { return false; }
 }

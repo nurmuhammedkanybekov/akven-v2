@@ -1038,6 +1038,8 @@ const shop: Partial<Record<MessageKey, string>> = {
   "od.help": "Вопрос по заказу?",
   "od.helpS": "Напишите семье: номер заказа уже в сообщении.",
   "od.helpMsg": "Здравствуйте! Вопрос по заказу {ref}: ",
+  "co.noPayments": "Онлайн-оплата в этом магазине пока не подключена, поэтому оплатить заказ здесь нельзя.",
+  "co.noPaymentsBag": "Из корзины можно отправить заказ семье сообщением.",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

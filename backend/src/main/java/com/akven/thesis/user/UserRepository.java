@@ -23,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     /** The demo accounts still switched on, to turn them off on a real installation. */
     List<User> findByEmailEndingWithAndActiveTrue(String suffix);
+
+    List<User> findByEmailEndingWithAndActiveFalse(String domain);
 }

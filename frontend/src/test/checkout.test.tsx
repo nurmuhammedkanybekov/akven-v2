@@ -238,4 +238,5 @@ describe("the bag page", () => {
     render(<MemoryRouter><AuthProvider><ToastProvider><CartProvider><CartPage /></CartProvider></ToastProvider></AuthProvider></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Your bag is empty" })).toBeInTheDocument();
   });
+
 });

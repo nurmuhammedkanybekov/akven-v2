@@ -1,5 +1,9 @@
-# Local development profile (active by default, see application.yml).
+# Demo mode, chosen explicitly (SPRING_PROFILES_ACTIVE=demo): the demo catalog and accounts, and the simulated wallet.
+# For presenting and developing the project only; no real money moves.
 spring:
   flyway:
     locations: classpath:db/migration,classpath:db/seed
 
+akven:
+  payments:
+    provider: simulated
