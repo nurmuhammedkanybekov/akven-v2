@@ -139,8 +139,11 @@ Then open **http://localhost:8081**. The first build takes a few minutes; the ba
 | Staff | `staff@akven.test` | `changeme-staff` | Products, stock, orders, reviews and wholesale requests, but not prices |
 | Customer | Sign in → Create an account | | Shop, ask for a price, check out, follow orders |
 
-The demo accounts exist only in demo mode and are switched off once a real super admin is set in `.env`
-(`SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`), unless `DEMO_ACCOUNTS=on`. A short tour:
+Docker Compose starts the shop **in demo mode** (`SPRING_PROFILES_ACTIVE=demo`): the demo catalog, these accounts, and a
+**simulated wallet** that moves no money and says so at checkout. Without demo mode the shop is safe by default: no demo
+data, the demo accounts switched off, and no payments taken until a real provider is connected (future work). The demo
+accounts are also switched off in demo mode once a real super admin is set in `.env`, unless `DEMO_ACCOUNTS=on`.
+A short tour:
 
 1. **Switch the language** in the top bar (EN · РУС · КЫР); the whole site follows.
 2. **Open a shelf**, pick a size and a colour, then take a filter off with its tag.

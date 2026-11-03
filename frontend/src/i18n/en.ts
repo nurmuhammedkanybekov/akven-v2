@@ -1053,6 +1053,8 @@ const shop = {
   "od.help": "Question about this order?",
   "od.helpS": "Write to the family: the order number is already in the message.",
   "od.helpMsg": "Hello! A question about my order {ref}: ",
+  "co.noPayments": "Online payment is not set up in this shop yet, so orders cannot be paid here.",
+  "co.noPaymentsBag": "From the bag you can send your order to the family as a message.",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

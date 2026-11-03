@@ -1,5 +1,6 @@
 package com.akven.thesis.shop;
 
+import com.akven.thesis.payment.PaymentMode;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -46,5 +47,6 @@ public final class ShopDtos {
         }
     }
 
-    public record ShopInfo(List<ContactView> contacts, List<PickupPointView> pickupPoints) {}
+    /** payments: NONE (checkout takes no payment yet), SIMULATED (demo wallet, no money moves) or LIVE. */
+    public record ShopInfo(List<ContactView> contacts, List<PickupPointView> pickupPoints, PaymentMode payments) {}
 }

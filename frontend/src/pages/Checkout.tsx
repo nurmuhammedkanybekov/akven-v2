@@ -7,6 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { useCart } from "../cart/CartContext";
 import { useQuote } from "../cart/useQuote";
 import { Alert, Skeleton } from "../components/Alert";
+import { useShopInfo } from "../shop/useShopInfo";
 import { Button } from "../components/Button";
 import { Input, Textarea } from "../components/Field";
 import { WalletSheet } from "../components/WalletSheet";
@@ -31,6 +32,8 @@ export function CheckoutPage() {
   const navigate = useNavigate();
   const { quote, loading, offline } = useQuote(cart.lines, session?.email ?? null);
   const gift = useGift();
+  // NONE: this installation takes no payments (started outside demo mode); SIMULATED: the demo wallet.
+  const payments = useShopInfo()?.payments;
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -182,10 +185,14 @@ export function CheckoutPage() {
           <p className="av-small">{t("co.paymentS")}</p>
           {/* On a phone the order sits under the form: the amount is said here, before anyone presses "Pay". */}
           <p className="av-topay" aria-live="polite"><span>{t("co.toPay")}</span> <strong className="av-price">{money(total)}</strong> <a href="#order-summary">{t("co.seeOrder")}</a></p>
+          {payments === "NONE" ? (
+            <Alert>{t("co.noPayments")} <Link to="/cart">{t("co.noPaymentsBag")}</Link></Alert>
+          ) : (
           <div className="av-row">
             <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.apple")}</Button>
             <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.google")}</Button>
           </div>
+          )}
         </form>
 
         <aside className="av-summary" id="order-summary" aria-label={t("co.summary")}>

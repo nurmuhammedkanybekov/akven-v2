@@ -2,6 +2,7 @@ package com.akven.thesis.payment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -13,11 +14,22 @@ import java.util.UUID;
  *
  * For the demo and the tests, the token decides the outcome: a token containing "declined" is declined by the
  * "bank", one containing "unavailable" simulates the provider being down, anything else is approved.
+ *
+ * <p>It exists only when akven.payments.provider=simulated, which the demo profile sets (and the tests). A server started
+ * without it has no payment provider at all, so it can never take a "payment" that moves no money by accident.
  */
 @Component
+@ConditionalOnProperty(name = "akven.payments.provider", havingValue = "simulated")
 public class SimulatedWalletProvider implements PaymentProvider {
 
     private static final Logger log = LoggerFactory.getLogger(SimulatedWalletProvider.class);
+
+    public SimulatedWalletProvider() {
+        log.warn("Payments are SIMULATED (demo mode): no real money moves. Never use this setting for a real shop.");
+    }
+
+    @Override
+    public boolean simulated() { return true; }
 
     @Override
     public boolean supports(PaymentMethod method) {

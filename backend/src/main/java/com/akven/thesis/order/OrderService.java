@@ -100,6 +100,9 @@ public class OrderService {
             return replay(earlier.get());
         }
 
+        // No provider (outside demo mode, until a real one is connected): refuse before anything is reserved.
+        payments.requireAvailable(request.payment().method());
+
         Map<String, Integer> quantities = new LinkedHashMap<>();
         Map<String, UUID> offers = new LinkedHashMap<>();
         for (CartItem item : request.items()) {

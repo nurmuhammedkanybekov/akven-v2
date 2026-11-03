@@ -1,6 +1,7 @@
 # One-command demo: docker compose up --build   then open http://localhost:8081
 # Demo accounts: admin@akven.test / changeme-admin and staff@akven.test / changeme-staff (demo profile; switched off once SUPER_ADMIN_EMAIL is set, unless DEMO_ACCOUNTS=on).
-# This is for trying and presenting the project. A real deployment runs with SPRING_PROFILES_ACTIVE=prod (the JWT signing key is generated per installation).
+# This is for trying and presenting the project (demo mode: demo data, demo accounts, simulated wallet). A real deployment
+# sets SPRING_PROFILES_ACTIVE to anything but demo in .env: no demo data or accounts, and no payments until a real provider exists.
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -22,7 +23,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}   # prod in .env for a real shop: no demo catalog or accounts
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}   # demo for presenting; prod (or any non-demo value) in .env for a real shop
       DB_URL: jdbc:postgresql://db:5432/akven
       DB_USER: akven
       DB_PASSWORD: ${DB_PASSWORD:-akven}
