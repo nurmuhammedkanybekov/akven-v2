@@ -3,6 +3,7 @@ import { Link, NavLink, useSearchParams } from "react-router-dom";
 import { getFacets, listProducts, type CatalogQuery } from "../api/endpoints";
 import type { Category, FacetOption, PageResponse, ProductSummary } from "../api/types";
 import { Skeleton } from "../components/Alert";
+import { LoadFailed } from "../components/LoadFailed";
 import { Button } from "../components/Button";
 import { Clothesline } from "../components/Clothesline";
 import { HeightIcon, isCut } from "../shop/fitting/HeightIcon";
@@ -220,7 +221,7 @@ export function CatalogPage({ category }: { category?: Category }) {
       )}
 
       {products.loading && !products.data && <div className="av-grid-products">{[0, 1, 2, 3, 4, 5, 6, 7].map((i) => <Skeleton key={i} height={360} />)}</div>}
-      {products.error && <p className="av-lead">{t("shop.error")}</p>}
+      {products.error && !products.loading && <LoadFailed message="shop.error" onRetry={products.reload} />}
       {products.data && products.data.items.length === 0 && (
         <div className="av-empty av-shelfempty">
           <div className="av-shelfempty__line" aria-hidden="true"><Clothesline socks={[]} /></div>

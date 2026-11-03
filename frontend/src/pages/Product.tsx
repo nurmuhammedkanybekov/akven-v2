@@ -20,6 +20,7 @@ import { HeartIcon, PinIcon, StackIcon, TruckIcon } from "../components/icons";
 import { useSaved } from "../shop/useSaved";
 import { rememberViewed } from "../shop/useViewed";
 import { useAsync } from "../hooks/useAsync";
+import { LoadFailed } from "../components/LoadFailed";
 import { RecentlyViewed } from "../shop/RecentlyViewed";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
@@ -44,13 +45,9 @@ export function ProductPage() {
   const product = useAsync(() => getProduct(slug), [slug]);
   if (product.loading && !product.data) return <div className="av-container av-page"><Skeleton height={520} /></div>;
   if (product.error instanceof ApiError && product.error.status === 404) return <NotFoundPage kind="product" />;
-  if (product.error || !product.data) return <div className="av-container av-page"><LoadError /></div>;
+  if (product.error) return <div className="av-container av-page"><LoadFailed message="pdp.loadError" onRetry={product.reload} /></div>;
+  if (!product.data) return <div className="av-container av-page"><Skeleton height={420} /></div>;
   return <ProductView product={product.data} />;
-}
-
-function LoadError() {
-  const { t } = useT();
-  return <p className="av-lead">{t("pdp.loadError")}</p>;
 }
 
 function ProductView({ product }: { product: ProductDetail }) {

@@ -1189,7 +1189,7 @@ body::before {
 /* A sideways-scrolling row must contain its own absolutely placed bits (the sort menu's hidden label): unpositioned,
    the label escaped the scrolling filter bar and stretched a phone's page to 1,482px, which zoomed the whole shelf out. */
 .av-tabs, .av-occasions, .av-fr__rail, .av-seen__line, .av-recent, .av-notes__board, .av-chips, .av-dates, .av-qv__thumbs, .av-casebuild__grid { position: relative; }
-@media (max-width: 760px) { .av-shelfbar { position: relative; } }
+@media (max-width: 760px) { .av-shelfbar { position: relative; top: auto; } }
 /* Long Russian and Kyrgyz words ("Конфиденциальность") break inside a narrow footer column instead of pushing it out. */
 .av-footer__col a, .av-footer__head { overflow-wrap: anywhere; hyphens: auto; }
 /* The notes hang crooked; a rotated corner at the screen's edge is clipped by the section, not added to the page width. */
@@ -1215,3 +1215,7 @@ body::before {
 .av-topay strong { font-size: 1.35rem; }
 .av-topay a { margin-left: auto; font-size: var(--text-small); }
 @media (min-width: 900px) { .av-topay { display: none; } }
+
+/* A page that could not fetch its socks: a note with the reason and a way to try again. */
+.av-loadfailed { display: grid; justify-items: start; gap: var(--space-4); margin-block: var(--space-6); padding: var(--space-5) var(--space-6); max-width: 36rem; border-left: 3px solid var(--accent); border-radius: 0 var(--radius-md) var(--radius-md) 0; background: var(--surface-2); }
+.av-loadfailed p { margin: 0; font-size: 1.05rem; color: var(--ink); }

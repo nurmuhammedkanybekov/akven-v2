@@ -1046,6 +1046,8 @@ const shop = {
   "img.soon": "Photo coming soon",
   "co.toPay": "To pay",
   "co.seeOrder": "See the order",
+  "err.retry": "Try again",
+  "err.noNet": "Your phone seems to be offline. The socks will appear as soon as the connection is back.",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

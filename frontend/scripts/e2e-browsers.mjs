@@ -68,6 +68,9 @@ for (const [engineName, engine] of engines) {
       await page.locator(".av-grid-products .av-card").first().waitFor();
       await fits();
       if (screen.mobile) await page.locator("[data-scroll-end]").first().waitFor({ state: "attached" });
+      // The filter bar sits above the socks, never over them (a stray offset once pushed it 72px down on phones).
+      const [barBottom, gridTop] = await page.evaluate(() => [document.querySelector(".av-shelfbar").getBoundingClientRect().bottom, document.querySelector(".av-grid-products").getBoundingClientRect().top]);
+      assert.ok(barBottom <= gridTop + 1, `the filter bar overlaps the socks by ${Math.round(barBottom - gridTop)}px`);
       // Click the sock's name: where the picture is, a pointer brings up "Quick view" (which is meant to catch the click).
       await page.locator(".av-grid-products .av-card__name").first().click();
       await page.getByRole("button", { name: /^Add to bag/ }).first().click();
