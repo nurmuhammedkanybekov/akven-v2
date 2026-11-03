@@ -265,13 +265,16 @@ try {
     assert.equal(saved[0].quantity, 2);
   });
   await step("paying with a working wallet creates a paid order and the stock drops", async () => {
-    await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
+    // demo mode says plainly that the wallet is simulated, before and after paying
+    await page.getByText(/the wallet is simulated, no card is charged and no real money moves/).waitFor();
+    await page.getByRole("button", { name: "Pay with Apple Pay (demo)" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Pay $19.00" }).click();
     await page.waitForURL(/\/orders\/[0-9a-f-]{36}/);
     await page.getByText(/Thank you! Your order AV-[0-9A-F]{8} is paid/).waitFor();
     await page.getByText("Paid", { exact: true }).first().waitFor();
     // help is one tap away, with the order's reference already written into the message
     const ref = (await page.getByRole("heading", { level: 1 }).innerText()).match(/AV-[0-9A-F]{8}/)[0];
+    await page.getByText("Demo payment: no real money was taken.").waitFor();
     await page.getByText("Question about this order?").waitFor();
     assert.ok(decodeURIComponent(await page.locator(".av-orderhelp__link").first().getAttribute("href")).includes(ref), "the help link carries the order reference");
     await a11y("the paid order page");

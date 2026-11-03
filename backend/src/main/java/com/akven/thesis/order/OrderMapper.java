@@ -5,6 +5,7 @@ import com.akven.thesis.order.OrderDtos.GiftView;
 import com.akven.thesis.order.OrderDtos.OrderItemView;
 import com.akven.thesis.order.OrderDtos.OrderView;
 import com.akven.thesis.order.OrderDtos.PaymentView;
+import com.akven.thesis.payment.SimulatedWalletProvider;
 import com.akven.thesis.order.OrderDtos.PickupView;
 import com.akven.thesis.shop.ShopDtos.PickupPointView;
 
@@ -21,7 +22,7 @@ final class OrderMapper {
                         o.getDeliveryCountry(),
                         o.getFulfillmentMethod() != FulfillmentMethod.DELIVERY ? null
                                 : new OrderDtos.DeliveryView(o.getDeliveryZoneName(), o.getDeliveryFee(), o.getDeliveryDaysMin(), o.getDeliveryDaysMax())),
-                o.getPaymentRef() == null ? null : new PaymentView(o.getPaymentMethod(), shorten(o.getPaymentRef())),
+                o.getPaymentRef() == null ? null : new PaymentView(o.getPaymentMethod(), shorten(o.getPaymentRef()), SimulatedWalletProvider.isSimulatedReference(o.getPaymentRef())),
                 o.getItems().stream().map(i -> new OrderItemView(i.getSku(), i.getProductName(), i.getProductSlug(), i.getVariantLabel(),
                         i.getColorHex(), i.getImageUrl(), i.getQuantity(), i.getListPrice(), i.getDiscountPct(), i.getUnitPrice(), i.lineTotal(),
                         i.getDiscountSource())).toList(),

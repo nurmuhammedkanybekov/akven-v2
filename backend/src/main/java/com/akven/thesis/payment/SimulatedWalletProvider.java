@@ -24,6 +24,13 @@ public class SimulatedWalletProvider implements PaymentProvider {
 
     private static final Logger log = LoggerFactory.getLogger(SimulatedWalletProvider.class);
 
+    /** Every reference this wallet gives starts so, which is how an order shows it was paid in the demo. */
+    public static final String REFERENCE_PREFIX = "sim_pay_";
+
+    public static boolean isSimulatedReference(String paymentReference) {
+        return paymentReference != null && paymentReference.startsWith(REFERENCE_PREFIX);
+    }
+
     public SimulatedWalletProvider() {
         log.warn("Payments are SIMULATED (demo mode): no real money moves. Never use this setting for a real shop.");
     }
@@ -45,7 +52,7 @@ public class SimulatedWalletProvider implements PaymentProvider {
         if (token.contains("declined")) {
             return PaymentResult.declined("Your bank declined the payment. You have not been charged.");
         }
-        String reference = "sim_pay_" + UUID.randomUUID();
+        String reference = REFERENCE_PREFIX + UUID.randomUUID();
         log.info("Simulated {} charge of {} for order {} approved as {}", request.method(), request.amount(), request.orderReference(), reference);
         return PaymentResult.approved(reference);
     }

@@ -1040,6 +1040,9 @@ const shop: Partial<Record<MessageKey, string>> = {
   "od.helpMsg": "Здравствуйте! Вопрос по заказу {ref}: ",
   "co.noPayments": "Онлайн-оплата в этом магазине пока не подключена, поэтому оплатить заказ здесь нельзя.",
   "co.noPaymentsBag": "Из корзины можно отправить заказ семье сообщением.",
+  "pay.demoTag": "демо",
+  "pay.demoCheckout": "Это демонстрационный магазин: кошелёк имитируется, карта не списывается, настоящие деньги не переводятся.",
+  "pay.demoPaid": "Демо-оплата: настоящие деньги не списаны.",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

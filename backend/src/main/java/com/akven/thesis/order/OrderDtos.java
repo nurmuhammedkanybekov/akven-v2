@@ -101,7 +101,8 @@ public final class OrderDtos {
     public record DeliveryView(String zone, BigDecimal fee, Integer daysMin, Integer daysMax) {}
 
     /** The payment reference is shown shortened: enough for a support call, not the whole token of the provider. */
-    public record PaymentView(String method, String reference) {}
+    /** simulated: paid with the demo wallet, so no money moved (the shop says so wherever the payment is shown). */
+    public record PaymentView(String method, String reference, boolean simulated) {}
 
     public record GiftView(GiftBox box, GiftRibbon ribbon, String to, String from, String message, boolean hidePrices) {}
 

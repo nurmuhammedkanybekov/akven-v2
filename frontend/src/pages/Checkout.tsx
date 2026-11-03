@@ -183,14 +183,15 @@ export function CheckoutPage() {
 
           <h2 className="av-formtitle">{t("co.payment")}</h2>
           <p className="av-small">{t("co.paymentS")}</p>
+          {payments === "SIMULATED" && <p className="av-demonote"><span className="av-demotag">{t("pay.demoTag")}</span> {t("pay.demoCheckout")}</p>}
           {/* On a phone the order sits under the form: the amount is said here, before anyone presses "Pay". */}
           <p className="av-topay" aria-live="polite"><span>{t("co.toPay")}</span> <strong className="av-price">{money(total)}</strong> <a href="#order-summary">{t("co.seeOrder")}</a></p>
           {payments === "NONE" ? (
             <Alert>{t("co.noPayments")} <Link to="/cart">{t("co.noPaymentsBag")}</Link></Alert>
           ) : (
           <div className="av-row">
-            <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.apple")}</Button>
-            <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.google")}</Button>
+            <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.apple")}{payments === "SIMULATED" ? ` (${t("pay.demoTag")})` : ""}</Button>
+            <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.google")}{payments === "SIMULATED" ? ` (${t("pay.demoTag")})` : ""}</Button>
           </div>
           )}
         </form>
