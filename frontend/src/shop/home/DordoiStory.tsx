@@ -39,7 +39,8 @@ const ease = (p: number, a: number, b: number) => { const x = Math.min(1, Math.m
  * socks sway only once the doors are open. With reduced motion it is simply the
  * finished scene. The scene is decoration (aria-hidden); the words and links carry the meaning.
  */
-export function DordoiStory() {
+/** short: on the home page the scene plays over less scrolling than on the story page. */
+export function DordoiStory({ short = false }: { short?: boolean }) {
   const { t } = useT();
   const stall = useShopInfo()?.pickupPoints[0];
   const section = useRef<HTMLElement>(null);
@@ -88,7 +89,7 @@ export function DordoiStory() {
   }
 
   return (
-    <section ref={section} className="av-dordoi" aria-labelledby="dordoi-title" onPointerMove={onMove} onPointerLeave={() => { last.current = null; }}>
+    <section ref={section} className={`av-dordoi${short ? " av-dordoi--short" : ""}`} aria-labelledby="dordoi-title" onPointerMove={onMove} onPointerLeave={() => { last.current = null; }}>
       <div className="av-dordoi__stage">
         <div className="av-hero5__sky" aria-hidden="true">
           <div className="av-hero5__lights">{Array.from({ length: 22 }, (_, i) => <i key={i} style={{ "--i": i } as React.CSSProperties} />)}</div>

@@ -39,25 +39,11 @@ function useRotation(count: number, ms: number) {
 }
 
 /**
- * The top bar's message on one line. When it is wider than its room (a long Russian or Kyrgyz message on a phone), it
- * glides along once while it is shown, so it never wraps onto three lines or runs under the language switch.
+ * The top bar's message. On a narrow screen a long Russian or Kyrgyz message wraps onto a second line inside a bar
+ * of fixed height, instead of gliding sideways and being cut off: it is read at once, and nothing below it moves.
  */
 function AnnText({ text }: { text: string }) {
-  const box = useRef<HTMLParagraphElement>(null);
-  const run = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const measure = () => {
-      const b = box.current, r = run.current;
-      if (!b || !r) return;
-      const over = r.scrollWidth - b.clientWidth;
-      b.classList.toggle("is-long", over > 2);
-      b.style.setProperty("--shift", `${-Math.max(0, over + 24)}px`);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [text]);
-  return <p ref={box} className="av-ann__text"><span ref={run} className="av-ann__run">{text}</span></p>;
+  return <p className="av-ann__text"><span className="av-ann__run">{text}</span></p>;
 }
 
 export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", accountLabel, extra }: HeaderProps) {
@@ -179,8 +165,10 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
           {NAV.map((n, i) => (
             <NavLink key={n.to} to={n.to} style={{ "--i": i } as React.CSSProperties}>{t(n.key)}</NavLink>
           ))}
-          <NavLink to="/wholesale" style={{ "--i": NAV.length } as React.CSSProperties}>{t("nav.wholesale")}</NavLink>
-          <NavLink to="/saved" style={{ "--i": NAV.length + 1 } as React.CSSProperties}>{t("nav.savedTitle")}</NavLink>
+          <NavLink to="/fitting" style={{ "--i": NAV.length } as React.CSSProperties}>{t("nav.fitting")}</NavLink>
+          <NavLink to="/family" style={{ "--i": NAV.length + 1 } as React.CSSProperties}>{t("nav.family")}</NavLink>
+          <NavLink to="/wholesale" style={{ "--i": NAV.length + 2 } as React.CSSProperties}>{t("nav.wholesale")}</NavLink>
+          <NavLink to="/saved" style={{ "--i": NAV.length + 3 } as React.CSSProperties}>{t("nav.savedTitle")}</NavLink>
         </div>
         <div className="av-mobile-nav__langs">
           <LanguageSwitch />

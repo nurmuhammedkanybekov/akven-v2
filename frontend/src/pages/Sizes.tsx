@@ -93,7 +93,7 @@ export function SizesPage() {
         <li><strong>{t("sizes.tip2")}</strong><span>{t("sizes.tip2S")}</span></li>
         <li><strong>{t("sizes.tip3")}</strong><span>{t("sizes.tip3S")}</span></li>
       </ul>
-      <div className="av-row"><Button to="/#family">{t("sizes.family")}</Button></div>
+      <div className="av-row"><Button to="/family">{t("sizes.family")}</Button></div>
     </div>
   );
 }

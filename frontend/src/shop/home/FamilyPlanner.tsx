@@ -26,7 +26,8 @@ const fromSaved = (list: FamilyMemberInput[]): Member[] =>
  * to the shop in WhatsApp or Telegram, or taken to the catalogue. A signed-in customer starts from the family saved in
  * their account and can save the list back, so the sizes are worked out once.
  */
-export function FamilyPlanner({ minPairs, tiers }: { minPairs: number; tiers: Array<{ minPairs: number; discountPct: number }> }) {
+export function FamilyPlanner({ minPairs, tiers, page = false }: { minPairs: number; tiers: Array<{ minPairs: number; discountPct: number }>; page?: boolean }) {
+  const Heading = page ? "h1" : "h2";
   const { t, lang } = useT();
   const uid = useId();
   const info = useShopInfo();
@@ -80,7 +81,7 @@ export function FamilyPlanner({ minPairs, tiers }: { minPairs: number; tiers: Ar
         <div className="av-family">
           <div className="av-stack av-family__copy">
             <span className="av-eyebrow">{t("family.eyebrow")}</span>
-            <h2 id="family-title">{t("family.title")}</h2>
+            <Heading id="family-title">{t("family.title")}</Heading>
             <p className="av-lead">{t("family.lead")}</p>
             <div className="av-family__add" role="group" aria-label={t("family.addLabel")}>
               {ROLES.map((r) => (

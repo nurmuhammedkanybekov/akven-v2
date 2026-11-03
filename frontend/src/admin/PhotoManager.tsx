@@ -6,6 +6,7 @@ import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { useToast } from "../components/Toast";
 import { useT } from "../i18n/I18n";
+import { imageSize, photoNotes } from "../lib/photoCheck";
 
 const MAX = 40;
 
@@ -21,10 +22,12 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [over, setOver] = useState(false);
+  const [advice, setAdvice] = useState<string[]>([]);
   const images = product.images;
 
   async function upload(files: File[]) {
-    setError(null);
+    setError(null); setAdvice([]);
+    const notes: string[] = [];
     let current = product;
     for (const [i, file] of files.entries()) {
       if (current.images.length >= MAX) { setError(t("a.ph.max", { n: MAX })); break; }
@@ -32,12 +35,14 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
       try {
         current = await adminUploadImage(product.id, file, "");
         onChange(current);
+        const size = await imageSize(file);
+        if (size) for (const n of photoNotes(size.width, size.height)) notes.push(t(n === "wide" ? "a.ph.wide" : "a.ph.small", { name: file.name, w: size.width, h: size.height }));
       } catch (e) {
         setError(`${file.name}: ${e instanceof ApiError ? e.message : t("a.ph.failed")}`);
         break;
       }
     }
-    setBusy(null);
+    setBusy(null); setAdvice(notes);
     if (input.current) input.current.value = "";
   }
 
@@ -72,6 +77,8 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
     <section className="av-card-form" id="photos" aria-labelledby="photos-h">
       <h2 className="av-formtitle" id="photos-h">{t("a.ph.title")}</h2>
       <p className="av-small">{t("a.ph.lead")}</p>
+      <p className="av-small av-muted">{t("a.ph.guide")}</p>
+      {advice.length > 0 && <Alert>{advice.map((a) => <span key={a} style={{ display: "block" }}>{a}</span>)}</Alert>}
       {error && <Alert tone="danger">{error}</Alert>}
 
       {images.length > 0 && (

@@ -48,6 +48,8 @@ const GiftPage = lazy(() => import("./pages/Gift").then((m) => ({ default: m.Gif
 const StoryPage = lazy(() => import("./pages/Story").then((m) => ({ default: m.StoryPage })));
 const GiftSetsPage = lazy(() => import("./pages/GiftSets").then((m) => ({ default: m.GiftSetsPage })));
 const FinderPage = lazy(() => import("./pages/Finder").then((m) => ({ default: m.FinderPage })));
+const FittingPage = lazy(() => import("./pages/Fitting").then((m) => ({ default: m.FittingPage })));
+const FamilyPage = lazy(() => import("./pages/Family").then((m) => ({ default: m.FamilyPage })));
 const OrdersPage = lazy(() => import("./pages/Orders").then((m) => ({ default: m.OrdersPage })));
 const StyleGuide = lazy(() => import("./pages/StyleGuide").then((m) => ({ default: m.StyleGuide })));
 
@@ -82,6 +84,8 @@ export default function App() {
               <Route path="gifts" element={<GiftSetsPage />} />
               <Route path="story" element={<StoryPage />} />
               <Route path="finder" element={<FinderPage />} />
+              <Route path="fitting" element={<FittingPage />} />
+              <Route path="family" element={<FamilyPage />} />
               <Route path="account" element={<RequireAuth><AccountPage /></RequireAuth>} />
               <Route path="checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
               <Route path="orders" element={<RequireAuth><OrdersPage /></RequireAuth>} />

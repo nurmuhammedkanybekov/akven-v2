@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { getTerms } from "../../api/endpoints";
 import { PairMeter } from "../../components/PairMeter";
 import { Button } from "../../components/Button";
@@ -21,6 +21,8 @@ export function CaseBuilder({ onUse }: { onUse: (mix: string, pairs: number) => 
   const terms = useAsync((signal) => getTerms().then((x) => { if (signal.aborted) throw new Error("aborted"); return x; }), []);
   const sections = terms.data?.sections ?? [];
   const [dozens, setDozens] = useState<Record<string, number>>({});
+  const [nudge, setNudge] = useState(false);
+  const grid = useRef<HTMLDivElement>(null);
   const key = (s: string, w: string) => `${s}|${w}`;
   const total = Object.values(dozens).reduce((a, b) => a + b, 0) * DOZEN;
   const cases = Math.floor(total / CASE);
@@ -38,7 +40,7 @@ export function CaseBuilder({ onUse }: { onUse: (mix: string, pairs: number) => 
         <h2 id="case-title">{t("case.title")}</h2>
         <p className="av-lead">{t("case.lead")}</p>
       </header>
-      <div className="av-casebuild__grid" role="table" aria-label={t("case.title")}>
+      <div ref={grid} className="av-casebuild__grid" role="table" aria-label={t("case.title")}>
         <div role="row" className="av-casebuild__row av-casebuild__head">
           <span role="columnheader" />
           {WHO.map((w) => <span key={w} role="columnheader">{t(`nav.${w.toLowerCase()}` as MessageKey)}</span>)}
@@ -53,7 +55,7 @@ export function CaseBuilder({ onUse }: { onUse: (mix: string, pairs: number) => 
                 <span role="cell" key={w} className={`av-casebuild__cell${n ? " is-on" : ""}`}>
                   <button type="button" aria-label={t("case.less", { what: label })} onClick={() => change(k, -1)} disabled={!n}>−</button>
                   <output aria-live="polite" aria-label={label} key={n}>{n * DOZEN}</output>
-                  <button type="button" aria-label={t("case.more", { what: label })} onClick={() => change(k, 1)}>+</button>
+                  <button type="button" data-more aria-label={t("case.more", { what: label })} onClick={() => change(k, 1)}>+</button>
                 </span>
               );
             })}
@@ -63,7 +65,17 @@ export function CaseBuilder({ onUse }: { onUse: (mix: string, pairs: number) => 
       <div className="av-casebuild__sum">
         <PairMeter total={rest || (total && CASE)} target={CASE} />
         <p><strong className="av-num">{t("bag.pairs", { n: total })}</strong> · {cases > 0 ? t("case.cases", { n: cases, rest }) : t("case.toCase", { n: CASE - total })}</p>
-        <Button disabled={total === 0} onClick={() => onUse(mix, total)}>{t("case.use")}</Button>
+        {/* The button always answers: with an empty case it says how to fill one, and points at the first "+". */}
+        <Button aria-describedby={total === 0 ? "case-hint" : undefined} onClick={() => {
+          if (total > 0) { onUse(mix, total); return; }
+          setNudge(true);
+          grid.current?.querySelector<HTMLButtonElement>("button[data-more]")?.focus();
+        }}>{t("case.use")}</Button>
+        {total === 0 && (
+          <p id="case-hint" className={`av-small av-casebuild__hint${nudge ? " is-nudged" : ""}`} aria-live="polite">
+            {t("case.empty")} <a href="#quote">{t("case.skip")}</a>
+          </p>
+        )}
       </div>
     </section>
   );

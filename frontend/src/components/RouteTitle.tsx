@@ -7,7 +7,7 @@ const SHOP: Record<string, MessageKey> = {
   "/shop": "title.shop", "/men": "nav.men", "/women": "nav.women", "/kids": "nav.kids", "/bundles": "nav.bundles",
   "/visit": "nav.visit", "/privacy": "foot.privacy", "/sizes": "title.sizes", "/wholesale": "nav.wholesale", "/login": "nav.signin",
   "/register": "title.register", "/cart": "title.bag", "/saved": "nav.savedTitle", "/checkout": "title.checkout",
-  "/orders": "nav.orders",
+  "/orders": "nav.orders", "/fitting": "nav.fitting", "/family": "nav.family",
 };
 
 /** Names the tab after the page. A product page names it after the product itself (ProductPage). */
