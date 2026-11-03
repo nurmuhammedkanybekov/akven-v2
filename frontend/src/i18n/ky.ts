@@ -53,7 +53,7 @@ const shop: Partial<Record<MessageKey, string>> = {
   "cut.knee-high": "Тизеге чейин",
   "card.soldOut": "Түгөндү",
   "card.colours": "{n} түс",
-  "card.perPair": "жубу {price}",
+  "card.perPair": "топтомдо жубу {price}",
 
   "best.eyebrow": "Коллекция",
   "best.title": "Эң көп сатылгандар жана жаңылар",
@@ -1013,6 +1013,9 @@ const shop: Partial<Record<MessageKey, string>> = {
   "cart.later": "Кийинчерээк",
   "cart.laterName": "{name} кийинчерээкке калтыруу",
   "cart.savedLater": "{name} тандалгандарда.",
+  "auth.needEmail": "Эл. почтаңызды жазыңыз.",
+  "auth.badEmail": "Бул эл. почтага окшобойт: @ белгиси жана домен керек, мисалы name@mail.com.",
+  "auth.needPassword": "Сырсөздү жазыңыз.",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

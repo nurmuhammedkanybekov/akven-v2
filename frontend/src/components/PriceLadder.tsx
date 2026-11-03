@@ -27,18 +27,23 @@ export function PriceLadder({ pricing, variant, onAdd }: { pricing: PublicPricin
   const now = perPair * (1 - pct / 100);
   const next = tiers.find((x) => x.minPairs > n);
   const packs = Math.min(n / pack, Math.max(1, Math.floor(variant.availableQty)));
-  const pos = (v: number) => `${((v - 1) / (top - 1)) * 100}%`;
+  const at = (v: number) => ((v - 1) / (top - 1)) * 100;
+  const pos = (v: number) => `${at(v)}%`;
+  // Steps close together on the track (20 and 30 pairs of 140) would print their numbers on top of each other on a
+  // phone: every other crowded mark drops its number a line lower.
+  const low = tiers.map(() => false);
+  tiers.forEach((x, i) => { if (i > 0 && !low[i - 1] && at(x.minPairs) - at(tiers[i - 1].minPairs) < 12) low[i] = true; });
   return (
     <section className="av-ladder2" aria-labelledby="ladder-title">
       <div className="av-row av-between">
         <h2 id="ladder-title" className="av-ladder2__title">{t("lad.title")}</h2>
         <span className="av-ladder2__pct" key={pct} data-on={pct > 0}>{pct > 0 ? `−${pct}%` : t("lad.none")}</span>
       </div>
-      <div className="av-ladder2__track">
+      <div className={`av-ladder2__track${low.some(Boolean) ? " has-low" : ""}`}>
         <input type="range" min={1} max={top} step={1} value={pairs} onChange={(e) => setPairs(Number(e.target.value))}
                aria-label={t("lad.pairs")} aria-valuetext={t("bag.pairs", { n })} style={{ "--v": pos(n) } as React.CSSProperties} />
-        {tiers.map((x) => (
-          <span key={x.minPairs} className={`av-ladder2__mark${n >= x.minPairs ? " is-on" : ""}`} style={{ left: pos(x.minPairs) }} aria-hidden="true">
+        {tiers.map((x, i) => (
+          <span key={x.minPairs} className={`av-ladder2__mark${n >= x.minPairs ? " is-on" : ""}${low[i] ? " is-low" : ""}`} style={{ left: pos(x.minPairs) }} aria-hidden="true">
             <i />{x.minPairs}
           </span>
         ))}

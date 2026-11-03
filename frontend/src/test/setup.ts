@@ -5,3 +5,7 @@ if (typeof HTMLDialogElement !== "undefined" && !HTMLDialogElement.prototype.sho
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
   HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); this.dispatchEvent(new Event("close")); };
 }
+
+// The app loads Russian and Kyrgyz before its first render (main.tsx); tests render pages directly, so load them here.
+import { loadLang } from "../i18n/I18n";
+await Promise.all([loadLang("ru"), loadLang("ky")]);

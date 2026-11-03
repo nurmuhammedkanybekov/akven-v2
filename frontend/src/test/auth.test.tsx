@@ -38,3 +38,33 @@ describe("session restore", () => {
     expect(sessionStorage.getItem("akven-session")).toBeNull();
   });
 });
+
+describe("sign-in form", () => {
+  afterEach(() => { vi.restoreAllMocks(); });
+
+  it("keeps the button active and says what is missing instead of greying it out", async () => {
+    const { fireEvent } = await import("@testing-library/react");
+    const { LoginPage } = await import("../pages/Login");
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+    render(<MemoryRouter><AuthProvider><LoginPage /></AuthProvider></MemoryRouter>);
+    const button = screen.getByRole("button", { name: "Sign in" });
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+    expect(await screen.findByText("Enter your email.")).toBeInTheDocument();
+    expect(screen.getByText("Enter your password.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText("Email")).toHaveFocus());
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "nur@mail" } });
+    fireEvent.click(button);
+    expect(await screen.findByText(/does not look like an email/)).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("email check", () => {
+  it("accepts ordinary addresses and refuses the usual slips", async () => {
+    const { looksLikeEmail } = await import("../lib/formCheck");
+    expect(looksLikeEmail("akven.socks@gmail.com")).toBe(true);
+    expect(looksLikeEmail(" nur@mail.kg ")).toBe(true);
+    for (const bad of ["", "nur", "nur@", "nur@mail", "nur mail@x.kg", "@mail.kg"]) expect(looksLikeEmail(bad)).toBe(false);
+  });
+});

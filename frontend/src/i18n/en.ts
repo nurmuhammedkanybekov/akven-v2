@@ -59,7 +59,7 @@ const shop = {
   "cut.knee-high": "Knee-high",
   "card.soldOut": "Sold out",
   "card.colours": "{n} {n:colour|colours}",
-  "card.perPair": "{price} a pair",
+  "card.perPair": "{price} a pair in a pack",
 
   // home: collection
   "best.eyebrow": "The collection",
@@ -1028,6 +1028,9 @@ const shop = {
   "cart.later": "Save for later",
   "cart.laterName": "Save {name} for later",
   "cart.savedLater": "{name} is in your saved socks.",
+  "auth.needEmail": "Enter your email.",
+  "auth.badEmail": "That does not look like an email: it needs an @ and a domain, like name@mail.com.",
+  "auth.needPassword": "Enter your password.",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

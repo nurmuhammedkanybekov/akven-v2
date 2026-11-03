@@ -1,7 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { en, type MessageKey } from "./en";
-import { ky } from "./ky";
-import { ru } from "./ru";
 
 /**
  * English, Russian and Kyrgyz. English is the main language and the source of every key; a missing Russian or
@@ -15,8 +13,22 @@ export const LANGS: Array<{ code: Lang; short: string; name: string }> = [
   { code: "ky", short: "КЫР", name: "Кыргызча" },
 ];
 
-const DICTS: Record<Lang, Partial<Record<MessageKey, string>>> = { en, ru, ky };
+type Dict = Partial<Record<MessageKey, string>>;
+
+// English ships with the app, because every other language falls back to it. Russian and Kyrgyz are fetched on their
+// own, only by the visitors who read them: the first download carries one language instead of three.
+const DICTS: Partial<Record<Lang, Dict>> = { en };
+const LOADERS: Record<Exclude<Lang, "en">, () => Promise<Dict>> = {
+  ru: () => import("./ru").then((m) => m.ru),
+  ky: () => import("./ky").then((m) => m.ky),
+};
 const KEY = "akven-lang";
+
+/** Fetches a language's texts once. When that fails (offline before it was ever cached), English stands in. */
+export async function loadLang(lang: Lang): Promise<void> {
+  if (DICTS[lang]) return;
+  try { DICTS[lang] = await LOADERS[lang as Exclude<Lang, "en">](); } catch { /* English is shown instead */ }
+}
 
 export type Translate = (key: MessageKey, vars?: Record<string, string | number>) => string;
 
@@ -33,7 +45,7 @@ function plural(lang: Lang, value: number, forms: string[]): string {
 }
 
 function translate(lang: Lang, key: MessageKey, vars?: Record<string, string | number>): string {
-  let text = DICTS[lang][key] ?? en[key] ?? key;
+  let text = DICTS[lang]?.[key] ?? en[key] ?? key;
   if (vars) {
     text = text.replace(/\{(\w+):([^{}]+)\}/g, (all, name: string, forms: string) =>
       name in vars ? plural(lang, Number(vars[name]), forms.split("|")) : all);
@@ -42,7 +54,8 @@ function translate(lang: Lang, key: MessageKey, vars?: Record<string, string | n
   return text;
 }
 
-function initialLang(): Lang {
+/** The language chosen on this device before, read before the first render so the right texts can be loaded. */
+export function savedLang(): Lang {
   try {
     const saved = localStorage.getItem(KEY);
     if (saved === "en" || saved === "ru" || saved === "ky") return saved;
@@ -60,13 +73,16 @@ interface I18nValue { lang: Lang; setLang: (l: Lang) => void; t: Translate }
 const I18nContext = createContext<I18nValue>({ lang: "en", setLang: () => {}, t: (k, v) => translate("en", k, v) });
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(initialLang);
+  const [lang, setLangState] = useState<Lang>(savedLang);
   activeLang = lang;
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
   const setLang = useCallback((l: Lang) => {
-    setLangState(l);
     try { localStorage.setItem(KEY, l); } catch { /* the choice just will not persist */ }
+    if (DICTS[l]) setLangState(l); else void loadLang(l).then(() => setLangState(l));
   }, []);
+  // A language chosen in another tab, or before its texts arrived, is drawn as soon as they are here.
+  const [, redraw] = useState(0);
+  useEffect(() => { if (!DICTS[lang]) void loadLang(lang).then(() => redraw((n) => n + 1)); }, [lang]);
   const value = useMemo<I18nValue>(() => ({ lang, setLang, t: (k, v) => translate(lang, k, v) }), [lang, setLang]);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
