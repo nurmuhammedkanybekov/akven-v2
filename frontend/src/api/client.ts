@@ -4,6 +4,7 @@
  * app when the session is no longer valid (401) so it can send the visitor to the login page.
  */
 import { translateNow } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/en";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string, public fieldErrors: Record<string, string> = {}) {
@@ -58,11 +59,43 @@ export async function api<T>(path: string, { method = "GET", body, form, signal,
   const text = await response.text();
   const data = text ? safeJson(text) : undefined;
   if (!response.ok) {
-    const detail = (data as { detail?: string } | undefined)?.detail;
-    const errors = (data as { errors?: Record<string, string> } | undefined)?.errors ?? {};
-    throw new ApiError(response.status, detail ?? messageFor(response.status), errors);
+    const problem = (data ?? {}) as Problem;
+    throw new ApiError(response.status, problemMessage(problem) ?? messageFor(response.status), fieldMessages(problem));
   }
   return data as T;
+}
+
+/** The API's error body (RFC 7807), with the stable code and values a customer-facing error carries. */
+interface Problem {
+  detail?: string;
+  code?: string;
+  args?: Record<string, string | number>;
+  errors?: Record<string, string>;
+  fieldCodes?: Record<string, string>;
+}
+
+/** A text from the dictionary, or null when it has none (translate gives back the key itself then). */
+function known(key: string, vars?: Record<string, string | number>): string | null {
+  const text = translateNow(key as MessageKey, vars);
+  return text === key ? null : text;
+}
+
+/**
+ * The error in the visitor's language: by its stable code when the shop knows it, otherwise the server's English
+ * sentence as before (errors only the shop team sees carry no code).
+ */
+export function problemMessage(problem: Problem): string | undefined {
+  return (problem.code && known(`api.${problem.code}`, problem.args)) || problem.detail;
+}
+
+/** Each field's message, translated by the rule it broke (fill this in, too long...) when the shop knows that rule. */
+export function fieldMessages(problem: Problem): Record<string, string> {
+  const out: Record<string, string> = { ...(problem.errors ?? {}) };
+  for (const [field, rule] of Object.entries(problem.fieldCodes ?? {})) {
+    const text = known(`api.field.${rule}`);
+    if (text) out[field] = text;
+  }
+  return out;
 }
 
 function safeJson(text: string): unknown {

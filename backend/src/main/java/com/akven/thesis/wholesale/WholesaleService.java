@@ -59,7 +59,7 @@ public class WholesaleService {
             return new Received(reference(UUID.randomUUID()), Instant.now());
         }
         String company = line(in.company());
-        if (company == null || company.length() < 2) throw new BusinessRuleException("Write the name of the shop or company.");
+        if (company == null || company.length() < 2) throw new BusinessRuleException("WHOLESALE_COMPANY", Map.of(), "Write the name of the shop or company.");
         String contact = contact(in.contactKind(), in.contact());
         limiter.check(address);
         WholesaleRequest r = new WholesaleRequest(in.kind(), company, line(in.city()), in.contactKind(), contact,
@@ -99,14 +99,14 @@ public class WholesaleService {
     /** The contact, tidied and checked against its kind. */
     static String contact(ContactKind kind, String raw) {
         String v = line(raw);
-        if (v == null) throw new BusinessRuleException("Leave a way for the family to answer you.");
+        if (v == null) throw new BusinessRuleException("WHOLESALE_CONTACT", Map.of(), "Leave a way for the family to answer you.");
         boolean ok = switch (kind) {
             case WHATSAPP, PHONE -> PHONE.matcher(v).matches() && v.replaceAll("\\D", "").length() >= 7;
             case TELEGRAM -> TELEGRAM.matcher(v).matches() || PHONE.matcher(v).matches();
             case EMAIL -> EMAIL.matcher(v).matches();
         };
         if (!ok) {
-            throw new BusinessRuleException(switch (kind) {
+            throw new BusinessRuleException("WHOLESALE_CONTACT_" + (kind == ContactKind.PHONE ? "WHATSAPP" : kind.name()), Map.of(), switch (kind) {
                 case WHATSAPP, PHONE -> "Write the phone number with its country code, for example +996 …";
                 case TELEGRAM -> "Write your Telegram name (for example @akven_shop) or phone number.";
                 case EMAIL -> "Write a full email address.";

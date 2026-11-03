@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
 
 /**
  * A customer's order. The status machine lives here so no caller can skip a step:
@@ -202,7 +203,7 @@ public class Order extends AuditableEntity {
     /** PENDING or PAID -> CANCELLED. Releases the customer's negotiated offers so they can be used again. */
     public void cancel() {
         if (status == OrderStatus.FULFILLED || status == OrderStatus.CANCELLED) {
-            throw new ConflictException("This order is already " + status.name().toLowerCase() + " and cannot be cancelled.");
+            throw new ConflictException("ORDER_NOT_CANCELLABLE", Map.of("status", status.name()), "This order is already " + status.name().toLowerCase() + " and cannot be cancelled.");
         }
         this.status = OrderStatus.CANCELLED;
         this.cancelledAt = Instant.now();

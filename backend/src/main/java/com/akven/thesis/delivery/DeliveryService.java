@@ -43,15 +43,15 @@ public class DeliveryService {
     public DeliveryZone zoneFor(UUID zoneId, Country country) {
         if (zoneId != null) {
             DeliveryZone z = zones.findById(zoneId).filter(DeliveryZone::isActive)
-                    .orElseThrow(() -> new BusinessRuleException("This delivery area is no longer available. Please choose another one."));
+                    .orElseThrow(() -> new BusinessRuleException("DELIVERY_AREA_GONE", Map.of(), "This delivery area is no longer available. Please choose another one."));
             if (country != null && z.getCountry() != country) {
-                throw new BusinessRuleException("The delivery area is not in the chosen country.");
+                throw new BusinessRuleException("DELIVERY_AREA_COUNTRY", Map.of(), "The delivery area is not in the chosen country.");
             }
             return z;
         }
         Country c = country == null ? Country.KG : country;
         return zones.findByCountryAndActiveTrueOrderByPositionAscNameAsc(c).stream().findFirst()
-                .orElseThrow(() -> new BusinessRuleException("We do not deliver to this country at the moment. Please choose pickup at the stall."));
+                .orElseThrow(() -> new BusinessRuleException("DELIVERY_COUNTRY_CLOSED", Map.of(), "We do not deliver to this country at the moment. Please choose pickup at the stall."));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

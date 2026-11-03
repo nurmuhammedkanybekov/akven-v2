@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
 
 /**
  * Saved socks in the account, so the heart follows a customer between devices. On sign-in the browser's own list is
@@ -46,7 +47,7 @@ public class SavedService {
         UUID userId = user(email);
         Product p = products.findBySlugAndActiveTrue(slug).orElseThrow(() -> new NotFoundException("Product not found."));
         if (saved.findByUserIdAndProductId(userId, p.getId()).isEmpty()) {
-            if (saved.countByUserId(userId) >= MAX) throw new BusinessRuleException("You have saved " + MAX + " socks. Remove some first.");
+            if (saved.countByUserId(userId) >= MAX) throw new BusinessRuleException("SAVED_LIMIT", Map.of("n", MAX), "You have saved " + MAX + " socks. Remove some first.");
             saved.save(new SavedItem(userId, p.getId()));
         }
         return mine(email);

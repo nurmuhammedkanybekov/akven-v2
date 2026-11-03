@@ -53,10 +53,10 @@ public class WholesaleRateLimiter {
             trim(mine, now);
             trim(all, now);
             if (mine.size() >= perAddress) {
-                throw new TooManyRequestsException("You have sent several requests already. The family will answer them; please wait an hour before sending more.");
+                throw new TooManyRequestsException("WHOLESALE_TOO_MANY", Map.of(), "You have sent several requests already. The family will answer them; please wait an hour before sending more.");
             }
             if (all.size() >= overall) {
-                throw new TooManyRequestsException("The shop is receiving many requests right now. Please try again in a little while, or write to the family directly.");
+                throw new TooManyRequestsException("SHOP_BUSY", Map.of(), "The shop is receiving many requests right now. Please try again in a little while, or write to the family directly.");
             }
             mine.addLast(now);
             all.addLast(now);

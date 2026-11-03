@@ -91,9 +91,9 @@ public class NegotiationService {
     public NegotiateResponse negotiate(String customerEmail, NegotiateRequest request) {
         limiter.check(customerEmail);
         User customer = users.findByEmail(customerEmail).orElseThrow(() -> new NotFoundException("Account not found."));
-        Variant variant = variants.findBySku(request.variantSku()).orElseThrow(() -> new NotFoundException("That item does not exist."));
+        Variant variant = variants.findBySku(request.variantSku()).orElseThrow(() -> new NotFoundException("ITEM_NOT_FOUND", Map.of(), "That item does not exist."));
         if (!variant.getProduct().isActive()) {
-            throw new BusinessRuleException("That item is no longer sold.");
+            throw new BusinessRuleException("ITEM_NOT_SOLD", Map.of(), "That item is no longer sold.");
         }
         int quantity = request.quantity() == null ? 1 : request.quantity();
         String language = Replies.language(request.language());

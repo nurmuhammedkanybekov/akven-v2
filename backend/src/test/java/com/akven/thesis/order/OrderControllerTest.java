@@ -247,7 +247,11 @@ class OrderControllerTest extends IntegrationTest {
         Variant v = data.variant(5);
         checkout(tokenForEmail(email(), Role.CUSTOMER), key(), body(v.getSku(), 6))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.detail").value("Only 5 left of " + v.getProduct().getName() + "."));
+                .andExpect(jsonPath("$.detail").value("Only 5 left of " + v.getProduct().getName() + "."))
+                // a stable code with its values, so the shop can say it in Russian or Kyrgyz; the detail stays as it was
+                .andExpect(jsonPath("$.code").value("ITEM_LOW_STOCK"))
+                .andExpect(jsonPath("$.args.n").value(5))
+                .andExpect(jsonPath("$.args.name").value(v.getProduct().getName()));
         Variant after = data.reload(v);
         assertThat(after.getStockQty()).isEqualTo(5);
         assertThat(after.getReservedQty()).isZero();
@@ -257,7 +261,7 @@ class OrderControllerTest extends IntegrationTest {
     void aSoldOutInactiveOrRetiredItemCannotBeBought() throws Exception {
         String me = tokenForEmail(email(), Role.CUSTOMER);
         Variant soldOut = data.variant(0);
-        checkout(me, key(), body(soldOut.getSku(), 1)).andExpect(status().isConflict()).andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.endsWith("is sold out.")));
+        checkout(me, key(), body(soldOut.getSku(), 1)).andExpect(status().isConflict()).andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.endsWith("is sold out."))).andExpect(jsonPath("$.code").value("ITEM_SOLD_OUT"));
 
         Variant hidden = data.variant(5);
         hidden.updateListing("M", "Navy", "#1F2A44", 1, hidden.getPrice(), 5, false);
@@ -286,7 +290,8 @@ class OrderControllerTest extends IntegrationTest {
     void badRequestsAreRefusedWithClearMessages() throws Exception {
         Variant v = data.variant(5);
         String me = tokenForEmail(email(), Role.CUSTOMER);
-        checkout(me, key(), body(v.getSku(), 0)).andExpect(status().isBadRequest()).andExpect(jsonPath("$.errors").exists());
+        checkout(me, key(), body(v.getSku(), 0)).andExpect(status().isBadRequest()).andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.fieldCodes['items[0].quantity']").value("Min"));   // which rule, for translation
         checkout(me, key(), body(v.getSku(), 1000)).andExpect(status().isBadRequest());   // one line holds at most 999 units
         checkout(me, key(), Map.of("items", List.of(), "fulfillment", Map.of("method", "PICKUP", "contactName", "A", "contactPhone", "+996700000000"),
                 "payment", Map.of("method", "APPLE_PAY", "token", OK))).andExpect(status().isBadRequest());
