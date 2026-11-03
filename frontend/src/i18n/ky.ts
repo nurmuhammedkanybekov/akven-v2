@@ -1031,6 +1031,8 @@ const shop: Partial<Record<MessageKey, string>> = {
   "img.soon": "Сүрөт жакында чыгат",
   "co.toPay": "Төлөнө турган сумма",
   "co.seeOrder": "Буйрутманы көрүү",
+  "err.retry": "Кайра аракет кылуу",
+  "err.noNet": "Телефонуңузда интернет жок окшойт. Байланыш калыбына келгенде байпактар чыгат.",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

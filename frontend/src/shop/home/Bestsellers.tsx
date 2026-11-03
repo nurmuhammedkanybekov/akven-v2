@@ -3,6 +3,7 @@ import { getBestsellers } from "../../api/endpoints";
 import type { Category } from "../../api/types";
 import { Skeleton } from "../../components/Alert";
 import { Button } from "../../components/Button";
+import { LoadFailed } from "../../components/LoadFailed";
 import { ProductCard } from "../../components/ProductCard";
 import { useAsync } from "../../hooks/useAsync";
 import { useT } from "../../i18n/I18n";
@@ -34,7 +35,7 @@ export function Bestsellers() {
           </div>
         </header>
         {best.loading && !best.data && <div className="av-grid-products">{[0, 1, 2, 3].map((i) => <Skeleton key={i} height={360} />)}</div>}
-        {best.error && <p className="av-small">{t("best.error")}</p>}
+        {best.error && !best.loading && <LoadFailed message="best.error" onRetry={best.reload} />}
         {best.data && (
           <div className={`av-grid-products av-shelf${best.loading ? " is-loading" : ""}`} key={cat ?? "all"}>
             {best.data.items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={(i % 6) + 1} />)}

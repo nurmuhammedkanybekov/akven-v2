@@ -1031,6 +1031,8 @@ const shop: Partial<Record<MessageKey, string>> = {
   "img.soon": "Фото скоро появится",
   "co.toPay": "К оплате",
   "co.seeOrder": "Посмотреть заказ",
+  "err.retry": "Попробовать снова",
+  "err.noNet": "Похоже, телефон без интернета. Носки появятся, как только связь вернётся.",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };
