@@ -19,6 +19,8 @@ import { useMoney } from "../shop/useMoney";
 import { NotFoundPage } from "./NotFound";
 import { Confetti } from "../components/Confetti";
 import { GiftSummary } from "../components/GiftSummary";
+import { ContactIcon, withMessage } from "../components/Contacts";
+import { useShopInfo } from "../shop/useShopInfo";
 
 export function OrderDetailPage() {
   const { money } = useMoney();
@@ -91,6 +93,7 @@ export function OrderDetailPage() {
           {o.gift && <GiftSummary gift={o.gift} />}
           <OrderAgain order={o} />
           {(o.status === "PAID" || o.status === "PENDING") && <Button variant="secondary" onClick={() => setConfirm(true)}>{t("od.cancel")}</Button>}
+          <OrderHelp reference={o.reference} />
         </aside>
       </div>
 
@@ -188,4 +191,24 @@ function OrderAgain({ order }: { order: OrderView }) {
     if (added) navigate("/cart");
   }
   return <Button variant="primary" block loading={busy} onClick={() => void again()}>{t("again.cta")}</Button>;
+}
+
+/** Someone to ask: the family's own channels, with the order's reference already written in the message. */
+function OrderHelp({ reference }: { reference: string }) {
+  const { t } = useT();
+  const contacts = (useShopInfo()?.contacts ?? []).filter((c) => c.kind === "TELEGRAM" || c.kind === "WHATSAPP" || c.kind === "PHONE" || c.kind === "EMAIL");
+  if (contacts.length === 0) return null;
+  return (
+    <div className="av-orderhelp">
+      <p className="av-small"><strong>{t("od.help")}</strong> {t("od.helpS")}</p>
+      <div className="av-row">
+        {contacts.slice(0, 3).map((c) => (
+          <a key={c.id} className="av-orderhelp__link" href={withMessage(c, t("od.helpMsg", { ref: reference }))}
+             target={c.url.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
+            <ContactIcon kind={c.kind} />{c.label ?? c.kind.charAt(0) + c.kind.slice(1).toLowerCase()}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
 }

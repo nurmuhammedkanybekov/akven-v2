@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import { Logo } from "../brand/Logo";
 import { Button } from "../components/Button";
 import { useT } from "../i18n/I18n";
+import { useNoIndex } from "../hooks/usePageMeta";
 
 /** Nothing at this address: a page, a product that left the shelf, or an order that is not this customer's. */
 export function NotFoundPage({ kind = "page" }: { kind?: "page" | "product" | "order" }) {
   const { t } = useT();
+  useNoIndex();
   return (
     <div className="av-container av-page av-empty">
       <Logo variant="mark" height={72} />

@@ -179,7 +179,12 @@ try {
   await step("removing the product hides it from the shop at once, and restoring brings it back", async () => {
     await page.goto(`${BASE}/admin`);
     await page.getByLabel("Search by name").fill(stamp);
-    await page.getByRole("link", { name: new RegExp(PRODUCT) }).click();
+    // The list filters as you type: a click can land on a row that is being replaced, so open it until the page changes.
+    const row = page.getByRole("link", { name: new RegExp(PRODUCT) });
+    for (let i = 0; i < 3 && !/\/admin\/products\/[0-9a-f-]{36}/.test(page.url()); i++) {
+      await row.click();
+      await page.waitForURL(/\/admin\/products\/[0-9a-f-]{36}/, { timeout: 5000 }).catch(() => {});
+    }
     await page.getByRole("button", { name: "Remove from the shop" }).click();
     await page.getByRole("button", { name: "Remove it" }).click();
     await page.getByText("This product is hidden from the shop.").waitFor();
@@ -265,6 +270,11 @@ try {
     await page.waitForURL(/\/orders\/[0-9a-f-]{36}/);
     await page.getByText(/Thank you! Your order AV-[0-9A-F]{8} is paid/).waitFor();
     await page.getByText("Paid", { exact: true }).first().waitFor();
+    // help is one tap away, with the order's reference already written into the message
+    const ref = (await page.getByRole("heading", { level: 1 }).innerText()).match(/AV-[0-9A-F]{8}/)[0];
+    await page.getByText("Question about this order?").waitFor();
+    assert.ok(decodeURIComponent(await page.locator(".av-orderhelp__link").first().getAttribute("href")).includes(ref), "the help link carries the order reference");
+    await a11y("the paid order page");
     await shot("shop-order");
     await page.goto(productUrl);
     await page.getByRole("button", { name: "Cream" }).click();
@@ -372,8 +382,8 @@ try {
     // the fitting room's teaser: her ankle sock on the leg, and the full room opens on the same choices
     await page.getByRole("heading", { name: "Try them on before you buy" }).scrollIntoViewIfNeeded();
     const teaser = page.locator("#fitting");
-    await teaser.getByRole("radio", { name: "Her" }).check({ force: true });
-    await teaser.getByRole("radio", { name: /^Knee-high/ }).check({ force: true });
+    await teaser.locator("label", { has: page.getByRole("radio", { name: "Her" }) }).click();
+    await teaser.locator("label", { has: page.getByRole("radio", { name: /^Knee-high/ }) }).click();
     await teaser.getByText(/Knee-high with sneakers/).waitFor();
     await page.getByRole("link", { name: /One set for the whole family/ }).waitFor();
     await page.getByRole("link", { name: /A gift box, built your way/ }).waitFor();
@@ -382,10 +392,10 @@ try {
     // the full room: boots and a no-show is advised against, and our own knee-highs go on the leg
     const fitting = page.locator("#fitting");
     await page.waitForFunction(() => document.querySelector("#fitting input[name=fr-who]:checked")?.closest("label")?.textContent === "Her");
-    await fitting.getByRole("radio", { name: "Boots" }).check({ force: true });
-    await fitting.getByRole("radio", { name: /^No-show/ }).check({ force: true });
+    await fitting.locator("label", { has: page.getByRole("radio", { name: "Boots" }) }).click();
+    await fitting.locator("label", { has: page.getByRole("radio", { name: /^No-show/ }) }).click();
     await fitting.getByText(/No-show with boots: better not/).waitFor();
-    await fitting.getByRole("radio", { name: /^Knee-high/ }).check({ force: true });
+    await fitting.locator("label", { has: page.getByRole("radio", { name: /^Knee-high/ }) }).click();
     await fitting.getByText(/Knee-high with boots: just right/).waitFor();
     await fitting.getByRole("link", { name: "See this pair" }).waitFor();
     await a11y("the fitting room page");
@@ -410,7 +420,7 @@ try {
     await page.getByRole("heading", { name: "Socks for every holiday" }).waitFor();
     await a11y("the gift sets page");
     await page.goto(`${BASE}/sizes`);
-    await page.getByRole("radio", { name: /^Knee-high/ }).check({ force: true });
+    await page.locator("label", { has: page.getByRole("radio", { name: /^Knee-high/ }) }).click();
     await page.getByRole("link", { name: "Shop knee-high socks" }).waitFor();
     // try a sock on from its own page, in the colour the link asked for
     await page.goto(`${BASE}/products/classic-rib-crew-men?colour=8A8D91`);
