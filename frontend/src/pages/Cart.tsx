@@ -2,7 +2,8 @@ import { useToast } from "../components/Toast";
 import { useSaved } from "../shop/useSaved";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { getBestsellers } from "../api/endpoints";
+import { getBestsellers, getDeliveryZones } from "../api/endpoints";
+import { deliveryFee } from "../lib/delivery";
 import { SOCK_COLOURS, SockArt } from "../brand/SockArt";
 import { PairMeter } from "../components/PairMeter";
 import { ProductCard } from "../components/ProductCard";
@@ -35,6 +36,8 @@ export function CartPage() {
   const info = useShopInfo();
   const gift = useGift();
   const messengers = (info?.contacts ?? []).filter((c) => c.kind === "WHATSAPP" || c.kind === "TELEGRAM");
+  // What delivery costs is said before checkout: pickup is free, and the cheapest area's fee for this bag.
+  const zones = useAsync((signal) => getDeliveryZones(signal), []);
 
   if (cart.lines.length === 0) {
     return (
@@ -54,6 +57,9 @@ export function CartPage() {
   const rows = cart.lines.map((line) => ({ line, q: quote?.lines.find((l) => l.sku === line.sku) }));
   const fallbackTotal = cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
   const total = quote ? quote.total : fallbackTotal;
+  const activeZones = Array.isArray(zones.data) ? zones.data.filter((z) => z.active) : [];
+  const cheapest = activeZones.length ? Math.min(...activeZones.map((z) => deliveryFee(z, total))) : null;
+  const deliveryNote = cheapest == null ? t("cart.deliveryS") : cheapest === 0 ? t("cart.deliveryFree") : t("cart.deliveryFrom", { fee: money(cheapest) });
   // The bag written out, for customers who would rather order by message: nothing is sent until they press send.
   const message = [t("cart.msgHello"), ...cart.lines.map((l) => `• ${l.productName} (${l.variantLabel}) × ${l.quantity}`), t("cart.msgTotal", { total: money(total) }),
     ...(gift ? [t("gb.msgLine", { box: t(`gb.box.${gift.box}` as MessageKey), ribbon: t(`gb.ribbon.${gift.ribbon}` as MessageKey) }), ...(gift.message ? [`“${gift.message}”`] : [])] : [])].join("\n");
@@ -75,7 +81,7 @@ export function CartPage() {
           <h2>{t("cart.summary")}</h2>
           <dl className="av-totals">
             <div><dt>{t("cart.subtotal")}</dt><dd className="av-price">{money(total)}</dd></div>
-            <div><dt>{t("cart.delivery")}</dt><dd className="av-small">{t("cart.deliveryS")}</dd></div>
+            <div><dt>{t("cart.delivery")}</dt><dd className="av-small">{deliveryNote}</dd></div>
             <div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(total)}</dd></div>
           </dl>
           {gift ? <GiftSummary gift={gift} edit onRemove={() => setGift(null)} /> : <GiftPromo />}

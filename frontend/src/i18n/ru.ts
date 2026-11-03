@@ -1033,6 +1033,11 @@ const shop: Partial<Record<MessageKey, string>> = {
   "co.seeOrder": "Посмотреть заказ",
   "err.retry": "Попробовать снова",
   "err.noNet": "Похоже, телефон без интернета. Носки появятся, как только связь вернётся.",
+  "cart.deliveryFrom": "Самовывоз из контейнера бесплатно; доставка от {fee}",
+  "cart.deliveryFree": "Самовывоз бесплатно, а в некоторые районы этот заказ уже доставим бесплатно",
+  "od.help": "Вопрос по заказу?",
+  "od.helpS": "Напишите семье: номер заказа уже в сообщении.",
+  "od.helpMsg": "Здравствуйте! Вопрос по заказу {ref}: ",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

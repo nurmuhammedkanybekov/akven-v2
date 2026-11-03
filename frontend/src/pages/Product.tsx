@@ -21,6 +21,7 @@ import { useSaved } from "../shop/useSaved";
 import { rememberViewed } from "../shop/useViewed";
 import { useAsync } from "../hooks/useAsync";
 import { LoadFailed } from "../components/LoadFailed";
+import { useJsonLd, usePageDescription } from "../hooks/usePageMeta";
 import { RecentlyViewed } from "../shop/RecentlyViewed";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
@@ -57,6 +58,8 @@ function ProductView({ product }: { product: ProductDetail }) {
   const isSaved = saved.has(product.slug);
   usePageTitle(product.name);
   const minPrice = product.variants.length ? Math.min(...product.variants.map((v) => v.price)) : null;
+  usePageDescription(product.description ? `${product.name}: ${product.description}` : product.name);
+  useJsonLd("product-ld", productLd(product));
   useEffect(() => { rememberViewed({ slug: product.slug, name: product.name, image: product.images[0]?.url ?? null, price: minPrice }); }, [product.slug, product.name, product.images, minPrice]);
   const variants = product.variants;
   const [search] = useSearchParams();
@@ -315,4 +318,28 @@ function MoreLikeThis({ product }: { product: ProductDetail }) {
 
 function Chip2({ label, pressed, onClick }: { label: string; pressed: boolean; onClick: () => void }) {
   return <button type="button" className="av-chip" aria-pressed={pressed} onClick={onClick}>{label}</button>;
+}
+
+/** The sock as schema.org Product data, for search results that show the price and whether it is in stock. */
+function productLd(p: ProductDetail): object | null {
+  if (!p.variants.length) return null;
+  const prices = p.variants.map((v) => v.price);
+  const origin = window.location.origin;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: p.name,
+    description: p.description ?? undefined,
+    image: p.images.map((i) => new URL(i.url, origin).href),
+    brand: { "@type": "Brand", name: "AK&VEN" },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "USD",
+      lowPrice: Math.min(...prices).toFixed(2),
+      highPrice: Math.max(...prices).toFixed(2),
+      offerCount: p.variants.length,
+      availability: p.variants.some((v) => v.availableQty > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url: `${origin}/products/${p.slug}`,
+    },
+  };
 }

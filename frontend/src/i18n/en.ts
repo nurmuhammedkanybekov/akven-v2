@@ -1048,6 +1048,11 @@ const shop = {
   "co.seeOrder": "See the order",
   "err.retry": "Try again",
   "err.noNet": "Your phone seems to be offline. The socks will appear as soon as the connection is back.",
+  "cart.deliveryFrom": "Pickup at the stall is free; delivery from {fee}",
+  "cart.deliveryFree": "Pickup is free, and this bag already ships free to some areas",
+  "od.help": "Question about this order?",
+  "od.helpS": "Write to the family: the order number is already in the message.",
+  "od.helpMsg": "Hello! A question about my order {ref}: ",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;
