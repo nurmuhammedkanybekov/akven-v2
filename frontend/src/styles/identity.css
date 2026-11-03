@@ -252,7 +252,7 @@ body::before {
 
 /* A drawn sock on a product card sways from its cuff when you point at it, as if it hung on the line. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .av-card:hover .av-card__media img { transform-origin: 50% 12%; animation: av-sway 1.4s var(--ease-out); }
+  .av-card:hover .av-card__media img[data-kind="art"] { transform-origin: 50% 12%; animation: av-sway 1.4s var(--ease-out); }
 }
 @keyframes av-sway { 0% { rotate: 0deg; scale: 1.05; } 25% { rotate: -2.2deg; } 55% { rotate: 1.4deg; } 80% { rotate: -0.5deg; } 100% { rotate: 0deg; scale: 1.05; } }
 
@@ -276,21 +276,16 @@ body::before {
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-fr__stage { background: radial-gradient(ellipse at 55% 30%, rgb(255 255 255 / 0.07), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--sand)); } }
 :root[data-theme="dark"] .av-fr__stage { background: radial-gradient(ellipse at 55% 30%, rgb(255 255 255 / 0.07), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--sand)); }
 
-/* The top bar's message: one line, clear of the switches on both sides, gliding along when it is too long. */
+/* The top bar's message, clear of the switches on both sides. */
 .av-ann__bar { justify-content: center; }
 .av-ann__text { flex: 1; min-width: 0; margin: 0 15rem 0 0; padding: 0; overflow: hidden; white-space: nowrap; text-align: center; }
 @media (min-width: 1280px) { .av-ann__text { margin-inline: 16rem; } }
 @media (max-width: 799px) { .av-ann__text { margin-right: 11rem; text-align: left; letter-spacing: 0.02em; } }
 .av-ann__run { display: inline-block; }
-.av-ann__text.is-long { text-align: left; mask: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 22px), transparent); }
-.av-ann__text.is-long .av-ann__run { padding-left: 10px; animation: av-ann-glide 4.8s 0.6s ease-in-out both; }
-@keyframes av-ann-glide { 0%, 12% { transform: translateX(0); } 88%, 100% { transform: translateX(var(--shift)); } }
-@media (prefers-reduced-motion: reduce) { .av-ann__text.is-long { white-space: normal; mask: none; } .av-ann__text.is-long .av-ann__run { animation: none; padding: 0; } }
 /* Narrow phones: the switches live in the menu, so the message gets the whole bar. */
 @media (max-width: 560px) {
   .av-ann__langs { display: none; }
   .av-ann__text { margin: 0; text-align: center; }
-  .av-ann__text.is-long { text-align: left; }
 }
 
 /* Shoes on or off, over the stage; and the socks from inside gift boxes in the rail. */
@@ -1084,26 +1079,10 @@ body::before {
   .av-grid-products > .av-promo .av-promo__go { grid-column: 2; grid-row: 1 / 4; }
 }
 
-/* Rows that scroll sideways (shelf tabs, sections, occasions, the fitting room's rail, recently seen) fade out at the
-   edge that has more to show, so a cut-off "Gift b" reads as "there is more this way". Browsers with scroll-driven
-   animations get it; a row that fits shows no fade at all, because its scroll timeline is inactive. */
-@property --av-fs { syntax: "<length>"; inherits: false; initial-value: 0px; }
-@property --av-fe { syntax: "<length>"; inherits: false; initial-value: 0px; }
-@keyframes av-scrollfade { 0% { --av-fs: 0px; --av-fe: 32px; } 6% { --av-fs: 32px; } 94% { --av-fe: 32px; } 100% { --av-fs: 32px; --av-fe: 0px; } }
-@supports (animation-timeline: scroll()) {
-  .av-tabs, .av-occasions, .av-fr__rail, .av-seen__line, .av-recent {
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
-    animation: av-scrollfade linear both; animation-timeline: scroll(self inline);
-  }
-  @media (max-width: 859px) {
-    .av-shelfbar {
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
-      animation: av-scrollfade linear both; animation-timeline: scroll(self inline);
-    }
-  }
-}
+/* Rows that scroll sideways fade at the edge that has more to show (lib/scrollHints.ts sets the attributes). */
+[data-scroll-end] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
+[data-scroll-start] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px); mask-image: linear-gradient(90deg, transparent, #000 36px); }
+[data-scroll-start][data-scroll-end] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
 
 /* Price steps that sit close on the track: the second one's number hangs a line lower on a longer tick. */
 .av-ladder2__track.has-low { padding-bottom: 38px; }
@@ -1115,3 +1094,124 @@ body::before {
 .av-finder summary::-webkit-details-marker { display: none; }
 .av-finder summary::after { content: "+"; flex: none; font-weight: 400; font-size: 1.25rem; line-height: 1; color: var(--accent-ink); transition: transform 0.3s var(--ease-out); }
 .av-finder[open] summary::after { transform: rotate(45deg); }
+
+/* ---- Home, shorter: teasers for the rooms that have pages of their own ---- */
+/* The fitting room's teaser: the choices on the left, the same leg as the full room on the right. */
+.av-ftease__grid { display: grid; gap: var(--space-6); align-items: center; }
+@media (min-width: 900px) { .av-ftease__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-8); } }
+.av-ftease__copy { display: grid; gap: var(--space-4); justify-items: start; }
+.av-ftease__copy h2 { margin: 0; }
+.av-ftease__copy .av-lead { margin: 0; max-width: 34rem; }
+.av-ftease__step { margin: 0; padding: 0; border: 0; min-width: 0; display: grid; gap: var(--space-2); }
+.av-ftease__step legend { padding: 0; margin-bottom: var(--space-2); font-weight: 600; color: var(--ink); }
+.av-ftease .av-fr__chip[data-fit="2"] > span::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; background: var(--validated); vertical-align: middle; }
+.av-ftease .av-fr__advice { max-width: 34rem; }
+.av-ftease__stage .av-fr__stage { max-width: 30rem; margin-inline: auto; }
+.av-ftease__stage .av-fr__svg { width: min(100%, 280px); }
+@media (max-width: 899px) {
+  .av-ftease__stage { order: -1; }
+  .av-ftease__stage .av-fr__stage { padding-block: var(--space-3) var(--space-2); }
+  .av-ftease__stage .av-fr__svg { width: min(100%, 210px); }
+}
+
+/* Gift box and family set, side by side: two cards, each wholly a link to where it is built. */
+.av-duo { display: grid; gap: var(--space-5); }
+@media (min-width: 760px) { .av-duo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.av-duo__card { position: relative; display: grid; grid-template-rows: auto 1fr; overflow: hidden; border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 1px 0 var(--line), 0 24px 40px -32px rgb(40 28 14 / 0.45); transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out); }
+.av-duo__card:hover { transform: translateY(-3px); box-shadow: 0 1px 0 var(--line), 0 30px 46px -30px rgb(40 28 14 / 0.5); }
+.av-duo__card:has(.av-duo__link:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+.av-duo__art { display: grid; place-items: center; height: clamp(12rem, 22vw, 16rem); padding: var(--space-4); overflow: hidden; }
+.av-duo__card--gift .av-duo__art { background: radial-gradient(120% 90% at 30% 15%, #fbf3e3, #ecdcc0); }
+.av-duo__card--gift .av-gbox { width: min(72%, 15.5rem); }
+.av-duo__card--family .av-duo__art { background: #efe6d6 radial-gradient(rgb(0 0 0 / 0.05) 1px, transparent 1.4px) 0 0 / 9px 9px; }
+.av-duo__copy { display: grid; gap: var(--space-2); align-content: start; padding: var(--space-5) var(--space-6) var(--space-6); }
+.av-duo__copy h2 { margin: 0; font-size: clamp(1.6rem, 1.2rem + 1vw, 2.1rem); }
+.av-duo__copy p { margin: 0; color: var(--ink-2); max-width: 32rem; }
+.av-duo__link { color: inherit; text-decoration: none; }
+.av-duo__link:focus-visible { outline: none; }
+.av-duo__link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.av-duo__go { margin-top: var(--space-2); font-weight: 650; color: var(--accent-ink); }
+.av-duo__also { position: relative; z-index: 2; justify-self: start; font-size: var(--text-small); color: var(--ink-2); }
+/* The family's line: the same sock in three sizes, pegged a little lower each time. */
+.av-duo__line { position: relative; display: flex; align-items: flex-start; justify-content: center; gap: 4%; padding-top: 2.4rem; }
+.av-duo__line::before { content: ""; position: absolute; left: 6%; right: 6%; top: 2.2rem; height: 18px; border-top: 2.5px solid #9a8569; border-radius: 50% / 100% 100% 0 0; transform: scaleY(-1); transform-origin: 50% 0; }
+.av-duo__sock { position: relative; width: calc(30% * var(--s)); animation: av-sway 5.5s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -1.7s); transform-origin: 50% 0; }
+.av-duo__sock > svg:last-child { display: block; width: 100%; height: auto; filter: drop-shadow(6px 10px 8px rgb(42 29 16 / 0.18)); }
+.av-duo__peg { position: absolute; left: 50%; top: -8px; width: 18%; min-width: 9px; transform: translateX(-50%); z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .av-duo__sock { animation: none; } }
+
+/* The stall scene plays over less scrolling on the home page than on the story page. */
+.av-dordoi.av-dordoi--short { height: 190svh; }
+@media (max-width: 720px) { .av-dordoi.av-dordoi--short { height: 170svh; } }
+
+@media (max-width: 639px) {
+  /* New on the shelf: four socks on a phone, the rest is one tap away ("See all socks"). */
+  .av-shelf > :nth-child(n + 5) { display: none; }
+  /* The five plain facts in two columns. */
+  .av-trust__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); padding-block: var(--space-4); }
+  .av-trust__list li { gap: var(--space-2); }
+  .av-trust__list li > svg { width: 18px; height: 18px; }
+  /* Notes from the stall: a row to swipe through instead of five notes stacked. */
+  .av-notes__board { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 72%; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; padding-block: 1.6rem; }
+  .av-note { scroll-snap-align: center; }
+}
+@media (max-width: 639px) {
+  .av-duo__art { height: 10.5rem; }
+  .av-duo__card--gift .av-gbox { width: min(56%, 12rem); }
+  .av-duo__copy { padding: var(--space-4) var(--space-5) var(--space-5); }
+}
+.av-ftease__legend { margin-left: var(--space-2); font-weight: 400; font-size: var(--text-small); color: var(--ink-3); }
+.av-ftease__legend i { display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--validated); vertical-align: middle; }
+/* The fitting room's own page: a short header beside its lead, so the leg is on the first screen. */
+.av-fitroom--page { padding-top: var(--space-6); }
+.av-fitroom--page .av-fitroom__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-6); }
+.av-fitroom--page h1 { margin: 0; font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.4rem); }
+.av-fitroom--page .av-fitroom__head .av-lead { margin: 0; max-width: 36rem; }
+@media (min-width: 900px) { .av-fitroom--page .av-fitroom__head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; column-gap: var(--space-8); } }
+
+/* The top bar's message wraps (two lines at most, balanced) instead of gliding; on phones the bar keeps the height
+   of two lines for every message, so the page does not jump when the message changes. */
+.av-ann__text { white-space: normal; text-wrap: balance; line-height: 1.3; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+@media (max-width: 799px) {
+  .av-ann__bar { min-height: 44px; padding-block: 4px; }
+  .av-ann__text { font-size: 0.6875rem; letter-spacing: 0.02em; text-align: center; }
+}
+@media (max-width: 560px) { .av-ann__text { margin: 0; text-align: center; } }
+/* Between phone and wide desktop the switches sit beside the message instead of over its end, so a long Kyrgyz
+   switch row ("EN РУС КЫР · $ СОМ ₽") can never cover the text. */
+@media (min-width: 561px) and (max-width: 1279px) {
+  .av-ann__langs { position: static; flex: none; }
+  .av-ann__text { margin: 0; }
+}
+.av-casebuild__hint { flex-basis: 100%; margin: 0; color: var(--ink-2); }
+.av-casebuild__hint.is-nudged { color: var(--accent-ink); font-weight: 600; animation: av-fr-note 0.45s var(--ease) both; }
+
+/* A sideways-scrolling row must contain its own absolutely placed bits (the sort menu's hidden label): unpositioned,
+   the label escaped the scrolling filter bar and stretched a phone's page to 1,482px, which zoomed the whole shelf out. */
+.av-tabs, .av-occasions, .av-fr__rail, .av-seen__line, .av-recent, .av-notes__board, .av-chips, .av-dates, .av-qv__thumbs, .av-casebuild__grid { position: relative; }
+@media (max-width: 760px) { .av-shelfbar { position: relative; } }
+/* Long Russian and Kyrgyz words ("Конфиденциальность") break inside a narrow footer column instead of pushing it out. */
+.av-footer__col a, .av-footer__head { overflow-wrap: anywhere; hyphens: auto; }
+/* The notes hang crooked; a rotated corner at the screen's edge is clipped by the section, not added to the page width. */
+.av-notes { overflow-x: clip; }
+/* "Сейчас закрыто · откроется завтра в 9:00" is longer than "Open now": the stall's status may wrap. */
+.av-footer__stall .av-open { white-space: normal; max-width: 100%; }
+
+/* Touch targets of at least 24 x 24 px (WCAG 2.2, 2.5.8) for the small controls a phone sweep found below it. */
+.av-fr__dot { width: 28px; height: 28px; }
+.av-linkbtn { min-height: 32px; padding-block: 4px; }
+.av-crumbs a { display: inline-block; padding-block: 4px; }
+.av-header__logo { padding-block: 6px; }
+
+/* The bag: lines, then the summary with "Check out", then the socks that fill the box. On a wide screen the summary
+   stays in its own column beside both. */
+@media (min-width: 900px) {
+  .av-cart__main { grid-column: 1; grid-row: 1; }
+  .av-cart > .av-summary { grid-column: 2; grid-row: 1 / span 2; }
+  .av-cart__more { grid-column: 1; grid-row: 2; min-width: 0; }
+}
+.av-cart__more { min-width: 0; }
+.av-topay { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-3); margin: 0; padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); background: var(--surface-2); }
+.av-topay strong { font-size: 1.35rem; }
+.av-topay a { margin-left: auto; font-size: var(--text-small); }
+@media (min-width: 900px) { .av-topay { display: none; } }

@@ -180,13 +180,15 @@ export function CheckoutPage() {
 
           <h2 className="av-formtitle">{t("co.payment")}</h2>
           <p className="av-small">{t("co.paymentS")}</p>
+          {/* On a phone the order sits under the form: the amount is said here, before anyone presses "Pay". */}
+          <p className="av-topay" aria-live="polite"><span>{t("co.toPay")}</span> <strong className="av-price">{money(total)}</strong> <a href="#order-summary">{t("co.seeOrder")}</a></p>
           <div className="av-row">
             <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.apple")}</Button>
             <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.google")}</Button>
           </div>
         </form>
 
-        <aside className="av-summary" aria-label={t("co.summary")}>
+        <aside className="av-summary" id="order-summary" aria-label={t("co.summary")}>
           <h2>{t("co.summary")}</h2>
           {loading && !quote ? <Skeleton height={80} /> : (
             <ul className="av-minilines">

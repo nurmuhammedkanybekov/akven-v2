@@ -4,6 +4,7 @@ import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
 import { DordoiStory } from "../shop/home/DordoiStory";
 import { TwoNames } from "../shop/home/TwoNames";
+import { UpClose } from "../shop/home/UpClose";
 import { StoryJourney } from "../shop/story/StoryJourney";
 
 /** A family's worth of socks, one for each of them. */
@@ -27,6 +28,7 @@ export function StoryPage() {
       <TwoNames page />
       <StoryJourney />
       <DordoiStory />
+      <UpClose />
       <section className="av-block" aria-labelledby="facts-title">
         <div className="av-container av-story2">
           <div className="av-stack">

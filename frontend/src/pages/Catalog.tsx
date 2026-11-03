@@ -234,7 +234,7 @@ export function CatalogPage({ category }: { category?: Category }) {
           {products.data.items.map((p, i) => (
             <Fragment key={p.slug}>
               {i === 4 && firstStep && !anyFilter && (
-                <Link to="/#family" className="av-promo">
+                <Link to="/family" className="av-promo">
                   <span className="av-eyebrow">{t("ladder.eyebrow")}</span>
                   <strong>{t("shop.promo", { n: firstStep.minPairs, pct: Number(firstStep.discountPct) })}</strong>
                   <span>{t("shop.promoS")}</span>

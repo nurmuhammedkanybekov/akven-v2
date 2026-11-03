@@ -15,8 +15,8 @@ import { categoryFor, useFamily } from "../family";
 export const CUTS: SockCut[] = ["no-show", "ankle", "crew", "mid-long", "knee-high"];
 export type Shoe = "bare" | "trainers" | "oxfords" | "loafers" | "boots";
 export const SHOE_LIST: Shoe[] = ["trainers", "oxfords", "loafers", "boots", "bare"];
-type Who = Exclude<Category, "BUNDLES">;
-const WHO: Who[] = ["MEN", "WOMEN", "KIDS"];
+export type Who = Exclude<Category, "BUNDLES">;
+export const WHO: Who[] = ["MEN", "WOMEN", "KIDS"];
 const SKIN = ["#f1d3bf", "#dfb08f", "#b9805d", "#7e5039"];
 /** Trouser colours people wear most; the drawn trousers take the one chosen. */
 export const TROUSERS: Array<{ key: string; hex: string }> = [
@@ -50,7 +50,7 @@ export const FIT: Record<Shoe, Record<SockCut, 0 | 1 | 2>> = {
 };
 
 /** The house sock, for when the catalogue cannot be reached: navy with the oimo band. */
-const HOUSE: SockSpec = { cut: "crew", main: C.navy, accent: C.gold, pattern: "oimo", second: C.cream };
+export const HOUSE: SockSpec = { cut: "crew", main: C.navy, accent: C.gold, pattern: "oimo", second: C.cream };
 
 /** The leg, the trousers rolled up above it, and a tailor's tape beside it, in the sock drawing's own space. */
 const VIEW = { x: -40, y: -236, w: 290, h: 560 };
@@ -106,7 +106,7 @@ function shoeMarkup(shoe: Exclude<Shoe, "bare">, id: string): string {
 }
 
 /** The leg on the right of the fitting room: skin, trousers, the sock as drawn for the shop, and the shoe. */
-function Stage({ spec, shoe, skin, cut, shoesOn, trousers }: { spec: SockSpec; shoe: Shoe; skin: string; cut: SockCut; shoesOn: boolean; trousers: string }) {
+export function Stage({ spec, shoe, skin, cut, shoesOn, trousers }: { spec: SockSpec; shoe: Shoe; skin: string; cut: SockCut; shoesOn: boolean; trousers: string }) {
   const { t } = useT();
   const id = `fr${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const sock = useMemo(() => sockMarkup(spec, id), [JSON.stringify(spec), id]);
@@ -182,16 +182,18 @@ function sizeLabel(rows: SizeRow[], who: Who, size: number): SizeRow | undefined
  * stays hidden. Every height is marked on a tailor's tape, rated for the chosen shoes, and the shoe size gives the
  * sock size from the shop's chart. Opens on a given product and colour from the product page.
  */
-export function FittingRoom({ initial, onPick }: {
+export function FittingRoom({ initial, start, onPick }: {
   initial?: { slug: string; cut: SockCut; hex?: string | null; category?: Category; product?: ProductSummary };
+  /** Where the visitor left the home page's teaser: who was trying on and which height. */
+  start?: { who?: Who; cut?: SockCut };
   /** When set (the dialog on a product page), choosing "see this pair" calls it instead of navigating. */
   onPick?: () => void;
 }) {
   const { t, lang } = useT();
   const [saved] = useState(remembered);
-  const [who, setWho] = useState<Who>(initial?.category && initial.category !== "BUNDLES" ? initial.category : saved.who ?? "MEN");
+  const [who, setWho] = useState<Who>(initial?.category && initial.category !== "BUNDLES" ? initial.category : start?.who ?? saved.who ?? "MEN");
   const [shoe, setShoe] = useState<Shoe>(saved.shoe ?? "trainers");
-  const [cut, setCut] = useState<SockCut>(initial?.cut ?? "crew");
+  const [cut, setCut] = useState<SockCut>(initial?.cut ?? start?.cut ?? "crew");
   const [skin, setSkin] = useState(saved.skin ?? SKIN[1]);
   const [size, setSize] = useState(saved.who === who && saved.size ? saved.size : DEFAULT_SIZE[who]);
   useEffect(() => {

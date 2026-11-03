@@ -1031,6 +1031,21 @@ const shop = {
   "auth.needEmail": "Enter your email.",
   "auth.badEmail": "That does not look like an email: it needs an @ and a domain, like name@mail.com.",
   "auth.needPassword": "Enter your password.",
+  "nav.fitting": "Fitting room",
+  "nav.family": "Family set",
+  "ft.lead": "Choose who is trying on and how high: the sock goes onto the leg with sneakers on, so you see where it ends.",
+  "ft.open": "Open the fitting room",
+  "ft.more": "Inside: every sock of that height, five kinds of shoes, your size and your trousers.",
+  "duo.label": "For others: gift boxes and family sets",
+  "duo.familyTitle": "One set for the whole family",
+  "duo.familyLead": "Add each person and their shoe size: we work out the sock sizes from our chart and the price step of the whole set.",
+  "duo.familyGo": "Plan the family set",
+  "ft.best": "best with sneakers",
+  "case.empty": "The case is empty: press + in any row to add twelve pairs at a time.",
+  "case.skip": "Or skip this and simply write what you need.",
+  "img.soon": "Photo coming soon",
+  "co.toPay": "To pay",
+  "co.seeOrder": "See the order",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

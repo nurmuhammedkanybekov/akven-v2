@@ -68,8 +68,6 @@ export function CartPage() {
           <ul className="av-cartlines">
             {rows.map(({ line, q }) => <CartRow key={line.sku} line={line} q={q} loading={loading && !q} />)}
           </ul>
-          <FillTheBox pairsToGo={quote?.collection?.nextTier?.pairsToGo ?? (quote?.collection?.minimumMessage ? Math.max(0, quote.collection.minimumPairs - quote.collection.totalPairs) : 0)}
-                      pct={quote?.collection?.nextTier ? Number(quote.collection.nextTier.discountPct) : 0} inBag={cart.lines.map((l) => l.productSlug)} />
         </div>
 
         <aside className="av-summary" aria-label={t("cart.summaryLabel")}>
@@ -99,6 +97,11 @@ export function CartPage() {
           )}
           <Link to="/shop" className="av-small">{t("cart.continue")}</Link>
         </aside>
+        {/* After the summary in the page's order: on a phone the total and "Check out" come before the suggestions. */}
+        <div className="av-cart__more">
+            <FillTheBox pairsToGo={quote?.collection?.nextTier?.pairsToGo ?? (quote?.collection?.minimumMessage ? Math.max(0, quote.collection.minimumPairs - quote.collection.totalPairs) : 0)}
+                        pct={quote?.collection?.nextTier ? Number(quote.collection.nextTier.discountPct) : 0} inBag={cart.lines.map((l) => l.productSlug)} />
+        </div>
       </div>
     </div>
   );

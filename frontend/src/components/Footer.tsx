@@ -70,12 +70,12 @@ export function Footer() {
           <nav className="av-footer__col" aria-label={t("foot.shop")}>
             <span className="av-footer__head">{t("foot.shop")}</span>
             <Link to="/men">{t("nav.men")}</Link><Link to="/women">{t("nav.women")}</Link>
-            <Link to="/kids">{t("nav.kids")}</Link><Link to="/gifts">{t("nav.gifts")}</Link>
+            <Link to="/kids">{t("nav.kids")}</Link><Link to="/gifts">{t("nav.gifts")}</Link><Link to="/family">{t("nav.family")}</Link>
             <Link to="/shop">{t("foot.all")}</Link>
           </nav>
           <nav className="av-footer__col" aria-label={t("foot.help")}>
             <span className="av-footer__head">{t("foot.help")}</span>
-            <Link to="/sizes">{t("foot.sizes")}</Link><Link to="/finder">{t("fd.eyebrow")}</Link><Link to="/visit#pickup">{t("foot.pickup")}</Link>
+            <Link to="/sizes">{t("foot.sizes")}</Link><Link to="/fitting">{t("nav.fitting")}</Link><Link to="/finder">{t("fd.eyebrow")}</Link><Link to="/visit#pickup">{t("foot.pickup")}</Link>
             <Link to="/visit">{t("foot.visit")}</Link><Link to="/story">{t("nav.story")}</Link>
           </nav>
           <nav className="av-footer__col" aria-label={t("foot.business")}>
