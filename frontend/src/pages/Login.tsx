@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
@@ -8,6 +8,7 @@ import { AuthShell } from "../components/AuthShell";
 import { Input } from "../components/Field";
 import { useT } from "../i18n/I18n";
 import { safeNext } from "../lib/safeNext";
+import { credentialErrors, focusFirstInvalid } from "../lib/formCheck";
 
 export function LoginPage() {
   const { session, isStaff, signIn, signOut } = useAuth();
@@ -17,6 +18,8 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const form = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
 
   // `next` must be a path inside this site, never a full URL (no open redirect).
@@ -25,7 +28,10 @@ export function LoginPage() {
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    setBusy(true); setError(null);
+    const problems = credentialErrors(email, password, t);
+    setFieldErrors(problems); setError(null);
+    if (Object.keys(problems).length) { focusFirstInvalid(form.current); return; }
+    setBusy(true);
     try {
       const s = await signIn(email.trim(), password);
       navigate(safeNextPath ?? (s.role === "CUSTOMER" ? "/" : "/admin"), { replace: true });
@@ -37,11 +43,11 @@ export function LoginPage() {
 
   return (
     <AuthShell eyebrow={t("auth.welcome")} title={t("auth.signin")}>
-      <form className="av-stack" onSubmit={submit} noValidate>
+      <form ref={form} className="av-stack" onSubmit={submit} noValidate>
         {error && <Alert tone="danger">{error}</Alert>}
-        <Input label={t("auth.email")} type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <Input label={t("auth.password")} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <Button type="submit" size="lg" block loading={busy} disabled={!email || !password}>{t("auth.signin")}</Button>
+        <Input label={t("auth.email")} type="email" autoComplete="username" value={email} error={fieldErrors.email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input label={t("auth.password")} type="password" autoComplete="current-password" value={password} error={fieldErrors.password} onChange={(e) => setPassword(e.target.value)} required />
+        <Button type="submit" size="lg" block loading={busy}>{t("auth.signin")}</Button>
         <p className="av-auth__switch">{t("auth.new")} <Link to={`/register${next ? `?next=${encodeURIComponent(next)}` : ""}`}>{t("auth.create")}</Link></p>
       </form>
     </AuthShell>

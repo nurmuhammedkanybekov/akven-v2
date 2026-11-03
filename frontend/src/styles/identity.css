@@ -1021,3 +1021,97 @@ body::before {
 .av-reviews__summary::before { content: ""; position: absolute; top: -10px; left: 50%; width: 46px; height: 20px; transform: translateX(-50%) rotate(-3deg); background: rgb(233 220 190 / 0.85); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
 :root[data-theme="dark"] .av-reviews__summary { background-color: var(--surface); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-reviews__summary { background-color: var(--surface); } }
+
+/* ---- Refinement pass ---- */
+/* Phones: the first screen of a sock shows its name, price and the way to buy it, not only the picture. The art is
+   square-cropped (the sock sits in the middle of its 4:5 frame, so nothing of it is lost) and the thumbnails shrink. */
+@media (max-width: 639px) {
+  .av-crumbs { margin-bottom: var(--space-3); }
+  .av-pdp { gap: var(--space-5); }
+  .av-pdp__main { aspect-ratio: 1 / 1; }
+  .av-pdp__thumb { width: 52px; }
+}
+
+/* Phones: the footer was taller than the sign-in page above it. Same content, packed for a narrow screen: a smaller
+   logo, the stall door beside its address instead of above it, the four promises as a 2 x 2 set of tags without their
+   second line, and tighter link columns. Nothing is hidden behind a tap. */
+@media (max-width: 639px) {
+  .av-footer__top { gap: var(--space-5); padding-block: var(--space-7) var(--space-5); }
+  .av-footer__logo { width: 116px !important; }
+  .av-footer__brand .av-footer__line { font-size: 1.6rem; }
+  .av-footer__sign { font-size: 1.35rem; }
+  .av-footer__stall { grid-template-columns: 5.5rem minmax(0, 1fr); justify-items: start; text-align: left; gap: var(--space-4); padding: 0; }
+  .av-footer__stall .av-door { width: 5.5rem; }
+  .av-footer__stallinfo { justify-items: start; gap: var(--space-2); }
+  .av-footer .av-footer__address { justify-content: flex-start; font-size: var(--text-small); }
+  .av-footer__go { justify-content: flex-start; }
+  .av-footer__stall .av-open { justify-self: start; }
+  .av-footer__promises { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); padding-block: var(--space-4); }
+  .av-footer__promises li { padding: var(--space-3) var(--space-4); gap: var(--space-2); }
+  .av-footer__promises strong { font-size: 0.95rem; line-height: 1.2; }
+  .av-footer__promises small { display: none; }
+  .av-footer__picon { width: 24px; height: 24px; }
+  .av-footer__picon svg { width: 22px; height: 22px; }
+  .av-footer__grid { gap: var(--space-5) var(--space-4); padding-block: var(--space-5); }
+  .av-footer__col { gap: var(--space-2); }
+}
+
+/* The shelf's "20 pairs or more" card was a thirteenth cell in a page of twelve socks, so every page ended on one
+   lonely sock. It is now a strip across the grid after the first row: twelve socks fill 2, 3 or 4 columns evenly
+   (dense flow lets the third-column layout close the gap the strip would leave). */
+.av-grid-products { grid-auto-flow: row dense; }
+.av-grid-products > .av-promo { grid-column: 1 / -1; min-height: 0; padding: var(--space-5) var(--space-6); }
+@media (min-width: 640px) {
+  .av-grid-products > .av-promo { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: var(--space-6); row-gap: var(--space-1); align-items: center; }
+  .av-grid-products > .av-promo .av-eyebrow { grid-column: 1; grid-row: 1; }
+  .av-grid-products > .av-promo strong { grid-column: 1; grid-row: 2; }
+  .av-grid-products > .av-promo > span:not(.av-eyebrow):not(.av-promo__go) { grid-column: 2; grid-row: 1 / 3; max-width: 34rem; }
+  .av-grid-products > .av-promo .av-promo__go { grid-column: 3; grid-row: 1 / 3; padding: 0.6em 1.2em; border: 1px solid var(--accent); border-radius: 999px; transition: background-color 0.25s var(--ease), color 0.25s var(--ease); }
+  .av-grid-products > .av-promo:hover .av-promo__go { background: var(--accent); color: var(--black-deep); }
+}
+.av-grid-products > .av-promo:hover { transform: translateY(-2px); }
+
+/* Under 860px the shelf's washing line sits above the title. Its socks are sized by its width, so on a tablet they
+   grew taller than the line's box and hung over the "Shop" note. The box now keeps the socks' proportions and stops
+   growing at a phone-and-a-half width. */
+@media (max-width: 859px) {
+  .av-shelfhead__line { min-height: 0; width: 100%; max-width: 28rem; justify-self: center; aspect-ratio: 9 / 4; }
+}
+/* Tablet: the strip's sentence gets its own line under the heading instead of a narrow middle column. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .av-grid-products > .av-promo { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto; }
+  .av-grid-products > .av-promo > span:not(.av-eyebrow):not(.av-promo__go) { grid-column: 1; grid-row: 3; max-width: none; }
+  .av-grid-products > .av-promo .av-promo__go { grid-column: 2; grid-row: 1 / 4; }
+}
+
+/* Rows that scroll sideways (shelf tabs, sections, occasions, the fitting room's rail, recently seen) fade out at the
+   edge that has more to show, so a cut-off "Gift b" reads as "there is more this way". Browsers with scroll-driven
+   animations get it; a row that fits shows no fade at all, because its scroll timeline is inactive. */
+@property --av-fs { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --av-fe { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@keyframes av-scrollfade { 0% { --av-fs: 0px; --av-fe: 32px; } 6% { --av-fs: 32px; } 94% { --av-fe: 32px; } 100% { --av-fs: 32px; --av-fe: 0px; } }
+@supports (animation-timeline: scroll()) {
+  .av-tabs, .av-occasions, .av-fr__rail, .av-seen__line, .av-recent {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
+    animation: av-scrollfade linear both; animation-timeline: scroll(self inline);
+  }
+  @media (max-width: 859px) {
+    .av-shelfbar {
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 var(--av-fs), #000 calc(100% - var(--av-fe)), transparent);
+      animation: av-scrollfade linear both; animation-timeline: scroll(self inline);
+    }
+  }
+}
+
+/* Price steps that sit close on the track: the second one's number hangs a line lower on a longer tick. */
+.av-ladder2__track.has-low { padding-bottom: 38px; }
+.av-ladder2__mark.is-low i { height: 22px; }
+
+/* "Find your size" opens the same way as the accordions under it: a "+" that turns into "×",
+   instead of the browser's own triangle. */
+.av-finder summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.av-finder summary::-webkit-details-marker { display: none; }
+.av-finder summary::after { content: "+"; flex: none; font-weight: 400; font-size: 1.25rem; line-height: 1; color: var(--accent-ink); transition: transform 0.3s var(--ease-out); }
+.av-finder[open] summary::after { transform: rotate(45deg); }

@@ -48,10 +48,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { installPointerFx } from "./lib/pointerFx";
+import { loadLang, savedLang } from "./i18n/I18n";
 
 installPointerFx();
 
-createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);
+// The visitor's language arrives before the first paint, so a Russian or Kyrgyz page never flashes in English.
+void loadLang(savedLang()).finally(() => {
+  createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);
+});
 
 // The service worker only runs in the production build: in dev it would cache stale modules.
 if (import.meta.env.PROD && "serviceWorker" in navigator) {

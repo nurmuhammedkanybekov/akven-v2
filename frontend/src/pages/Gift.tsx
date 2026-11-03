@@ -94,7 +94,7 @@ export function GiftPage() {
                 ))}
               </ul>
             )}
-            <p className="av-small">{t("gb.pairs", { n: pairs })} <Link to="/cart">{t("gb.editBag")}</Link></p>
+            {pairs > 0 && <p className="av-small">{t("gb.pairs", { n: pairs })} <Link to="/cart">{t("gb.editBag")}</Link></p>}
             <div className="av-tabs av-tabs--inline" role="group" aria-label={t("gb.shelves")}>
               {SHELVES.map((s) => (
                 <button key={s.key} type="button" aria-pressed={shelf === s.category} className="av-tabbtn" onClick={() => setShelf(s.category)}>{t(s.key)}</button>
