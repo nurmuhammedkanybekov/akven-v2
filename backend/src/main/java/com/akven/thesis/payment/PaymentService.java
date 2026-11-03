@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
  * The single door to payment. Before any provider sees a token, it must have the exact shape of a wallet token
@@ -41,7 +42,7 @@ public class PaymentService {
     /** Refuses a checkout before anything is reserved when no provider can take this method. */
     public void requireAvailable(PaymentMethod method) {
         if (providers.isEmpty()) {
-            throw new BusinessRuleException("Online payment is not set up in this shop yet.");
+            throw new BusinessRuleException("PAYMENT_NOT_SET_UP", Map.of(), "Online payment is not set up in this shop yet.");
         }
         providerFor(method);
     }
@@ -57,19 +58,19 @@ public class PaymentService {
 
     static void requireWellFormedToken(PaymentMethod method, String token) {
         if (token == null || token.isBlank()) {
-            throw new BusinessRuleException("Payment could not be started. Please try again.");
+            throw new BusinessRuleException("PAYMENT_NOT_STARTED", Map.of(), "Payment could not be started. Please try again.");
         }
         if (LOOKS_LIKE_A_CARD.matcher(token.trim()).matches()) {
-            throw new BusinessRuleException("Card numbers are never accepted here. Pay with Apple Pay or Google Pay.");
+            throw new BusinessRuleException("PAYMENT_NO_CARDS", Map.of(), "Card numbers are never accepted here. Pay with Apple Pay or Google Pay.");
         }
         Pattern expected = method == PaymentMethod.APPLE_PAY ? APPLE : GOOGLE;
         if (!expected.matcher(token).matches()) {
-            throw new BusinessRuleException("The payment token was not recognised. Please try again.");
+            throw new BusinessRuleException("PAYMENT_TOKEN_INVALID", Map.of(), "The payment token was not recognised. Please try again.");
         }
     }
 
     private PaymentProvider providerFor(PaymentMethod method) {
         return providers.stream().filter(p -> p.supports(method)).findFirst()
-                .orElseThrow(() -> new BusinessRuleException("That payment method is not available."));
+                .orElseThrow(() -> new BusinessRuleException("PAYMENT_METHOD_UNAVAILABLE", Map.of(), "That payment method is not available."));
     }
 }

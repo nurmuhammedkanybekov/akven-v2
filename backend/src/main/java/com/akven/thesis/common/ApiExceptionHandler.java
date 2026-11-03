@@ -33,28 +33,28 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     ProblemDetail notFound(NotFoundException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        return coded(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage()), e);
     }
 
     @ExceptionHandler(ConflictException.class)
     ProblemDetail conflict(ConflictException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+        return coded(ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage()), e);
     }
 
     @ExceptionHandler(BusinessRuleException.class)
     ProblemDetail businessRule(BusinessRuleException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        return coded(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage()), e);
     }
 
     @ExceptionHandler(TooManyRequestsException.class)
     ProblemDetail tooMany(TooManyRequestsException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, e.getMessage());
+        return coded(ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, e.getMessage()), e);
     }
 
     /** 402 for a declined payment, 502 when the payment service failed. The order (when there is one) rides along. */
     @ExceptionHandler(PaymentFailedException.class)
     ProblemDetail paymentFailed(PaymentFailedException e) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(e.status()), e.getMessage());
+        ProblemDetail problem = coded(ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(e.status()), e.getMessage()), e);
         if (e.order() != null) {
             problem.setProperty("order", e.order());
         }
@@ -89,6 +89,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, String> fields = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(fe -> fields.putIfAbsent(fe.getField(), fe.getDefaultMessage()));
         problem.setProperty("errors", fields);
+        // Which rule each field broke (NotBlank, Email, Size...), so the shop can say it in the customer's language.
+        Map<String, String> codes = new LinkedHashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(fe -> codes.putIfAbsent(fe.getField(), fe.getCode()));
+        problem.setProperty("fieldCodes", codes);
         return ResponseEntity.badRequest().body(problem);
+    }
+
+    /** Adds the error's stable code and its values next to the English detail (customer-facing errors only). */
+    private static ProblemDetail coded(ProblemDetail problem, CodedException e) {
+        if (e.code() != null) {
+            problem.setProperty("code", e.code());
+            if (!e.args().isEmpty()) problem.setProperty("args", e.args());
+        }
+        return problem;
     }
 }

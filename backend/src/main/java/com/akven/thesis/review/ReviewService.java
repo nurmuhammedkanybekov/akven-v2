@@ -75,10 +75,10 @@ public class ReviewService {
         Product p = product(slug);
         User u = user(email);
         if (!received(u.getId(), p.getId())) {
-            throw new BusinessRuleException("Reviews are written by customers who have received this sock.");
+            throw new BusinessRuleException("REVIEW_NOT_RECEIVED", Map.of(), "Reviews are written by customers who have received this sock.");
         }
         String body = in.body().replace("\r\n", "\n").replaceAll("[\\p{Cc}&&[^\n]]", "").replaceAll("\n{3,}", "\n\n").strip();
-        if (body.length() < 10) throw new BusinessRuleException("Write a few more words (at least 10 characters).");
+        if (body.length() < 10) throw new BusinessRuleException("REVIEW_TOO_SHORT", Map.of(), "Write a few more words (at least 10 characters).");
         String author = in.author() == null || in.author().isBlank() ? null : in.author().strip().replaceAll("\\s+", " ");
         ProductReview r = reviews.findByProductIdAndUserId(p.getId(), u.getId()).orElseGet(() -> new ProductReview(p.getId(), u.getId()));
         r.write(in.rating(), author, body);

@@ -38,7 +38,8 @@ class PaymentsNotSetUpTest extends IntegrationTest {
         mockMvc.perform(post("/api/orders").header("Authorization", tokenFor(Role.CUSTOMER)).header("Idempotency-Key", "no-provider-key-123456")
                         .contentType("application/json").content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Online payment is not set up in this shop yet."));
+                .andExpect(jsonPath("$.detail").value("Online payment is not set up in this shop yet."))
+                .andExpect(jsonPath("$.code").value("PAYMENT_NOT_SET_UP"));
         assertThat(orders.count()).isEqualTo(before);
     }
 }

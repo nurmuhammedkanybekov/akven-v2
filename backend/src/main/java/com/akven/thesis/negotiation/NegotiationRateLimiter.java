@@ -44,7 +44,7 @@ public class NegotiationRateLimiter {
         synchronized (q) {
             while (!q.isEmpty() && q.peekFirst().isBefore(now.minus(window))) q.pollFirst();
             if (q.size() >= max) {
-                throw new TooManyRequestsException("You are sending messages very fast. Please wait a few minutes and try again.");
+                throw new TooManyRequestsException("CHAT_TOO_FAST", Map.of(), "You are sending messages very fast. Please wait a few minutes and try again.");
             }
             q.addLast(now);
         }

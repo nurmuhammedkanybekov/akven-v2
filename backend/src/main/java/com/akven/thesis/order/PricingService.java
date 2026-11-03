@@ -14,6 +14,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.Map;
 
 /**
  * The only place a price is decided. The client sends which item and how many, never a price. A negotiated discount
@@ -57,21 +58,21 @@ public class PricingService {
             return decide(variant, tier, BigDecimal.ZERO, null);
         }
         if (customer == null) {
-            throw new BusinessRuleException("Sign in to use your negotiated price.");
+            throw new BusinessRuleException("OFFER_SIGN_IN", Map.of(), "Sign in to use your negotiated price.");
         }
         NegotiationSession session = sessions.findById(negotiationSessionId)
-                .orElseThrow(() -> new BusinessRuleException("That offer no longer exists."));
+                .orElseThrow(() -> new BusinessRuleException("OFFER_GONE", Map.of(), "That offer no longer exists."));
         if (!session.getCustomer().getId().equals(customer.getId()) || !session.getVariant().getId().equals(variant.getId())) {
-            throw new BusinessRuleException("That offer is not for this item.");
+            throw new BusinessRuleException("OFFER_OTHER_ITEM", Map.of(), "That offer is not for this item.");
         }
         if (session.getOfferedAt() != null && session.getOfferedAt().isBefore(Instant.now().minus(offerTtl))) {
-            throw new BusinessRuleException("That offer has expired. Ask for a new price.");
+            throw new BusinessRuleException("OFFER_EXPIRED", Map.of(), "That offer has expired. Ask for a new price.");
         }
         if (quantity < session.getQuantity()) {
-            throw new BusinessRuleException("That offer is for " + session.getQuantity() + " pairs or more.");
+            throw new BusinessRuleException("OFFER_MIN_PAIRS", Map.of("n", session.getQuantity()), "That offer is for " + session.getQuantity() + " pairs or more.");
         }
         if (orderItems.existsByNegotiationSessionId(session.getId())) {
-            throw new BusinessRuleException("That offer has already been used.");
+            throw new BusinessRuleException("OFFER_USED", Map.of(), "That offer has already been used.");
         }
         BigDecimal negotiated = session.getValidatedDiscountPct() == null ? BigDecimal.ZERO : session.getValidatedDiscountPct();
         return decide(variant, tier, negotiated, session.getId());

@@ -109,12 +109,12 @@ public class OrderService {
             quantities.merge(item.sku(), item.quantity(), Integer::sum);
             if (item.negotiationSessionId() != null && offers.putIfAbsent(item.sku(), item.negotiationSessionId()) != null
                     && !offers.get(item.sku()).equals(item.negotiationSessionId())) {
-                throw new BusinessRuleException("Only one negotiated offer can be used per item.");
+                throw new BusinessRuleException("OFFER_ONE_PER_ITEM", Map.of(), "Only one negotiated offer can be used per item.");
             }
         }
         if (request.fulfillment().method() == FulfillmentMethod.DELIVERY
                 && (request.fulfillment().address() == null || request.fulfillment().address().isBlank())) {
-            throw new BusinessRuleException("Enter a delivery address, or choose pickup.");
+            throw new BusinessRuleException("DELIVERY_ADDRESS_REQUIRED", Map.of(), "Enter a delivery address, or choose pickup.");
         }
 
         // Lock first, then look at stock: this is what makes the last-pair race safe.
@@ -123,7 +123,7 @@ public class OrderService {
         Set<String> missing = new TreeSet<>(quantities.keySet());
         missing.removeAll(found);
         if (!missing.isEmpty()) {
-            throw new BusinessRuleException("Some items are no longer in the shop: " + String.join(", ", missing) + ".");
+            throw new BusinessRuleException("ITEMS_GONE", Map.of(), "Some items are no longer in the shop: " + String.join(", ", missing) + ".");
         }
 
         // The cart is one collection: the minimum and the price tier count pairs across all lines.
@@ -131,7 +131,7 @@ public class OrderService {
         for (Variant v : locked) byVariant.put(v, quantities.get(v.getSku()));
         CollectionPricing.Collection collection = collections.evaluate(byVariant, customer);
         if (collection.belowMinimum()) {
-            throw new BusinessRuleException(collection.minimumMessage());
+            throw new BusinessRuleException("MINIMUM_ORDER", Map.of("n", collection.minimumPairs()), collection.minimumMessage());
         }
 
         FulfillmentInputs f = new FulfillmentInputs(request);
@@ -151,13 +151,13 @@ public class OrderService {
             int qty = quantities.get(v.getSku());
             String name = v.getProduct().getName();
             if (!v.isActive() || !v.getProduct().isActive()) {
-                throw new ConflictException(name + " is no longer available.");
+                throw new ConflictException("ITEM_UNAVAILABLE", Map.of("name", name), name + " is no longer available.");
             }
             if (v.available() <= 0) {
-                throw new ConflictException(name + " is sold out.");
+                throw new ConflictException("ITEM_SOLD_OUT", Map.of("name", name), name + " is sold out.");
             }
             if (v.available() < qty) {
-                throw new ConflictException("Only " + v.available() + " left of " + name + ".");
+                throw new ConflictException("ITEM_LOW_STOCK", Map.of("name", name, "n", v.available()), "Only " + v.available() + " left of " + name + ".");
             }
             PricingService.PricedLine priced = pricing.price(v, offers.get(v.getSku()), customer, qty, collection.tierDiscountPct());
             OrderItem line = new OrderItem(order, v, qty, priced.listPrice(), priced.discountPct(), priced.unitPrice(), priced.sessionId(),
@@ -167,7 +167,7 @@ public class OrderService {
             v.reserve(qty);
         }
         if (order.getTotal().signum() <= 0) {
-            throw new BusinessRuleException("There is nothing to pay for in this order.");
+            throw new BusinessRuleException("NOTHING_TO_PAY", Map.of(), "There is nothing to pay for in this order.");
         }
         if (zone != null) {
             order.deliverIn(zone.getId(), zone.getName(), zone.feeFor(order.getTotal()), zone.getDaysMin(), zone.getDaysMax());
@@ -177,7 +177,8 @@ public class OrderService {
             orders.saveAndFlush(order);
         } catch (DataIntegrityViolationException e) {
             String cause = String.valueOf(e.getMostSpecificCause().getMessage()).toLowerCase();
-            throw new ConflictException(cause.contains("negotiation") ? "That offer has already been used."
+            boolean offer = cause.contains("negotiation");
+            throw new ConflictException(offer ? "OFFER_USED" : "ORDER_IN_PROGRESS", Map.of(), offer ? "That offer has already been used."
                     : "This order is already being processed. Please wait a moment and check your orders.");
         }
         audit.record(customerEmail, "ORDER_PLACED", "ORDER", order.getId(), null, snapshot(order));
@@ -188,11 +189,11 @@ public class OrderService {
             result = payments.charge(new PaymentRequest(method, request.payment().token(), order.getTotal(), order.getReference()));
         } catch (PaymentUnavailableException e) {
             OrderView failed = failOrder(customerEmail, order);
-            throw new PaymentFailedException(502, "We could not reach the payment service. You have not been charged.", failed);
+            throw new PaymentFailedException(502, "PAYMENT_UNREACHABLE", "We could not reach the payment service. You have not been charged.", failed);
         }
         if (!result.approved()) {
             OrderView failed = failOrder(customerEmail, order);
-            throw new PaymentFailedException(402, result.declineReason(), failed);
+            throw new PaymentFailedException(402, "PAYMENT_DECLINED", result.declineReason(), failed);
         }
 
         order.markPaid(method.name(), result.reference());
@@ -209,7 +210,7 @@ public class OrderService {
 
     private CheckoutResult replay(Order existing) {
         if (existing.getStatus() == OrderStatus.CANCELLED) {
-            throw new PaymentFailedException(402, "That payment did not go through. Please start a new checkout.", OrderMapper.toView(existing, false));
+            throw new PaymentFailedException(402, "PAYMENT_START_AGAIN", "That payment did not go through. Please start a new checkout.", OrderMapper.toView(existing, false));
         }
         return new CheckoutResult(OrderMapper.toView(existing, false), true);
     }
@@ -322,7 +323,7 @@ public class OrderService {
             try {
                 payments.refund(PaymentMethod.valueOf(o.getPaymentMethod()), o.getPaymentRef(), o.getTotal());
             } catch (PaymentUnavailableException e) {
-                throw new PaymentFailedException(502, "The refund could not be made right now, so the order was not cancelled. Please try again shortly.", null);
+                throw new PaymentFailedException(502, "REFUND_UNREACHABLE", "The refund could not be made right now, so the order was not cancelled. Please try again shortly.", null);
             }
         }
         orders.save(o);

@@ -56,10 +56,10 @@ public class StockRequestService {
         User user = user(email);
         Variant variant = variants.findBySku(sku).filter(v -> v.isActive() && v.getProduct().isActive())
                 .orElseThrow(() -> new NotFoundException("No such option."));
-        if (variant.available() > 0) throw new BusinessRuleException("This option is in stock: it can go in the bag now.");
+        if (variant.available() > 0) throw new BusinessRuleException("NOTIFY_IN_STOCK", Map.of(), "This option is in stock: it can go in the bag now.");
         Optional<StockRequest> earlier = requests.findByVariantIdAndUserId(variant.getId(), user.getId());
         if (earlier.isEmpty() && requests.countByUserIdAndNotifiedAtIsNull(user.getId()) >= MAX_OPEN) {
-            throw new BusinessRuleException("You are already waiting for " + MAX_OPEN + " options. Remove one you no longer need first.");
+            throw new BusinessRuleException("NOTIFY_LIMIT", Map.of("n", MAX_OPEN), "You are already waiting for " + MAX_OPEN + " options. Remove one you no longer need first.");
         }
         earlier.ifPresentOrElse(StockRequest::reopen, () -> requests.save(new StockRequest(variant.getId(), user.getId())));
         return mine(user);
