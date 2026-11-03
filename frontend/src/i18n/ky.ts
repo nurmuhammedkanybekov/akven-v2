@@ -1040,6 +1040,9 @@ const shop: Partial<Record<MessageKey, string>> = {
   "od.helpMsg": "Саламатсызбы! {ref} буйрутмам боюнча суроо: ",
   "co.noPayments": "Бул дүкөндө онлайн төлөм азырынча туташтырылган эмес, ошондуктан буйрутманы бул жерде төлөөгө болбойт.",
   "co.noPaymentsBag": "Себеттен буйрутманы үй-бүлөгө билдирүү менен жөнөтсөңүз болот.",
+  "pay.demoTag": "демо",
+  "pay.demoCheckout": "Бул көрсөтмө дүкөн: капчык окшотулган, карта чегерилбейт жана чыныгы акча которулбайт.",
+  "pay.demoPaid": "Демо төлөм: чыныгы акча алынган жок.",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

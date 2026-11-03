@@ -86,7 +86,7 @@ export function OrderDetailPage() {
                 ? t("co.days", { min: o.fulfillment.delivery.daysMin, max: o.fulfillment.delivery.daysMax }) : t("co.day", { n: o.fulfillment.delivery.daysMin })}</>}</dd></div>}
             {o.fulfillment.country && <div><dt className="av-eyebrow">{t("order.country")}</dt><dd>{t(`country.${o.fulfillment.country}` as MessageKey)}</dd></div>}
             {o.fulfillment.note && <div><dt className="av-eyebrow">{t("od.note")}</dt><dd>{o.fulfillment.note}</dd></div>}
-            {o.payment && <div><dt className="av-eyebrow">{t("od.paidWith")}</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}
+            {o.payment && <div><dt className="av-eyebrow">{t("od.paidWith")}</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"}{o.payment.simulated && <> <span className="av-demotag">{t("pay.demoTag")}</span><br /><span className="av-small av-muted">{t("pay.demoPaid")}</span></>} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}
             {o.fulfilledAt && <div><dt className="av-eyebrow">{t("od.completed")}</dt><dd>{formatDateTime(o.fulfilledAt)}</dd></div>}
             {o.cancelledAt && <div><dt className="av-eyebrow">{t("od.cancelledAt")}</dt><dd>{formatDateTime(o.cancelledAt)}</dd></div>}
           </dl>

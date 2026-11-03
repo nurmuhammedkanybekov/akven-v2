@@ -160,7 +160,8 @@ export interface OrderView {
   fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null;
     /** Delivery orders: the area, fee and days as they were when the order was placed. */
     delivery?: { zone: string | null; fee: number; daysMin: number | null; daysMax: number | null } | null };
-  payment: { method: string; reference: string } | null;
+  /** simulated: paid with the demo wallet, no money moved. */
+  payment: { method: string; reference: string; simulated?: boolean } | null;
   items: OrderItemView[];
   customerEmail: string | null;
   /** Pickup orders only. The code is shown to the customer, never to staff. */

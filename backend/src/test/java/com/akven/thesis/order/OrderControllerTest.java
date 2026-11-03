@@ -127,6 +127,7 @@ class OrderControllerTest extends IntegrationTest {
         assertThat(order.get("items").get(0).get("productName").asText()).startsWith("Order Test Sock");
         assertThat(order.get("items").get(0).get("variantLabel").asText()).isEqualTo("Navy, M");
         assertThat(order.get("payment").get("reference").asText()).startsWith("…").doesNotContain("sim_pay_");   // shortened
+        assertThat(order.get("payment").get("simulated").asBoolean()).as("a demo-wallet payment says it moved no money").isTrue();
         assertThat(order.get("customerEmail").isNull()).isTrue();                                              // customers never see this field filled
 
         Variant after = data.reload(v);                       // 2 pairs left the shelf, nothing is still held

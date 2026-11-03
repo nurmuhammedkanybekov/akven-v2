@@ -1226,3 +1226,7 @@ body::before {
 .av-orderhelp__link { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0.4em 0.9em; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink); text-decoration: none; font-weight: 600; font-size: var(--text-small); }
 .av-orderhelp__link:hover { border-color: var(--ink); }
 .av-orderhelp__link svg { width: 18px; height: 18px; }
+
+/* Simulated payments say so wherever money appears: a small tag and a plain sentence. */
+.av-demotag { display: inline-block; padding: 0.05em 0.5em; border-radius: 999px; background: var(--accent-soft, color-mix(in srgb, var(--accent) 22%, transparent)); color: var(--accent-ink); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: 0.1em; }
+.av-demonote { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--surface-2); font-size: var(--text-small); color: var(--ink); }

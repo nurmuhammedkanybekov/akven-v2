@@ -1055,6 +1055,9 @@ const shop = {
   "od.helpMsg": "Hello! A question about my order {ref}: ",
   "co.noPayments": "Online payment is not set up in this shop yet, so orders cannot be paid here.",
   "co.noPaymentsBag": "From the bag you can send your order to the family as a message.",
+  "pay.demoTag": "demo",
+  "pay.demoCheckout": "This shop is a demonstration: the wallet is simulated, no card is charged and no real money moves.",
+  "pay.demoPaid": "Demo payment: no real money was taken.",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;
