@@ -9,6 +9,26 @@
 | **One small server (recommended)** | The same `docker compose` that CI tests, on a rented Linux server, behind Caddy for automatic HTTPS. About 4–6 EUR a month (for example Hetzner CX22: 2 processors, 4 GB of memory, 40 GB disk). With only 2 GB, add swap (step 3), or building the Java backend runs out of memory. Everything stays in one place. |
 | Render, Railway, Fly.io | Possible without managing a server (a Docker service, a managed PostgreSQL and a disk for photos), at a similar or higher price. Their free tiers sleep or expire, so they suit a demo, not a shop. |
 
+## Free, for the thesis and the first months
+
+Everything above can cost nothing:
+
+| Piece | Free choice | Catch |
+|---|---|---|
+| Server | **Oracle Cloud "Always Free"**: an Ampere (ARM) VM with up to 4 processors and 24 GB of memory, free with no time limit | Sign-up asks for a card to check identity (nothing is charged on Always Free resources); free ARM capacity is sometimes "out of capacity", then try again later or another region. All images the shop uses (PostgreSQL with pgvector, Java, Node, nginx) run on ARM. |
+| Or, as a student | **Azure for Students** (100 USD credit a year, no card) or the **GitHub Student Developer Pack** (DigitalOcean credit) | Credit runs out; the Oracle VM does not |
+| Domain | **DuckDNS** (`yourname.duckdns.org`), free, works with Caddy's HTTPS | A subdomain, not your own name; a real `.kg` or `.shop` domain can come later |
+| HTTPS | Caddy with Let's Encrypt | none |
+| Email | The shop's Gmail with an app password (about 500 a day) | Fine for a small shop |
+| Monitoring | UptimeRobot free plan | none |
+
+On Oracle Cloud: create a VM with the image **Ubuntu 24.04** and the shape **VM.Standard.A1.Flex** (2 processors and
+12 GB is plenty), add your SSH key, and in the VM's *subnet > security list* add ingress rules for TCP 80 and 443
+from `0.0.0.0/0`. Oracle's Ubuntu image also has its own firewall rules: run
+`sudo iptables -I INPUT -p tcp -m multiport --dports 80,443 -j ACCEPT && sudo netfilter-persistent save`
+(use this instead of `ufw` in step 2). On DuckDNS: sign in, create a name, and set its IP to the VM's public IP.
+Then follow the steps below unchanged, with `your-domain` = `yourname.duckdns.org`.
+
 ## Two kinds of public installation
 
 1. **A public demo for the thesis.** Demo mode (`SPRING_PROFILES_ACTIVE=demo`): the demo catalogue, the simulated wallet
