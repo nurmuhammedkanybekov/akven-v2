@@ -41,6 +41,11 @@ public class AuditService {
                 toJson(before), toJson(after), correlationId()));
     }
 
+    /** A change made by a customer without an account (a guest checkout or cancellation): no acting user. */
+    public void recordAsGuest(String action, String entityType, UUID entityId, Object before, Object after) {
+        repository.save(new AuditLogEntry(null, action, entityType, entityId, toJson(before), toJson(after), correlationId()));
+    }
+
     /** The current request's id (see CorrelationIdFilter); a fresh one when called outside a request. */
     private static String correlationId() {
         String id = MDC.get(CorrelationIdFilter.MDC_KEY);

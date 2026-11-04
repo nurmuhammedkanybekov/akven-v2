@@ -49,6 +49,7 @@ export function LoginPage() {
         <Input label={t("auth.password")} type="password" autoComplete="current-password" value={password} error={fieldErrors.password} onChange={(e) => setPassword(e.target.value)} required />
         <Button type="submit" size="lg" block loading={busy}>{t("auth.signin")}</Button>
         <p className="av-auth__switch">{t("auth.new")} <Link to={`/register${next ? `?next=${encodeURIComponent(next)}` : ""}`}>{t("auth.create")}</Link></p>
+        <p className="av-auth__switch av-small">{t("find.fromLogin")} <Link to="/orders/find">{t("find.title")}</Link></p>
       </form>
     </AuthShell>
   );

@@ -21,26 +21,54 @@ import { Confetti } from "../components/Confetti";
 import { GiftSummary } from "../components/GiftSummary";
 import { ContactIcon, withMessage } from "../components/Contacts";
 import { useShopInfo } from "../shop/useShopInfo";
+import { useAuth } from "../auth/AuthContext";
+import { FindOrderForm } from "./FindOrder";
+
+/**
+ * The key of a guest's private link: from the "#t=..." of the address, or remembered for this tab once seen (so a
+ * reload or a walk through the shop and back still opens the order). Only this tab keeps it, never the server's logs.
+ */
+function useLinkKey(id: string, hash: string): string | null {
+  const fromHash = new URLSearchParams(hash.replace(/^#/, "")).get("t");
+  const stored = `akven-order-link-${id}`;
+  try {
+    if (fromHash) { sessionStorage.setItem(stored, fromHash); return fromHash; }
+    return sessionStorage.getItem(stored);
+  } catch { return fromHash; }
+}
 
 export function OrderDetailPage() {
   const { money } = useMoney();
   const { id = "" } = useParams();
-  const justPaid = Boolean((useLocation().state as { justPaid?: boolean } | null)?.justPaid);
+  const location = useLocation();
+  const justPaid = Boolean((location.state as { justPaid?: boolean } | null)?.justPaid);
   const toast = useToast();
   const { t } = useT();
-  const order = useAsync(() => getMyOrder(id), [id]);
+  const { session } = useAuth();
+  const linkKey = useLinkKey(id, location.hash);
+  const order = useAsync(() => getMyOrder(id, linkKey), [id, linkKey]);
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (order.loading && !order.data) return <div className="av-container av-page"><Skeleton height={320} /></div>;
+  // Without an account and without the link's key, the order cannot be shown: offer to email its link again.
+  if (order.error instanceof ApiError && order.error.status === 404 && !session && !linkKey) {
+    return (
+      <div className="av-container av-page av-narrow">
+        <header className="av-page__head"><span className="av-eyebrow">{t("find.eyebrow")}</span><h1>{t("find.locked")}</h1></header>
+        <p className="av-lead">{t("find.lead")}</p>
+        <FindOrderForm />
+      </div>
+    );
+  }
   if (order.error instanceof ApiError && order.error.status === 404) return <NotFoundPage kind="order" />;
   if (order.error || !order.data) return <div className="av-container av-page"><Alert tone="danger">{order.error?.message ?? t("od.loadError")}</Alert></div>;
   const o = order.data;
 
   async function cancel() {
     setBusy(true); setError(null);
-    try { await cancelMyOrder(o.id); toast(o.status === "PAID" ? t("od.cancelledPaid") : t("od.cancelled")); order.reload(); }
+    try { await cancelMyOrder(o.id, linkKey); toast(o.status === "PAID" ? t("od.cancelledPaid") : t("od.cancelled")); order.reload(); }
     catch (e) { setError(e instanceof ApiError ? e.message : t("od.cancelError")); }
     finally { setBusy(false); setConfirm(false); }
   }
@@ -48,7 +76,7 @@ export function OrderDetailPage() {
   return (
     <div className="av-container av-page">
       {justPaid && o.status === "PAID" && <Confetti />}
-      <nav className="av-crumbs" aria-label={t("pdp.crumbs")}><Link to="/orders">{t("od.yours")}</Link><span aria-hidden="true">/</span><span>{o.reference}</span></nav>
+      {!o.guest && <nav className="av-crumbs" aria-label={t("pdp.crumbs")}><Link to="/orders">{t("od.yours")}</Link><span aria-hidden="true">/</span><span>{o.reference}</span></nav>}
       {justPaid && o.status === "PAID" && (
         <Alert tone="success">{t(o.fulfillment.method === "PICKUP" ? "od.thanksPickup" : "od.thanksDelivery", { ref: o.reference, phone: o.fulfillment.contactPhone })}</Alert>
       )}
@@ -58,6 +86,7 @@ export function OrderDetailPage() {
         <OrderStatusBadge status={o.status} />
       </header>
       <Timeline order={o} />
+      {o.guest && <GuestLink />}
 
       {o.pickup?.code && o.status === "PAID" && <PickupCode code={o.pickup.code} point={o.pickup.point} />}
 
@@ -209,6 +238,26 @@ function OrderHelp({ reference }: { reference: string }) {
             <ContactIcon kind={c.kind} />{c.label ?? c.kind.charAt(0) + c.kind.slice(1).toLowerCase()}
           </a>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/** A guest's order lives at its private link: say so, offer to copy it, and suggest an account for next time. */
+function GuestLink() {
+  const { t } = useT();
+  const toast = useToast();
+  const { session } = useAuth();
+  async function copy() {
+    try { await navigator.clipboard.writeText(window.location.href); toast(t("od.copied")); }
+    catch { toast(t("od.copyFailed"), "danger"); }
+  }
+  return (
+    <div className="av-guest">
+      <p>{t("od.guestKeep")}</p>
+      <div className="av-row">
+        <Button size="sm" variant="secondary" onClick={() => void copy()}>{t("od.copyLink")}</Button>
+        {!session && <Button size="sm" variant="ghost" to="/register">{t("od.createAccount")}</Button>}
       </div>
     </div>
   );

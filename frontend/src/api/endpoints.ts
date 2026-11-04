@@ -33,8 +33,12 @@ export const quoteCart = (items: CartLineRequest[], signal?: AbortSignal) =>
 export const checkout = (body: CheckoutBody, idempotencyKey: string) =>
   api<OrderView>("/api/orders", { method: "POST", body, headers: { "Idempotency-Key": idempotencyKey } });
 export const listMyOrders = () => api<OrderView[]>("/api/orders");
-export const getMyOrder = (id: string) => api<OrderView>(`/api/orders/${id}`);
-export const cancelMyOrder = (id: string) => api<OrderView>(`/api/orders/${id}/cancel`, { method: "POST" });
+/** token: the key of a guest's private link (after "#t=" in the link); sent as a header, never in the address. */
+const linkKey = (token?: string | null) => (token ? { "X-Order-Token": token } : undefined);
+export const getMyOrder = (id: string, token?: string | null) => api<OrderView>(`/api/orders/${id}`, { headers: linkKey(token) });
+export const cancelMyOrder = (id: string, token?: string | null) => api<OrderView>(`/api/orders/${id}/cancel`, { method: "POST", headers: linkKey(token) });
+/** "I lost the link": the server emails it to the order's own address, and answers the same either way. */
+export const findMyOrder = (email: string, reference: string) => api<void>("/api/orders/find", { method: "POST", body: { email, reference } });
 export const adminListOrders = (p: { status?: OrderStatus; page?: number; pageSize?: number }) =>
   api<PageResponse<OrderView>>(`/api/admin/orders${qs(p)}`);
 export const adminGetOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}`);

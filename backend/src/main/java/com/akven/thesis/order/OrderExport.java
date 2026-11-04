@@ -49,7 +49,7 @@ public class OrderExport {
                     .collect(Collectors.joining("; "));
             String gift = o.getGiftBox() == null ? "" : o.getGiftBox() + " / " + o.getGiftRibbon() + (o.getGiftTo() == null ? "" : " / to " + o.getGiftTo());
             out.append(String.join(",", List.of(o.getReference(), WHEN.format(o.getCreatedAt()), o.getStatus().name(), o.getTotal().toPlainString(),
-                    o.getCustomer().getEmail(), nz(o.getContactName()), nz(o.getContactPhone()), o.getFulfillmentMethod().name(),
+                    o.getContactEmail(), nz(o.getContactName()), nz(o.getContactPhone()), o.getFulfillmentMethod().name(),
                     o.getDeliveryCountry() == null ? "" : o.getDeliveryCountry().name(), nz(o.getDeliveryZoneName()),
                     o.getDeliveryKind() == null ? "" : o.getDeliveryKind().name() + (o.isDeliveryPayOnReceipt() ? " (carrier paid on receipt)" : ""),
                     o.getDeliveryZoneName() == null ? "" : o.getDeliveryFee().toPlainString(), nz(o.getDeliveryAddress()), items, gift,

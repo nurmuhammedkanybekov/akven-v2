@@ -46,6 +46,7 @@ const AdminCustomers = lazy(() => import("./admin/AdminCustomers").then((m) => (
 const ProductEditor = lazy(() => import("./admin/ProductEditor").then((m) => ({ default: m.ProductEditor })));
 const CheckoutPage = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.CheckoutPage })));
 const OrderDetailPage = lazy(() => import("./pages/OrderDetail").then((m) => ({ default: m.OrderDetailPage })));
+const FindOrderPage = lazy(() => import("./pages/FindOrder").then((m) => ({ default: m.FindOrderPage })));
 const AccountPage = lazy(() => import("./pages/Account").then((m) => ({ default: m.AccountPage })));
 const GiftPage = lazy(() => import("./pages/Gift").then((m) => ({ default: m.GiftPage })));
 const StoryPage = lazy(() => import("./pages/Story").then((m) => ({ default: m.StoryPage })));
@@ -97,9 +98,10 @@ export default function App() {
               <Route path="fitting" element={<FittingPage />} />
               <Route path="family" element={<FamilyPage />} />
               <Route path="account" element={<RequireAuth><AccountPage /></RequireAuth>} />
-              <Route path="checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
+              <Route path="checkout" element={<CheckoutPage />} />
               <Route path="orders" element={<RequireAuth><OrdersPage /></RequireAuth>} />
-              <Route path="orders/:id" element={<RequireAuth><OrderDetailPage /></RequireAuth>} />
+              <Route path="orders/find" element={<FindOrderPage />} />
+              <Route path="orders/:id" element={<OrderDetailPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
             <Route path="styleguide" element={<StyleGuide />} />

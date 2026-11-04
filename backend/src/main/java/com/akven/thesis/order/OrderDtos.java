@@ -4,6 +4,7 @@ import com.akven.thesis.delivery.DeliveryKind;
 import com.akven.thesis.payment.PaymentMethod;
 import com.akven.thesis.shop.ShopDtos.PickupPointView;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -63,16 +64,17 @@ public final class OrderDtos {
                                   @NotNull @Valid FulfillmentInput fulfillment,
                                   @NotNull @Valid PaymentInput payment,
                                   @Valid GiftInput gift,
-                                  @Pattern(regexp = "en|ru|ky") String lang) {
+                                  @Pattern(regexp = "en|ru|ky") String lang,
+                                  @Email @Size(max = 255) String email) {
 
         /** Without a language: the emails about the order are in English. */
         public CheckoutRequest(List<CartItem> items, FulfillmentInput fulfillment, PaymentInput payment, GiftInput gift) {
-            this(items, fulfillment, payment, gift, null);
+            this(items, fulfillment, payment, gift, null, null);
         }
 
         /** An order that is not a gift. */
         public CheckoutRequest(List<CartItem> items, FulfillmentInput fulfillment, PaymentInput payment) {
-            this(items, fulfillment, payment, null, null);
+            this(items, fulfillment, payment, null, null, null);
         }
     }
 
@@ -124,7 +126,18 @@ public final class OrderDtos {
     public record OrderView(UUID id, String reference, OrderStatus status, BigDecimal total, Instant createdAt,
                             Instant paidAt, Instant fulfilledAt, Instant cancelledAt, FulfillmentView fulfillment,
                             PaymentView payment, List<OrderItemView> items, String customerEmail, PickupView pickup,
-                            GiftView gift) {}
+                            GiftView gift, boolean guest, String accessToken) {
+
+        /** The order as its guest sees it right after paying: with the token of the private link, sent only then. */
+        public OrderView withAccessToken(String token) {
+            return new OrderView(id, reference, status, total, createdAt, paidAt, fulfilledAt, cancelledAt, fulfillment, payment, items,
+                    customerEmail, pickup, gift, guest, token);
+        }
+    }
+
+    /** "I lost the link": the email used at checkout and the order's reference (AV-1234ABCD). */
+    public record FindRequest(@NotBlank @Email @Size(max = 255) String email,
+                              @NotBlank @Pattern(regexp = "(?i)AV-[0-9A-F]{8}") String reference) {}
 
     /** Handing over at the stall: the code and the last four digits of the contact phone. */
     public record HandoverRequest(@NotBlank @Pattern(regexp = "[0-9]{6}", message = "six digits") String code,

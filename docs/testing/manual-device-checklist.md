@@ -42,7 +42,11 @@ Mark every line ✅ (works), ⚠️ (works, but awkward: write what happened) or
 
 ## 4. Account and checkout
 
-- [ ] "Check out" asks to sign in; "Create an account" brings you back to the checkout afterwards.
+- [ ] Signed out, "Check out" opens the checkout with "No account needed" and an email field; paying opens the order
+      page with "This page is your order's private link". Copy the link, open it in another browser: the order opens.
+- [ ] The same address without the part after "#": it offers "Email me the link"; with the email and the order number
+      it says the link is on its way.
+- [ ] "Have an account? Sign in" on the checkout, then "Create an account", brings you back to the checkout afterwards.
 - [ ] Press "Sign in" with empty fields: it says what is missing, and the keyboard opens on the email field.
 - [ ] The phone's keyboard shows "@" on the email field and digits on the phone field.
 - [ ] While typing in checkout, the field you type in is never hidden under the keyboard.

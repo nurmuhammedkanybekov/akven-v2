@@ -27,12 +27,13 @@ final class OrderMapper {
                 o.getItems().stream().map(i -> new OrderItemView(i.getSku(), i.getProductName(), i.getProductSlug(), i.getVariantLabel(),
                         i.getColorHex(), i.getImageUrl(), i.getQuantity(), i.getListPrice(), i.getDiscountPct(), i.getUnitPrice(), i.lineTotal(),
                         i.getDiscountSource())).toList(),
-                withCustomer ? o.getCustomer().getEmail() : null,
+                withCustomer ? o.getContactEmail() : null,
                 o.getFulfillmentMethod() != FulfillmentMethod.PICKUP ? null
                         : new PickupView(withCustomer ? null : o.getPickupCode(),
                                 o.getPickupPoint() == null ? null : PickupPointView.of(o.getPickupPoint())),
                 o.getGiftBox() == null ? null : new GiftView(o.getGiftBox(), o.getGiftRibbon(), o.getGiftTo(), o.getGiftFrom(),
-                        o.getGiftMessage(), o.isGiftHidePrices()));
+                        o.getGiftMessage(), o.isGiftHidePrices()),
+                o.isGuest(), null);
     }
 
     private static String shorten(String reference) {

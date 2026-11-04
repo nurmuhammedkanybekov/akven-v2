@@ -72,10 +72,12 @@ public class OrderService {
     private final PickupCodes pickupCodes;
     private final DeliveryService delivery;
     private final Notifier notifier;
+    private final OrderLinks links;
 
     public OrderService(OrderRepository orders, VariantRepository variants, UserRepository users, PricingService pricing,
                         PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections,
-                        ShopInfoService shopInfo, PickupCodes pickupCodes, DeliveryService delivery, Notifier notifier) {
+                        ShopInfoService shopInfo, PickupCodes pickupCodes, DeliveryService delivery, Notifier notifier,
+                        OrderLinks links) {
         this.orders = orders;
         this.variants = variants;
         this.users = users;
@@ -88,6 +90,7 @@ public class OrderService {
         this.pickupCodes = pickupCodes;
         this.delivery = delivery;
         this.notifier = notifier;
+        this.links = links;
     }
 
     private final ProductImageRepository images;
@@ -96,9 +99,12 @@ public class OrderService {
 
     @Transactional(noRollbackFor = PaymentFailedException.class)
     public CheckoutResult checkout(String customerEmail, String idempotencyKey, CheckoutRequest request) {
-        User customer = requireUser(customerEmail);
+        // Signed in: the account orders. Not signed in: a guest, who gives an email for the confirmation and the link.
+        User customer = customerEmail == null ? null : requireUser(customerEmail);
+        String guestEmail = customer != null ? null : guestEmail(request.email());
 
-        Optional<Order> earlier = orders.findByCustomerIdAndIdempotencyKey(customer.getId(), idempotencyKey);
+        Optional<Order> earlier = customer != null ? orders.findByCustomerIdAndIdempotencyKey(customer.getId(), idempotencyKey)
+                : orders.findByCustomerIsNullAndIdempotencyKey(idempotencyKey).filter(o -> o.getGuestEmail().equals(guestEmail));
         if (earlier.isPresent()) {
             return replay(earlier.get());
         }
@@ -140,7 +146,7 @@ public class OrderService {
         FulfillmentInputs f = new FulfillmentInputs(request);
         // The area decides the fee; the browser only says which area. Its country wins over a country sent alongside.
         DeliveryZone zone = f.method == FulfillmentMethod.DELIVERY ? delivery.zoneFor(request.fulfillment().zoneId(), request.fulfillment().zoneId() == null ? f.country : null) : null;
-        Order order = new Order(customer, idempotencyKey);
+        Order order = customer != null ? new Order(customer, idempotencyKey) : Order.forGuest(guestEmail, idempotencyKey);
         order.speak(request.lang());
         order.setFulfillment(f.method, f.name, f.phone, f.address, f.note, zone == null ? f.country : zone.getCountry());
         if (request.gift() != null) {
@@ -185,7 +191,7 @@ public class OrderService {
             throw new ConflictException(offer ? "OFFER_USED" : "ORDER_IN_PROGRESS", Map.of(), offer ? "That offer has already been used."
                     : "This order is already being processed. Please wait a moment and check your orders.");
         }
-        audit.record(customerEmail, "ORDER_PLACED", "ORDER", order.getId(), null, snapshot(order));
+        audit(customerEmail, "ORDER_PLACED", order, null);
 
         PaymentMethod method = request.payment().method();
         PaymentResult result;
@@ -208,16 +214,35 @@ public class OrderService {
             item.getVariant().commitSale(item.getQuantity());
         }
         orders.save(order);
-        audit.record(customerEmail, "ORDER_PAID", "ORDER", order.getId(), Map.of("status", "PENDING"), snapshot(order));
+        audit(customerEmail, "ORDER_PAID", order, Map.of("status", "PENDING"));
         notifier.orderConfirmed(order);
-        return new CheckoutResult(OrderMapper.toView(order, false), false);
+        return new CheckoutResult(forCustomer(order), false);
+    }
+
+    /** The order as the customer sees it; a guest also gets the token of the private link (it is never stored). */
+    private OrderView forCustomer(Order o) {
+        OrderView v = OrderMapper.toView(o, false);
+        return o.isGuest() ? v.withAccessToken(links.tokenFor(o.getId())) : v;
+    }
+
+    private static String guestEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new BusinessRuleException("GUEST_EMAIL_REQUIRED", Map.of(), "Enter your email: the confirmation and the link to your order go there.");
+        }
+        return email.strip().toLowerCase(java.util.Locale.ROOT);
+    }
+
+    /** Audited as the account that acted, or as a guest (no account). */
+    private void audit(String actorEmail, String action, Order o, Object before) {
+        if (actorEmail == null) audit.recordAsGuest(action, "ORDER", o.getId(), before, snapshot(o));
+        else audit.record(actorEmail, action, "ORDER", o.getId(), before, snapshot(o));
     }
 
     private CheckoutResult replay(Order existing) {
         if (existing.getStatus() == OrderStatus.CANCELLED) {
             throw new PaymentFailedException(402, "PAYMENT_START_AGAIN", "That payment did not go through. Please start a new checkout.", OrderMapper.toView(existing, false));
         }
-        return new CheckoutResult(OrderMapper.toView(existing, false), true);
+        return new CheckoutResult(forCustomer(existing), true);
     }
 
     private OrderView failOrder(String actorEmail, Order order) {
@@ -226,7 +251,7 @@ public class OrderService {
         }
         order.cancel();
         orders.save(order);
-        audit.record(actorEmail, "ORDER_PAYMENT_FAILED", "ORDER", order.getId(), Map.of("status", "PENDING"), snapshot(order));
+        audit(actorEmail, "ORDER_PAYMENT_FAILED", order, Map.of("status", "PENDING"));
         return OrderMapper.toView(order, false);
     }
 
@@ -238,17 +263,38 @@ public class OrderService {
         return orders.findByCustomerIdOrderByCreatedAtDesc(customer.getId()).stream().map(o -> OrderMapper.toView(o, false)).toList();
     }
 
-    /** An order that belongs to someone else looks exactly like one that does not exist. */
+    /**
+     * The customer's own order: their account's, or any order whose private link they hold (token). An order that
+     * belongs to someone else looks exactly like one that does not exist.
+     */
     @Transactional(readOnly = true)
-    public OrderView myOrder(String customerEmail, UUID orderId) {
-        Order o = orders.findById(orderId).filter(x -> x.getCustomer().getEmail().equals(customerEmail))
+    public OrderView myOrder(String customerEmail, UUID orderId, String token) {
+        Order o = orders.findById(orderId).filter(x -> mayOpen(x, customerEmail, token))
                 .orElseThrow(() -> new NotFoundException("Order not found."));
         return OrderMapper.toView(o, false);
     }
 
     @Transactional
-    public OrderView cancelMine(String customerEmail, UUID orderId) {
-        return cancel(customerEmail, orderId, false);
+    public OrderView cancelMine(String customerEmail, UUID orderId, String token) {
+        return cancel(customerEmail, orderId, false, token);
+    }
+
+    private boolean mayOpen(Order o, String userEmail, String token) {
+        boolean owner = userEmail != null && o.getCustomer() != null && o.getCustomer().getEmail().equals(userEmail);
+        return owner || links.opens(o.getId(), token);
+    }
+
+    /**
+     * "I lost the link": when the email and the reference belong to one order, the link goes to that email again. The
+     * answer is the same either way, so the form tells nobody which emails or orders exist.
+     */
+    @Transactional
+    public void sendLinkAgain(OrderDtos.FindRequest r) {
+        String email = r.email().strip().toLowerCase(java.util.Locale.ROOT);
+        String reference = r.reference().strip().toUpperCase(java.util.Locale.ROOT);
+        List<Order> candidates = new ArrayList<>(orders.findByGuestEmail(email));
+        users.findByEmail(email).ifPresent(u -> candidates.addAll(orders.findByCustomerIdOrderByCreatedAtDesc(u.getId())));
+        candidates.stream().filter(o -> o.getReference().equals(reference)).findFirst().ifPresent(notifier::orderLink);
     }
 
     // ---- staff ------------------------------------------------------------------------------
@@ -302,7 +348,7 @@ public class OrderService {
     @Transactional
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public OrderView cancelAsStaff(String actorEmail, UUID orderId) {
-        return cancel(actorEmail, orderId, true);
+        return cancel(actorEmail, orderId, true, null);
     }
 
     // ---- shared -----------------------------------------------------------------------------
@@ -312,9 +358,9 @@ public class OrderService {
      * FULFILLED and CANCELLED orders cannot be cancelled (Order.cancel refuses). If the refund fails, the whole
      * transaction rolls back and the order stays as it was.
      */
-    private OrderView cancel(String actorEmail, UUID orderId, boolean asStaff) {
+    private OrderView cancel(String actorEmail, UUID orderId, boolean asStaff, String token) {
         Order o = orders.lockById(orderId).orElseThrow(() -> new NotFoundException("Order not found."));
-        if (!asStaff && !o.getCustomer().getEmail().equals(actorEmail)) {
+        if (!asStaff && !mayOpen(o, actorEmail, token)) {
             throw new NotFoundException("Order not found.");
         }
         OrderStatus before = o.getStatus();
@@ -334,7 +380,7 @@ public class OrderService {
             }
         }
         orders.save(o);
-        audit.record(actorEmail, "ORDER_CANCELLED", "ORDER", o.getId(), Map.of("status", before), snapshot(o));
+        audit(actorEmail, "ORDER_CANCELLED", o, Map.of("status", before));
         if (before == OrderStatus.PAID) notifier.orderCancelled(o, asStaff);
         return OrderMapper.toView(o, asStaff);
     }

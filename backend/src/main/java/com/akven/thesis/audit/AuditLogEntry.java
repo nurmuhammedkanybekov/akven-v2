@@ -34,7 +34,8 @@ public class AuditLogEntry {
      * @ManyToOne here — writing an audit entry should never trigger (or
      * require) loading the full User entity.
      */
-    @Column(nullable = false)
+    /** Null for a customer without an account (a guest's order or cancellation). */
+    @Column
     private UUID actorId;
 
     @Column(nullable = false, length = 100)

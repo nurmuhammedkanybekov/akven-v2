@@ -4,6 +4,7 @@ import com.akven.thesis.delivery.DeliveryKind;
 import com.akven.thesis.order.FulfillmentMethod;
 import com.akven.thesis.order.Order;
 import com.akven.thesis.order.OrderItem;
+import com.akven.thesis.order.OrderLinks;
 import com.akven.thesis.payment.SimulatedWalletProvider;
 import com.akven.thesis.shop.PickupPoint;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,10 +33,13 @@ public class Notifier {
     private final OutboundEmailRepository emails;
     private final EmailTemplates t;
     private final String publicUrl;
+    private final OrderLinks links;
 
-    public Notifier(OutboundEmailRepository emails, EmailTemplates templates, @Value("${akven.public-url:http://localhost:8081}") String publicUrl) {
+    public Notifier(OutboundEmailRepository emails, EmailTemplates templates, OrderLinks links,
+                    @Value("${akven.public-url:http://localhost:8081}") String publicUrl) {
         this.emails = emails;
         this.t = templates;
+        this.links = links;
         this.publicUrl = publicUrl.replaceAll("/+$", "");
     }
 
@@ -72,7 +76,19 @@ public class Notifier {
             body.add(t.text(l, "confirmed.courier", v));
         }
         if (o.getGiftBox() != null) body.add(t.text(l, "confirmed.gift"));
+        if (o.isGuest()) { body.add(""); body.add(t.text(l, "confirmed.guest")); }
         queue(EmailKind.ORDER_CONFIRMED, o, t.text(l, "confirmed.subject", v), body);
+    }
+
+    /** The private link again, because the customer asked for it with the order's email and reference. */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void orderLink(Order o) {
+        String l = o.getLang();
+        Map<String, Object> v = values(o);
+        v.put("link", publicUrl + "/orders/" + o.getId() + "#t=" + links.tokenFor(o.getId()));
+        List<String> body = List.of(t.text(l, "greeting", v), "", t.text(l, "orderLink.body", v), "", t.text(l, "orderLink.notYou"),
+                "", t.text(l, "signature"));
+        emails.save(new OutboundEmail(EmailKind.ORDER_LINK, o.getContactEmail(), l, t.text(l, "orderLink.subject", v), String.join("\n", body), o.getId()));
     }
 
     /** Collected at the stall, on its way with the courier, or with the cargo carrier. */
@@ -106,12 +122,13 @@ public class Notifier {
     }
 
     private void queue(EmailKind kind, Order o, String subject, List<String> lines) {
-        String to = o.getCustomer() == null ? null : o.getCustomer().getEmail();
+        String to = o.getContactEmail();
         if (to == null || to.isBlank()) return;
         String l = o.getLang();
         List<String> body = new ArrayList<>(lines);
         body.add("");
-        body.add(t.text(l, "link", Map.of("link", publicUrl + "/orders/" + o.getId())));
+        // A guest has no account to sign in to: the link carries its key (after the "#", never sent to a server).
+        body.add(t.text(l, "link", Map.of("link", publicUrl + "/orders/" + o.getId() + (o.isGuest() ? "#t=" + links.tokenFor(o.getId()) : ""))));
         body.add(t.text(l, "questions"));
         body.add("");
         body.add(t.text(l, "signature"));

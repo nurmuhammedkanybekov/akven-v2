@@ -165,6 +165,10 @@ export interface OrderView {
   payment: { method: string; reference: string; simulated?: boolean } | null;
   items: OrderItemView[];
   customerEmail: string | null;
+  /** Ordered without an account. */
+  guest?: boolean;
+  /** Only in the answer to a guest's checkout: the key of the order's private link. */
+  accessToken?: string | null;
   /** Pickup orders only. The code is shown to the customer, never to staff. */
   pickup?: { code: string | null; point: PickupPoint | null } | null;
   /** Set when the order goes out as a gift box. */
@@ -177,6 +181,8 @@ export interface CheckoutBody {
   gift?: GiftInput | null;
   /** The language the customer is using: the emails about the order are written in it. */
   lang?: Lang;
+  /** Without an account: the guest's email (the confirmation and the private link go there). */
+  email?: string;
 }
 
 // ---- negotiation ----
