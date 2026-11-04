@@ -9,6 +9,7 @@ import { Pagination } from "../components/Pagination";
 import { Switch } from "../components/Switch";
 import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
+import { useMoney } from "../shop/useMoney";
 import { useT } from "../i18n/I18n";
 import { formatDateTime } from "../lib/format";
 import { NewPasswordDialog } from "./AdminAccounts";
@@ -37,6 +38,7 @@ function CustomerList() {
   const [page, setPage] = useState(0);
   useEffect(() => { const id = window.setTimeout(() => { setQuery(q.trim()); setPage(0); }, 300); return () => window.clearTimeout(id); }, [q]);
   const list = useAsync(() => adminListCustomers({ q: query, page, pageSize: 20 }), [query, page]);
+  const { money } = useMoney();
   const [changed, setChanged] = useState<Record<string, boolean>>({});
   const [active, setActive] = useState<Record<string, boolean>>({});
   const [resetting, setResetting] = useState<CustomerAccount | null>(null);
@@ -61,7 +63,7 @@ function CustomerList() {
     <section className="av-card-form" aria-label={t("a.nav.customers")}>
       <div className="av-field av-admin__search">
         <label className="av-label" htmlFor="customer-search">{t("a.cu.search")}</label>
-        <input id="customer-search" className="av-input" type="search" value={q} placeholder="name@example.com" onChange={(e) => setQ(e.target.value)} />
+        <input id="customer-search" className="av-input" type="search" value={q}  placeholder={t("a.customers.searchEg")} onChange={(e) => setQ(e.target.value)} />
       </div>
       {list.loading && !list.data && <Skeleton height={120} />}
       {list.error && <Alert tone="danger">{list.error.message}</Alert>}
@@ -69,16 +71,22 @@ function CustomerList() {
       {list.data && list.data.items.length > 0 && (
         <div className="av-tablewrap">
           <table className="av-table">
-            <thead><tr><th scope="col">{t("a.ac.email")}</th><th scope="col">{t("a.cu.since")}</th><th scope="col">{t("a.cu.trusted")}</th><th scope="col"><span className="av-visually-hidden">{t("a.cu.actions")}</span></th></tr></thead>
+            <thead><tr><th scope="col">{t("a.customers.name")}</th><th scope="col">{t("a.customers.orders")}</th><th scope="col">{t("a.customers.spent")}</th><th scope="col">{t("a.customers.last")}</th><th scope="col">{t("a.cu.since")}</th><th scope="col">{t("a.cu.trusted")}</th><th scope="col"><span className="av-visually-hidden">{t("a.cu.actions")}</span></th></tr></thead>
             <tbody>
               {list.data.items.map((c) => {
                 const trusted = changed[c.id] ?? c.trusted;
                 const on = active[c.id] ?? c.active;
                 return (
                   <tr key={c.id}>
-                    <td>{c.email}{!on && <> <Badge tone="danger">{t("a.ac.disabled")}</Badge></>}</td>
+                    <td className="av-custcell">
+                      <span className="av-custcell__avatar" aria-hidden="true">{(c.name || c.email).trim().charAt(0).toUpperCase()}</span>
+                      <span><strong>{c.name || c.email.split("@")[0]}</strong>{!on && <> <Badge tone="danger">{t("a.ac.disabled")}</Badge></>}<br /><span className="av-small av-muted">{c.email}</span></span>
+                    </td>
+                    <td className="av-num">{c.orders ?? 0}</td>
+                    <td className="av-num av-price">{c.orders ? money(c.spent ?? 0) : "—"}</td>
+                    <td className="av-small">{c.lastOrderAt ? formatDateTime(c.lastOrderAt) : <span className="av-muted">{t("a.customers.never")}</span>}</td>
                     <td className="av-small">{formatDateTime(c.createdAt)}</td>
-                    <td><Switch checked={trusted} onChange={(yes) => void trust(c, yes)} label={t("a.cu.trustedFor", { email: c.email })} /></td>
+                    <td><Switch checked={trusted} onChange={(yes) => void trust(c, yes)} label={t("a.cu.trustedFor", { email: c.email })} hideLabel /></td>
                     <td className="av-admin__rowactions">
                       <Button size="sm" variant="ghost" onClick={() => setResetting(c)}>{t("a.cu.newPassword")}</Button>
                       <Button size="sm" variant="ghost" onClick={() => void switchActive(c, !on)}>{on ? t("a.cu.switchOff") : t("a.cu.switchOn")}</Button>

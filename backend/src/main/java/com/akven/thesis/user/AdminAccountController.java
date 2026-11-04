@@ -68,7 +68,8 @@ public class AdminAccountController {
     }
 
     @GetMapping("/audit")
-    public PageResponse<AuditView> audit(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int pageSize) {
-        return service.auditLog(page, pageSize);
+    public PageResponse<AuditView> audit(@RequestParam(required = false) String area, @RequestParam(required = false) String who,
+                                         @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int pageSize) {
+        return service.auditLog(area, who, page, pageSize);
     }
 }

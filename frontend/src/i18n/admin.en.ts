@@ -404,7 +404,7 @@ export const adminEn = {
 
   // customers
   "a.cu.lead": "Find a customer by email. Mark trusted customers (they may order from the lower minimum set under Pricing), set a new password for someone who forgot theirs, or switch off a fake account.",
-  "a.cu.search": "Search by email",
+  "a.cu.search": "Search by name or email",
   "a.cu.noMatch": "No customer matches that email.",
   "a.cu.none": "No customers yet.",
   "a.cu.since": "Customer since",

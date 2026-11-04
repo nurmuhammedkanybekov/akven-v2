@@ -54,7 +54,19 @@ public class ShopSummaryService {
                                int incoming, LocalDate restockEta) {}
 
     public record ShopSummary(int days, Sales sales, int toHandOver, int fewLeftThreshold, int soldOut,
-                              List<LowStockLine> lowStock) {}
+                              List<LowStockLine> lowStock, Insights insights) {}
+
+    /** A slice of the period's sales: how many orders and how much money. */
+    public record Share(String key, int orders, BigDecimal revenue) {}
+
+    public record TopCustomer(String name, String email, boolean guest, int orders, BigDecimal spent) {}
+
+    /**
+     * What the period's paid orders say: how they travelled, which shelves sold, who bought most, how many came back,
+     * how many were guests, how many reached a price step, pairs per order, and the busiest weekdays (Monday first).
+     */
+    public record Insights(List<Share> ways, List<Share> shelves, List<TopCustomer> topCustomers, int returningCustomers,
+                           int guestOrders, int cancelled, int ladderOrders, BigDecimal averagePairs, int[] weekdays) {}
 
     /** One day of sales in Bishkek time: paid orders, their total, and pairs. */
     public record DayPoint(LocalDate date, int orders, BigDecimal revenue, int pairs) {}
@@ -107,6 +119,38 @@ public class ShopSummaryService {
                 .toList();
 
         int toHandOver = orders.findByStatus(OrderStatus.PAID).size();
-        return new ShopSummary(days, new Sales(paidOrders.size(), revenue, pairs, average), toHandOver, threshold, soldOut, low);
+        return new ShopSummary(days, new Sales(paidOrders.size(), revenue, pairs, average), toHandOver, threshold, soldOut, low,
+                insights(paidOrders.values(), sold, since, pairs));
+    }
+
+    private Insights insights(java.util.Collection<Order> paid, List<OrderItem> sold, Instant since, int pairs) {
+        Map<String, List<Order>> byWay = paid.stream().collect(Collectors.groupingBy(o -> o.getFulfillmentMethod() == FulfillmentMethod.PICKUP ? "PICKUP"
+                : o.getDeliveryKind() == com.akven.thesis.delivery.DeliveryKind.CARGO ? "CARGO" : "COURIER"));
+        List<Share> ways = java.util.stream.Stream.of("PICKUP", "COURIER", "CARGO").map(k -> {
+            List<Order> l = byWay.getOrDefault(k, List.of());
+            return new Share(k, l.size(), l.stream().map(Order::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+        }).toList();
+
+        Map<String, List<OrderItem>> byShelf = sold.stream().collect(Collectors.groupingBy(i -> i.getVariant().getProduct().getCategory().name()));
+        List<Share> shelves = byShelf.entrySet().stream()
+                .map(e -> new Share(e.getKey(), (int) e.getValue().stream().map(i -> i.getOrder().getId()).distinct().count(),
+                        e.getValue().stream().map(OrderItem::lineTotal).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .sorted(Comparator.comparing(Share::revenue).reversed()).toList();
+
+        Map<String, List<Order>> byBuyer = paid.stream().collect(Collectors.groupingBy(Order::getContactEmail));
+        List<TopCustomer> top = byBuyer.values().stream()
+                .map(l -> new TopCustomer(l.get(0).getCustomer() != null && l.get(0).getCustomer().getDisplayName() != null
+                        ? l.get(0).getCustomer().getDisplayName() : l.get(0).getContactName(), l.get(0).getContactEmail(), l.get(0).isGuest(),
+                        l.size(), l.stream().map(Order::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .sorted(Comparator.comparing(TopCustomer::spent).reversed()).limit(5).toList();
+        int returning = (int) byBuyer.values().stream().filter(l -> l.size() > 1).count();
+        int guests = (int) paid.stream().filter(Order::isGuest).count();
+        int cancelled = (int) orders.findByStatus(OrderStatus.CANCELLED).stream()
+                .filter(o -> o.getCreatedAt() != null && !o.getCreatedAt().isBefore(since) && o.getPaidAt() != null).count();
+        int ladder = (int) sold.stream().filter(i -> i.getDiscountSource() == DiscountSource.TIER).map(i -> i.getOrder().getId()).distinct().count();
+        BigDecimal avgPairs = paid.isEmpty() ? BigDecimal.ZERO : BigDecimal.valueOf(pairs).divide(BigDecimal.valueOf(paid.size()), 1, RoundingMode.HALF_UP);
+        int[] weekdays = new int[7];
+        paid.forEach(o -> weekdays[o.getPaidAt().atZone(CatalogService.SHOP_ZONE).getDayOfWeek().getValue() - 1]++);
+        return new Insights(ways, shelves, top, returning, guests, cancelled, ladder, avgPairs, weekdays);
     }
 }

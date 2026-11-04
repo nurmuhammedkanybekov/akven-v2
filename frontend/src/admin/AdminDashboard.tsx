@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { adminAnswerStockRequest, adminDaily, adminEvaluation, adminNegotiationStats, adminStockRequests, adminSummary, downloadOrdersCsv } from "../api/endpoints";
 import { useAuth } from "../auth/AuthContext";
 import { Button } from "../components/Button";
+import type { MessageKey } from "../i18n/en";
 import { useToast } from "../components/Toast";
 import { useMoney } from "../shop/useMoney";
 import type { EvaluationReport, NegotiationStats, ShopSummary, StockWaiting } from "../api/types";
@@ -118,6 +119,7 @@ function ShopNow({ s }: { s: ShopSummary }) {
         <li><span className="av-eyebrow">{t("a.db.pairs")}</span><strong className="av-num">{s.sales.pairs}</strong><span className="av-small">{t("a.db.pairsNote")}</span></li>
         <li><span className="av-eyebrow">{t("a.db.waiting")}</span><strong className="av-num">{s.toHandOver}</strong><Link className="av-small" to="/admin/handover">{t("a.nav.handover")}</Link></li>
       </ul>
+      {s.insights && <Insights s={s} />}
       <section className="av-card-form" aria-labelledby="low-h">
         <h2 id="low-h" className="av-formtitle">{t("a.db.low")}</h2>
         <p className="av-small">{t("a.db.lowLead", { n: s.fewLeftThreshold, out: s.soldOut })}</p>
@@ -137,6 +139,75 @@ function ShopNow({ s }: { s: ShopSummary }) {
               </tbody>
             </table>
           </div>
+        )}
+      </section>
+    </>
+  );
+}
+
+const WAYS = { PICKUP: ["🏪", "co.pickup"], COURIER: ["🚕", "co.courier"], CARGO: ["🚌", "co.cargo"] } as const;
+const SHELF_KEY: Record<string, MessageKey> = { MEN: "a.cat.MEN", WOMEN: "a.cat.WOMEN", KIDS: "a.cat.KIDS", BUNDLES: "a.cat.BUNDLES" };
+
+/** Bars as wide as their share: how orders travel, which shelves sell, which weekdays are busy. */
+function Bars({ rows }: { rows: Array<{ label: string; value: number; note?: string }> }) {
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  return (
+    <ul className="av-bars">
+      {rows.map((r) => (
+        <li key={r.label}>
+          <span className="av-bars__label">{r.label}</span>
+          <span className="av-bars__track"><span className="av-bars__fill" style={{ width: `${(r.value / max) * 100}%` }} /></span>
+          <span className="av-bars__value av-num">{r.note ?? r.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The period in a few honest numbers and pictures, for the owners at a glance. */
+function Insights({ s }: { s: ShopSummary }) {
+  const { money } = useMoney();
+  const { t, lang } = useT();
+  const i = s.insights!;
+  const total = Math.max(1, s.sales.orders);
+  const pct = (n: number) => `${Math.round((n / total) * 100)}%`;
+  const dayName = (d: number) => new Date(2024, 0, 1 + d).toLocaleDateString(LOCALES[lang], { weekday: "short" });   // 1 Jan 2024 was a Monday
+  return (
+    <>
+      <ul className="av-tiles4 av-tiles4--soft" aria-label={t("a.db.insights")}>
+        <li><span className="av-eyebrow">{t("a.db.returning")}</span><strong className="av-num">{i.returningCustomers}</strong><span className="av-small">{t("a.db.returningNote")}</span></li>
+        <li><span className="av-eyebrow">{t("a.db.avgPairs")}</span><strong className="av-num">{i.averagePairs}</strong><span className="av-small">{t("a.db.ladderOrders", { n: i.ladderOrders })}</span></li>
+        <li><span className="av-eyebrow">{t("a.db.guests")}</span><strong className="av-num">{pct(i.guestOrders)}</strong><span className="av-small">{t("a.db.guestsNote", { n: i.guestOrders })}</span></li>
+        <li><span className="av-eyebrow">{t("a.db.cancelled")}</span><strong className="av-num">{i.cancelled}</strong><span className="av-small">{t("a.db.cancelledNote")}</span></li>
+      </ul>
+      <div className="av-db__grid3">
+        <section className="av-card-form" aria-labelledby="ways-h">
+          <h2 id="ways-h" className="av-formtitle">{t("a.db.ways")}</h2>
+          <Bars rows={i.ways.map((w) => ({ label: `${WAYS[w.key as keyof typeof WAYS][0]} ${t(WAYS[w.key as keyof typeof WAYS][1])}`, value: w.orders, note: `${w.orders} · ${pct(w.orders)}` }))} />
+        </section>
+        <section className="av-card-form" aria-labelledby="shelves-h">
+          <h2 id="shelves-h" className="av-formtitle">{t("a.db.shelves")}</h2>
+          {i.shelves.length === 0 ? <p className="av-small">{t("a.db.noPaid")}</p>
+            : <Bars rows={i.shelves.map((sh) => ({ label: t(SHELF_KEY[sh.key] ?? "a.all"), value: Number(sh.revenue), note: money(Number(sh.revenue)) }))} />}
+        </section>
+        <section className="av-card-form" aria-labelledby="days-h">
+          <h2 id="days-h" className="av-formtitle">{t("a.db.weekdays")}</h2>
+          <Bars rows={i.weekdays.map((n, d) => ({ label: dayName(d), value: n }))} />
+        </section>
+      </div>
+      <section className="av-card-form" aria-labelledby="top-h">
+        <h2 id="top-h" className="av-formtitle">{t("a.db.topCustomers")}</h2>
+        {i.topCustomers.length === 0 ? <p className="av-small">{t("a.db.noPaid")}</p> : (
+          <ol className="av-topcust">
+            {i.topCustomers.map((c, n) => (
+              <li key={c.email}>
+                <span className="av-topcust__n" aria-hidden="true">{n + 1}</span>
+                <span><strong>{c.name}</strong>{c.guest && <> <Badge tone="warning">{t("a.orders.guest")}</Badge></>}<br /><span className="av-small av-muted">{c.email}</span></span>
+                <span className="av-small">{t("a.db.ordersN", { n: c.orders })}</span>
+                <strong className="av-price">{money(Number(c.spent))}</strong>
+              </li>
+            ))}
+          </ol>
         )}
       </section>
     </>

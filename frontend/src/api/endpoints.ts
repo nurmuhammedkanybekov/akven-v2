@@ -39,7 +39,7 @@ export const getMyOrder = (id: string, token?: string | null) => api<OrderView>(
 export const cancelMyOrder = (id: string, token?: string | null) => api<OrderView>(`/api/orders/${id}/cancel`, { method: "POST", headers: linkKey(token) });
 /** "I lost the link": the server emails it to the order's own address, and answers the same either way. */
 export const findMyOrder = (email: string, reference: string) => api<void>("/api/orders/find", { method: "POST", body: { email, reference } });
-export const adminListOrders = (p: { status?: OrderStatus; page?: number; pageSize?: number }) =>
+export const adminListOrders = (p: { status?: OrderStatus; page?: number; pageSize?: number ; q?: string; way?: string }) =>
   api<PageResponse<OrderView>>(`/api/admin/orders${qs(p)}`);
 export const adminGetOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}`);
 export const adminFulfilOrder = (id: string) => api<OrderView>(`/api/admin/orders/${id}/fulfil`, { method: "POST" });
@@ -168,7 +168,7 @@ export const adminResetCustomerPassword = (id: string, password: string) =>
   api<void>(`/api/admin/customers/${id}/password`, { method: "PUT", body: { password } });
 export const adminSetCustomerActive = (id: string, active: boolean) =>
   api<CustomerAccount>(`/api/admin/customers/${id}/active`, { method: "PUT", body: { active } });
-export const adminAuditLog = (p: { page?: number; pageSize?: number }) => api<PageResponse<AuditLine>>(`/api/admin/audit${qs(p)}`);
+export const adminAuditLog = (p: { area?: string; who?: string; page?: number; pageSize?: number }) => api<PageResponse<AuditLine>>(`/api/admin/audit${qs(p)}`);
 
 // ---- the assistant (super admin) ----
 export const adminAssistantStatus = () => api<AssistantStatus>("/api/admin/assistant");
