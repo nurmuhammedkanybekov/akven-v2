@@ -1,0 +1,13 @@
+# HTTPS in front of AK&VEN (see docs/deployment.md). Caddy gets and renews the certificate by itself.
+# Replace the domain, put this file at /etc/caddy/Caddyfile, then: sudo systemctl reload caddy
+akven.example.com {
+	encode zstd gzip
+	# The web container listens on 127.0.0.1:8081 (AKVEN_BIND=127.0.0.1), so only Caddy reaches it. Caddy replaces any
+	# X-Forwarded-For a visitor sends with the visitor's real address, so the shop's login and sign-up limits count
+	# visitors, not the proxy.
+	reverse_proxy 127.0.0.1:8081
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}

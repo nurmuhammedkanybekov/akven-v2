@@ -57,6 +57,7 @@ installation makes on its first start and keeps in its database; a key written i
 | `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`, `SUPER_ADMIN_NAME` | empty | Create the super admin on the first start of a real installation (password at least 12 characters). An existing account is never changed |
 | `DEMO_ACCOUNTS` | `off` | Outside demo mode, and in demo mode once a super admin is set, every `@akven.test` demo account is switched off at start. `on` keeps them |
 | `PAYMENT_PROVIDER` | `none` | `none`: no payments are taken. `simulated`: the demo wallet (set by the demo profile; no money moves). A real provider is future work |
+| `API_DOCS` | `false` | `true` publishes the API description (`/v3/api-docs`) and Swagger UI outside demo mode. Demo mode always has them |
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` | empty, 587 | The SMTP server for emails to customers (STARTTLS). Empty host: nothing is sent, every email is kept in Admin > Emails to customers |
 | `MAIL_FROM`, `MAIL_FROM_NAME` | `akven.socks@gmail.com`, `AK&VEN` | Who the emails come from; replies go there too |
 | `PUBLIC_URL` | `http://localhost:8081` | The shop's own address, for the order links in emails |
@@ -67,7 +68,9 @@ Copy `.env.example` to `.env` for local values; git ignores `.env`, and secrets 
 
 ## Running it for real
 
-1. In `.env`: leave `SPRING_PROFILES_ACTIVE` unset (or any profile but `demo`), `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD`, `SHOP_CONTACTS`, and change
+The full guide, from renting a server to backups, is [`deployment.md`](deployment.md). In short:
+
+1. In `.env`: `SPRING_PROFILES_ACTIVE=prod` (any value but `demo`; Docker Compose starts in demo mode without it), `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD`, `SHOP_CONTACTS`, and change
    `DB_PASSWORD` (a long random value, set before the very first start: the database keeps the password it was
    created with).
 2. Put the shop behind HTTPS (for example Caddy or nginx with a Let's Encrypt certificate) that forwards to

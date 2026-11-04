@@ -476,7 +476,7 @@ const shop: Partial<Record<MessageKey, string>> = {
   "co.address": "Адрес доставки",
   "co.note": "Комментарий (необязательно)",
   "co.payment": "Оплата",
-  "co.paymentS": "Оплатите кошельком телефона. Мы не видим и не храним данные карты.",
+  "co.paymentS": "Оплата через Apple Pay или Google Pay: мы никогда не видим и не храним данные карты. Оплата местными банковскими картами и приложениями банков появится позже.",
   "co.apple": "Оплатить Apple Pay",
   "co.google": "Оплатить Google Pay",
   "co.summary": "Ваш заказ",

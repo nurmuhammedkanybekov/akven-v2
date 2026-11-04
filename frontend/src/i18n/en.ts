@@ -491,7 +491,7 @@ const shop = {
   "co.address": "Delivery address",
   "co.note": "Note (optional)",
   "co.payment": "Payment",
-  "co.paymentS": "Pay with your phone's wallet. We never see or store card details.",
+  "co.paymentS": "Pay with Apple Pay or Google Pay: we never see or store card details. Paying with local bank cards and banking apps will come later.",
   "co.apple": "Pay with Apple Pay",
   "co.google": "Pay with Google Pay",
   "co.summary": "Your order",

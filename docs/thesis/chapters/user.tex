@@ -193,10 +193,12 @@ the sock was added, the bag says so. A line can be removed or saved for later, w
 
 \shot{u-bag.jpg}{The bag as one collection}{fig:bag}
 
-Checkout (Figure~\ref{fig:checkout}) asks for a name and a phone number and how to receive the order: pickup at
-container 70-E, or delivery to Kyrgyzstan, Kazakhstan, Uzbekistan or Russia. For delivery the customer chooses a
-country and an area; each area shows its fee, the days it takes and from which amount delivery is free, and the summary
-says how much more makes it free. \emph{Remember my details} keeps the name, phone, area and address for next time.
+Checkout (Figure~\ref{fig:checkout}) needs no account: a guest gives an email address, where the confirmation and a
+private link to the order go; signing in adds saved details, agreed prices and the list of orders. It asks for a name
+and a phone number and how to receive the order: pickup at container 70-E, a courier in Bishkek and the Chui region,
+or cargo to the regions, Kazakhstan, Uzbekistan or Russia. Each area or carrier shows its fee, the days it takes, from
+which amount delivery is free and the owners' note; a carrier paid on receipt says so, and the summary says how much
+more makes delivery free. \emph{Remember my details} keeps the name, phone, area and address for next time.
 Payment is with Apple Pay or Google Pay (Figure~\ref{fig:wallet}); the wallet in this thesis is simulated and the dialog
 says so, and it can be told to decline in order to show what happens then: nothing is charged and the bag stays.
 
@@ -208,7 +210,9 @@ says so, and it can be told to decline in order to show what happens then: nothi
 A paid order (Figure~\ref{fig:order}) shows its timeline (placed, paid, ready or on its way, delivered), the socks, the
 delivery area and time, and for pickup a six-digit code and a QR code. At the stall the customer says the code and the
 last four digits of their phone number. A paid order can be cancelled until it is handed over; the payment is refunded
-and the socks go back on the shelf. \emph{Order these again} fills the bag with the same socks.
+and the socks go back on the shelf. \emph{Order these again} fills the bag with the same socks. Each step is also
+emailed in the customer's language. A guest's order lives at its private link; \emph{Find my order} emails a lost link
+again, given the email address and the order number.
 
 \shot{u-order.jpg}{A paid order}{fig:order}
 
@@ -309,8 +313,13 @@ are set on the product's options and are visible only to the owners.
 \shot{a-pricing.jpg}{Pricing}{fig:a-pricing}
 
 \paragraph{Delivery areas} (Figure~\ref{fig:a-delivery}) are where the shop delivers: for each area the country, a name,
-the fee in US dollars, the amount from which delivery is free, and the shortest and longest time in days. An area can be
-hidden from checkout or deleted; orders that used it keep their copy.
+whether it is a courier area or a cargo carrier, the fee in US dollars, the amount from which delivery is free, the
+shortest and longest time in days, a note for customers, and for a carrier whether the customer pays it on receipt.
+An area can be hidden from checkout or deleted; orders that used it keep their copy.
+
+\paragraph{Emails to customers} lists every email the shop wrote: to whom, about what, in which language, whether it
+went out, and the email itself; the order's page shows its own. Without a mail server the page says that the emails are
+kept and not sent, and \emph{Send again} delivers one once a server is set up.
 
 \shot{a-delivery.jpg}{Delivery areas}{fig:a-delivery}
 

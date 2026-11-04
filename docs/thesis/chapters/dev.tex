@@ -103,8 +103,8 @@ details whose text the frontend shows to the user.
 
 There are four roles: \texttt{CUSTOMER}, \texttt{STAFF}, \texttt{ADMIN} (the owners) and \texttt{SUPER\_ADMIN}. A Spring
 role hierarchy makes \texttt{SUPER\_ADMIN} include \texttt{ADMIN}, so owner rules need not mention the super admin. URL
-rules give the public catalogue, sign-in, registration, the price quote, the shop's information, delivery areas and
-wholesale requests to everyone, \texttt{/api/admin/**} to the team, and everything else to signed-in users; method
+rules give the public catalogue, sign-in, registration, the price quote, the shop's information, delivery areas,
+wholesale requests, checkout and a guest's own order (which the service opens only with its private link) to everyone, \texttt{/api/admin/**} to the team, and everything else to signed-in users; method
 security refines this inside the services.
 
 \section{Data model}
@@ -135,7 +135,9 @@ demo-data migrations) is generated from the database into the \texttt{docs/diagr
 	\texttt{negotiation\_session}, \texttt{negotiation\_turn} & A conversation about one option and every message of it,
 	with the proposed and allowed discount and the assistant that answered. \\
 	\texttt{price\_tier}, \texttt{shop\_policy} & The ladder of discounts by pairs, the minimum order, exchange rates. \\
-	\texttt{delivery\_zone} & Delivery areas with fee, free-from amount and days. \\
+	\texttt{delivery\_zone} & Delivery areas: courier or cargo carrier, fee, free-from amount, days, a note, and whether the
+	carrier is paid on receipt. \\
+	\texttt{outbound\_email} & The outbox: every email to a customer, its language, state and attempts. \\
 	\texttt{wholesale\_request} & Requests from shops and companies with their status. \\
 	\texttt{customer\_details} & Contact and delivery details a customer asked to keep. \\
 	\texttt{family\_member}, \texttt{saved\_item}, \texttt{product\_review}, \texttt{stock\_request} & Family profiles,
@@ -345,6 +347,31 @@ anything that looks like a card number.
 or the first active area of the country. Owners edit areas with checks that the longest time is not shorter than the
 shortest and that a free area has no free-from amount; every change is audited. A fresh installation starts with one free
 area per country, so delivery works as before until the owners set prices.
+
+\paragraph{Courier and cargo.} An area is a \emph{courier} area (Bishkek and the Chui region, where the family calls a
+taxi or brings a large order in its own car, free above the area's amount) or a \emph{cargo carrier} (the bus cargo to
+Osh, carriers to Kazakhstan, Uzbekistan and Russia), which can be paid by the customer on receipt. The order keeps its
+own copy of the kind and the payment on receipt, like the fee, so the receipt never changes.
+
+\paragraph{Emails through an outbox.} \texttt{Notifier} writes each email to a customer (confirmed, handed over,
+cancelled; a wholesale request received) into \texttt{outbound\_email} \emph{inside the transaction that changes the
+order}, in the language the customer used at checkout. A change that rolls back therefore sends nothing, and a mail
+server that is down loses nothing: \texttt{EmailSender} delivers the queue every few seconds through any SMTP server, tries a
+refusal again after 1, 2, 4 and 8 minutes and then marks it failed. Without a mail server nothing leaves the shop and
+each email is marked \emph{not sent} but stays readable in the admin. Emails hold names and addresses, so they are
+deleted after 90 days. The texts live in three property files, and a test fails when a sentence is missing in one
+language. The acknowledgement of a wholesale request carries only its reference and number of pairs, never text the
+visitor typed, so the public form cannot be used to send someone's words to a stranger.
+
+\paragraph{Checkout without an account.} An order has either an account or a guest's email (a database check keeps
+exactly one). A guest opens the order at \texttt{/orders/<id>\#t=<key>}. The key is an HMAC-SHA256 of the order id
+under a key derived from the installation's secret, so nothing is stored, a retried checkout returns the same link, and
+the key can never pass as a login token. It stands after the \texttt{\#}, which browsers never send, so it reaches no
+access log; the page sends it in an \texttt{X-Order-Token} header and the server compares it in constant time. A guest
+who lost the link gives the email and the order number, and the link is emailed to the order's own address; the
+answer is the same whether anything matched, so the form reveals no customer. Guest checkouts and link requests are
+limited per address. Negotiated prices still need an account, because an offer belongs to the account that negotiated
+it; and guest orders are never joined to an account by email, because an email address is not proof of identity.
 
 \paragraph{Wholesale requests.} \texttt{WholesaleService} accepts requests without an account. The contact is checked
 against its kind (a phone number for WhatsApp and calls, a Telegram name or number, an e-mail address); text is cleaned;

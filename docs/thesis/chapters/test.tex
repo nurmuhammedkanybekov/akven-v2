@@ -24,10 +24,10 @@ Table~\ref{tab:tests} summarises the suites as they stand at the end of the proj
 		\toprule
 		\textbf{Suite} & \textbf{Command} & \textbf{Result} \\
 		\midrule
-		Backend & \texttt{mvn verify} & 250 tests, 95\% line coverage; the build fails below 80\% \\
+		Backend & \texttt{mvn verify} & 257 tests, 97\% line coverage; the build fails below 80\% \\
 		Real PostgreSQL & \texttt{-Dtest=PostgresIntegrationTest} & 11 tests over real HTTP on PostgreSQL 16 \\
-		Frontend & \texttt{npm test} & 186 tests, type check and production build \\
-		Browser journey & \texttt{npm run e2e} & 27 steps in three languages, axe rules on every page \\
+		Frontend & \texttt{npm test} & 204 tests, type check and production build \\
+		Browser journey & \texttt{npm run e2e} & 28 steps in three languages, axe rules on every page \\
 		\bottomrule
 	\end{tabularx}
 	\caption{The test suites}
@@ -105,14 +105,15 @@ check follows the server's rules.
 
 \section{The browser journey}
 
-\texttt{npm run e2e} drives Chromium through Playwright against the real backend and the built frontend. Its 27 steps
+\texttt{npm run e2e} drives Chromium through Playwright against the real backend and the built frontend. Its 28 steps
 cover the owner adding a section and a product with two colours and a picture (and a disguised file being refused), the
 product appearing in the shop with its filter count, removing and restoring it, a visitor filling the bag and
 registering, a declined and then a successful payment, the last pair bought and returned by cancelling, the customer
-asking for 90\% and being held to the limit, the team handing the order over, the site in Russian and Kyrgyz, the home
+asking for 90\% and being held to the limit, the team handing the order over and reading the emails it caused, the site in Russian and Kyrgyz, the home
 page's sections, the owners' screens, the super admin's accounts, assistant and audit log, quick view and prices in som,
-the family and the gift box, reviews and search, a wholesale request with a wrong and then a right phone number, and the
-women's shelf filtered by size and colour. After each important page the axe rules~\cite{axe} run, and any serious or
+the family and the gift box, reviews and search, a wholesale request with a wrong and then a right phone number, the
+women's shelf filtered by size and colour, and a guest ordering without an account and opening the order from a
+second browser, first without the link's key (and asking for it by email), then with it. After each important page the axe rules~\cite{axe} run, and any serious or
 critical finding fails the journey.
 
 The journey has caught problems that unit tests could not: a menu that flipped between two sizes in Russian, faded text
