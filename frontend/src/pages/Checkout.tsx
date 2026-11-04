@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { checkout, getDeliveryZones, getMyDetails, saveMyDetails } from "../api/endpoints";
-import type { Country, FulfillmentMethod, PaymentMethod } from "../api/types";
+import type { DeliveryKind, Country, FulfillmentMethod, PaymentMethod } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { useCart } from "../cart/CartContext";
 import { useQuote } from "../cart/useQuote";
@@ -41,6 +41,8 @@ export function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [country, setCountry] = useState<Country>("KG");
   const [zoneId, setZoneId] = useState<string | null>(null);
+  // Delivery goes one of two ways: the family's courier around Bishkek, or a cargo carrier to the regions and abroad.
+  const [kind, setKind] = useState<DeliveryKind>("COURIER");
   const zones = useAsync((signal) => getDeliveryZones(signal), []);
   // The details the customer asked us to remember: filled in once, never over what they have typed.
   const [remember, setRemember] = useState(false);
@@ -75,8 +77,14 @@ export function CheckoutPage() {
   const itemsTotal = quote?.total ?? cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
   // Anything but a list (an old server, a proxy page) counts as not known yet, never as a crash.
   const allZones = Array.isArray(zones.data) ? zones.data : [];
-  const countries = (["KG", "KZ", "UZ", "RU"] as const).filter((c) => allZones.some((z) => z.country === c));
-  const inCountry = allZones.filter((z) => z.country === country);
+  const kindOf = (z: { kind?: DeliveryKind }) => z.kind ?? "COURIER";
+  // A saved area decides the kind it belongs to.
+  const savedZone = zoneId ? allZones.find((z) => z.id === zoneId) : undefined;
+  const activeKind: DeliveryKind = savedZone ? kindOf(savedZone) : kind;
+  const ofKind = allZones.filter((z) => kindOf(z) === activeKind);
+  const kinds = (["COURIER", "CARGO"] as const).filter((k) => allZones.some((z) => kindOf(z) === k));
+  const countries = (["KG", "KZ", "UZ", "RU"] as const).filter((c) => ofKind.some((z) => z.country === c));
+  const inCountry = activeKind === "COURIER" ? ofKind : ofKind.filter((z) => z.country === country);
   const zone = method === "DELIVERY" ? inCountry.find((z) => z.id === zoneId) ?? inCountry[0] ?? null : null;
   const fee = zone ? deliveryFee(zone, itemsTotal) : 0;
   const toFree = zone ? toFreeDelivery(zone, itemsTotal) : null;
@@ -147,11 +155,20 @@ export function CheckoutPage() {
             <legend className="av-label">{t("co.how")}</legend>
             <div className="av-row" role="radiogroup" aria-label={t("co.how")}>
               <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "PICKUP"} onChange={() => setMethod("PICKUP")} /><span><strong>{t("co.pickup")}</strong><br /><span className="av-small">{t("co.pickupS")}</span></span></label>
-              <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "DELIVERY"} onChange={() => setMethod("DELIVERY")} /><span><strong>{t("co.delivery")}</strong><br /><span className="av-small">{t("co.deliveryS")}</span></span></label>
+              {kinds.length === 0 && (
+                <label className="av-radiocard"><input type="radio" name="fulfilment" checked={method === "DELIVERY"} onChange={() => setMethod("DELIVERY")} /><span><strong>{t("co.delivery")}</strong><br /><span className="av-small">{t("co.deliveryS")}</span></span></label>
+              )}
+              {kinds.map((k) => (
+                <label key={k} className="av-radiocard">
+                  <input type="radio" name="fulfilment" checked={method === "DELIVERY" && activeKind === k}
+                         onChange={() => { setMethod("DELIVERY"); setKind(k); setZoneId(null); if (k === "COURIER") setCountry("KG"); }} />
+                  <span><strong>{t(k === "COURIER" ? "co.courier" : "co.cargo")}</strong><br /><span className="av-small">{t(k === "COURIER" ? "co.courierS" : "co.cargoS")}</span></span>
+                </label>
+              ))}
             </div>
           </fieldset>
           {noDelivery && <Alert tone="danger">{t("co.noDelivery")}</Alert>}
-          {method === "DELIVERY" && countries.length > 0 && (
+          {method === "DELIVERY" && activeKind === "CARGO" && countries.length > 0 && (
             <label className="av-field">
               <span className="av-label">{t("order.country")}</span>
               <select className="av-select" value={country} onChange={(e) => { setCountry(e.target.value as Country); setZoneId(null); }}>
@@ -161,23 +178,26 @@ export function CheckoutPage() {
           )}
           {method === "DELIVERY" && inCountry.length > 0 && (
             <fieldset className="av-option av-zones">
-              <legend className="av-label">{t("co.area")}</legend>
+              <legend className="av-label">{t(activeKind === "CARGO" ? "co.carrier" : "co.area")}</legend>
               {inCountry.map((z) => {
                 const f = deliveryFee(z, itemsTotal);
                 return (
                   <label key={z.id} className="av-radiocard av-zone">
                     <input type="radio" name="zone" checked={zone?.id === z.id} onChange={() => setZoneId(z.id)} />
-                    <span className="av-zone__name"><strong>{z.name}</strong><span className="av-small">{days(z)}</span></span>
+                    <span className="av-zone__name"><strong>{z.name}</strong><span className="av-small">{days(z)}</span>
+                      {z.note && <span className="av-small av-zone__note">{z.note}</span>}</span>
                     <span className="av-zone__fee">
                       <strong>{f === 0 ? t("co.free") : money(f)}</strong>
                       {z.freeFrom != null && f > 0 && <span className="av-small">{t("co.freeFrom", { amount: money(z.freeFrom) })}</span>}
+                      {z.payOnReceipt && <span className="av-small av-zone__receipt">{t("co.payOnReceipt")}</span>}
                     </span>
                   </label>
                 );
               })}
             </fieldset>
           )}
-          {method === "DELIVERY" && <Textarea label={t("co.address")} rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
+          {method === "DELIVERY" && <Textarea label={t(activeKind === "CARGO" ? "co.addressCargo" : "co.address")} hint={t(activeKind === "CARGO" ? "co.addressCargoHint" : "co.addressHint")}
+                                               rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
           <Textarea label={t("co.note")} rows={2} maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} />
           <label className="av-check"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> {t(hadDetails ? "co.rememberAgain" : "co.remember")}</label>
 
@@ -212,6 +232,7 @@ export function CheckoutPage() {
           <dl className="av-totals">
             {zone && <div><dt>{t("co.socks")}</dt><dd className="av-price">{money(itemsTotal)}</dd></div>}
             {zone && <div><dt>{t("co.deliveryLine")} · {zone.name}</dt><dd className="av-price">{fee === 0 ? t("co.free") : money(fee)}</dd></div>}
+            {zone?.payOnReceipt && <div><dt className="av-small">{t("co.carrierLine")}</dt><dd className="av-small">{t("co.carrierOnReceipt")}</dd></div>}
             <div className="av-totals__grand"><dt>{t("cart.total")}</dt><dd className="av-price av-price--lg">{money(total)}</dd></div>
           </dl>
           {toFree != null && <p className="av-small av-zones__hint">{t("co.toFree", { amount: money(toFree) })}</p>}

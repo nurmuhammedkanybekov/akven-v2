@@ -102,6 +102,41 @@ class DeliveryZoneTest extends IntegrationTest {
         deliver(buyer, v, 2, Map.of("zoneId", UUID.randomUUID().toString())).andExpect(status().isBadRequest());
     }
 
+    @Test
+    void aCargoAreaIsPaidToTheCarrierOnReceiptAndTheOrderKeepsSaying() throws Exception {
+        String owner = tokenFor(Role.ADMIN);
+        Map<String, Object> cargo = zone("KG", "Bus cargo " + UUID.randomUUID().toString().substring(0, 6), "0.00", null, 2, 4);
+        cargo.put("kind", "CARGO");
+        cargo.put("payOnReceipt", true);
+        cargo.put("note", "  We hand the parcel to the bus cargo at Dordoi.  ");
+        JsonNode created = json(sendJson("POST", "/api/admin/delivery-zones", owner, cargo).andExpect(status().isCreated()));
+        assertThat(created.get("kind").asText()).isEqualTo("CARGO");
+        assertThat(created.get("payOnReceipt").asBoolean()).isTrue();
+        assertThat(created.get("note").asText()).isEqualTo("We hand the parcel to the bus cargo at Dordoi.");
+
+        // a courier area never has the carrier paid on receipt, whatever is sent
+        Map<String, Object> courier = zone("KG", "Courier " + UUID.randomUUID().toString().substring(0, 6), "2.00", null, 1, 1);
+        courier.put("payOnReceipt", true);
+        JsonNode c = json(sendJson("POST", "/api/admin/delivery-zones", owner, courier).andExpect(status().isCreated()));
+        assertThat(c.get("kind").asText()).isEqualTo("COURIER");
+        assertThat(c.get("payOnReceipt").asBoolean()).isFalse();
+
+        String buyer = customer();
+        JsonNode order = json(deliver(buyer, data.variant(10), 2, Map.of("zoneId", created.get("id").asText(), "address", "Osh, Lenin street 5, Aida"))
+                .andExpect(status().isCreated()));
+        assertThat(order.at("/fulfillment/delivery/kind").asText()).isEqualTo("CARGO");
+        assertThat(order.at("/fulfillment/delivery/payOnReceipt").asBoolean()).isTrue();
+        assertThat(order.at("/fulfillment/delivery/fee").decimalValue()).isZero();
+
+        // the receipt keeps saying so after the owners change the area
+        cargo.put("payOnReceipt", false);
+        cargo.put("kind", "COURIER");
+        sendJson("PUT", "/api/admin/delivery-zones/" + created.get("id").asText(), owner, cargo).andExpect(status().isOk());
+        JsonNode again = json(getJson("/api/orders/" + order.get("id").asText(), buyer).andExpect(status().isOk()));
+        assertThat(again.at("/fulfillment/delivery/kind").asText()).isEqualTo("CARGO");
+        assertThat(again.at("/fulfillment/delivery/payOnReceipt").asBoolean()).isTrue();
+    }
+
     @Autowired private DeliveryService delivery;
     @Autowired private DeliveryZoneRepository zones;
 

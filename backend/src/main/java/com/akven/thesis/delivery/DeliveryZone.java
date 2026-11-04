@@ -46,12 +46,29 @@ public class DeliveryZone {
     @Column(nullable = false)
     private int position;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private DeliveryKind kind = DeliveryKind.COURIER;
+
+    /** The customer pays the carrier when collecting the parcel (cargo), on top of the shop's own fee. */
+    @Column(name = "pay_on_receipt", nullable = false)
+    private boolean payOnReceipt;
+
+    @Column(length = 300)
+    private String note;
+
     protected DeliveryZone() {
         // JPA
     }
 
     DeliveryZone(Country country) {
         this.country = country;
+    }
+
+    void describe(DeliveryKind kind, boolean payOnReceipt, String note) {
+        this.kind = kind;
+        this.payOnReceipt = payOnReceipt;
+        this.note = note;
     }
 
     void update(Country country, String name, BigDecimal fee, BigDecimal freeFrom, Integer daysMin, Integer daysMax, boolean active, int position) {
@@ -79,4 +96,7 @@ public class DeliveryZone {
     public Integer getDaysMax() { return daysMax; }
     public boolean isActive() { return active; }
     public int getPosition() { return position; }
+    public DeliveryKind getKind() { return kind; }
+    public boolean isPayOnReceipt() { return payOnReceipt; }
+    public String getNote() { return note; }
 }

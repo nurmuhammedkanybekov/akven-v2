@@ -159,7 +159,7 @@ export interface OrderView {
   fulfilledAt: string | null; cancelledAt: string | null;
   fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null;
     /** Delivery orders: the area, fee and days as they were when the order was placed. */
-    delivery?: { zone: string | null; fee: number; daysMin: number | null; daysMax: number | null } | null };
+    delivery?: { zone: string | null; fee: number; daysMin: number | null; daysMax: number | null; kind?: DeliveryKind | null; payOnReceipt?: boolean } | null };
   /** simulated: paid with the demo wallet, no money moved. */
   payment: { method: string; reference: string; simulated?: boolean } | null;
   items: OrderItemView[];
@@ -299,9 +299,13 @@ export interface WholesaleLine {
 }
 export interface WholesaleInbox { waiting: number; requests: WholesaleLine[] }
 
+/** COURIER: the family's courier in and around Bishkek. CARGO: a cargo carrier to the regions and abroad. */
+export type DeliveryKind = "COURIER" | "CARGO";
 export interface DeliveryZone {
   id: string; country: Country; name: string; fee: number; freeFrom: number | null; daysMin: number | null; daysMax: number | null;
   active: boolean; position: number;
+  /** Older servers send neither: a courier area. payOnReceipt: the customer pays the carrier when collecting. */
+  kind?: DeliveryKind; payOnReceipt?: boolean; note?: string | null;
 }
 export type DeliveryZoneInput = Omit<DeliveryZone, "id">;
 

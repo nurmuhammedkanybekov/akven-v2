@@ -170,7 +170,7 @@ public class OrderService {
             throw new BusinessRuleException("NOTHING_TO_PAY", Map.of(), "There is nothing to pay for in this order.");
         }
         if (zone != null) {
-            order.deliverIn(zone.getId(), zone.getName(), zone.feeFor(order.getTotal()), zone.getDaysMin(), zone.getDaysMax());
+            order.deliverIn(zone.getId(), zone.getName(), zone.feeFor(order.getTotal()), zone.getDaysMin(), zone.getDaysMax(), zone.getKind(), zone.isPayOnReceipt());
         }
 
         try {

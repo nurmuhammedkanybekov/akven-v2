@@ -46,7 +46,8 @@ Mark every line ✅ (works), ⚠️ (works, but awkward: write what happened) or
 - [ ] Press "Sign in" with empty fields: it says what is missing, and the keyboard opens on the email field.
 - [ ] The phone's keyboard shows "@" on the email field and digits on the phone field.
 - [ ] While typing in checkout, the field you type in is never hidden under the keyboard.
-- [ ] Pickup / Delivery switch works; delivery shows the areas and the fee.
+- [ ] Pickup / Courier in Bishkek / Cargo switch works; the courier shows the areas and the fee; cargo shows the
+      countries, the carriers' notes and "paid to the carrier on receipt", and the address field asks for the city and receiver.
 - [ ] "To pay" shows the amount before the Pay buttons.
 - [ ] Pay (simulated wallet): the order page opens with a pickup code (for pickup).
 - [ ] Take a screenshot of the pickup code; it is readable.

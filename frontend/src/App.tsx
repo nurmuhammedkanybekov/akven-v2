@@ -1,4 +1,6 @@
 import { Suspense, lazy } from "react";
+import { RouteErrorBoundary } from "./components/ErrorBoundary";
+import { useT } from "./i18n/I18n";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 import { CartProvider } from "./cart/CartContext";
@@ -53,6 +55,12 @@ const FamilyPage = lazy(() => import("./pages/Family").then((m) => ({ default: m
 const OrdersPage = lazy(() => import("./pages/Orders").then((m) => ({ default: m.OrdersPage })));
 const StyleGuide = lazy(() => import("./pages/StyleGuide").then((m) => ({ default: m.StyleGuide })));
 
+/** While a page's code arrives: said in the visitor's language. */
+function PageLoading() {
+  const { t } = useT();
+  return <div className="av-container av-page" role="status" aria-live="polite">{t("crash.loading")}</div>;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -60,7 +68,8 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <CartProvider>
-          <Suspense fallback={<div className="av-container av-page" role="status" aria-live="polite">Loading…</div>}>
+          <RouteErrorBoundary>
+          <Suspense fallback={<PageLoading />}>
           <RouteTitle />
           <ScrollManager />
           <Routes>
@@ -116,6 +125,7 @@ export default function App() {
             </Route>
           </Routes>
           </Suspense>
+          </RouteErrorBoundary>
           </CartProvider>
         </ToastProvider>
       </AuthProvider>

@@ -38,7 +38,12 @@ page.on("console", (m) => { if (m.type() === "error" && !/status of 40[0-9]/.tes
 
 let productUrl = "";
 const CUSTOMER = `customer-${stamp}@akven.test`;
-const step = async (name, fn) => { process.stdout.write(`- ${name} ... `); await fn(); console.log("ok"); };
+const step = async (name, fn) => {
+  process.stdout.write(`- ${name} ... `);
+  // A failing step also says what the browser reported so far (a blank page usually has a script error behind it).
+  try { await fn(); } catch (e) { if (problems.length) console.log(`\nThe browser reported:\n${problems.join("\n")}`); throw e; }
+  console.log("ok");
+};
 const axeSource = fs.readFileSync(path.join(root, "node_modules/axe-core/axe.min.js"), "utf8");
 /** Runs the axe accessibility rules on the page as it is now; serious or critical findings fail the run. */
 /** Adding to the bag slides in the bag drawer (a modal); the journey carries on once it is closed. */
@@ -249,7 +254,11 @@ try {
     await page.getByText("Tell us who to ask for.").waitFor();
     await page.getByLabel("Name", { exact: true }).fill("Aida Test");
     await page.getByLabel("Phone").fill("+996 700 123 456");
-    await page.getByRole("radio", { name: /Delivery/ }).check();
+    // the family's ways of delivering: a courier in Bishkek, or a cargo carrier paid on receipt
+    await page.getByRole("radio", { name: /Cargo to the regions and abroad/ }).check();
+    await page.getByText(/We hand the parcel to the bus cargo at Dordoi/).first().waitFor();
+    await page.getByText("+ the carrier, paid on receipt").first().waitFor();
+    await page.getByRole("radio", { name: /Courier in Bishkek/ }).check();
     await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
     await page.getByText("Enter the delivery address, or choose pickup.").waitFor();
     await page.getByRole("radio", { name: /Pick up/ }).check();

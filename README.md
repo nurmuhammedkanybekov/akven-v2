@@ -33,8 +33,10 @@ This shop keeps those habits online instead of replacing them with a fixed price
 - **Ask for your price.** A chat on every sock, in English, Russian or Kyrgyz, as at the stall.
 - **The more pairs, the lower the price.** Any socks can be mixed; the whole bag counts towards the next step.
 - **One set for the whole family.** Shoe sizes in, sock sizes and the price step out.
-- **Collect at 70-E** with a six-digit code, or have it **delivered** to Kyrgyzstan, Kazakhstan, Uzbekistan or Russia,
-  with the fee and the days shown before paying.
+- **Three ways to get the socks, the way the family works:** collect at 70-E with a six-digit code; a **courier in
+  Bishkek** (a taxi the family calls, or the father's own car above an amount the owners set); or **cargo** to the
+  regions, Kazakhstan, Uzbekistan and Russia, where the customer pays the carrier on receipt. Fee and days are shown
+  before paying.
 - **Shops buy by the case.** Build a case, send a request, get a reference; the family answers from an inbox.
 
 ## The idea: talking is not deciding
@@ -81,7 +83,8 @@ rule-based assistant (which over-promised six times by design) or for the model.
 - **The family planner and family profiles** (sizes, birthdays), **gift boxes** with a ribbon and a hand-written card,
   the **sock finder** in three taps, and a **size guide** in the sizes each customer knows.
 - **The bag as one collection:** minimum order, the step reached, "add 4 more pairs to save 5%", **save for later**.
-- **Checkout:** pickup with a code and a QR code, or delivery by **area** with its fee, days and free-from amount;
+- **Checkout:** pickup with a code and a QR code, a courier by **area** with its fee, days and free-from amount, or a
+  **cargo carrier** with its note and "paid to the carrier on receipt";
   **remember my details** for next time; a simulated Apple Pay / Google Pay wallet (no money moves).
 - **Orders** with a timeline, cancel with refund until handover, and *order these again*.
 - **Wholesale and company gifts:** an open case of packs, how a case is made, *Build a case*, and a request (no account
@@ -149,7 +152,7 @@ A short tour:
 2. **Open a shelf**, pick a size and a colour, then take a filter off with its tag.
 3. **Plan a family set** on the home page: change a shoe size and watch the sock size and the price step.
 4. **Ask for a better price** as a customer: open a sock and type "50% off". The offer stays within the limit.
-5. **Check out** with delivery: choose an area, see its fee and days, tick *Remember my details*, pay with the
+5. **Check out** with a courier or cargo: choose an area or a carrier, see its fee and days, tick *Remember my details*, pay with the
    simulated wallet.
 6. **Send a wholesale request**, then open **http://localhost:8081/admin** as the owner: answer it from the inbox, hand
    an order over with its code, change a delivery area, read the dashboard.

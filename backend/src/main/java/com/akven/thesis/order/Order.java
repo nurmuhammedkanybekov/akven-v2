@@ -1,5 +1,6 @@
 package com.akven.thesis.order;
 
+import com.akven.thesis.delivery.DeliveryKind;
 import com.akven.thesis.common.AuditableEntity;
 import com.akven.thesis.common.ConflictException;
 import com.akven.thesis.shop.PickupPoint;
@@ -85,6 +86,13 @@ public class Order extends AuditableEntity {
     @Column(name = "delivery_days_max")
     private Integer deliveryDaysMax;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_kind", length = 10)
+    private DeliveryKind deliveryKind;
+
+    @Column(name = "delivery_pay_on_receipt", nullable = false)
+    private boolean deliveryPayOnReceipt;
+
     @Column(length = 64)
     private String idempotencyKey;
 
@@ -143,6 +151,13 @@ public class Order extends AuditableEntity {
      * after the socks are added: the fee is added to the total the customer pays.
      */
     public void deliverIn(UUID zoneId, String zoneName, BigDecimal fee, Integer daysMin, Integer daysMax) {
+        deliverIn(zoneId, zoneName, fee, daysMin, daysMax, DeliveryKind.COURIER, false);
+    }
+
+    /** As above, with how the area is delivered (courier or cargo) and whether the carrier is paid on receipt. */
+    public void deliverIn(UUID zoneId, String zoneName, BigDecimal fee, Integer daysMin, Integer daysMax, DeliveryKind kind, boolean payOnReceipt) {
+        this.deliveryKind = kind;
+        this.deliveryPayOnReceipt = payOnReceipt;
         if (fulfillmentMethod != FulfillmentMethod.DELIVERY || deliveryZoneName != null) {
             throw new IllegalStateException("Delivery is set once, on a delivery order.");
         }
@@ -228,6 +243,8 @@ public class Order extends AuditableEntity {
     public BigDecimal getDeliveryFee() { return deliveryFee; }
     public Integer getDeliveryDaysMin() { return deliveryDaysMin; }
     public Integer getDeliveryDaysMax() { return deliveryDaysMax; }
+    public DeliveryKind getDeliveryKind() { return deliveryKind; }
+    public boolean isDeliveryPayOnReceipt() { return deliveryPayOnReceipt; }
     public String getIdempotencyKey() { return idempotencyKey; }
     public PickupPoint getPickupPoint() { return pickupPoint; }
     public String getPickupCode() { return pickupCode; }

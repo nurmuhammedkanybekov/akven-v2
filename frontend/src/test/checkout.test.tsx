@@ -20,7 +20,8 @@ let DETAILS: Record<string, unknown> = { contactName: null, contactPhone: null, 
 
 const ZONES = [
   { id: "z-bishkek", country: "KG", name: "Bishkek", fee: 2, freeFrom: 40, daysMin: 1, daysMax: 2, active: true, position: 1 },
-  { id: "z-almaty", country: "KZ", name: "Almaty", fee: 8, freeFrom: null, daysMin: 2, daysMax: 4, active: true, position: 2 },
+  { id: "z-almaty", country: "KZ", name: "Almaty", fee: 8, freeFrom: null, daysMin: 2, daysMax: 4, active: true, position: 2, kind: "CARGO", payOnReceipt: true,
+    note: "We take the parcel to the cargo carrier." },
 ];
 
 interface Call { url: string; method: string; headers: Record<string, string>; body: any }
@@ -116,11 +117,16 @@ describe("checkout", () => {
     const user = userEvent.setup();
     await screen.findByText("Mid-Long Sock", { exact: false });
     await fillContact(user);
-    await user.click(screen.getByRole("radio", { name: /Delivery/ }));
+    // the family's courier in Bishkek: free from an amount
+    await user.click(screen.getByRole("radio", { name: /Courier in Bishkek/ }));
     await screen.findByText("Add $21.00 more and delivery is free.");
+    // cargo abroad: the carrier is paid on receipt, and the shop says so
+    await user.click(screen.getByRole("radio", { name: /Cargo to the regions and abroad/ }));
     await user.selectOptions(screen.getByLabelText("Country"), "KZ");
     await screen.findByText("Delivery · Almaty");
-    await user.type(screen.getByLabelText("Delivery address"), "Abay 1, Almaty");
+    expect(screen.getByText("We take the parcel to the cargo carrier.")).toBeInTheDocument();
+    expect(screen.getByText("paid to the carrier when you collect")).toBeInTheDocument();
+    await user.type(screen.getByLabelText("City, receiver and where to collect"), "Almaty, Aida, Sayran cargo office");
     await user.click(screen.getByRole("button", { name: "Pay with Apple Pay" }));
     await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /Pay \$27\.00/ }));
     await screen.findByText("order page");

@@ -103,4 +103,5 @@ Flyway runs the migrations in `backend/src/main/resources/db/migration`; the dem
 [`diagrams/04-er-data-model.svg`](diagrams/04-er-data-model.svg) (full schema).
 
 The diagrams do not yet show the tables added for Milestone 3 (`shop_policy`, `price_tier`, `shop_contact`,
-`pickup_point`, `size_chart_row`) or the new columns on `variant`, `customer_order` and `order_item`.
+`pickup_point`, `size_chart_row`, `delivery_zone`) or the new columns on `variant`, `customer_order` and `order_item`
+(V35 adds `kind`, `pay_on_receipt` and `note` to a delivery area, and the same kind and pay-on-receipt to the order's copy).
