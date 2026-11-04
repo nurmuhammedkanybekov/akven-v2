@@ -34,9 +34,11 @@ public class AdminOrderController {
 
     @GetMapping
     public PageResponse<OrderView> list(@RequestParam(required = false) OrderStatus status,
+                                        @RequestParam(required = false) String q,
+                                        @RequestParam(required = false) String way,
                                         @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "20") int pageSize) {
-        return service.list(status, page, pageSize);
+        return service.list(status, q, way, page, pageSize);
     }
 
     @GetMapping("/{id}")

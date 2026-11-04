@@ -30,13 +30,18 @@ public final class AccountDtos {
         }
     }
 
-    public record CustomerView(UUID id, String email, boolean trusted, boolean active, Instant createdAt) {
+    /** orders and spent count paid and handed-over orders; lastOrderAt is the newest of them. */
+    public record CustomerView(UUID id, String email, boolean trusted, boolean active, Instant createdAt,
+                               String name, long orders, java.math.BigDecimal spent, Instant lastOrderAt) {
         static CustomerView of(User u) {
-            return new CustomerView(u.getId(), u.getEmail(), u.isTrusted(), u.isActive(), u.getCreatedAt());
+            return of(u, 0, java.math.BigDecimal.ZERO, null);
+        }
+        static CustomerView of(User u, long orders, java.math.BigDecimal spent, Instant lastOrderAt) {
+            return new CustomerView(u.getId(), u.getEmail(), u.isTrusted(), u.isActive(), u.getCreatedAt(), u.getDisplayName(), orders, spent, lastOrderAt);
         }
     }
 
     /** One line of the audit log, with the actor's email instead of their id. before/after are JSON text. */
     public record AuditView(UUID id, Instant at, String actor, String action, String entityType, UUID entityId,
-                            String before, String after) {}
+                            String before, String after, String actorRole) {}
 }

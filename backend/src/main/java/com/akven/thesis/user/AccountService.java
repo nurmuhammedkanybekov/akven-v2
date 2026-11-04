@@ -46,6 +46,9 @@ public class AccountService {
     private final AuditService audit;
     private final AuditLogRepository auditLog;
 
+    @jakarta.persistence.PersistenceContext
+    private jakarta.persistence.EntityManager em;
+
     public AccountService(UserRepository users, PasswordEncoder encoder, AuditService audit, AuditLogRepository auditLog) {
         this.users = users;
         this.encoder = encoder;
@@ -121,22 +124,73 @@ public class AccountService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<CustomerView> customers(String search, int page, int size) {
-        Page<User> result = users.findByRoleAndEmailContainingIgnoreCaseOrderByEmailAsc(Role.CUSTOMER, search == null ? "" : search.strip(),
-                PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100)));
-        return PageResponse.of(result, CustomerView::of);
+        String text = "%" + (search == null ? "" : search.strip().toLowerCase(Locale.ROOT)).replace("%", "") + "%";
+        Page<User> result = users.searchByRole(Role.CUSTOMER, text, PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100)));
+        // What each one bought, in one query: paid and handed-over orders, their sum and the newest.
+        Map<UUID, Object[]> bought = new HashMap<>();
+        List<UUID> ids = result.getContent().stream().map(User::getId).toList();
+        if (!ids.isEmpty()) {
+            em.createQuery("select o.customer.id, count(o), sum(o.total), max(o.createdAt) from Order o where o.customer.id in :ids "
+                            + "and o.status in (com.akven.thesis.order.OrderStatus.PAID, com.akven.thesis.order.OrderStatus.FULFILLED) group by o.customer.id", Object[].class)
+                    .setParameter("ids", ids).getResultList().forEach(row -> bought.put((UUID) row[0], row));
+        }
+        return PageResponse.of(result, u -> {
+            Object[] b = bought.get(u.getId());
+            return b == null ? CustomerView.of(u) : CustomerView.of(u, (Long) b[1], (java.math.BigDecimal) b[2], (java.time.Instant) b[3]);
+        });
     }
 
     /** The whole audit log, newest first: every change anyone made in the admin. */
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public PageResponse<AuditView> auditLog(int page, int size) {
-        Page<AuditLogEntry> result = auditLog.findAll(PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100),
+        return auditLog(null, null, page, size);
+    }
+
+    /** The parts of the shop a change can be about, so the log can be read one part at a time. */
+    static final Map<String, List<String>> AREAS = Map.of(
+            "orders", List.of("ORDER", "ORDER_EXPORT"),
+            "catalog", List.of("PRODUCT", "VARIANT", "TERM"),
+            "prices", List.of("PRICE_TIER", "SHOP_POLICY"),
+            "delivery", List.of("DELIVERY_ZONE"),
+            "people", List.of("USER"),
+            "chat", List.of("NEGOTIATION_SESSION", "APP_SETTING"),
+            "shop", List.of("SHOP_CONTACT", "PICKUP_POINT", "SIZE_CHART_ROW"),
+            "messages", List.of("EMAIL", "STOCK_REQUEST", "REVIEW", "WHOLESALE_REQUEST"));
+
+    /**
+     * The audit log, newest first. area: one of {@link #AREAS} (null for all). who: "team" (staff, owners, super
+     * admins), "customers", "guests" (no account), or one email (null for everyone).
+     */
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public PageResponse<AuditView> auditLog(String area, String who, int page, int size) {
+        List<String> types = area == null ? null : AREAS.get(area);
+        Set<UUID> team = users.findAll().stream().filter(u -> u.getRole() != Role.CUSTOMER).map(User::getId).collect(Collectors.toSet());
+        org.springframework.data.jpa.domain.Specification<AuditLogEntry> spec = (root, query, cb) -> {
+            List<jakarta.persistence.criteria.Predicate> all = new java.util.ArrayList<>();
+            if (types != null) all.add(root.get("entityType").in(types));
+            if ("guests".equals(who)) all.add(cb.isNull(root.get("actorId")));
+            else if ("team".equals(who)) all.add(team.isEmpty() ? cb.disjunction() : root.get("actorId").in(team));
+            else if ("customers".equals(who)) {
+                all.add(cb.isNotNull(root.get("actorId")));
+                if (!team.isEmpty()) all.add(cb.not(root.get("actorId").in(team)));
+            } else if (who != null && !who.isBlank()) {
+                all.add(cb.equal(root.get("actorId"), users.findByEmail(who.strip()).map(User::getId).orElse(new UUID(0, 0))));
+            }
+            return cb.and(all.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+        Page<AuditLogEntry> result = auditLog.findAll(spec, PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100),
                 Sort.by(Sort.Direction.DESC, "createdAt")));
-        Map<UUID, String> emails = new HashMap<>();
+        Map<UUID, User> actors = new HashMap<>();
         users.findAllById(result.stream().map(AuditLogEntry::getActorId).filter(java.util.Objects::nonNull).collect(Collectors.toSet()))
-                .forEach(u -> emails.put(u.getId(), u.getEmail()));
-        return PageResponse.of(result, e -> new AuditView(e.getId(), e.getCreatedAt(), e.getActorId() == null ? "guest" : emails.getOrDefault(e.getActorId(), "?"),
-                e.getAction(), e.getEntityType(), e.getEntityId(), e.getBeforeState(), e.getAfterState()));
+                .forEach(u -> actors.put(u.getId(), u));
+        return PageResponse.of(result, e -> {
+            User a = e.getActorId() == null ? null : actors.get(e.getActorId());
+            return new AuditView(e.getId(), e.getCreatedAt(), e.getActorId() == null ? "guest" : a == null ? "?" : a.getEmail(),
+                    e.getAction(), e.getEntityType(), e.getEntityId(), e.getBeforeState(), e.getAfterState(),
+                    e.getActorId() == null ? "GUEST" : a == null ? null : a.getRole().name());
+        });
     }
 
     /** A staff or owner account. Super admin accounts are never changed through the API. */

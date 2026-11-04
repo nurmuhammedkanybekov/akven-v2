@@ -302,9 +302,34 @@ public class OrderService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public PageResponse<OrderView> list(OrderStatus status, int page, int size) {
+        return list(status, null, null, page, size);
+    }
+
+    /**
+     * q: part of the order number (AV-1234ABCD), a name, a phone or an email. way: PICKUP, COURIER or CARGO.
+     */
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public PageResponse<OrderView> list(OrderStatus status, String q, String way, int page, int size) {
         Specification<Order> spec = (root, query, cb) -> {
             List<Predicate> all = new ArrayList<>();
             if (status != null) all.add(cb.equal(root.get("status"), status));
+            if ("PICKUP".equals(way)) all.add(cb.equal(root.get("fulfillmentMethod"), FulfillmentMethod.PICKUP));
+            else if ("COURIER".equals(way) || "CARGO".equals(way)) {
+                all.add(cb.equal(root.get("fulfillmentMethod"), FulfillmentMethod.DELIVERY));
+                all.add(cb.equal(root.get("deliveryKind"), com.akven.thesis.delivery.DeliveryKind.valueOf(way)));
+            }
+            if (q != null && !q.isBlank()) {
+                String text = q.strip().toLowerCase(java.util.Locale.ROOT).replaceFirst("^av-", "").replace("%", "").replace("_", "");
+                String like = "%" + text + "%";
+                var customer = root.join("customer", jakarta.persistence.criteria.JoinType.LEFT);
+                all.add(cb.or(
+                        cb.like(cb.lower(root.get("id").as(String.class)), text + "%"),
+                        cb.like(cb.lower(root.get("contactName")), like),
+                        cb.like(cb.lower(root.get("contactPhone")), like),
+                        cb.like(cb.lower(root.get("guestEmail")), like),
+                        cb.like(cb.lower(customer.get("email")), like)));
+            }
             return cb.and(all.toArray(new Predicate[0]));
         };
         Page<Order> found = orders.findAll(spec, PageRequest.of(Math.max(page, 0), size <= 0 ? 20 : Math.min(size, 100), Sort.by(Sort.Order.desc("createdAt"))));

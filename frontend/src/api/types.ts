@@ -235,6 +235,14 @@ export interface SizeMatch { system: SizeSystem; size: number; labels: string[] 
 
 // ---- owners' dashboard ----
 
+export interface ShopShare { key: string; orders: number; revenue: number }
+export interface ShopInsights {
+  ways: ShopShare[]; shelves: ShopShare[];
+  topCustomers: Array<{ name: string; email: string; guest: boolean; orders: number; spent: number }>;
+  returningCustomers: number; guestOrders: number; cancelled: number; ladderOrders: number; averagePairs: number;
+  /** Paid orders per weekday, Monday first. */
+  weekdays: number[];
+}
 export interface ShopSummary {
   days: number;
   sales: { orders: number; revenue: number; pairs: number; averageOrder: number | null };
@@ -243,6 +251,8 @@ export interface ShopSummary {
   soldOut: number;
   lowStock: Array<{ productId: string; slug: string; productName: string; sku: string; color: string | null; size: string | null;
                     available: number; incoming: number; restockEta: string | null }>;
+  /** What the period's paid orders say (missing from an older server). */
+  insights?: ShopInsights;
 }
 
 export interface NegotiationStats {
@@ -265,8 +275,11 @@ export interface EvaluationSummary { averageFinalPct: number | null; acceptedPct
 // ---- accounts, audit log and the assistant (super admin) ----
 export type TeamRole = "STAFF" | "ADMIN" | "SUPER_ADMIN";
 export interface Account { id: string; email: string; displayName: string | null; role: TeamRole; active: boolean; createdAt: string }
-export interface CustomerAccount { id: string; email: string; trusted: boolean; active: boolean; createdAt: string }
-export interface AuditLine { id: string; at: string; actor: string; action: string; entityType: string; entityId: string; before: string | null; after: string | null }
+export interface CustomerAccount { id: string; email: string; trusted: boolean; active: boolean; createdAt: string;
+  name?: string | null; orders?: number; spent?: number; lastOrderAt?: string | null }
+export interface AuditLine { id: string; at: string; actor: string; action: string; entityType: string; entityId: string; before: string | null; after: string | null;
+  actorRole?: "GUEST" | "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN" | null }
+export type AuditArea = "orders" | "catalog" | "prices" | "delivery" | "people" | "chat" | "shop" | "messages";
 export type AssistantMode = "ai" | "rules";
 export interface AssistantStatus { mode: AssistantMode; aiConfigured: boolean; model: string; endpointHost: string | null; answersLast7Days: Record<string, number> }
 export interface AssistantTry { assistant: string; proposedPct: number; validatedPct: number; offerPrice: number; reply: string; millis: number }
