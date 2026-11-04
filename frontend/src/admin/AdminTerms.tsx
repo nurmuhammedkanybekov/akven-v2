@@ -3,7 +3,6 @@ import { ApiError } from "../api/client";
 import { adminCreateTerm, adminDeleteTerm, adminListTerms, adminReorderTerms, adminUpdateTerm } from "../api/endpoints";
 import type { AdminTerm, TermKind } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
-import { Badge } from "../components/Badge";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { Input, Textarea } from "../components/Field";
@@ -71,24 +70,33 @@ export function AdminTerms() {
       {list.error && <Alert tone="danger">{list.error.message}</Alert>}
       {list.data && terms.length === 0 && <div className="av-empty"><h2>{t(`a.term.none.${kind}`)}</h2><Button onClick={() => open(null)}>{t(`a.term.add.${kind}`)}</Button></div>}
       {terms.length > 0 && (
-        <ol className="av-termlist">
-          {terms.map((x, i) => (
-            <li key={x.id} className="av-term">
-              <div className="av-term__main">
-                <strong>{x.name}</strong>{!x.active && <> <Badge tone="danger">{t("a.hidden")}</Badge></>}
-                {x.description && <span className="av-small av-muted"> {x.description}</span>}
-                <span className="av-small av-muted"> {t("a.term.productCount", { n: x.productCount })}</span>
-              </div>
-              <div className="av-row">
-                <Switch checked={x.active} onChange={(a) => void setActive(x, a)} label={t("a.term.showIn", { name: x.name })} />
-                <Button size="sm" variant="ghost" disabled={i === 0} aria-label={t("a.term.up", { name: x.name })} onClick={() => void move(i, -1)}>↑</Button>
-                <Button size="sm" variant="ghost" disabled={i === terms.length - 1} aria-label={t("a.term.down", { name: x.name })} onClick={() => void move(i, 1)}>↓</Button>
-                <Button size="sm" variant="secondary" aria-label={t("a.term.editN", { name: x.name })} onClick={() => open(x)}>{t("a.edit")}</Button>
-                <Button size="sm" variant="ghost" aria-label={t("a.term.deleteN", { name: x.name })} onClick={() => setDeleting(x)}>{t("a.delete")}</Button>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <div className="av-tablewrap">
+          <table className="av-table av-termtable">
+            <thead><tr>
+              <th scope="col" className="av-termtable__pos">#</th><th scope="col">{t("a.name")}</th><th scope="col">{t("a.term.productsCol")}</th>
+              <th scope="col">{t("a.term.inShop")}</th><th scope="col">{t("a.term.orderCol")}</th><th scope="col"><span className="av-visually-hidden">{t("a.cu.actions")}</span></th>
+            </tr></thead>
+            <tbody>
+              {terms.map((x, i) => (
+                <tr key={x.id} className={`av-term${x.active ? "" : " is-hidden"}`}>
+                  <td className="av-termtable__pos av-num">{i + 1}</td>
+                  <td><strong>{x.name}</strong>{x.description && <><br /><span className="av-small av-muted">{x.description}</span></>}</td>
+                  <td className="av-num">{x.productCount}</td>
+                  <td><span className="av-termtable__shown"><Switch checked={x.active} onChange={(a) => void setActive(x, a)} label={t("a.term.showIn", { name: x.name })} hideLabel />
+                    <span className="av-small">{x.active ? t("a.dz.shown") : t("a.hidden")}</span></span></td>
+                  <td className="av-termtable__move">
+                    <Button size="sm" variant="ghost" disabled={i === 0} aria-label={t("a.term.up", { name: x.name })} onClick={() => void move(i, -1)}>↑</Button>
+                    <Button size="sm" variant="ghost" disabled={i === terms.length - 1} aria-label={t("a.term.down", { name: x.name })} onClick={() => void move(i, 1)}>↓</Button>
+                  </td>
+                  <td className="av-admin__rowactions">
+                    <Button size="sm" variant="secondary" aria-label={t("a.term.editN", { name: x.name })} onClick={() => open(x)}>{t("a.edit")}</Button>
+                    <Button size="sm" variant="ghost" aria-label={t("a.term.deleteN", { name: x.name })} onClick={() => setDeleting(x)}>{t("a.delete")}</Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <Dialog open={!!editing} title={editing?.term ? t("a.term.editN", { name: editing.term.name }) : t(`a.term.add.${kind}`)} onClose={() => setEditing(null)}

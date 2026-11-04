@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { Fragment, useState, type FormEvent } from "react";
+import { useMoney } from "../shop/useMoney";
 import { adminCreateDeliveryZone, adminDeleteDeliveryZone, adminDeliveryZones, adminUpdateDeliveryZone } from "../api/endpoints";
 import type { Country, DeliveryKind, DeliveryZone, DeliveryZoneInput } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
@@ -58,7 +59,6 @@ function ZoneForm({ zone, onDone }: { zone: DeliveryZone | null; onDone: () => v
 
   return (
     <form className="av-card-form av-dzone" onSubmit={save} aria-label={zone ? zone.name : t("a.dz.new")}>
-      {zone && !zone.active && <Badge>{t("a.dz.hidden")}</Badge>}
       <div className="av-dzone__grid">
         <Select label={t("a.dz.kind")} value={d.kind} onChange={set("kind")}>
           <option value="COURIER">{t("a.dz.kindCourier")}</option>
@@ -86,22 +86,66 @@ function ZoneForm({ zone, onDone }: { zone: DeliveryZone | null; onDone: () => v
   );
 }
 
-/** Delivery areas: where the shop delivers, the fee, the free-from amount and the days. Owners only. */
+const FLAG: Record<Country, string> = { KG: "🇰🇬", KZ: "🇰🇿", UZ: "🇺🇿", RU: "🇷🇺" };
+
+/** Delivery areas: where the shop delivers, the fee, the free-from amount and the days, as a table; a row opens to edit. Owners only. */
 export function AdminDelivery() {
   const { t } = useT();
+  const { money } = useMoney();
   const list = useAsync(() => adminDeliveryZones(), []);
+  const [open, setOpen] = useState<string | null>(null);
+  const done = () => { setOpen(null); list.reload(); };
+  const days = (z: DeliveryZone) => z.daysMin == null ? "—" : z.daysMax == null || z.daysMax === z.daysMin ? t("co.day", { n: z.daysMin }) : t("co.days", { min: z.daysMin, max: z.daysMax });
+  const groups: Array<[DeliveryKind, string]> = [["COURIER", t("a.dz.kindCourier")], ["CARGO", t("a.dz.kindCargo")]];
   return (
     <>
-      <header className="av-admin__head"><div><span className="av-eyebrow">{t("a.group.owners")}</span><h1>{t("a.nav.delivery")}</h1></div></header>
+      <header className="av-admin__head">
+        <div><span className="av-eyebrow">{t("a.group.owners")}</span><h1>{t("a.nav.delivery")}</h1></div>
+        <OwnersOnly><Button onClick={() => setOpen(open === "new" ? null : "new")}>{t("a.dz.new")}</Button></OwnersOnly>
+      </header>
       <p className="av-lead">{t("a.dz.lead")}</p>
       <OwnersOnly>
+        {open === "new" && <div className="av-dzone__new"><ZoneForm zone={null} onDone={done} /></div>}
         {list.loading && !list.data && <Skeleton height={200} />}
         {list.error && <Alert tone="danger">{list.error.message}</Alert>}
-        <div className="av-dzones">
-          {(list.data ?? []).map((z) => <ZoneForm key={`${z.id}-${z.fee}-${z.name}-${z.active}-${z.daysMin}-${z.daysMax}-${z.freeFrom}-${z.kind}-${z.payOnReceipt}-${z.note}`} zone={z} onDone={list.reload} />)}
-          <h2>{t("a.dz.new")}</h2>
-          <ZoneForm zone={null} onDone={list.reload} />
-        </div>
+        {groups.map(([kind, title]) => {
+          const zones = (list.data ?? []).filter((z) => (z.kind ?? "COURIER") === kind);
+          if (!list.data) return null;
+          return (
+            <section key={kind} className="av-card-form av-dzgroup" aria-label={title}>
+              <h2 className="av-formtitle">{kind === "COURIER" ? "🚕" : "🚌"} {title} <span className="av-small av-muted">· {zones.length}</span></h2>
+              {zones.length === 0 ? <p className="av-small">{t("a.dz.noneOfKind")}</p> : (
+                <div className="av-tablewrap">
+                  <table className="av-table av-dztable">
+                    <thead><tr>
+                      <th scope="col">{t("a.dz.name")}</th><th scope="col">{t("a.dz.fee")}</th><th scope="col">{t("a.dz.freeFromShort")}</th>
+                      <th scope="col">{t("a.dz.daysShort")}</th><th scope="col">{t("a.dz.shownShort")}</th><th scope="col"><span className="av-visually-hidden">{t("a.cu.actions")}</span></th>
+                    </tr></thead>
+                    <tbody>
+                      {zones.map((z) => (
+                        <Fragment key={z.id}>
+                          <tr className={open === z.id ? "is-open" : undefined}>
+                            <td><strong>{FLAG[z.country]} {z.name}</strong>
+                              {z.payOnReceipt && <> <Badge tone="accent">{t("a.dz.payOnReceiptShort")}</Badge></>}
+                              {z.note && <><br /><span className="av-small av-muted av-dztable__note">{z.note}</span></>}</td>
+                            <td className="av-num">{Number(z.fee) === 0 ? t("co.free") : money(Number(z.fee))}</td>
+                            <td className="av-num">{z.freeFrom != null ? money(Number(z.freeFrom)) : "—"}</td>
+                            <td className="av-small">{days(z)}</td>
+                            <td>{z.active ? <Badge tone="success">{t("a.dz.shown")}</Badge> : <Badge>{t("a.dz.hidden")}</Badge>}</td>
+                            <td><Button size="sm" variant={open === z.id ? "secondary" : "ghost"} aria-expanded={open === z.id} onClick={() => setOpen(open === z.id ? null : z.id)}>{open === z.id ? t("a.ng.hide") : t("a.dz.edit")}</Button></td>
+                          </tr>
+                          {open === z.id && <tr className="av-dztable__form"><td colSpan={6}>
+                            <ZoneForm key={`${z.id}-${z.fee}-${z.name}-${z.active}-${z.daysMin}-${z.daysMax}-${z.freeFrom}-${z.kind}-${z.payOnReceipt}-${z.note}`} zone={z} onDone={done} />
+                          </td></tr>}
+                        </Fragment>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          );
+        })}
       </OwnersOnly>
     </>
   );
