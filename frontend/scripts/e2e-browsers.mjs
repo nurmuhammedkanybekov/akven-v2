@@ -61,6 +61,9 @@ for (const [engineName, engine] of engines) {
         advice: document.querySelector("#fitting .av-fr__advice")?.textContent,
       }));
       await teaser.scrollIntoViewIfNeeded();
+      // The section people choose in must not slide under the pointer (a sliding chip once took the tap elsewhere in WebKit).
+      const moves = await teaser.evaluate((el) => getComputedStyle(el).transform);
+      assert.equal(moves, "none", `the teaser slides while it is being used (transform ${moves})`);
       await teaser.locator("label", { hasText: /^Her$/ }).click();
       await teaser.locator("label", { hasText: /^Ankle/ }).click();
       try {

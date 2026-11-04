@@ -8,6 +8,9 @@
 /* A slide, never a fade: text keeps full contrast at every moment of the motion. */
 .reveal [data-reveal] { transform: translateY(28px); transition: transform 1s var(--ease); }
 .reveal [data-reveal].is-in { transform: none; }
+/* A section people choose things in (the fitting room's teaser, the family planner) stays put: a chip that slides
+   away under the finger takes the tap somewhere else. Its heading still arrives. */
+.reveal [data-reveal]:has(input, select, textarea) { transform: none; transition: none; }
 
 /* ---------- buttons on navy ---------- */
 .av-btn--shine { background-image: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%); background-size: 250% 100%; background-position: 120% 0; animation: av-shine 5s var(--ease) 2s infinite; }
