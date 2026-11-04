@@ -6,7 +6,7 @@
 |---|---|
 | **Localhost** (`docker compose up`) | Right for developing and for the defence: the whole shop runs on one laptop, offline. It is not "safer" for a real shop, only unreachable: no customer can buy. |
 | **Vercel** (or Netlify) | Hosts static pages and short serverless functions. The frontend would run there, but the backend is a long-running Spring Boot server with a PostgreSQL database and uploaded photos on disk, and none of that fits. Splitting the frontend (Vercel) from the backend (somewhere else) adds two deployments, two domains and cross-origin requests for nothing. |
-| **One small server (recommended)** | The same `docker compose` that CI tests, on a rented Linux server, behind Caddy for automatic HTTPS. About 4–6 EUR a month (for example Hetzner CX22 or a DigitalOcean basic droplet, 2 GB of memory). Everything stays in one place. |
+| **One small server (recommended)** | The same `docker compose` that CI tests, on a rented Linux server, behind Caddy for automatic HTTPS. About 4–6 EUR a month (for example Hetzner CX22: 2 processors, 4 GB of memory, 40 GB disk). With only 2 GB, add swap (step 3), or building the Java backend runs out of memory. Everything stays in one place. |
 | Render, Railway, Fly.io | Possible without managing a server (a Docker service, a managed PostgreSQL and a disk for photos), at a similar or higher price. Their free tiers sleep or expire, so they suit a demo, not a shop. |
 
 ## Two kinds of public installation
@@ -25,8 +25,14 @@
 2. **The server:** Ubuntu 24.04, log in with an SSH key only, and open just the web and SSH ports:
    `sudo ufw allow OpenSSH && sudo ufw allow 80 && sudo ufw allow 443 && sudo ufw enable`. Turn on automatic security
    updates (`sudo apt install unattended-upgrades`).
-3. **Docker** with the compose plugin (docs.docker.com, "Install Docker Engine on Ubuntu").
-4. **The code:** `git clone` the repository, then `cp .env.example .env`, `chmod 600 .env`, and fill in:
+3. **Docker** with the compose plugin: `curl -fsSL https://get.docker.com | sudo sh`, then
+   `sudo usermod -aG docker $USER` and log in again. On a server with less than 4 GB of memory, add 2 GB of swap:
+   `sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile &&
+   echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab`.
+4. **The code:** `git clone -b dev https://github.com/<owner>/akven-v2.git && cd akven-v2`. A private repository
+   needs a read-only *deploy key*: `ssh-keygen -t ed25519 -f ~/.ssh/akven_deploy -N ""`, add the `.pub` file in the
+   repository's Settings > Deploy keys, and clone with `GIT_SSH_COMMAND='ssh -i ~/.ssh/akven_deploy' git clone -b dev
+   git@github.com:<owner>/akven-v2.git`. Then `cp .env.example .env`, `chmod 600 .env`, and fill in:
    - `DB_PASSWORD`: a long random value, set **before the first start** (the database keeps the first one);
    - `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD` (at least 12 characters), `SUPER_ADMIN_NAME`;
    - `SHOP_CONTACTS` (the real WhatsApp, Telegram and phone; they never go into the repository);
