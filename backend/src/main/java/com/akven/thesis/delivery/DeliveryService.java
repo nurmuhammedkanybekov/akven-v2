@@ -96,6 +96,9 @@ public class DeliveryService {
         if (in.freeFrom() != null && in.fee().signum() == 0) throw new BusinessRuleException("A free area needs no free-from amount.");
         z.update(in.country(), in.name().strip().replaceAll("\\s+", " "), in.fee(), in.freeFrom(), min, max == null ? min : max,
                 in.active(), in.position());
+        String note = in.note() == null || in.note().isBlank() ? null : in.note().strip();
+        DeliveryKind kind = in.kind() == null ? DeliveryKind.COURIER : in.kind();
+        z.describe(kind, kind == DeliveryKind.CARGO && in.payOnReceipt(), note);
     }
 
     private static Map<String, Object> snapshot(DeliveryZone z) {
@@ -106,6 +109,9 @@ public class DeliveryService {
         m.put("freeFrom", z.getFreeFrom());
         m.put("days", z.getDaysMin() == null ? null : z.getDaysMin() + "-" + z.getDaysMax());
         m.put("active", z.isActive());
+        m.put("kind", z.getKind());
+        m.put("payOnReceipt", z.isPayOnReceipt());
+        m.put("note", z.getNote());
         return m;
     }
 }

@@ -28,7 +28,7 @@ class DefaultDeliveryZones implements ApplicationRunner {
             if (n.longValue() > 0) return;
             String[][] zones = {{"KG", "Kyrgyzstan", "10"}, {"KZ", "Kazakhstan", "20"}, {"UZ", "Uzbekistan", "30"}, {"RU", "Russia", "40"}};
             for (String[] z : zones) {
-                em.createNativeQuery("insert into delivery_zone (id, country, name, fee, active, position) values (random_uuid(), ?1, ?2, 0, true, ?3)")
+                em.createNativeQuery("insert into delivery_zone (id, country, name, fee, active, position, kind, pay_on_receipt) values (random_uuid(), ?1, ?2, 0, true, ?3, 'COURIER', false)")
                         .setParameter(1, z[0]).setParameter(2, z[1]).setParameter(3, Integer.parseInt(z[2])).executeUpdate();
             }
         });

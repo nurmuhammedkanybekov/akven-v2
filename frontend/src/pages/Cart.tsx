@@ -57,7 +57,8 @@ export function CartPage() {
   const rows = cart.lines.map((line) => ({ line, q: quote?.lines.find((l) => l.sku === line.sku) }));
   const fallbackTotal = cart.lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0);
   const total = quote ? quote.total : fallbackTotal;
-  const activeZones = Array.isArray(zones.data) ? zones.data.filter((z) => z.active) : [];
+  // Courier areas only: a cargo carrier is paid on receipt, so its "free" would not be the whole story.
+  const activeZones = Array.isArray(zones.data) ? zones.data.filter((z) => z.active && (z.kind ?? "COURIER") === "COURIER") : [];
   const cheapest = activeZones.length ? Math.min(...activeZones.map((z) => deliveryFee(z, total))) : null;
   const deliveryNote = cheapest == null ? t("cart.deliveryS") : cheapest === 0 ? t("cart.deliveryFree") : t("cart.deliveryFrom", { fee: money(cheapest) });
   // The bag written out, for customers who would rather order by message: nothing is sent until they press send.

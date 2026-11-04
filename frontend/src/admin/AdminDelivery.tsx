@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { adminCreateDeliveryZone, adminDeleteDeliveryZone, adminDeliveryZones, adminUpdateDeliveryZone } from "../api/endpoints";
-import type { Country, DeliveryZone, DeliveryZoneInput } from "../api/types";
+import type { Country, DeliveryKind, DeliveryZone, DeliveryZoneInput } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { Badge } from "../components/Badge";
 import { Button } from "../components/Button";
-import { Input, Select } from "../components/Field";
+import { Input, Select, Textarea } from "../components/Field";
 import { Switch } from "../components/Switch";
 import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
@@ -13,16 +13,20 @@ import type { MessageKey } from "../i18n/en";
 import { OwnersOnly } from "./OwnersOnly";
 
 const COUNTRIES: Country[] = ["KG", "KZ", "UZ", "RU"];
-const EMPTY: DeliveryZoneInput = { country: "KG", name: "", fee: 0, freeFrom: null, daysMin: null, daysMax: null, active: true, position: 0 };
+const EMPTY: DeliveryZoneInput = { country: "KG", name: "", fee: 0, freeFrom: null, daysMin: null, daysMax: null, active: true, position: 0,
+  kind: "COURIER", payOnReceipt: false, note: null };
 
-type Draft = { country: Country; name: string; fee: string; freeFrom: string; daysMin: string; daysMax: string; active: boolean; position: string };
+type Draft = { country: Country; name: string; fee: string; freeFrom: string; daysMin: string; daysMax: string; active: boolean; position: string;
+  kind: DeliveryKind; payOnReceipt: boolean; note: string };
 const toDraft = (z: DeliveryZoneInput): Draft => ({
   country: z.country, name: z.name, fee: String(z.fee), freeFrom: z.freeFrom == null ? "" : String(z.freeFrom),
   daysMin: z.daysMin == null ? "" : String(z.daysMin), daysMax: z.daysMax == null ? "" : String(z.daysMax), active: z.active, position: String(z.position),
+  kind: z.kind ?? "COURIER", payOnReceipt: !!z.payOnReceipt, note: z.note ?? "",
 });
 const fromDraft = (d: Draft): DeliveryZoneInput => ({
   country: d.country, name: d.name.trim(), fee: Number(d.fee || 0), freeFrom: d.freeFrom.trim() ? Number(d.freeFrom) : null,
   daysMin: d.daysMin.trim() ? Number(d.daysMin) : null, daysMax: d.daysMax.trim() ? Number(d.daysMax) : null, active: d.active, position: Number(d.position || 0),
+  kind: d.kind, payOnReceipt: d.kind === "CARGO" && d.payOnReceipt, note: d.note.trim() || null,
 });
 
 /** One area as an editable card: the owners change a price and press save; the server checks and audits it. */
@@ -56,6 +60,10 @@ function ZoneForm({ zone, onDone }: { zone: DeliveryZone | null; onDone: () => v
     <form className="av-card-form av-dzone" onSubmit={save} aria-label={zone ? zone.name : t("a.dz.new")}>
       {zone && !zone.active && <Badge>{t("a.dz.hidden")}</Badge>}
       <div className="av-dzone__grid">
+        <Select label={t("a.dz.kind")} value={d.kind} onChange={set("kind")}>
+          <option value="COURIER">{t("a.dz.kindCourier")}</option>
+          <option value="CARGO">{t("a.dz.kindCargo")}</option>
+        </Select>
         <Select label={t("a.dz.country")} value={d.country} onChange={set("country")}>
           {COUNTRIES.map((c) => <option key={c} value={c}>{t(`country.${c}` as MessageKey)}</option>)}
         </Select>
@@ -65,6 +73,9 @@ function ZoneForm({ zone, onDone }: { zone: DeliveryZone | null; onDone: () => v
         <Input label={t("a.dz.daysMin")} type="number" min={0} max={60} value={d.daysMin} onChange={set("daysMin")} />
         <Input label={t("a.dz.daysMax")} type="number" min={0} max={60} value={d.daysMax} onChange={set("daysMax")} />
       </div>
+      <Textarea label={t("a.dz.note")} hint={t("a.dz.noteHint")} rows={2} maxLength={300} value={d.note}
+                onChange={(e) => setD({ ...d, note: e.target.value })} />
+      {d.kind === "CARGO" && <Switch checked={d.payOnReceipt} onChange={(payOnReceipt) => setD({ ...d, payOnReceipt })} label={t("a.dz.payOnReceipt")} />}
       <Switch checked={d.active} onChange={(active) => setD({ ...d, active })} label={t("a.dz.active")} />
       {error && <Alert tone="danger">{error}</Alert>}
       <div className="av-row">
@@ -87,7 +98,7 @@ export function AdminDelivery() {
         {list.loading && !list.data && <Skeleton height={200} />}
         {list.error && <Alert tone="danger">{list.error.message}</Alert>}
         <div className="av-dzones">
-          {(list.data ?? []).map((z) => <ZoneForm key={`${z.id}-${z.fee}-${z.name}-${z.active}-${z.daysMin}-${z.daysMax}-${z.freeFrom}`} zone={z} onDone={list.reload} />)}
+          {(list.data ?? []).map((z) => <ZoneForm key={`${z.id}-${z.fee}-${z.name}-${z.active}-${z.daysMin}-${z.daysMax}-${z.freeFrom}-${z.kind}-${z.payOnReceipt}-${z.note}`} zone={z} onDone={list.reload} />)}
           <h2>{t("a.dz.new")}</h2>
           <ZoneForm zone={null} onDone={list.reload} />
         </div>

@@ -1,5 +1,6 @@
 package com.akven.thesis.order;
 
+import com.akven.thesis.delivery.DeliveryKind;
 import com.akven.thesis.payment.PaymentMethod;
 import com.akven.thesis.shop.ShopDtos.PickupPointView;
 import jakarta.validation.Valid;
@@ -97,11 +98,16 @@ public final class OrderDtos {
     public record FulfillmentView(FulfillmentMethod method, String contactName, String contactPhone, String address, String note,
                                   Country country, DeliveryView delivery) {}
 
-    /** The delivery as it was when the order was placed: the area's name, what it cost and how long it takes. */
-    public record DeliveryView(String zone, BigDecimal fee, Integer daysMin, Integer daysMax) {}
+    /**
+     * The delivery as it was when the order was placed: the area's name, what it cost, how long it takes, how it travels
+     * (courier or cargo) and whether the carrier is paid on receipt.
+     */
+    public record DeliveryView(String zone, BigDecimal fee, Integer daysMin, Integer daysMax, DeliveryKind kind, boolean payOnReceipt) {}
 
-    /** The payment reference is shown shortened: enough for a support call, not the whole token of the provider. */
-    /** simulated: paid with the demo wallet, so no money moved (the shop says so wherever the payment is shown). */
+    /**
+     * The payment reference is shown shortened: enough for a support call, not the whole token of the provider.
+     * simulated: paid with the demo wallet, so no money moved (the shop says so wherever the payment is shown).
+     */
     public record PaymentView(String method, String reference, boolean simulated) {}
 
     public record GiftView(GiftBox box, GiftRibbon ribbon, String to, String from, String message, boolean hidePrices) {}

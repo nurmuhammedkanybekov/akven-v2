@@ -1230,3 +1230,14 @@ body::before {
 /* Simulated payments say so wherever money appears: a small tag and a plain sentence. */
 .av-demotag { display: inline-block; padding: 0.05em 0.5em; border-radius: 999px; background: var(--accent-soft, color-mix(in srgb, var(--accent) 22%, transparent)); color: var(--accent-ink); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: 0.1em; }
 .av-demonote { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--surface-2); font-size: var(--text-small); color: var(--ink); }
+
+/* Delivery areas: the owners' note under the name, and the carrier paid on receipt under the fee. */
+.av-zone__note { color: var(--ink-2); max-width: 34rem; }
+.av-zone__receipt { color: var(--accent-ink); font-weight: 600; text-align: right; }
+/* An area card on a phone: the name and the owners' note take the width, the price sits under them. */
+.av-zone { grid-template-columns: auto minmax(0, 1fr) auto; }
+@media (max-width: 520px) {
+  .av-zone { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+  .av-zone__fee { grid-column: 2; justify-items: start; }
+  .av-zone__receipt { text-align: left; }
+}

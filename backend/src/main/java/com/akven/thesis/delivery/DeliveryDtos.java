@@ -19,10 +19,10 @@ public final class DeliveryDtos {
     }
 
     public record ZoneView(UUID id, Country country, String name, BigDecimal fee, BigDecimal freeFrom, Integer daysMin,
-                           Integer daysMax, boolean active, int position) {
+                           Integer daysMax, boolean active, int position, DeliveryKind kind, boolean payOnReceipt, String note) {
         static ZoneView of(DeliveryZone z) {
             return new ZoneView(z.getId(), z.getCountry(), z.getName(), z.getFee(), z.getFreeFrom(), z.getDaysMin(), z.getDaysMax(),
-                    z.isActive(), z.getPosition());
+                    z.isActive(), z.getPosition(), z.getKind(), z.isPayOnReceipt(), z.getNote());
         }
     }
 
@@ -33,5 +33,8 @@ public final class DeliveryDtos {
                             @Min(0) @Max(60) Integer daysMin,
                             @Min(0) @Max(60) Integer daysMax,
                             boolean active,
-                            @Min(0) @Max(10000) int position) {}
+                            @Min(0) @Max(10000) int position,
+                            DeliveryKind kind,
+                            boolean payOnReceipt,
+                            @Size(max = 300) String note) {}
 }
