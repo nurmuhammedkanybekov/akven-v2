@@ -140,7 +140,8 @@ class EmailNotificationTest extends IntegrationTest {
     void withoutAMailServerNothingLeavesAndTheEmailIsKept() throws Exception {
         JsonNode order = json(buy(tokenForEmail(email(), Role.CUSTOMER), data.variant(10), 1, Map.of(), null, token()).andExpect(status().isCreated()));
         assertThat(sender.mode()).isEqualTo("OFF");
-        sender.dispatch();
+        // Other tests leave emails in the queue; the sender takes 20 at a time, oldest first, so run it until it is empty.
+        while (sender.dispatch() > 0) { /* next batch */ }
         OutboundEmail e = about(order.get("id").asText()).get(0);
         assertThat(e.getStatus()).isEqualTo(EmailStatus.NOT_SENT);
         assertThat(e.getLastError()).contains("MAIL_HOST");
