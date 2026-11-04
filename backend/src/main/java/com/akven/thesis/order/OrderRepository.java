@@ -26,6 +26,11 @@ public interface OrderRepository extends JpaRepository<Order, UUID>, JpaSpecific
 
     Optional<Order> findByCustomerIdAndIdempotencyKey(UUID customerId, String idempotencyKey);
 
+    /** A guest's earlier attempt with the same key (a double click or a network retry). */
+    Optional<Order> findByCustomerIsNullAndIdempotencyKey(String idempotencyKey);
+
+    List<Order> findByGuestEmail(String guestEmail);
+
     /** Locks the order row, so two cancellations (or a cancel and a fulfil) of the same order are serialised. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select o from Order o where o.id = :id")

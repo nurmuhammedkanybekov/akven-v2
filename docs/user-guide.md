@@ -83,11 +83,14 @@ the shop still checks and sends itself.
    is a real conversation: the assistant remembers what was said and offered, answers questions about the sock, and
    may offer a discount; "Add to bag at this price" puts exactly that offer in the bag. An offer is for one item, for
    at least the number of pairs it was negotiated for, and lasts 24 hours.
-3. **Checkout.** Signing in (or creating an account) is needed here. The customer gives a name and phone, chooses
-   pick-up or delivery, and pays with Apple Pay or Google Pay. In this project the wallet is **simulated**: it returns a
+3. **Checkout.** No account is needed: a guest gives an email (the confirmation and a private link to the order go
+   there). Signing in adds saved details, agreed prices and the list of orders. The customer gives a name and phone,
+   chooses pick-up, a courier in Bishkek or cargo, and pays with Apple Pay or Google Pay. In this project the wallet is **simulated**: it returns a
    one-time token, never a card number, and no money moves. A switch in the sheet makes the "bank" decline, to show a
    failed payment. A real payment provider would sit behind the same `PaymentProvider` interface.
-4. **Order.** A confirmation page, then the order under "Your orders". A paid pickup order shows a six-digit pickup
+4. **Order.** A confirmation page, then the order under "Your orders" (a guest's order lives at its private link,
+   `/orders/<id>#t=<key>`, also in the confirmation email; a lost link is sent again from **Find my order**, with the
+   email and the order number). A paid pickup order shows a six-digit pickup
    code to say at the stall, and a QR code the stall can scan instead. **"Order these again"** puts the same socks back
    in the bag at today's prices. A line of four steps (placed, paid, ready at 70-E or on its way, collected) shows
    where the order is. A customer can cancel while the order is paid

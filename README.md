@@ -83,6 +83,9 @@ rule-based assistant (which over-promised six times by design) or for the model.
 - **The family planner and family profiles** (sizes, birthdays), **gift boxes** with a ribbon and a hand-written card,
   the **sock finder** in three taps, and a **size guide** in the sizes each customer knows.
 - **The bag as one collection:** minimum order, the step reached, "add 4 more pairs to save 5%", **save for later**.
+- **Checkout without an account:** a guest gives an email; the order opens at a private link (an HMAC of the order
+  id, never stored, kept after the `#` so it reaches no server log) that is emailed too, and a lost link can be
+  emailed again without telling anyone which orders exist.
 - **Checkout:** pickup with a code and a QR code, a courier by **area** with its fee, days and free-from amount, or a
   **cargo carrier** with its note and "paid to the carrier on receipt";
   **remember my details** for next time; a simulated Apple Pay / Google Pay wallet (no money moves).

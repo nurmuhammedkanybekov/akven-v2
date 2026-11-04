@@ -35,6 +35,9 @@ export function CheckoutPage() {
   // NONE: this installation takes no payments (started outside demo mode); SIMULATED: the demo wallet.
   const payments = useShopInfo()?.payments;
 
+  // Without an account the customer orders as a guest: the email takes the account's place.
+  const guest = !session;
+  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [method, setMethod] = useState<FulfillmentMethod>("PICKUP");
@@ -95,6 +98,7 @@ export function CheckoutPage() {
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
+    if (guest && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email.trim())) errs.email = t("co.errEmail");
     if (!name.trim()) errs.name = t("co.errName");
     if (!/^[0-9+()\-\s]{6,40}$/.test(phone.trim())) errs.phone = t("co.errPhone");
     if (method === "DELIVERY" && !address.trim()) errs.address = t("co.errAddress");
@@ -117,16 +121,18 @@ export function CheckoutPage() {
         payment: { method: payment, token: newWalletToken(payment, declined) },
         gift: giftForCheckout(gift),
         lang,
+        ...(guest ? { email: email.trim() } : {}),
       }, attemptKey.current);
       setPlaced(true);
       // Keep (or update) the details for next time only when asked; a failure here never spoils the order.
-      if (remember) {
+      if (remember && !guest) {
         void saveMyDetails({ contactName: name.trim(), contactPhone: phone.trim(), address: method === "DELIVERY" ? address.trim() : null,
           country: method === "DELIVERY" ? zone?.country ?? country : null, zoneId: method === "DELIVERY" ? zone?.id ?? null : null }).catch(() => undefined);
       }
       cart.clear();
       setGift(null);
-      navigate(`/orders/${order.id}`, { replace: true, state: { justPaid: true } });
+      // A guest's order opens with its private link: the key rides after the "#", which never reaches a server.
+      navigate(`/orders/${order.id}${order.accessToken ? `#t=${order.accessToken}` : ""}`, { replace: true, state: { justPaid: true } });
     } catch (e) {
       setSheet(null);
       const api = e instanceof ApiError ? e : null;
@@ -146,7 +152,16 @@ export function CheckoutPage() {
 
       <div className="av-cart">
         <form className="av-card-form" noValidate onSubmit={(e) => choose("APPLE_PAY", e)} aria-label={t("co.formLabel")}>
+          {guest && (
+            <div className="av-guest">
+              <p><strong>{t("co.guestTitle")}</strong> {t("co.guestLead")}</p>
+              <p className="av-small"><Link to="/login?next=%2Fcheckout">{t("co.signInInstead")}</Link></p>
+            </div>
+          )}
+          {guest && cart.lines.some((l) => l.negotiationSessionId) && <Alert>{t("co.offerNeedsAccount")} <Link to="/login?next=%2Fcheckout">{t("auth.signin")}</Link></Alert>}
           <h2 className="av-formtitle">{t("co.contact")}</h2>
+          {guest && <Input label={t("co.email")} type="email" autoComplete="email" inputMode="email" value={email} hint={t("co.emailHint")}
+                           error={fieldErrors.email} onChange={(e) => setEmail(e.target.value)} />}
           <div className="av-formgrid">
             <Input label={t("co.name")} autoComplete="name" value={name} error={fieldErrors.name ?? fieldErrors.contactName} onChange={(e) => setName(e.target.value)} />
             <Input label={t("co.phone")} type="tel" autoComplete="tel" value={phone} error={fieldErrors.phone ?? fieldErrors.contactPhone} hint={t("co.phoneHint")} onChange={(e) => setPhone(e.target.value)} />
@@ -200,7 +215,7 @@ export function CheckoutPage() {
           {method === "DELIVERY" && <Textarea label={t(activeKind === "CARGO" ? "co.addressCargo" : "co.address")} hint={t(activeKind === "CARGO" ? "co.addressCargoHint" : "co.addressHint")}
                                                rows={2} value={address} error={fieldErrors.address} onChange={(e) => setAddress(e.target.value)} />}
           <Textarea label={t("co.note")} rows={2} maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} />
-          <label className="av-check"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> {t(hadDetails ? "co.rememberAgain" : "co.remember")}</label>
+          {!guest && <label className="av-check"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> {t(hadDetails ? "co.rememberAgain" : "co.remember")}</label>}
 
           <h2 className="av-formtitle">{t("co.payment")}</h2>
           <p className="av-small">{t("co.paymentS")}</p>

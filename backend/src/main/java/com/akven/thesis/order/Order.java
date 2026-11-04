@@ -38,7 +38,8 @@ public class Order extends AuditableEntity {
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne(optional = false)
+    /** The account that ordered; null for a guest, who has {@link #guestEmail} instead. */
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     private User customer;
 
@@ -103,6 +104,10 @@ public class Order extends AuditableEntity {
     @Column(length = 6)
     private String pickupCode;
 
+    /** A guest's email (lower case): where the confirmation and the private link to the order go. */
+    @Column(name = "guest_email")
+    private String guestEmail;
+
     /** The language the customer used at checkout (en, ru or ky): the emails about this order are written in it. */
     @Column(nullable = false, length = 2)
     private String lang = "en";
@@ -133,6 +138,13 @@ public class Order extends AuditableEntity {
     public Order(User customer, String idempotencyKey) {
         this.customer = customer;
         this.idempotencyKey = idempotencyKey;
+    }
+
+    /** An order without an account: the guest's email takes the account's place. */
+    public static Order forGuest(String email, String idempotencyKey) {
+        Order o = new Order(null, idempotencyKey);
+        o.guestEmail = email.strip().toLowerCase(java.util.Locale.ROOT);
+        return o;
     }
 
     public void addItem(OrderItem item) {
@@ -253,6 +265,10 @@ public class Order extends AuditableEntity {
     public PickupPoint getPickupPoint() { return pickupPoint; }
     public String getPickupCode() { return pickupCode; }
     public String getLang() { return lang; }
+    public String getGuestEmail() { return guestEmail; }
+    public boolean isGuest() { return customer == null; }
+    /** Where emails about this order go: the account's address, or the guest's. */
+    public String getContactEmail() { return customer != null ? customer.getEmail() : guestEmail; }
     public void speak(String lang) { this.lang = lang == null || !lang.matches("en|ru|ky") ? "en" : lang; }
     public GiftBox getGiftBox() { return giftBox; }
     public GiftRibbon getGiftRibbon() { return giftRibbon; }

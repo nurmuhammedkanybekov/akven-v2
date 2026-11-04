@@ -234,13 +234,16 @@ try {
     await closeBagDrawer();
     await page.getByRole("link", { name: /Bag, 2 items/ }).waitFor();
   });
-  await step("the bag shows today's price and a visitor must sign in to check out; registering brings them back", async () => {
+  await step("the bag shows today's price; checkout needs no account, and registering from it brings the visitor back", async () => {
     await page.getByRole("link", { name: /Bag, 2 items/ }).click();
     await page.getByRole("heading", { name: "Bag (2)" }).waitFor();
     await page.getByText("$19.00").first().waitFor();
     await shot("shop-cart");
     await a11y("the bag");
     await page.getByRole("link", { name: "Check out" }).click();
+    await page.waitForURL(`${BASE}/checkout`);
+    await page.getByText("No account needed.").waitFor();
+    await page.getByRole("link", { name: /Have an account\? Sign in/ }).click();
     await page.waitForURL(/\/login\?next=%2Fcheckout/);
     await page.getByRole("link", { name: "Create an account" }).click();
     await page.getByRole("heading", { name: "Create an account" }).waitFor();
@@ -632,6 +635,46 @@ try {
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
     await page.waitForURL(/\/products\//);
+  });
+
+  await step("a guest orders without an account, opens the order at its private link, and another browser gets the link again by email", async () => {
+    await page.goto(`${BASE}/admin`);
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.evaluate(() => localStorage.removeItem("akven-cart-v1"));
+    await page.goto(`${BASE}/men`);
+    const card = page.locator(".av-card-wrap").first();
+    await card.hover();
+    await card.getByRole("button", { name: /^Quick view/ }).click();
+    await page.locator("dialog.av-qv").getByRole("button", { name: "Add to bag" }).click();
+    await closeBagDrawer();
+    await page.goto(`${BASE}/checkout`);
+    await page.getByText("No account needed.").waitFor();
+    await a11y("checkout without an account");
+    const guestEmail = `guest-${stamp}@example.com`;
+    await page.getByLabel("Email", { exact: true }).fill(guestEmail);
+    await page.getByLabel("Name", { exact: true }).fill("Guest Test");
+    await page.getByLabel("Phone").fill("+996 700 123 456");
+    await page.getByRole("button", { name: "Pay with Google Pay (demo)" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: /^Pay \$/ }).click();
+    await page.waitForURL(/\/orders\/[0-9a-f-]{36}#t=[A-Za-z0-9_-]{20,}$/);
+    await page.getByText(/This page is your order's private link/).waitFor();
+    await page.getByText(/Thank you! Your order AV-[0-9A-F]{8} is paid/).waitFor();
+    await a11y("a guest's order page");
+    await shot("shop-order-guest");
+    const link = page.url();
+    const ref = (await page.getByRole("heading", { level: 1 }).innerText()).match(/AV-[0-9A-F]{8}/)[0];
+
+    const elsewhere = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: "light" });
+    const p2 = await elsewhere.newPage();
+    await p2.goto(link.split("#")[0]);                                   // the address without its key opens nothing
+    await p2.getByRole("heading", { name: "This order opens with its private link" }).waitFor();
+    await p2.getByLabel("Email", { exact: true }).fill(guestEmail);
+    await p2.getByLabel(/Order number/).fill(ref.toLowerCase());
+    await p2.getByRole("button", { name: "Email me the link" }).click();
+    await p2.getByText(new RegExp(`If ${ref} was ordered with that email, its link is on its way`)).waitFor();
+    await p2.goto(link);                                                 // the key opens it on any device
+    await p2.getByRole("heading", { level: 1, name: new RegExp(ref) }).waitFor();
+    await elsewhere.close();
   });
 
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);

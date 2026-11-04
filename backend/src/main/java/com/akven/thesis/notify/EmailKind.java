@@ -8,6 +8,8 @@ public enum EmailKind {
     ORDER_HANDED_OVER,
     /** A paid order was cancelled, by the customer or by the shop, and the money returned. */
     ORDER_CANCELLED,
+    /** The private link to an order, sent again because the customer asked for it. */
+    ORDER_LINK,
     /** A wholesale request that gave an email address as the way to answer. */
     WHOLESALE_RECEIVED
 }

@@ -309,9 +309,10 @@ class OrderControllerTest extends IntegrationTest {
     }
 
     @Test
-    void checkoutAndOrderHistoryNeedALogin() throws Exception {
+    void checkoutWithoutAnAccountNeedsAnEmailAndOrderHistoryNeedsALogin() throws Exception {
         Variant v = data.variant(5);
-        checkout(null, key(), body(v.getSku(), 1)).andExpect(status().isUnauthorized());
+        checkout(null, key(), body(v.getSku(), 1)).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("GUEST_EMAIL_REQUIRED"));
+        assertThat(data.reload(v).getStockQty()).isEqualTo(5);                      // nothing was held for it
         mockMvc.perform(get("/api/orders")).andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/admin/orders").header("Authorization", tokenForEmail(email(), Role.CUSTOMER))).andExpect(status().isForbidden());
     }

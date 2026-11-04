@@ -133,9 +133,9 @@ public class AccountService {
         Page<AuditLogEntry> result = auditLog.findAll(PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100),
                 Sort.by(Sort.Direction.DESC, "createdAt")));
         Map<UUID, String> emails = new HashMap<>();
-        users.findAllById(result.stream().map(AuditLogEntry::getActorId).collect(Collectors.toSet()))
+        users.findAllById(result.stream().map(AuditLogEntry::getActorId).filter(java.util.Objects::nonNull).collect(Collectors.toSet()))
                 .forEach(u -> emails.put(u.getId(), u.getEmail()));
-        return PageResponse.of(result, e -> new AuditView(e.getId(), e.getCreatedAt(), emails.getOrDefault(e.getActorId(), "?"),
+        return PageResponse.of(result, e -> new AuditView(e.getId(), e.getCreatedAt(), e.getActorId() == null ? "guest" : emails.getOrDefault(e.getActorId(), "?"),
                 e.getAction(), e.getEntityType(), e.getEntityId(), e.getBeforeState(), e.getAfterState()));
     }
 

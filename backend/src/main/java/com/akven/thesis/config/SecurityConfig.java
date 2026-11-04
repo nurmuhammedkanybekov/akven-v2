@@ -67,7 +67,7 @@ public class SecurityConfig {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(Arrays.stream(origins.split(",")).map(String::trim).filter(o -> !o.isEmpty()).toList());
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        cors.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Request-Id", "Idempotency-Key"));
+        cors.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Request-Id", "Idempotency-Key", "X-Order-Token"));
         cors.setExposedHeaders(List.of("X-Request-Id", "Retry-After"));
         cors.setAllowCredentials(false);
         cors.setMaxAge(3600L);
@@ -110,6 +110,9 @@ public class SecurityConfig {
                 // Registration and login must be reachable without a token; everything else
                 // under /api/auth/** (e.g. /api/auth/me) stays behind anyRequest().authenticated().
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/cart/quote", "/api/wholesale/requests").permitAll()
+                // Checkout without an account, and a guest's own order through its private link (the service checks the token).
+                .requestMatchers(HttpMethod.POST, "/api/orders", "/api/orders/find", "/api/orders/*/cancel").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/orders/*").permitAll()
                 .requestMatchers("/api/admin/**").hasAnyRole("STAFF", "ADMIN")   // SUPER_ADMIN through the role hierarchy
                 .anyRequest().authenticated()
             )
