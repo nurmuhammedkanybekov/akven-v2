@@ -25,6 +25,16 @@ Status: **Done**, **Partial** (works, with a stated gap) or **Open**.
 | FR-13 audit entry for every catalog, price or policy change | Done | `audit/AuditService` (mandatory transaction, request id) | `AdminCatalogControllerTest`, `PostgresIntegrationTest` |
 | FR-14 admin views the audit log and creates staff/admin accounts | Done | A super admin role (`SUPER_ADMIN`, V21) above the owners: Admin > Accounts creates owner and staff accounts, changes their role, disables them and sets a new password (`user/AccountService`); Admin > Audit log shows every change with who made it and the values before and after. A disabled account or a new password ends its sessions at once (`JwtAuthenticationFilter` reads the account on every request). The first super admin of a real installation comes from the environment (`SuperAdminSetup`) | `AccountsTest`, `SuperAdminSetupTest`, browser test (super admin step) |
 
+### Added after the requirement analysis
+
+These came from the family's real way of working and are numbered as in the thesis (Table "Functional requirements").
+
+| ID | Status | Implemented in | Shown by |
+|---|---|---|---|
+| FR-16 pickup, a Bishkek courier, or cargo paid on receipt | Done | `delivery/DeliveryZone` (kind, note, pay on receipt; V35), the order's own copy | `DeliveryZoneTest`, `checkout` frontend tests, browser test (cargo and courier) |
+| FR-27 order without an account, private link, find a lost link | Done | `order/OrderLinks` (HMAC key, never stored), `OrderService` (guest checkout, `sendLinkAgain`), `GuestLimiter`; V37 | `GuestCheckoutTest`, `guest-checkout` frontend tests, browser test (a guest in two browsers) |
+| FR-28 emails in the customer's language, kept without a mail server | Done | `notify/` (`Notifier` writes into the outbox in the order's transaction, `EmailSender` delivers and retries); Admin > Emails to customers; V36 | `EmailNotificationTest` (languages, retries with a stand-in SMTP server, clean-up), `emails` frontend tests, browser test |
+
 ## Non-functional requirements
 
 | ID | Status | Evidence |

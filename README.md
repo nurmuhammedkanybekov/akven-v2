@@ -183,7 +183,7 @@ flowchart LR
 | Layer | Technology |
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, role-gated routes. About 1,600 texts per language in English, Russian and Kyrgyz, with typed keys |
-| API | Spring Boot 3.5, Java 17, 107 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` |
+| API | Spring Boot 3.5, Java 17, 107 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` (demo mode; `API_DOCS=true` elsewhere) |
 | Data | PostgreSQL 16 with pgvector. 35 Flyway versions: 19 schema migrations, 16 demo-data migrations (demo profile only). Check constraints repeat the rules that must never break |
 | Assistant | A `Negotiator` interface: rule-based, and a language model over any OpenAI-compatible API (Gemini by default), with fallback to the rules and a run-time switch |
 | Delivery | Docker Compose (database, backend, nginx). CI on GitHub Actions (six jobs) and on the ELTE GitLab |
@@ -205,10 +205,10 @@ the thesis:
 
 | Check | Command | Result |
 |---|---|---|
-| Backend, in-memory database | `cd backend && mvn verify` | 250 tests, **95% line coverage**; the build fails below 80% |
+| Backend, in-memory database | `cd backend && mvn verify` | 257 tests, **97% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 186 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
-| In a real browser | `cd frontend && npm run e2e` | 27 steps: the owner's, the customer's and the super admin's work in three languages, with accessibility rules on every page |
+| Frontend | `cd frontend && npm test && npm run build` | 204 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
+| In a real browser | `cd frontend && npm run e2e` | 28 steps: the owner's, the customer's (with and without an account) and the super admin's work in three languages, with accessibility rules on every page |
 
 What the tests demonstrate, among others:
 
@@ -230,6 +230,8 @@ What the tests demonstrate, among others:
 | [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator, security |
 | [`docs/user-guide.md`](docs/user-guide.md) | How the owners, the staff and the customers use the shop |
 | [`docs/development.md`](docs/development.md) | Running, settings, tests, CI, database |
+| [`docs/deployment.md`](docs/deployment.md) | Putting the shop online: why one small server, step by step, email, payments, a security checklist |
+| [`docs/telegram-bot-plan.md`](docs/telegram-bot-plan.md) | The planned Telegram bot: order messages, an AI helper that links to the shop, and handing over to the family |
 | [`docs/api.md`](docs/api.md) | The API and its error codes |
 | [`docs/evaluation/`](docs/evaluation/) | The recorded live run of the assistant on 16 simulated customers |
 | [`docs/diagrams/`](docs/diagrams/README.md) | Architecture, validation path, negotiation sequence, data model, use cases |
