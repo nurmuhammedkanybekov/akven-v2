@@ -77,7 +77,7 @@ Grouped by the module each maps to in the architecture (Catalog & Orders, Negoti
 
 ## 6. Constraints
 
-- **Technology:** Java 17 / Spring Boot 3.3 backend, PostgreSQL with the `pgvector` extension, a single PWA frontend — see `architecture.md`.
+- **Technology:** Java 17 / Spring Boot 3.5 backend, PostgreSQL with the `pgvector` extension, a single PWA frontend — see `architecture.md`.
 - **Timeline:** ELTE IK milestone schedule (Milestone 1: 25 Sept; Milestone 3 — ~100% complete, CI/CD, >80% model-layer coverage: 10 Nov; final submission: 1 Dec).
 - **Business:** No formal agreement exists with a Kyrgyz FinTech provider (MBank/Optima); checkout uses Apple Pay / Google Pay instead, which requires no such agreement (see decision log in the project brief).
 - **Evaluation:** All graded work must be present in the GitLab repository; nothing outside it is evaluated.
