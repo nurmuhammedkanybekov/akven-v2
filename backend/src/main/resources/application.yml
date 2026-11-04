@@ -29,9 +29,10 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    # V2/V4 (demo seed data) live in db/seed and are only loaded by the demo profile. A database that
-    # already applied them keeps working when it runs without the demo profile.
-    ignore-migration-patterns: "*:missing"
+    # The demo data lives in db/seed and is only loaded by the demo profile. A database that already applied it keeps
+    # working when it runs without the demo profile: a seed older than the newest migration is "missing" to Flyway,
+    # one newer than it (V35_1 after V35) is "future"; both are ignored.
+    ignore-migration-patterns: "*:missing,*:future"
 
 logging:
   pattern:
