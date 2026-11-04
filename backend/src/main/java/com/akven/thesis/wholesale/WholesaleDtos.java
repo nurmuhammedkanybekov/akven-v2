@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
@@ -26,7 +27,8 @@ public final class WholesaleDtos {
                                @NotNull @Min(1) @Max(100000) Integer pairs,
                                @Size(max = 1000) String mix,
                                @Size(max = 500) String note,
-                               @Size(max = 200) String website) {}
+                               @Size(max = 200) String website,
+                               @Pattern(regexp = "en|ru|ky") String lang) {}
 
     /** The answer to the customer: a short reference they can quote when they call. */
     public record Received(String reference, Instant createdAt) {}

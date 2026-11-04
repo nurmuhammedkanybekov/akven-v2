@@ -62,11 +62,17 @@ public final class OrderDtos {
     public record CheckoutRequest(@NotEmpty @Size(max = 50) List<@Valid CartItem> items,
                                   @NotNull @Valid FulfillmentInput fulfillment,
                                   @NotNull @Valid PaymentInput payment,
-                                  @Valid GiftInput gift) {
+                                  @Valid GiftInput gift,
+                                  @Pattern(regexp = "en|ru|ky") String lang) {
+
+        /** Without a language: the emails about the order are in English. */
+        public CheckoutRequest(List<CartItem> items, FulfillmentInput fulfillment, PaymentInput payment, GiftInput gift) {
+            this(items, fulfillment, payment, gift, null);
+        }
 
         /** An order that is not a gift. */
         public CheckoutRequest(List<CartItem> items, FulfillmentInput fulfillment, PaymentInput payment) {
-            this(items, fulfillment, payment, null);
+            this(items, fulfillment, payment, null, null);
         }
     }
 

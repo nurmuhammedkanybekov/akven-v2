@@ -9,6 +9,7 @@ import type {
   FamilyMember, FamilyMemberInput, ProductReviews, ShowcaseReview, MyReview, ModerationLine, ReviewStatus, DayPoint,
   SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
   CustomerDetails, DeliveryZone, DeliveryZoneInput, WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
+  EmailList, EmailStatus, OutboundEmail,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -231,3 +232,7 @@ export const adminDeleteDeliveryZone = (id: string) => api<void>(`/api/admin/del
 export const getMyDetails = () => api<CustomerDetails>("/api/account/details");
 export const saveMyDetails = (body: CustomerDetails) => api<CustomerDetails>("/api/account/details", { method: "PUT", body });
 export const forgetMyDetails = () => api<void>("/api/account/details", { method: "DELETE" });
+
+export const adminEmails = (status?: EmailStatus, page = 0) => api<EmailList>(`/api/admin/emails${qs({ status, page })}`);
+export const adminOrderEmails = (orderId: string) => api<OutboundEmail[]>(`/api/admin/emails${qs({ orderId })}`);
+export const adminRetryEmail = (id: string) => api<OutboundEmail>(`/api/admin/emails/${id}/retry`, { method: "POST" });

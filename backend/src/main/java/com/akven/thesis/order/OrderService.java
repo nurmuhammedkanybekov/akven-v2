@@ -9,6 +9,7 @@ import com.akven.thesis.common.ConflictException;
 import com.akven.thesis.common.NotFoundException;
 import com.akven.thesis.common.PageResponse;
 import com.akven.thesis.delivery.DeliveryService;
+import com.akven.thesis.notify.Notifier;
 import com.akven.thesis.delivery.DeliveryZone;
 import com.akven.thesis.order.OrderDtos.CartItem;
 import com.akven.thesis.order.OrderDtos.CheckoutRequest;
@@ -70,10 +71,11 @@ public class OrderService {
     private final ShopInfoService shopInfo;
     private final PickupCodes pickupCodes;
     private final DeliveryService delivery;
+    private final Notifier notifier;
 
     public OrderService(OrderRepository orders, VariantRepository variants, UserRepository users, PricingService pricing,
                         PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections,
-                        ShopInfoService shopInfo, PickupCodes pickupCodes, DeliveryService delivery) {
+                        ShopInfoService shopInfo, PickupCodes pickupCodes, DeliveryService delivery, Notifier notifier) {
         this.orders = orders;
         this.variants = variants;
         this.users = users;
@@ -85,6 +87,7 @@ public class OrderService {
         this.shopInfo = shopInfo;
         this.pickupCodes = pickupCodes;
         this.delivery = delivery;
+        this.notifier = notifier;
     }
 
     private final ProductImageRepository images;
@@ -138,6 +141,7 @@ public class OrderService {
         // The area decides the fee; the browser only says which area. Its country wins over a country sent alongside.
         DeliveryZone zone = f.method == FulfillmentMethod.DELIVERY ? delivery.zoneFor(request.fulfillment().zoneId(), request.fulfillment().zoneId() == null ? f.country : null) : null;
         Order order = new Order(customer, idempotencyKey);
+        order.speak(request.lang());
         order.setFulfillment(f.method, f.name, f.phone, f.address, f.note, zone == null ? f.country : zone.getCountry());
         if (request.gift() != null) {
             OrderDtos.GiftInput g = request.gift();
@@ -205,6 +209,7 @@ public class OrderService {
         }
         orders.save(order);
         audit.record(customerEmail, "ORDER_PAID", "ORDER", order.getId(), Map.of("status", "PENDING"), snapshot(order));
+        notifier.orderConfirmed(order);
         return new CheckoutResult(OrderMapper.toView(order, false), false);
     }
 
@@ -279,6 +284,7 @@ public class OrderService {
         o.fulfil();
         orders.save(o);
         audit.record(actorEmail, "ORDER_HANDED_OVER", "ORDER", o.getId(), Map.of("status", "PAID"), snapshot(o));
+        notifier.orderHandedOver(o);
         return OrderMapper.toView(o, true);
     }
 
@@ -289,6 +295,7 @@ public class OrderService {
         o.fulfil();
         orders.save(o);
         audit.record(actorEmail, "ORDER_FULFILLED", "ORDER", o.getId(), Map.of("status", "PAID"), snapshot(o));
+        notifier.orderHandedOver(o);
         return OrderMapper.toView(o, true);
     }
 
@@ -328,6 +335,7 @@ public class OrderService {
         }
         orders.save(o);
         audit.record(actorEmail, "ORDER_CANCELLED", "ORDER", o.getId(), Map.of("status", before), snapshot(o));
+        if (before == OrderStatus.PAID) notifier.orderCancelled(o, asStaff);
         return OrderMapper.toView(o, asStaff);
     }
 

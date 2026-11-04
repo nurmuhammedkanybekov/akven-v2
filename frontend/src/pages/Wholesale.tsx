@@ -51,7 +51,7 @@ const WHO: Array<{ n: 1 | 2 | 3; socks: SockSpec[] }> = [
  * price, the quantity and the delivery, so they are never published; the family answers each request with a price.
  */
 export function WholesalePage() {
-  const { t } = useT();
+  const { t, lang } = useT();
   const info = useShopInfo();
   const contacts = info?.contacts ?? [];
   const writable = contacts.filter((c) => c.kind === "WHATSAPP" || c.kind === "TELEGRAM" || c.kind === "EMAIL");
@@ -85,7 +85,7 @@ export function WholesalePage() {
       const pairs = mix ? mix.pairs : parseInt(form.pairs, 10) || 1;
       setReceived(await sendWholesaleRequest({
         kind: kind === "gifts" ? "GIFTS" : "WHOLESALE", company: form.name, city: form.city || null, contactKind,
-        contact: form.contact, pairs: Math.min(pairs, 100000), mix: mix?.text.slice(0, 1000) ?? null, note: form.note || null, website: form.website,
+        contact: form.contact, pairs: Math.min(pairs, 100000), mix: mix?.text.slice(0, 1000) ?? null, note: form.note || null, website: form.website, lang,
       }));
     } catch (err) {
       setError(err instanceof ApiError && err.status !== 500 ? err.message : t("quote.err"));

@@ -356,6 +356,18 @@ try {
     await page.getByRole("row", { name: new RegExp(CUSTOMER) }).getByRole("link").first().click();
     await page.getByRole("button", { name: "Mark as completed" }).click();
     await page.getByText("Completed", { exact: true }).first().waitFor();
+    // What the customer was told: the confirmation at payment, then "collected / on its way" at completion.
+    await page.getByRole("heading", { name: "Emails about this order" }).waitFor();
+    await page.getByText("Order confirmed", { exact: true }).waitFor();
+    await page.getByText("Collected / on its way", { exact: true }).waitFor();
+    await page.getByRole("link", { name: "Emails to customers" }).click();
+    await page.getByText(/No mail server is set up, so emails are kept here and not sent/).waitFor();   // demo mode: honest about it
+    await page.getByText(new RegExp(`To ${CUSTOMER.replace(/[.+]/g, "\\$&")}`)).first().waitFor();
+    const confirmation = page.locator(".av-email").filter({ hasText: "Order confirmed" }).first();
+    await confirmation.getByText("Read the email").click();
+    await confirmation.getByText(/Your pickup code is \d{6}|We bring it to:|We hand your parcel to/).waitFor();
+    await shot("admin-emails");
+    await a11y("admin emails");
     await page.getByRole("button", { name: "Sign out" }).click();
 
     await page.goto(`${BASE}/login`);

@@ -12,6 +12,7 @@ import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
 import { formatDateTime, formatPrice } from "../lib/format";
 import { useT } from "../i18n/I18n";
+import { OrderEmails } from "./AdminEmails";
 
 export function AdminOrderDetail() {
   const { id = "" } = useParams();
@@ -72,6 +73,8 @@ export function AdminOrderDetail() {
         </ul>
         <p className="av-price av-price--lg">{t("a.orders.total")} {formatPrice(o.total)}</p>
       </div>
+
+      <OrderEmails key={`${o.id}-${o.status}`} orderId={o.id} />
 
       <Dialog open={confirm === "cancel"} title={t("a.od.cancelQ")} onClose={() => setConfirm(null)}
               actions={<><Button variant="ghost" onClick={() => setConfirm(null)}>{t("a.keep")}</Button><Button loading={busy} onClick={() => run(() => adminCancelOrder(o.id), t("a.od.cancelledToast"))}>{t("a.od.cancel")}</Button></>}>

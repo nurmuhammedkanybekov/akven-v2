@@ -42,6 +42,7 @@ export function AdminLayout() {
           <NavLink to="/admin/dashboard">{t("a.nav.dashboard")}</NavLink>
           <NavLink to="/admin/reviews">{t("a.nav.reviews")}</NavLink>
           <NavLink to="/admin/wholesale">{t("a.nav.wholesale")}</NavLink>
+          <NavLink to="/admin/emails">{t("a.nav.emails")}</NavLink>
           {isAdmin && <span className="av-admin__group">{t("a.group.owners")}</span>}
           {isAdmin && <NavLink to="/admin/pricing">{t("a.nav.pricing")}</NavLink>}
           {isAdmin && <NavLink to="/admin/delivery">{t("a.nav.delivery")}</NavLink>}

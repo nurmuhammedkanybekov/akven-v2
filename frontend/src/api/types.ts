@@ -1,3 +1,4 @@
+import type { Lang } from "../i18n/I18n";
 /** Mirrors the backend's response shapes (CatalogViews.java, AdminCatalogDtos.java). */
 export type Category = "MEN" | "WOMEN" | "KIDS" | "BUNDLES";
 export type Role = "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN";
@@ -174,6 +175,8 @@ export interface CheckoutBody {
   fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null; zoneId?: string | null };
   payment: { method: PaymentMethod; token: string };
   gift?: GiftInput | null;
+  /** The language the customer is using: the emails about the order are written in it. */
+  lang?: Lang;
 }
 
 // ---- negotiation ----
@@ -289,7 +292,7 @@ export type WholesaleContactKind = "WHATSAPP" | "TELEGRAM" | "EMAIL" | "PHONE";
 export type WholesaleStatus = "NEW" | "IN_PROGRESS" | "ANSWERED" | "CLOSED";
 export interface WholesaleRequestInput {
   kind: WholesaleKind; company: string; city: string | null; contactKind: WholesaleContactKind; contact: string;
-  pairs: number; mix: string | null; note: string | null; website: string;
+  pairs: number; mix: string | null; note: string | null; website: string; lang?: Lang;
 }
 export interface WholesaleReceived { reference: string; createdAt: string }
 export interface WholesaleLine {
@@ -311,3 +314,14 @@ export type DeliveryZoneInput = Omit<DeliveryZone, "id">;
 
 /** The contact and delivery details a customer keeps for the next order. */
 export interface CustomerDetails { contactName: string | null; contactPhone: string | null; address: string | null; country: Country | null; zoneId: string | null }
+
+// ---- emails to customers (admin) ----
+
+export type EmailKind = "ORDER_CONFIRMED" | "ORDER_HANDED_OVER" | "ORDER_CANCELLED" | "WHOLESALE_RECEIVED";
+export type EmailStatus = "QUEUED" | "SENT" | "FAILED" | "NOT_SENT";
+export interface OutboundEmail {
+  id: string; kind: EmailKind; to: string; lang: Lang; subject: string; body: string; orderId: string | null;
+  status: EmailStatus; attempts: number; lastError: string | null; createdAt: string; sentAt: string | null;
+}
+/** mode SMTP: a mail server is set up; OFF: emails are only kept here. */
+export interface EmailList { mode: "SMTP" | "OFF"; failed: number; emails: PageResponse<OutboundEmail> }

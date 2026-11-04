@@ -87,6 +87,10 @@ rule-based assistant (which over-promised six times by design) or for the model.
   **cargo carrier** with its note and "paid to the carrier on receipt";
   **remember my details** for next time; a simulated Apple Pay / Google Pay wallet (no money moves).
 - **Orders** with a timeline, cancel with refund until handover, and *order these again*.
+- **Emails in the customer's language** (English, Russian or Kyrgyz): the confirmation with the pickup code or the
+  delivery details, "collected / on its way / with the carrier", and a cancellation with its refund. They are written in
+  the same transaction as the order (an outbox), sent through any SMTP server, retried when it is down, and readable
+  in the admin; without a mail server they are kept there and the admin says so.
 - **Wholesale and company gifts:** an open case of packs, how a case is made, *Build a case*, and a request (no account
   needed) that the shop keeps and answers with a reference.
 - **Find us:** whether the stall is open now in Bishkek time, the week's hours, the way inside the bazaar, Google Maps

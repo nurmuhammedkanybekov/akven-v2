@@ -62,7 +62,7 @@ export function CheckoutPage() {
     }).catch(() => undefined);
     return () => { live = false; };
   }, [session]);
-  const { t } = useT();
+  const { t, lang } = useT();
   const [note, setNote] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +116,7 @@ export function CheckoutPage() {
           country: method === "DELIVERY" ? zone?.country ?? country : null, zoneId: method === "DELIVERY" ? zone?.id ?? null : null },
         payment: { method: payment, token: newWalletToken(payment, declined) },
         gift: giftForCheckout(gift),
+        lang,
       }, attemptKey.current);
       setPlaced(true);
       // Keep (or update) the details for next time only when asked; a failure here never spoils the order.
