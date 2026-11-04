@@ -9,6 +9,7 @@ import { Alert, Skeleton } from "../components/Alert";
 import { Button } from "../components/Button";
 import { Input, Textarea } from "../components/Field";
 import { Switch } from "../components/Switch";
+import { ContactIcon } from "../components/Contacts";
 import { useToast } from "../components/Toast";
 import { OwnersOnly } from "./OwnersOnly";
 import { useT } from "../i18n/I18n";
@@ -73,14 +74,14 @@ function Contacts() {
           {list.map((c) => <ContactRow key={c.id} contact={c} onSave={(b) => run(() => adminUpdateContact(c.id, b), t("a.si.saved"))} onDelete={() => run(() => adminDeleteContact(c.id), t("a.si.removed"))} />)}
         </ul>
       )}
-      <form className="av-formgrid av-formgrid--4" onSubmit={async (e) => {
+      <form className="av-contactnew" aria-label={t("a.si.add")} onSubmit={async (e) => {
         e.preventDefault();
         if (await run(() => adminCreateContact({ ...draft, position: list?.length ?? 0 }), t("a.si.added"))) setDraft({ ...draft, value: "" });
       }}>
         <KindSelect value={draft.kind} onChange={(kind) => setDraft({ ...draft, kind, label: kindName(kind) })} />
         <Input label={t("a.si.shownAs")} value={draft.label ?? ""} onChange={(e) => setDraft({ ...draft, label: e.target.value })} />
         <Input label={t("a.si.value")} value={draft.value} placeholder={KINDS.find((k) => k[0] === draft.kind)![2]} onChange={(e) => setDraft({ ...draft, value: e.target.value })} />
-        <div className="av-field"><span className="av-label">&nbsp;</span><Button type="submit" variant="secondary" disabled={!draft.value.trim()}>{t("a.si.add")}</Button></div>
+        <Button type="submit" variant="secondary" disabled={!draft.value.trim()}>{t("a.si.add")}</Button>
       </form>
     </section>
   );
@@ -107,15 +108,14 @@ function ContactRow({ contact, onSave, onDelete }: { contact: ShopContact; onSav
   const dirty = label !== (contact.label ?? "") || value !== contact.value;
   const body = (over: Partial<ContactInput> = {}): ContactInput => ({ kind: contact.kind, label: label.trim() || null, value, position: contact.position, active: contact.active, ...over });
   return (
-    <li className="av-term">
-      <div className="av-formgrid av-formgrid--4" style={{ flex: 1 }}>
-        <Input label={t("a.si.shownAs")} value={label} onChange={(e) => setLabel(e.target.value)} />
-        <Input label={kindName(contact.kind)} value={value} onChange={(e) => setValue(e.target.value)} hint={contact.url} />
-      </div>
-      <div className="av-row">
+    <li className="av-contactrow">
+      <span className="av-contactrow__icon" aria-hidden="true"><ContactIcon kind={contact.kind} /></span>
+      <Input label={t("a.si.shownAs")} value={label} onChange={(e) => setLabel(e.target.value)} />
+      <Input label={kindName(contact.kind)} value={value} onChange={(e) => setValue(e.target.value)} hint={contact.url} />
+      <div className="av-contactrow__actions">
         <Switch checked={contact.active} onChange={(a) => onSave(body({ active: a }))} label={t("a.si.shown")} />
-        <Button size="sm" disabled={!dirty} onClick={() => onSave(body())}>{t("a.save")}</Button>
-        <Button size="sm" variant="ghost" aria-label={t("a.si.removeN", { name: contact.label ?? kindName(contact.kind) })} onClick={onDelete}>{t("a.remove")}</Button>
+        {dirty ? <Button size="sm" onClick={() => onSave(body())}>{t("a.save")}</Button> : <span className="av-small av-muted av-saved">✓ {t("a.pr.saved")}</span>}
+        <Button size="sm" variant="ghost" aria-label={t("a.si.removeN", { name: contact.label ?? kindName(contact.kind) })} onClick={() => { if (window.confirm(t("a.si.removeQ", { name: contact.label ?? kindName(contact.kind) }))) onDelete(); }}>{t("a.remove")}</Button>
       </div>
     </li>
   );
