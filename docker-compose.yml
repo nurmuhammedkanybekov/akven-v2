@@ -38,6 +38,13 @@ services:
       SUPER_ADMIN_PASSWORD: ${SUPER_ADMIN_PASSWORD:-}
       SUPER_ADMIN_NAME: ${SUPER_ADMIN_NAME:-}
       DEMO_ACCOUNTS: ${DEMO_ACCOUNTS:-off}
+      # Emails to customers. Without MAIL_HOST nothing is sent; the emails are kept in the admin (Emails to customers).
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8081}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-akven.socks@gmail.com}
     volumes:
       - media:/data/media
 

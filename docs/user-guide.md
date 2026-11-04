@@ -20,6 +20,7 @@ who runs the system) can do everything an owner can, plus the accounts, the AI a
 | See who changed what (admins) | The product's page, History |
 | Handle orders: see what is waiting, mark it completed, or cancel and refund | Orders |
 | Read what the assistant offered customers, next to what the policy allowed | Negotiations |
+| See **what each customer was emailed** (confirmed, collected / on its way / with the carrier, cancelled, wholesale request received), read the email itself, and **send it again** after a mail problem. Without a mail server the emails are kept here and the page says so | Emails to customers, or the order's own page |
 | Record stock **on the way**, its arrival date and the **pairs in a wholesale case** (the shop then says "arrives in about N days") | The product's page, each colour and size |
 | See **paid orders, revenue and pairs sold**, how many paid orders wait at the stall, **which socks are running out** (and what is on the way), **who is waiting for a sold-out option** (write to them when it is back, then mark them as told); and offers per day, how often the limit stepped in, offers that became orders, best sellers, and the **rule-based against AI comparison** | Dashboard |
 | **Hand over a pickup order** at the stall: the customer says the six-digit code or shows its QR code (scan it with the button, in Chrome or Edge), and says the last four digits of their phone | Hand over an order |

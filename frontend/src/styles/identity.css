@@ -1241,3 +1241,10 @@ body::before {
   .av-zone__fee { grid-column: 2; justify-items: start; }
   .av-zone__receipt { text-align: left; }
 }
+
+/* Admin: emails to customers */
+.av-email { display: grid; gap: var(--space-2); }
+.av-email__subject { margin: 0; overflow-wrap: anywhere; }
+.av-email__body summary { cursor: pointer; font-weight: 600; }
+.av-email__body pre { margin: var(--space-2) 0 0; padding: var(--space-3); background: var(--paper-2, #f6f1e7); border-radius: 8px;
+  white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; font-size: var(--text-small); }

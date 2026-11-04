@@ -57,6 +57,10 @@ installation makes on its first start and keeps in its database; a key written i
 | `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`, `SUPER_ADMIN_NAME` | empty | Create the super admin on the first start of a real installation (password at least 12 characters). An existing account is never changed |
 | `DEMO_ACCOUNTS` | `off` | Outside demo mode, and in demo mode once a super admin is set, every `@akven.test` demo account is switched off at start. `on` keeps them |
 | `PAYMENT_PROVIDER` | `none` | `none`: no payments are taken. `simulated`: the demo wallet (set by the demo profile; no money moves). A real provider is future work |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` | empty, 587 | The SMTP server for emails to customers (STARTTLS). Empty host: nothing is sent, every email is kept in Admin > Emails to customers |
+| `MAIL_FROM`, `MAIL_FROM_NAME` | `akven.socks@gmail.com`, `AK&VEN` | Who the emails come from; replies go there too |
+| `PUBLIC_URL` | `http://localhost:8081` | The shop's own address, for the order links in emails |
+| `MAIL_KEEP_DAYS` | 90 | Emails hold names and addresses, so they are deleted after this many days |
 | `AKVEN_DEMO_EXPOSE_PROPOSAL` | `false` | When `true`, the chat also shows the assistant's raw proposal next to the validated discount (for demonstrations) |
 
 Copy `.env.example` to `.env` for local values; git ignores `.env`, and secrets are never committed.

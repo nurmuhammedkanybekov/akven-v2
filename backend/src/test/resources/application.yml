@@ -12,6 +12,8 @@ spring:
 # Test's own application.yml replaces (not merges with) the main one on the test
 # classpath, so JwtService's required properties need an explicit value here too.
 akven:
+  mail:
+    scheduler: off   # the tests run the email sender themselves
   payments:
     provider: simulated   # the tests pay with the demo wallet
   jwt:

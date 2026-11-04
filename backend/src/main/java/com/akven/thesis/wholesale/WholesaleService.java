@@ -1,5 +1,6 @@
 package com.akven.thesis.wholesale;
 
+import com.akven.thesis.notify.Notifier;
 import com.akven.thesis.audit.AuditService;
 import com.akven.thesis.common.BusinessRuleException;
 import com.akven.thesis.common.NotFoundException;
@@ -40,11 +41,13 @@ public class WholesaleService {
     private final WholesaleRequestRepository requests;
     private final WholesaleRateLimiter limiter;
     private final AuditService audit;
+    private final Notifier notifier;
 
-    public WholesaleService(WholesaleRequestRepository requests, WholesaleRateLimiter limiter, AuditService audit) {
+    public WholesaleService(WholesaleRequestRepository requests, WholesaleRateLimiter limiter, AuditService audit, Notifier notifier) {
         this.requests = requests;
         this.limiter = limiter;
         this.audit = audit;
+        this.notifier = notifier;
     }
 
     /** A short reference the customer can quote: the first eight characters of the id, in capitals. */
@@ -65,6 +68,7 @@ public class WholesaleService {
         WholesaleRequest r = new WholesaleRequest(in.kind(), company, line(in.city()), in.contactKind(), contact,
                 in.pairs(), text(in.mix()), text(in.note()), accountEmail);
         requests.save(r);
+        if (in.contactKind() == ContactKind.EMAIL) notifier.wholesaleReceived(contact, in.lang(), reference(r.getId()), r.getPairs());
         return new Received(reference(r.getId()), r.getCreatedAt());
     }
 

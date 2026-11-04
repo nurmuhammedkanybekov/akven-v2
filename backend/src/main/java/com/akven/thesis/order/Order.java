@@ -103,6 +103,10 @@ public class Order extends AuditableEntity {
     @Column(length = 6)
     private String pickupCode;
 
+    /** The language the customer used at checkout (en, ru or ky): the emails about this order are written in it. */
+    @Column(nullable = false, length = 2)
+    private String lang = "en";
+
     @Enumerated(EnumType.STRING)
     @Column(length = 12)
     private GiftBox giftBox;
@@ -248,6 +252,8 @@ public class Order extends AuditableEntity {
     public String getIdempotencyKey() { return idempotencyKey; }
     public PickupPoint getPickupPoint() { return pickupPoint; }
     public String getPickupCode() { return pickupCode; }
+    public String getLang() { return lang; }
+    public void speak(String lang) { this.lang = lang == null || !lang.matches("en|ru|ky") ? "en" : lang; }
     public GiftBox getGiftBox() { return giftBox; }
     public GiftRibbon getGiftRibbon() { return giftRibbon; }
     public String getGiftTo() { return giftTo; }
