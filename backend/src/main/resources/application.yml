@@ -53,6 +53,14 @@ logging:
   pattern:
     level: "%5p [%X{correlationId:-}]"
 
+# The API description (/v3/api-docs) and Swagger UI map every endpoint: useful for presenting and developing, an
+# attacker's map in a real shop. On in demo mode (application-demo.yml), off otherwise unless API_DOCS=true.
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS:false}
+  swagger-ui:
+    enabled: ${API_DOCS:false}
+
 management:
   endpoints:
     web:

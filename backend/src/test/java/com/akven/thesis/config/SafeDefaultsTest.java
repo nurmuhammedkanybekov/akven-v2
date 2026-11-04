@@ -28,6 +28,8 @@ class SafeDefaultsTest {
         assertThat(String.valueOf(main.getProperty("akven.payments.provider"))).isEqualTo("${PAYMENT_PROVIDER:none}");
         assertThat(String.valueOf(main.getProperty("akven.demo-accounts"))).isEqualTo("${DEMO_ACCOUNTS:off}");
         assertThat(String.valueOf(main.getProperty("spring.flyway.locations"))).doesNotContain("seed");
+        assertThat(String.valueOf(main.getProperty("springdoc.api-docs.enabled"))).as("the API map is not public").isEqualTo("${API_DOCS:false}");
+        assertThat(String.valueOf(main.getProperty("springdoc.swagger-ui.enabled"))).isEqualTo("${API_DOCS:false}");
     }
 
     @Test
@@ -35,6 +37,7 @@ class SafeDefaultsTest {
         PropertySource<?> demo = load("application-demo.yml");
         assertThat(demo.getProperty("akven.payments.provider")).isEqualTo("simulated");
         assertThat(String.valueOf(demo.getProperty("spring.flyway.locations"))).contains("classpath:db/seed");
+        assertThat(demo.getProperty("springdoc.api-docs.enabled")).isEqualTo(true);
     }
 
     /**
