@@ -173,7 +173,7 @@ flowchart LR
 | Layer | Technology |
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, role-gated routes. About 1,600 texts per language in English, Russian and Kyrgyz, with typed keys |
-| API | Spring Boot 3.3, Java 17, 107 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` |
+| API | Spring Boot 3.5, Java 17, 107 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` |
 | Data | PostgreSQL 16 with pgvector. 35 Flyway versions: 19 schema migrations, 16 demo-data migrations (demo profile only). Check constraints repeat the rules that must never break |
 | Assistant | A `Negotiator` interface: rule-based, and a language model over any OpenAI-compatible API (Gemini by default), with fallback to the rules and a run-time switch |
 | Delivery | Docker Compose (database, backend, nginx). CI on GitHub Actions (six jobs) and on the ELTE GitLab |
