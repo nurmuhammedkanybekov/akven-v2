@@ -61,10 +61,20 @@ for (const [engineName, engine] of engines) {
         advice: document.querySelector("#fitting .av-fr__advice")?.textContent,
       }));
       await teaser.scrollIntoViewIfNeeded();
+      // The site scrolls smoothly, so that scroll is still animating here. WebKit can call a chip "stable" between two
+      // frames of it and then click where the chip was a moment ago, so wait until the page stands still for a few frames.
+      await page.evaluate(() => new Promise((done) => {
+        let last = -1, still = 0;
+        const tick = () => { still = window.scrollY === last ? still + 1 : 0; last = window.scrollY; still >= 5 ? done() : requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+      }));
       // The section people choose in must not slide under the pointer (a sliding chip once took the tap elsewhere in WebKit).
       const moves = await teaser.evaluate((el) => getComputedStyle(el).transform);
       assert.equal(moves, "none", `the teaser slides while it is being used (transform ${moves})`);
       await teaser.locator("label", { hasText: /^Her$/ }).click();
+      try {
+        await page.waitForFunction(() => document.querySelector("#fitting input[name=ft-who]:checked")?.closest("label")?.textContent === "Her", null, { timeout: 5000 });
+      } catch { throw new Error(`the Her choice did not take: ${JSON.stringify(await state())}`); }
       await teaser.locator("label", { hasText: /^Ankle/ }).click();
       try {
         await page.waitForFunction(() => document.querySelector("#fitting input[name=ft-cut]:checked")?.closest("label")?.textContent?.startsWith("Ankle"), null, { timeout: 5000 });
@@ -72,7 +82,8 @@ for (const [engineName, engine] of engines) {
       try { await teaser.getByText(/Ankle with sneakers/).waitFor({ timeout: 5000 }); }
       catch { throw new Error(`Ankle is chosen but the advice did not follow: ${JSON.stringify(await state())}`); }
       await teaser.getByRole("link", { name: /Open the fitting room/ }).click();
-      await page.waitForURL(/\/fitting\?who=WOMEN&cut=ankle/);
+      try { await page.waitForURL(/\/fitting\?who=WOMEN&cut=ankle/, { timeout: 10000 }); }
+      catch { throw new Error(`the fitting room opened at ${page.url()}, not with Her and Ankle`); }
       await page.getByRole("heading", { level: 1, name: "Try them on before you buy" }).waitFor();
       await fits();
     });
