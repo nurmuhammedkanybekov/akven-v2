@@ -96,6 +96,8 @@ export interface AdminProduct {
   quality: string | null; care: string | null; origin: string | null;
   active: boolean; retiredAt: string | null; version: number;
   images: AdminImage[]; variants: AdminVariant[];
+  /** When it was added: the list shows the newest first and marks this week's as new. */
+  createdAt?: string;
 }
 export interface AuditEntry {
   id: string; actorId: string; action: string; entityType: string; entityId: string;

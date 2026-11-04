@@ -79,10 +79,19 @@ public class AdminCatalogService {
 
     // ---- reads -----------------------------------------------------------------------------
 
-    /** status: "active" (default: visible in the shop), "retired" (hidden) or "all". q searches the name. */
+    /**
+     * status: "active" (default: visible in the shop), "retired" (hidden) or "all". q searches the name; category narrows
+     * to one shelf. sort: "newest" (default, so a sock just added is at the top) or "name".
+     */
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public PageResponse<AdminProductView> list(String q, String status, int page, int size) {
+        return list(q, status, null, "newest", page, size);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public PageResponse<AdminProductView> list(String q, String status, Category category, String sort, int page, int size) {
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> all = new ArrayList<>();
             if ("retired".equalsIgnoreCase(status)) all.add(cb.isFalse(root.get("active")));
@@ -91,10 +100,12 @@ public class AdminCatalogService {
                 String like = "%" + q.trim().toLowerCase(Locale.ROOT).replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
                 all.add(cb.like(cb.lower(root.get("name")), like, '\\'));
             }
+            if (category != null) all.add(cb.equal(root.get("category"), category));
             return cb.and(all.toArray(new Predicate[0]));
         };
         Page<Product> products = productRepository.findAll(spec, PageRequest.of(Math.max(page, 0),
-                size <= 0 ? 20 : Math.min(size, 100), Sort.by("name").and(Sort.by("slug"))));
+                size <= 0 ? 20 : Math.min(size, 100),
+                "name".equalsIgnoreCase(sort) ? Sort.by("name").and(Sort.by("slug")) : Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by("name"))));
         List<UUID> ids = products.getContent().stream().map(Product::getId).toList();
         Map<UUID, List<Variant>> variants = ids.isEmpty() ? new HashMap<>()
                 : variantRepository.findByProductIdInOrderBySkuAsc(ids).stream()

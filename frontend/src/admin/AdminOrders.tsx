@@ -1,16 +1,18 @@
 import { Link, useSearchParams } from "react-router-dom";
+import { useMoney } from "../shop/useMoney";
 import { adminListOrders } from "../api/endpoints";
 import type { OrderStatus } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { OrderStatusBadge } from "../components/OrderStatusBadge";
 import { Pagination } from "../components/Pagination";
 import { useAsync } from "../hooks/useAsync";
-import { formatDateTime, formatPrice } from "../lib/format";
+import { formatDateTime } from "../lib/format";
 import { useT } from "../i18n/I18n";
 
 const TABS = [["PAID", "a.orders.toFulfil"], ["FULFILLED", "a.orders.completed"], ["CANCELLED", "a.orders.cancelled"], ["", "a.all"]] as const;
 
 export function AdminOrders() {
+  const { money: formatPrice } = useMoney();
   const { t } = useT();
   const [params, setParams] = useSearchParams();
   const status = (params.get("status") ?? "PAID") as OrderStatus | "";

@@ -31,9 +31,11 @@ public class AdminCatalogController {
     @GetMapping("/products")
     public PageResponse<AdminProductView> list(@RequestParam(required = false) String q,
                                                @RequestParam(defaultValue = "active") String status,
+                                               @RequestParam(required = false) Category category,
+                                               @RequestParam(defaultValue = "newest") String sort,
                                                @RequestParam(defaultValue = "0") int page,
                                                @RequestParam(defaultValue = "20") int pageSize) {
-        return service.list(q, status, page, pageSize);
+        return service.list(q, status, category, sort, page, pageSize);
     }
 
     @GetMapping("/products/{id}")

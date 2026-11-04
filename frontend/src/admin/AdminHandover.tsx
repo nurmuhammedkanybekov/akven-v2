@@ -1,11 +1,12 @@
 import { useCallback, useState, type FormEvent } from "react";
+import { useMoney } from "../shop/useMoney";
 import { ApiError } from "../api/client";
 import { adminHandOver } from "../api/endpoints";
 import type { OrderView } from "../api/types";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { Input } from "../components/Field";
-import { formatPrice } from "../lib/format";
+
 import { useT } from "../i18n/I18n";
 import { QrScanner } from "./QrScanner";
 
@@ -14,6 +15,7 @@ import { QrScanner } from "./QrScanner";
  * the order is handed over once.
  */
 export function AdminHandover() {
+  const { money: formatPrice } = useMoney();
   const { t } = useT();
   const [code, setCode] = useState("");
   const [phoneEnd, setPhoneEnd] = useState("");

@@ -1163,6 +1163,12 @@ const shop: Partial<Record<MessageKey, string>> = {
   "api.GUEST_EMAIL_REQUIRED": "Почтаңызды жазыңыз: ырастоо жана буйрутманын шилтемеси ошол жакка келет.",
   "api.GUEST_TOO_MANY": "Акыркы саатта бул туташуудан өтө көп буйрутма болду. Бир аз күтүңүз же аккаунтка кириңиз.",
   "api.FIND_TOO_MANY": "Шилтемени бир нече жолу сурадыңыз. Бир саат күтүңүз же үй-бүлөгө жазыңыз.",
+  "a.products.shelf": "Текче",
+  "a.products.sort": "Тартип",
+  "a.products.sortNewest": "Адегенде жаңылары",
+  "a.products.sortName": "Аталышы боюнча",
+  "a.products.total": "Товарлар: {n}",
+  "a.products.new": "Жаңы",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

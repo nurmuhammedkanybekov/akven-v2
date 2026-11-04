@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMoney } from "../shop/useMoney";
 import { Link, useParams } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { adminCancelOrder, adminFulfilOrder, adminGetOrder } from "../api/endpoints";
@@ -10,11 +11,12 @@ import { ProductImage } from "../components/ProductImage";
 import { GiftSummary } from "../components/GiftSummary";
 import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
-import { formatDateTime, formatPrice } from "../lib/format";
+import { formatDateTime } from "../lib/format";
 import { useT } from "../i18n/I18n";
 import { OrderEmails } from "./AdminEmails";
 
 export function AdminOrderDetail() {
+  const { money: formatPrice } = useMoney();
   const { id = "" } = useParams();
   const toast = useToast();
   const { t } = useT();

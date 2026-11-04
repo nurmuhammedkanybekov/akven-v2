@@ -171,14 +171,14 @@ public final class AdminCatalogDtos {
                                    AdminTermRef section, AdminTermRef cut, String collection, String description,
                                    String fabricComposition, String quality, String care, String origin,
                                    boolean active, Instant retiredAt, Integer version,
-                                   List<AdminImageView> images, List<AdminVariantView> variants) {
+                                   List<AdminImageView> images, List<AdminVariantView> variants, Instant createdAt) {
         static AdminProductView of(Product p, List<Variant> variants, List<ProductImage> images) {
             return new AdminProductView(p.getId(), p.getSlug(), p.getName(), p.getCategory(),
                     AdminTermRef.of(p.getSection()), AdminTermRef.of(p.getCut()), p.getCollection(), p.getDescription(),
                     p.getFabricComposition(), p.getQuality(), p.getCare(), p.getOrigin(),
                     p.isActive(), p.getRetiredAt(), p.getVersion(),
                     images.stream().map(AdminImageView::of).toList(),
-                    variants.stream().map(AdminVariantView::of).toList());
+                    variants.stream().map(AdminVariantView::of).toList(), p.getCreatedAt());
         }
     }
 
