@@ -142,7 +142,7 @@ jobs:
             -H 'Content-Type: application/json' -d '{"email":"admin@akven.test","password":"wrong-password"}')
           echo "wrong password -> $CODE"; test "$CODE" = "401"
           curl -fsS http://localhost:8080/api/products > /dev/null
-      - name: Safe by default — the same database started without demo mode takes no payments and has no demo login
+      - name: Safe by default — the same database started without demo mode takes no payments, has no demo login and no public API map
         run: |
           set -e
           pkill -f 'java -jar' || true; sleep 3
@@ -153,6 +153,8 @@ jobs:
           CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/api/auth/login \
             -H 'Content-Type: application/json' -d '{"email":"admin@akven.test","password":"changeme-admin"}')
           echo "demo admin without demo mode -> $CODE"; test "$CODE" = "401"
+          DOCS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/v3/api-docs)
+          echo "API description without demo mode -> $DOCS"; test "$DOCS" != "200"
       - name: Show app log on failure
         if: failure()
         run: cat app.log; cat app-safe.log 2>/dev/null || true

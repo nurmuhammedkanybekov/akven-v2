@@ -4,6 +4,12 @@ spring:
   flyway:
     locations: classpath:db/migration,classpath:db/seed
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 akven:
   payments:
     provider: simulated
