@@ -87,7 +87,7 @@
 .av-price__was { color: var(--ink-3); text-decoration: line-through; font-weight: 400; margin-left: 0.6em; font-size: 0.875em; }
 
 /* ---------- Forms ---------- */
-.av-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+.av-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); align-content: start; }
 .av-label { font-size: var(--text-small); font-weight: 500; }
 .av-hint { font-size: var(--text-small); color: var(--ink-3); }
 .av-error { font-size: var(--text-small); color: var(--danger); }
@@ -527,3 +527,13 @@ body.av-locked { overflow: hidden; }
 .av-scan__view { position: relative; display: grid; gap: var(--space-2); }
 .av-scan__view video { width: 100%; max-height: 18rem; object-fit: cover; border-radius: var(--radius-md); background: #000; }
 .av-scan__frame { position: absolute; top: 50%; left: 50%; width: 9rem; height: 9rem; translate: -50% calc(-50% - 1.4rem); border: 3px solid var(--accent); border-radius: 14px; box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.25); pointer-events: none; }
+
+/* Admin product list: pictures big enough to recognise a sock, its colours, and what was just added */
+.av-prodcell__img { width: 64px; }
+.av-prodcell__img .av-imgplaceholder svg { height: 30px; }
+.av-prodcell__text { display: grid; gap: 4px; justify-items: start; }
+.av-prodcell__dots { display: flex; gap: 4px; }
+.av-prodcell__dots i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+.av-admin__tools--second { align-items: center; gap: var(--space-4); margin-top: calc(-1 * var(--space-2)); }
+.av-sortpick { display: inline-flex; align-items: center; gap: var(--space-2); }
+.av-sortpick .av-select { min-height: 40px; padding-block: 6px; }

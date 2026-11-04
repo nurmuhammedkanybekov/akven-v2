@@ -83,7 +83,7 @@ export const adminEn = {
   "a.products.options": "Colours and sizes",
   "a.products.prices": "Prices",
   "a.products.noSection": "No section",
-  "a.products.optionCount": "{n} options",
+  "a.products.optionCount": "Options: {n}",
   "a.products.inStock": "{n} in stock",
   "a.products.noPrices": "No prices yet",
   "a.products.priceRange": "{min} to {max}",

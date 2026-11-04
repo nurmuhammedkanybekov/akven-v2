@@ -1178,6 +1178,12 @@ const shop = {
   "api.GUEST_EMAIL_REQUIRED": "Enter your email: the confirmation and the link to your order go there.",
   "api.GUEST_TOO_MANY": "Too many orders from this connection in the last hour. Please wait a while, or sign in.",
   "api.FIND_TOO_MANY": "You have asked for links several times. Please wait an hour, or write to the family.",
+  "a.products.shelf": "Shelf",
+  "a.products.sort": "Order",
+  "a.products.sortNewest": "Newest first",
+  "a.products.sortName": "By name",
+  "a.products.total": "{n} products",
+  "a.products.new": "New",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

@@ -1,3 +1,4 @@
+import { CurrencySwitch } from "../shop/useMoney";
 import { Link, NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Logo } from "../brand/Logo";
 import { useAuth } from "../auth/AuthContext";
@@ -53,12 +54,14 @@ export function AdminLayout() {
           {isSuperAdmin && <NavLink to="/admin/accounts">{t("a.nav.accounts")}</NavLink>}
           {isSuperAdmin && <NavLink to="/admin/assistant">{t("a.nav.assistant")}</NavLink>}
           {isSuperAdmin && <NavLink to="/admin/audit">{t("a.nav.audit")}</NavLink>}
-          <Link to="/" target="_blank" rel="noreferrer">{t("a.nav.viewShop")}</Link>
+          {/* Same tab: the sign-in lives in this tab only (so a shared computer forgets it), and a new tab would start signed out. */}
+          <Link to="/">{t("a.nav.viewShop")}</Link>
         </nav>
         <div className="av-admin__who">
           <span className="av-small" title={session.email}>{session.email}</span>
           <Badge tone={isAdmin ? "accent" : "neutral"}>{role}</Badge>
           <LanguageSwitch />
+          <CurrencySwitch />
           <div className="av-row">
             <ThemeToggle theme={theme} onToggle={toggle} />
             <Button variant="ghost" size="sm" onClick={signOut}>{t("a.signOut")}</Button>

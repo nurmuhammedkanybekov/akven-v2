@@ -1163,6 +1163,12 @@ const shop: Partial<Record<MessageKey, string>> = {
   "api.GUEST_EMAIL_REQUIRED": "Введите почту: туда придут подтверждение и ссылка на заказ.",
   "api.GUEST_TOO_MANY": "За последний час с этого подключения было слишком много заказов. Подождите немного или войдите в аккаунт.",
   "api.FIND_TOO_MANY": "Вы уже несколько раз запрашивали ссылку. Подождите час или напишите семье.",
+  "a.products.shelf": "Полка",
+  "a.products.sort": "Порядок",
+  "a.products.sortNewest": "Сначала новые",
+  "a.products.sortName": "По названию",
+  "a.products.total": "Товаров: {n}",
+  "a.products.new": "Новый",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

@@ -9,7 +9,7 @@ import type { EvaluationReport, NegotiationStats, ShopSummary, StockWaiting } fr
 import { Alert, Skeleton } from "../components/Alert";
 import { Badge } from "../components/Badge";
 import { useAsync } from "../hooks/useAsync";
-import { formatDay, formatPrice } from "../lib/format";
+import { formatDay } from "../lib/format";
 import { useT } from "../i18n/I18n";
 
 const RANGES = [7, 30, 90];
@@ -107,6 +107,7 @@ function SalesChart({ days }: { days: number }) {
 }
 
 function ShopNow({ s }: { s: ShopSummary }) {
+  const { money: formatPrice } = useMoney();
   const { t, lang } = useT();
   return (
     <>
@@ -185,6 +186,7 @@ function WaitingList() {
 }
 
 function Stats({ s }: { s: NegotiationStats }) {
+  const { money: formatPrice } = useMoney();
   const { t: tr } = useT();
   const t = s.totals;
   return (
@@ -284,6 +286,7 @@ function Comparison() {
 
 /** One comparison report, recorded or live, with where the AI answers came from stated first. */
 export function ComparisonReport({ report: r }: { report: EvaluationReport }) {
+  const { money: formatPrice } = useMoney();
   const { t } = useT();
   const source = t(r.aiSource === "LIVE" ? "a.cmp.src.LIVE" : r.aiSource === "RECORDED" ? "a.cmp.src.RECORDED" : "a.cmp.src.SCRIPTED");
   return (

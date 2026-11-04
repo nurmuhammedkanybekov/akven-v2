@@ -69,7 +69,7 @@ export const getTerms = () => api<TermsView>("/api/catalog/terms");
 export const getProduct = (slug: string) => api<ProductDetail>(`/api/products/${encodeURIComponent(slug)}`);
 
 // ---- admin: products ----
-export const adminListProducts = (p: { q?: string; status?: string; page?: number; pageSize?: number }) =>
+export const adminListProducts = (p: { q?: string; status?: string; category?: string; sort?: "newest" | "name"; page?: number; pageSize?: number }) =>
   api<PageResponse<AdminProduct>>(`/api/admin/products${qs(p)}`);
 export const adminGetProduct = (id: string) => api<AdminProduct>(`/api/admin/products/${id}`);
 export const adminCreateProduct = (body: ProductInput) => api<AdminProduct>("/api/admin/products", { method: "POST", body });

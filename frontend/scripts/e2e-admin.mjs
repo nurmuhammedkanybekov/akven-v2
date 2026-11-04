@@ -621,7 +621,8 @@ try {
     await page.waitForURL(`${BASE}/admin/reviews`);
     await page.getByText("Soft and warm, and they stay up all day.").waitFor();
     await a11y("review moderation");
-    await page.getByRole("button", { name: "Publish", exact: true }).first().click();
+    // the demo data has older reviews waiting too: publish this customer's own
+    await page.locator("li").filter({ hasText: "Soft and warm, and they stay up all day." }).getByRole("button", { name: "Publish", exact: true }).click();
     await page.getByText("The review is in the shop.").waitFor();
     await page.goto(productUrl);
     await page.locator(".av-reviews__list").getByText("Soft and warm, and they stay up all day.").waitFor();
