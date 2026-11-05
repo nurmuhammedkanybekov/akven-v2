@@ -133,7 +133,8 @@ rule-based assistant (which over-promised six times by design) or for the model.
   review moderation; the **wholesale inbox** with one-tap reply in the customer's own messenger.
 - **Owners:** the limit and cost of each sock, the price ladder and minimum order, som and rouble rates, **delivery
   areas**, customers with their orders and spending, contacts, the stall and its hours, the size chart, the emails sent
-  to customers, and the orders as a spreadsheet. Prices can be read in dollars, som or roubles.
+  to customers, and the orders as a spreadsheet. An **automatic low-stock alert** emails them the moment a sale leaves
+  a sock at the "few left" level. Prices can be read in dollars, som or roubles.
 - **Super admin:** the team's accounts, which assistant answers the chat (with a test box, a connection test that says
   in plain words why the AI is not answering, and the live comparison), and the history of every change, by part of
   the shop and by who made it, with the values before and after.
@@ -152,7 +153,7 @@ docker compose up --build
 ```
 
 Then open **http://localhost:8081**. The first build takes a few minutes; the backend is ready when its log says
-`Successfully applied 41 migrations`.
+`Successfully applied 43 migrations`.
 
 | Demo account | Email | Password | Can do |
 |---|---|---|---|
@@ -204,7 +205,7 @@ flowchart LR
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, role-gated routes. About 1,900 texts per language in English, Russian and Kyrgyz, with typed keys |
 | API | Spring Boot 3.5, Java 17, 112 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` (demo mode; `API_DOCS=true` elsewhere) |
-| Data | PostgreSQL 16 with pgvector. 41 Flyway versions: 23 schema migrations, 18 demo-data migrations (demo profile only). Check constraints repeat the rules that must never break |
+| Data | PostgreSQL 16 with pgvector. 43 Flyway versions: 24 schema migrations, 19 demo-data migrations (demo profile only). Check constraints repeat the rules that must never break |
 | Assistant | A `Negotiator` interface: rule-based, and a language model over any OpenAI-compatible API (Gemini by default), with fallback to the rules and a run-time switch |
 | Delivery | Docker Compose (database, backend, nginx). CI on GitHub Actions (six jobs) and on the ELTE GitLab |
 
@@ -229,7 +230,7 @@ the thesis:
 
 | Check | Command | Result |
 |---|---|---|
-| Backend, in-memory database | `cd backend && mvn verify` | 271 tests, **96% line coverage**; the build fails below 80% |
+| Backend, in-memory database | `cd backend && mvn verify` | 273 tests, **96% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
 | Frontend | `cd frontend && npm test && npm run build` | 208 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
 | In a real browser | `cd frontend && npm run e2e` | 28 steps: the owner's, the customer's (with and without an account) and the super admin's work in three languages, with accessibility rules on every page |

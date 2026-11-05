@@ -1356,6 +1356,8 @@ const shop = {
   "visit.zoneFree": "free",
   "visit.zoneOnReceipt": "paid to the carrier",
   "visit.zoneFreeFrom": "free from {amount}",
+  "a.em.kind.LOW_STOCK": "Running low (to the owners)",
+  "nf.hand": "this one lost its pair…",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

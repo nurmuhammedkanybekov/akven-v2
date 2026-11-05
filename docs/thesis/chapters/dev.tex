@@ -110,7 +110,7 @@ security refines this inside the services.
 \section{Data model}
 \label{sec:data}
 
-Figure~\ref{fig:er-core} shows the core tables; the full schema of 41 Flyway versions (23 schema migrations and 18
+Figure~\ref{fig:er-core} shows the core tables; the full schema of 43 Flyway versions (24 schema migrations and 19
 demo-data migrations) is generated from the database into the \texttt{docs/diagrams} folder.
 
 \begin{figure}[H]
@@ -137,7 +137,7 @@ demo-data migrations) is generated from the database into the \texttt{docs/diagr
 	\texttt{price\_tier}, \texttt{shop\_policy} & The ladder of discounts by pairs, the minimum order, exchange rates. \\
 	\texttt{delivery\_zone} & Delivery areas: courier or cargo carrier, fee, free-from amount, days, a note, and whether the
 	carrier is paid on receipt. \\
-	\texttt{outbound\_email} & The outbox: every email to a customer, its language, state and attempts. \\
+	\texttt{outbound\_email} & The outbox: every email to a customer (and the owners' low-stock alerts), its language, state and attempts. \\
 	\texttt{wholesale\_request} & Requests from shops and companies with their status. \\
 	\texttt{customer\_details} & Contact and delivery details a customer asked to keep. \\
 	\texttt{family\_member}, \texttt{saved\_item}, \texttt{product\_review}, \texttt{stock\_request} & Family profiles,
@@ -352,6 +352,12 @@ area per country, so delivery works as before until the owners set prices.
 taxi or brings a large order in its own car, free above the area's amount) or a \emph{cargo carrier} (the bus cargo to
 Osh, carriers to Kazakhstan, Uzbekistan and Russia), which can be paid by the customer on receipt. The order keeps its
 own copy of the kind and the payment on receipt, like the fee, so the receipt never changes.
+
+\paragraph{Automatic low-stock alerts.} When a paid order takes an option from above the owners' ``few left'' level
+to at or below it, \texttt{OrderService} collects it and \texttt{Notifier.lowStock} writes one email per order to every
+active owner and super admin: which socks, how many are left and how many are on the way, with a link to the dashboard.
+Only the crossing counts, so later sales of the same option do not repeat the alert, and like every email it is written
+in the order's transaction. The Telegram bot (future work) can send the same news from the same moment.
 
 \paragraph{Emails through an outbox.} \texttt{Notifier} writes each email to a customer (confirmed, handed over,
 cancelled; a wholesale request received) into \texttt{outbound\_email} \emph{inside the transaction that changes the

@@ -340,7 +340,7 @@ export interface CustomerDetails { contactName: string | null; contactPhone: str
 
 // ---- emails to customers (admin) ----
 
-export type EmailKind = "ORDER_CONFIRMED" | "ORDER_HANDED_OVER" | "ORDER_CANCELLED" | "WHOLESALE_RECEIVED";
+export type EmailKind = "ORDER_CONFIRMED" | "ORDER_HANDED_OVER" | "ORDER_CANCELLED" | "WHOLESALE_RECEIVED" | "ORDER_LINK" | "LOW_STOCK";
 export type EmailStatus = "QUEUED" | "SENT" | "FAILED" | "NOT_SENT";
 export interface OutboundEmail {
   id: string; kind: EmailKind; to: string; lang: Lang; subject: string; body: string; orderId: string | null;

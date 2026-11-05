@@ -35,7 +35,7 @@ docker compose up --build
 \end{lstlisting}
 
 The first build takes a few minutes. The backend has started when its log ends with
-\texttt{Successfully applied 41 migrations}; the database tables are created and, in the demo, filled with the
+\texttt{Successfully applied 43 migrations}; the database tables are created and, in the demo, filled with the
 catalogue. To start again from an empty database, run \texttt{docker compose down -v} and start again.
 
 \subsection{Demo accounts}
@@ -301,7 +301,8 @@ reordered, and deleted when no product uses them.
 
 \paragraph{Negotiations and the dashboard.} \emph{Negotiations} (Figure~\ref{fig:a-negotiations}) lists every
 conversation with what the assistant proposed and what was allowed. The dashboard (Figure~\ref{fig:a-dashboard}) shows
-paid orders, revenue and pairs sold per day, orders waiting at the stall, socks running out with what is on the way,
+paid orders, revenue and pairs sold per day, orders waiting at the stall, socks running out with what is on the way
+(the owners also get an email the moment a sale leaves a sock at the ``few left'' level),
 customers waiting for a sold-out option, and for the assistant the offers per day, how often the limit stepped in and how
 many offers became orders.
 

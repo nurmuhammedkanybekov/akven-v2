@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useCart } from "../cart/CartContext";
 import { BagDrawer } from "../components/BagDrawer";
@@ -18,6 +18,7 @@ export function ShopLayout() {
   const saved = useSaved();
   useReveal();
   useCalmOffscreen();
+  const { pathname } = useLocation();
   useSavedSync(session && !isStaff ? session.email : null);
   return (
     <>
@@ -30,7 +31,8 @@ export function ShopLayout() {
         accountLabel={session ? (isStaff ? t("nav.admin") : t("nav.account")) : t("nav.signin")}
         extra={<ThemeToggle theme={theme} onToggle={toggle} className="av-ann__theme" />}
       />
-      <main id="main" className="av-shopmain"><Outlet /></main>
+      {/* A new page fades in softly. Opacity only: a moving wrapper would carry the fixed bars and dialogs with it. */}
+      <main id="main" className="av-shopmain"><div key={pathname} className="av-pagein"><Outlet /></div></main>
       <BagDrawer />
       <Footer />
     </>
