@@ -171,7 +171,8 @@ A short tour:
 
 1. **Switch the language** in the top bar (EN · РУС · КЫР); the whole site follows.
 2. **Open a shelf**, pick a size and a colour, then take a filter off with its tag.
-3. **Plan a family set** on the home page: change a shoe size and watch the sock size and the price step.
+3. **Plan a family set** (home page → *One set for the whole family*): change a shoe size and watch the sock size and
+   the price step.
 4. **Ask for a better price** as a customer: open a sock and type "50% off". The offer stays within the limit.
 5. **Check out** with a courier or cargo: choose an area or a carrier, see its fee and days, tick *Remember my details*, pay with the
    simulated wallet.
@@ -182,6 +183,11 @@ A short tour:
 
 Start again from an empty database with `docker compose down -v`. Running without Docker, every setting and every test
 command are in [`docs/development.md`](docs/development.md).
+
+**Putting it online.** The same `docker compose` runs on one small Linux server behind Caddy, which gets the HTTPS
+certificate by itself (a free Oracle Cloud VM and a free DuckDNS name are enough for the thesis demo). Keep
+`AKVEN_BIND=127.0.0.1` so only Caddy reaches the shop, and set a real super admin in `.env`, which switches the demo
+accounts off. Every step, from renting the server to nightly backups, is in [`docs/deployment.md`](docs/deployment.md).
 
 ## How it is built
 
