@@ -54,7 +54,20 @@ async function closeBagDrawer() {
   await drawer.waitFor({ state: "hidden" });
 }
 
+/** Signs out and waits until the sign-out has really finished: opening /login a moment too early still finds the user
+ * signed in, and the sign-in page sends a signed-in user away (this raced on the slower CI machine). */
+const signOut = async () => {
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await page.getByRole("button", { name: "Sign out" }).waitFor({ state: "detached" });
+  await page.waitForFunction(() => !Object.keys(sessionStorage).some((k) => /token|auth/i.test(k) && sessionStorage.getItem(k)));
+};
 const a11y = async (label) => {
+  // Check the page as people see it once it has settled: a fade-in measured halfway reads as poor contrast (this failed
+  // on the slower CI machine, where a stamp was still appearing). Endless animations are left running.
+  await page.evaluate(() => Promise.race([
+    Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {}))),
+    new Promise((done) => setTimeout(done, 4000)),
+  ]));
   await page.evaluate(axeSource);
   const bad = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ["violations"] })).violations
     .filter((v) => v.impact === "serious" || v.impact === "critical")
@@ -214,7 +227,7 @@ try {
   });
 
   await step("the admin can sign out, and the admin is closed again", async () => {
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.goto(`${BASE}/admin`);
     await page.waitForURL(/\/login/);
   });
@@ -344,7 +357,7 @@ try {
   });
   await step("the shop team sees the paid order, marks it completed, and the customer can no longer cancel it", async () => {
     await page.goto(`${BASE}/orders`);
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.goto(`${BASE}/login`);
     await page.getByLabel("Email").fill("staff@akven.test");
     await page.getByLabel("Password").fill("changeme-staff");
@@ -368,14 +381,14 @@ try {
     await page.getByText("Order confirmed", { exact: true }).waitFor();
     await page.getByText("Collected / on its way", { exact: true }).waitFor();
     await page.getByRole("link", { name: "Emails to customers" }).click();
-    await page.getByText(/No mail server is set up, so emails are kept here and not sent/).waitFor();   // demo mode: honest about it
+    await page.getByText(/Email isn't set up yet, so the emails wait here/).waitFor();   // demo mode: honest about it
     await page.getByText(new RegExp(`To ${CUSTOMER.replace(/[.+]/g, "\\$&")}`)).first().waitFor();
     const confirmation = page.locator(".av-email").filter({ hasText: "Order confirmed" }).first();
     await confirmation.getByText("Read the email").click();
     await confirmation.getByText(/Your pickup code is \d{6}|We bring it to:|We hand your parcel to/).waitFor();
     await shot("admin-emails");
     await a11y("admin emails");
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
 
     await page.goto(`${BASE}/login`);
     await page.getByLabel("Email").fill(CUSTOMER);
@@ -464,7 +477,7 @@ try {
   });
   await step("the owners' screens open and pass the accessibility rules; staff cannot change prices", async () => {
     await page.goto(`${BASE}/orders`);
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.goto(`${BASE}/login`);
     await page.getByLabel("Email").fill("admin@akven.test");
     await page.getByLabel("Password").fill("changeme-admin");
@@ -476,7 +489,7 @@ try {
       if (heading === "Dashboard") await page.getByRole("heading", { name: "Running out" }).waitFor();
       await a11y(`admin ${heading.toLowerCase()}`);
     }
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.goto(`${BASE}/login`);
     await page.getByLabel("Email").fill("staff@akven.test");
     await page.getByLabel("Password").fill("changeme-staff");
@@ -488,7 +501,7 @@ try {
   });
 
   await step("the super admin adds a staff account, switches the assistant, reads the audit log, and the admin speaks Kyrgyz", async () => {
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.goto(`${BASE}/login`);
     await page.getByLabel("Email").fill("superadmin@akven.test");
     await page.getByLabel("Password").fill("changeme-super");
@@ -521,7 +534,7 @@ try {
   });
 
   await step("quick view adds a sock without leaving the shelf, prices switch to som, and the visit page shows today's hours", async () => {
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.goto(`${BASE}/men`);
     const card = page.locator(".av-card-wrap").first();
     await card.hover();
@@ -628,7 +641,7 @@ try {
     await page.getByRole("button", { name: "Send the review" }).click();
     await page.getByText(/Your review will appear once the family has read it/).waitFor();
     await page.goto(`${BASE}/account`);
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.goto(`${BASE}/login?next=%2Fadmin%2Freviews`);
     await page.getByLabel("Email").fill("admin@akven.test");
     await page.getByLabel("Password").fill("changeme-admin");
@@ -655,7 +668,7 @@ try {
 
   await step("a guest orders without an account, opens the order at its private link, and another browser gets the link again by email", async () => {
     await page.goto(`${BASE}/admin`);
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await signOut();
     await page.evaluate(() => localStorage.removeItem("akven-cart-v1"));
     await page.goto(`${BASE}/men`);
     const card = page.locator(".av-card-wrap").first();
@@ -696,9 +709,14 @@ try {
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);
   console.log("\nAll steps passed. Screenshots in docs/design/.");
 } catch (e) {
-  await page.screenshot({ path: path.join(os.tmpdir(), "e2e-failure.png"), fullPage: true }).catch(() => {});
+  // Kept by CI (browser-failures/ is uploaded as an artifact), with what the page said at that moment.
+  const failShot = path.join(root, "browser-failures", "e2e-failure.png");
+  fs.mkdirSync(path.dirname(failShot), { recursive: true });
+  await page.screenshot({ path: failShot, fullPage: true }).catch(() => {});
+  const said = await page.evaluate(() => `${location.pathname}${location.search}\n${document.body.innerText.slice(0, 600)}`).catch(() => "");
+  if (said) console.error(`\nThe page at that moment: ${said.replace(/\n+/g, " | ")}`);
   if (failedCalls.length) console.error("\nFailed network calls:\n  " + failedCalls.join("\n  "));
-  console.error("\nFAILED:", e.message, "\n(screenshot: " + path.join(os.tmpdir(), "e2e-failure.png") + ")");
+  console.error("\nFAILED:", e.message, "\n(screenshot: frontend/browser-failures/e2e-failure.png)");
   process.exitCode = 1;
 } finally {
   await browser.close();

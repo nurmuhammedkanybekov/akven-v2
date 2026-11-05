@@ -65,7 +65,7 @@ describe("NegotiationChat", () => {
     setup();
     await userEvent.click(screen.getByRole("button", { name: "Can I get a better price?" }));
     expect(await screen.findByText(/assistant suggested 40%/)).toBeInTheDocument();
-    expect(screen.getByText(/capped by the margin floor/)).toBeInTheDocument();
+    expect(screen.getByText(/the shop's lowest price/)).toBeInTheDocument();
   });
 
   it("shows a friendly error and keeps the chat usable", async () => {
