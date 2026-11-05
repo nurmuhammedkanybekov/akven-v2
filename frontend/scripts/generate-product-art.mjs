@@ -38,19 +38,17 @@ const scaleFor = (spec, fit) => { const b = sockBounds(spec.cut); const short = 
 const baseFor = (spec, fit) => { const b = sockBounds(spec.cut); const hPx = (b.h - 22) * scaleFor(spec, fit); return Math.round(Math.min(330, Math.max(110, 470 - hPx / 2 - 25))); };
 
 /**
- * The backdrop: the product's tint, woven like linen, with soft light from above. Socks hang from a washing line
- * on wooden pegs, the way the stall dries and shows them; boxes stand on the floor.
+ * The picture: the sock (or box) with its shadow, on a transparent ground. The ground is the shop's: every product
+ * picture sits on one of the backdrops in the styles (Kyrgyz felt, Korean hanji paper, a quiet bojagi patchwork), so
+ * drawn socks and photographs share one look and the backdrops can change without redrawing a single file. Socks hang
+ * from a washing line on wooden pegs, the way the stall dries and shows them; boxes stand on the floor. (`tint` is
+ * kept for the collection data; the backdrop no longer uses it.)
  */
 function frame(tint, body, { line = null, floor = 870 } = {}) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img">
   <defs>
-    <radialGradient id="light" cx=".5" cy=".38" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".7" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".06"/></radialGradient>
-    <pattern id="weave" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 1.5H6M1.5 0V6" stroke="#000" stroke-opacity=".035" stroke-width="1"/><path d="M0 4.5H6" stroke="#fff" stroke-opacity=".18" stroke-width="1"/></pattern>
-    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="12" dy="18" stdDeviation="11" flood-color="#2a1d10" flood-opacity=".16"/></filter>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="12" dy="18" stdDeviation="11" flood-color="#2a1d10" flood-opacity=".18"/></filter>
   </defs>
-  <rect width="${W}" height="${H}" fill="${tint}"/>
-  <rect width="${W}" height="${H}" fill="url(#weave)"/>
-  <rect width="${W}" height="${H}" fill="url(#light)"/>
   ${line != null ? `<path d="M-10 ${line + 4}Q400 ${line + 108} 810 ${line + 4}" fill="none" stroke="#000" stroke-opacity=".08" stroke-width="5"/><path d="M-10 ${line}Q400 ${line + 100} 810 ${line}" fill="none" stroke="#9a8569" stroke-width="3"/><path d="M-10 ${line - 1}Q400 ${line + 99} 810 ${line - 1}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>`
     : `<ellipse cx="400" cy="${floor}" rx="270" ry="22" fill="#000" fill-opacity=".09"/>`}
   ${body}

@@ -1,3 +1,4 @@
+import { stageFor } from "../../components/ProductImage";
 import { Link } from "react-router-dom";
 import { categoryFor, useFamily } from "../family";
 import { useViewed } from "../useViewed";
@@ -38,7 +39,7 @@ export function ForYou() {
               {viewed.map((v, i) => (
                 <li key={v.slug}>
                   <Link to={`/products/${v.slug}`}>
-                    <span className="av-recent__img" style={{ background: `var(--tint-${(i % 6) + 1})` }}>{v.image && <img src={v.image} alt="" loading="lazy" width={160} height={200} />}</span>
+                    <span className="av-recent__img" style={{ background: `var(--tint-${(i % 6) + 1})` }}>{v.image && <img src={v.image} data-stage={stageFor(v.image)} alt="" loading="lazy" width={160} height={200} />}</span>
                     <span className="av-recent__name">{v.name}</span>
                   </Link>
                 </li>

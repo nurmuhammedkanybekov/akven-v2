@@ -14,7 +14,7 @@ import { NegotiationChat } from "../components/NegotiationChat";
 import { Price } from "../components/Price";
 import { SizeFinder } from "../components/SizeFinder";
 import { NotifyMe } from "../components/NotifyMe";
-import { ProductImage } from "../components/ProductImage";
+import { ProductImage, stageFor } from "../components/ProductImage";
 import { ProductCard } from "../components/ProductCard";
 import { HeartIcon, PinIcon, StackIcon, TruckIcon } from "../components/icons";
 import { useSaved } from "../shop/useSaved";
@@ -122,7 +122,7 @@ function ProductView({ product }: { product: ProductDetail }) {
             <div className="av-pdp__thumbs" role="group" aria-label={t("pdp.photos")}>
               {images.map((img, i) => (
                 <button key={img.url} type="button" className="av-pdp__thumb" aria-pressed={i === imageIndex} aria-label={t("pdp.photoN", { n: i + 1, alt: img.alt })} onClick={() => setImageIndex(i)}>
-                  <img src={img.url} alt="" width={96} height={120} loading="lazy" />
+                  <img src={img.url} alt="" width={96} height={120} loading="lazy" data-stage={stageFor(img.url)} />
                 </button>
               ))}
             </div>

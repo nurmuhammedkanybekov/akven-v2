@@ -1347,6 +1347,11 @@ const shop = {
   "crafts.km": "about 4,400 km",
   "crafts.socks": "both words mean socks.",
   "crafts.cta": "How a pair travels",
+  "hero7.t1": "for grandma",
+  "hero7.t2": "for dad",
+  "hero7.t3": "for her",
+  "hero7.t4": "for the little one",
+  "hero7.t5": "for winter",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

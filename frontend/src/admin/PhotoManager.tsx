@@ -1,3 +1,4 @@
+import { stageFor } from "../components/ProductImage";
 import { useRef, useState, type DragEvent } from "react";
 import { ApiError } from "../api/client";
 import { adminReplaceImages, adminUploadImage } from "../api/endpoints";
@@ -85,7 +86,7 @@ export function PhotoManager({ product, onChange }: { product: AdminProduct; onC
         <ul className="av-photos">
           {images.map((img, i) => (
             <li key={img.id} className="av-photo">
-              <div className="av-photo__img"><img src={img.url} alt={img.alt} width={160} height={200} /></div>
+              <div className="av-photo__img"><img src={img.url} alt={img.alt} width={160} height={200} data-stage={stageFor(img.url)} /></div>
               {i === 0 && <span className="av-badge av-badge--accent">{t("a.ph.cover")}</span>}
               <label className="av-visually-hidden" htmlFor={`alt-${img.id}`}>{t("a.ph.alt", { n: i + 1 })}</label>
               <input id={`alt-${img.id}`} className="av-input" defaultValue={img.alt} onBlur={(e) => rename(i, e.target.value)} />

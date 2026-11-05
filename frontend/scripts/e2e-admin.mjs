@@ -405,7 +405,7 @@ try {
   await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting room has its own page", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("heading", { name: /Socks chosen pair by pair/ }).waitFor();
-    await page.locator(".av-still__box").waitFor();
+    await page.locator(".av-hero7__arch .av-hero7__sock").first().waitFor();
     await page.getByRole("link", { name: /For her/ }).waitFor();
     await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
     await page.getByRole("group", { name: "Show socks for" }).getByRole("button", { name: "Women" }).click();
@@ -551,7 +551,7 @@ try {
     const builder = page.locator(".av-casebuild");
     await builder.getByRole("button", { name: "Men", exact: true }).click();
     await builder.getByRole("searchbox", { name: "Find a sock by name" }).fill("Classic Rib");
-    const sock = builder.locator(".av-casebuild__sockhead").first();
+    const sock = builder.locator(".av-casebuild__sockhead", { hasText: "Classic Rib Crew" }).first();
     await sock.waitFor();
     await sock.click();
     const firstMore = builder.locator(".av-casebuild__variants button[data-more]").first();

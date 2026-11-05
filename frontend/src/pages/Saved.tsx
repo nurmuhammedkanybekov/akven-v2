@@ -1,3 +1,4 @@
+import { stageFor } from "../components/ProductImage";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getProduct } from "../api/endpoints";
@@ -77,7 +78,7 @@ function SavedGrid({ items, onRemove, removeLabel }: { items: SavedItem[]; onRem
         <li key={p.slug} className="av-card-wrap" style={{ "--i": i } as React.CSSProperties}>
           <Link to={`/products/${p.slug}`} className="av-card">
             <div className="av-card__media" style={{ background: `var(--tint-${(i % 6) + 1})` }}>
-              {p.image && <img src={p.image} alt="" width={800} height={1000} loading="lazy" />}
+              {p.image && <img src={p.image} data-stage={stageFor(p.image)} alt="" width={800} height={1000} loading="lazy" />}
             </div>
             <div className="av-card__meta">
               <span className="av-card__name">{p.name}</span>

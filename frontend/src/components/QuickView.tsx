@@ -13,7 +13,7 @@ import { Dialog } from "./Dialog";
 import { CheckIcon, CloseIcon, HeartIcon } from "./icons";
 import { Price } from "./Price";
 import { NotifyMe } from "./NotifyMe";
-import { ProductImage } from "./ProductImage";
+import { ProductImage, stageFor } from "./ProductImage";
 import { QuantityStepper } from "./QuantityStepper";
 import { flyToBag } from "../lib/flyToBag";
 import { productMeta } from "../lib/labels";
@@ -89,7 +89,7 @@ function Chooser({ product, onDone }: { product: ProductDetail; onDone: () => vo
           <div className="av-qv__thumbs" role="group" aria-label={t("pdp.photos")}>
             {images.slice(0, 6).map((img, i) => (
               <button key={img.url} type="button" aria-pressed={i === image} aria-label={t("qv.photo", { n: i + 1 })} onClick={() => setImage(i)}>
-                <img src={img.url} alt="" loading="lazy" />
+                <img src={img.url} alt="" loading="lazy" data-stage={stageFor(img.url)} />
               </button>
             ))}
           </div>

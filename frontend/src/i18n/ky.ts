@@ -1332,6 +1332,11 @@ const shop: Partial<Record<MessageKey, string>> = {
   "crafts.km": "болжол менен 4 400 км",
   "crafts.socks": "эки сөз тең «байпак» дегенди билдирет.",
   "crafts.cta": "Жуп кантип саякаттайт",
+  "hero7.t1": "чоң энеге",
+  "hero7.t2": "атага",
+  "hero7.t3": "ага",
+  "hero7.t4": "кичинекейге",
+  "hero7.t5": "кышка",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };
