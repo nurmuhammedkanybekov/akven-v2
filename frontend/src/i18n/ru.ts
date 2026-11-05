@@ -1337,6 +1337,7 @@ const shop: Partial<Record<MessageKey, string>> = {
   "hero7.t3": "для неё",
   "hero7.t4": "для малыша",
   "hero7.t5": "на зиму",
+  "a.em.kind.ORDER_LINK": "Ссылка на заказ",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };
