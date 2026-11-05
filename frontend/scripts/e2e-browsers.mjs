@@ -51,7 +51,7 @@ for (const [engineName, engine] of engines) {
 
     await step("the home page, and the fitting room's teaser leads into the room with the same choices", async () => {
       await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-      await page.getByRole("heading", { name: /Socks chosen pair by pair/ }).waitFor();
+      await page.getByRole("heading", { name: /Good socks for the whole family/ }).waitFor();
       await fits();
       const teaser = page.locator("#fitting");
       // Choose like a person does, then check what the page made of it: the choice itself, then the advice it gives.

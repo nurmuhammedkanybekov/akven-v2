@@ -222,7 +222,7 @@ try {
 
   // ---------------------------------------------------------------- the customer's journey
   await step("the public pages pass the accessibility rules", async () => {
-    for (const [url, heading] of [["/", null], ["/shop", null], ["/login", "Sign in"], ["/visit", "Find us at Dordoi"], ["/sizes", "Find your sock size"], ["/wholesale", "Socks by the case, from our container to your shelf"]]) {
+    for (const [url, heading] of [["/", null], ["/shop", null], ["/login", "Sign in"], ["/visit", "Find us at Dordoi"], ["/sizes", "Find your sock size"], ["/wholesale", "Socks by the case, straight from our container"]]) {
       await page.goto(`${BASE}${url}`);
       if (heading) await page.getByRole("heading", { name: heading }).waitFor();
       else await page.locator("main h1, main h2").first().waitFor();
@@ -271,7 +271,7 @@ try {
     await page.getByRole("radio", { name: /Pick up/ }).check();
     await page.getByRole("button", { name: "Pay with Apple Pay" }).click();
     const sheet = page.getByRole("dialog");
-    await sheet.getByText("This is a demonstration wallet").waitFor();
+    await sheet.getByText("This is a demo wallet").waitFor();
     await shot("shop-checkout");
     await sheet.getByText("Demo: make the bank decline this payment").click();   // click it like a person: the visible label
     await sheet.getByRole("button", { name: "Pay $19.00" }).click();
@@ -392,19 +392,19 @@ try {
   await step("the site speaks Russian and Kyrgyz, and remembers the choice", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("button", { name: "Русский" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Носки, выбранные пара за парой/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Хорошие носки/ }).waitFor();
     await page.reload();
-    await page.getByRole("heading", { level: 1, name: /Носки, выбранные пара за парой/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Хорошие носки/ }).waitFor();
     await a11y("the home page in Russian");
     await page.getByRole("button", { name: "Кыргызча" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Жуп-жубу менен тандалган/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Жакшы байпак/ }).waitFor();
     await page.getByRole("button", { name: "English" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Socks chosen pair by pair/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Good socks for the whole family/ }).waitFor();
   });
 
   await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting room has its own page", async () => {
     await page.goto(`${BASE}/`);
-    await page.getByRole("heading", { name: /Socks chosen pair by pair/ }).waitFor();
+    await page.getByRole("heading", { name: /Good socks for the whole family/ }).waitFor();
     await page.locator(".av-hero7__arch .av-hero7__sock").first().waitFor();
     await page.getByRole("link", { name: /For her/ }).waitFor();
     await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
@@ -435,7 +435,7 @@ try {
     await a11y("the family set page");
     await page.goto(`${BASE}/`);
     await page.getByRole("heading", { name: "Notes from the stall" }).waitFor();
-    await page.getByRole("heading", { name: "Two names. One family. One story." }).waitFor();
+    await page.getByRole("heading", { name: "Two names, one family." }).waitFor();
     await page.locator(".av-dordoi").scrollIntoViewIfNeeded();
     await page.evaluate(() => { const el = document.querySelector(".av-dordoi"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + el.offsetHeight - window.innerHeight); });
     await page.locator(".av-dordoi.is-done").waitFor();
