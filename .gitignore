@@ -41,4 +41,10 @@ docs/thesis/*.out
 docs/thesis/*.run.xml
 docs/thesis/*.toc
 docs/thesis/*.synctex.gz
+docs/thesis/*.idx
+docs/thesis/*.ilg
+docs/thesis/*.ind
+docs/thesis/*.nlo
+docs/thesis/*.nls
+docs/thesis/*-SAVE-ERROR
 frontend/browser-failures/
