@@ -677,3 +677,10 @@ body.av-locked { overflow: hidden; }
 .av-team__edit .av-field { min-width: 11rem; }
 .av-roles td { text-align: center; font-weight: 700; color: var(--validated, #2f7a4b); }
 .av-roles th[scope="row"] { font-weight: 500; }
+
+/* In the admin a wide table scrolls inside its frame; nothing around it may grow to the table's width (grid items and
+   fieldsets otherwise take their content's width and push a phone's page sideways). */
+.av-admin__main :is(div, section, article, form, fieldset, details) { min-width: 0; }
+.av-admin__main fieldset { min-inline-size: 0; }
+.av-tablewrap { max-width: 100%; position: relative; }
+.av-admin__main { overflow-x: clip; }

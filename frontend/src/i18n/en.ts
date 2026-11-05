@@ -1352,6 +1352,7 @@ const shop = {
   "hero7.t3": "for her",
   "hero7.t4": "for the little one",
   "hero7.t5": "for winter",
+  "a.em.kind.ORDER_LINK": "Link to an order",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

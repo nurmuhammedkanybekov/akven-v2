@@ -337,10 +337,12 @@ function OffersChart({ s }: { s: NegotiationStats }) {
       </div>
       <details>
         <summary className="av-small">{t("a.db.asTable")}</summary>
+        <div className="av-tablewrap" tabIndex={0}>
         <table className="av-table">
           <thead><tr><th scope="col">{t("a.db.day")}</th><th scope="col">{t("a.db.offers")}</th><th scope="col">{t("a.db.became")}</th><th scope="col">{t("a.db.cut")}</th><th scope="col">{t("a.db.avg")}</th></tr></thead>
           <tbody>{s.perDay.filter((d) => d.offers > 0).map((d) => <tr key={d.date}><td>{d.date}</td><td className="av-num">{d.offers}</td><td className="av-num">{d.offersUsed}</td><td className="av-num">{d.limitedByShop}</td><td className="av-num">{pct(d.averageDiscountPct)}</td></tr>)}</tbody>
         </table>
+        </div>
       </details>
     </section>
   );
