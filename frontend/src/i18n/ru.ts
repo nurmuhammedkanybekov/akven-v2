@@ -1332,11 +1332,6 @@ const shop: Partial<Record<MessageKey, string>> = {
   "crafts.km": "около 4 400 км",
   "crafts.socks": "оба слова значат «носки».",
   "crafts.cta": "Как путешествует пара",
-  "hero7.t1": "для бабушки",
-  "hero7.t2": "для папы",
-  "hero7.t3": "для неё",
-  "hero7.t4": "для малыша",
-  "hero7.t5": "на зиму",
   "a.em.kind.ORDER_LINK": "Ссылка на заказ",
 };
 

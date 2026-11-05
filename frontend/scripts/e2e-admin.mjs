@@ -418,7 +418,7 @@ try {
   await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting room has its own page", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("heading", { name: /Good socks for the whole family/ }).waitFor();
-    await page.locator(".av-hero7__arch .av-hero7__sock").first().waitFor();
+    await page.locator(".av-still__box").waitFor();
     await page.getByRole("link", { name: /For her/ }).waitFor();
     await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
     await page.getByRole("group", { name: "Show socks for" }).getByRole("button", { name: "Women" }).click();
