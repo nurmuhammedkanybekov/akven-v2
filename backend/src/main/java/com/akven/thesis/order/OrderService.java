@@ -210,12 +210,18 @@ public class OrderService {
         if (order.getFulfillmentMethod() == FulfillmentMethod.PICKUP) {
             order.givePickupCode(pickupCodes.next());
         }
+        // A sock that this sale takes from above the "few left" level to at or below it is news for the owners.
+        int fewLeft = collections.policy().getFewLeftThreshold();
+        List<Variant> crossed = new ArrayList<>();
         for (OrderItem item : order.getItems()) {
-            item.getVariant().commitSale(item.getQuantity());
+            Variant v = item.getVariant();
+            v.commitSale(item.getQuantity());
+            if (v.available() <= fewLeft && v.available() + item.getQuantity() > fewLeft) crossed.add(v);
         }
         orders.save(order);
         audit(customerEmail, "ORDER_PAID", order, Map.of("status", "PENDING"));
         notifier.orderConfirmed(order);
+        notifier.lowStock(order, crossed, fewLeft);
         return new CheckoutResult(forCustomer(order), false);
     }
 

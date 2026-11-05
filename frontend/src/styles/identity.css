@@ -1595,3 +1595,16 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
 @media (max-width: 599px) { .av-ladderstrip__steps { display: grid; grid-template-columns: repeat(2, max-content); column-gap: var(--space-6); } }
 .av-reviews__who { border-top: 0; padding-top: var(--space-1); margin-top: 0; }
 .av-reviews__who .av-say2__seal { width: 28px; height: 28px; font-size: 0.95rem; }
+/* Not found: one sock on the line, an empty peg where its pair should hang. */
+.av-lost { display: grid; justify-items: center; text-align: center; gap: var(--space-4); padding-block: var(--space-7) var(--space-9); }
+.av-lost__line { position: relative; width: min(520px, 100%); aspect-ratio: 2.2; }
+.av-lost__peg { position: absolute; left: 66%; top: 5%; width: 2.8%; min-width: 10px; height: auto; transform: rotate(-8deg); transform-origin: 50% 0; animation: av-lost-peg 3.6s ease-in-out infinite alternate; }
+@keyframes av-lost-peg { to { transform: rotate(6deg); } }
+.av-lost__hand { margin: 0; font-size: 1.6rem; color: var(--accent-ink); transform: rotate(-2deg); }
+.av-lost h1 { margin: 0; }
+.av-lost .av-lead { max-width: 34rem; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .av-lost__peg { animation: none; } }
+/* Between pages: the new one fades in (opacity only, so fixed bars inside it stay put). */
+.av-pagein { animation: av-pagein 0.32s ease-out; }
+@keyframes av-pagein { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .av-pagein { animation: none; } }

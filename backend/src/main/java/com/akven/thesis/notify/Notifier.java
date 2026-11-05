@@ -1,5 +1,6 @@
 package com.akven.thesis.notify;
 
+import com.akven.thesis.catalog.Variant;
 import com.akven.thesis.delivery.DeliveryKind;
 import com.akven.thesis.order.FulfillmentMethod;
 import com.akven.thesis.order.Order;
@@ -7,6 +8,9 @@ import com.akven.thesis.order.OrderItem;
 import com.akven.thesis.order.OrderLinks;
 import com.akven.thesis.payment.SimulatedWalletProvider;
 import com.akven.thesis.shop.PickupPoint;
+import com.akven.thesis.user.Role;
+import com.akven.thesis.user.User;
+import com.akven.thesis.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,13 +38,53 @@ public class Notifier {
     private final EmailTemplates t;
     private final String publicUrl;
     private final OrderLinks links;
+    private final UserRepository users;
+    private final String ownersLang;
 
-    public Notifier(OutboundEmailRepository emails, EmailTemplates templates, OrderLinks links,
-                    @Value("${akven.public-url:http://localhost:8081}") String publicUrl) {
+    public Notifier(OutboundEmailRepository emails, EmailTemplates templates, OrderLinks links, UserRepository users,
+                    @Value("${akven.public-url:http://localhost:8081}") String publicUrl,
+                    @Value("${akven.owners-lang:en}") String ownersLang) {
         this.emails = emails;
         this.t = templates;
         this.links = links;
+        this.users = users;
         this.publicUrl = publicUrl.replaceAll("/+$", "");
+        this.ownersLang = lang(ownersLang);
+    }
+
+    /**
+     * To every active owner (and super admin): this sale left these socks at or below the "few left" level. Written
+     * in the order's transaction, so an order that rolls back warns no one; one email per order, however many socks
+     * crossed the line. The Telegram bot can send the same news from the same moment.
+     */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void lowStock(Order o, List<Variant> crossed, int threshold) {
+        if (crossed.isEmpty()) return;
+        String l = ownersLang;
+        List<String> body = new ArrayList<>();
+        body.add(t.text(l, "lowStock.intro", Map.of("ref", o.getReference(), "n", threshold)));
+        body.add("");
+        for (Variant v : crossed) {
+            String label = Stream.of(v.getColor(), v.getSize()).filter(Objects::nonNull).filter(x -> !x.isBlank()).collect(Collectors.joining(", "));
+            Map<String, Object> line = new HashMap<>();
+            line.put("product", v.getProduct().getName());
+            line.put("variant", label);
+            line.put("sku", v.getSku());
+            line.put("left", Math.max(0, v.available()));
+            String text = t.text(l, "lowStock.item", line).replace(" ()", "");
+            if (v.getIncomingQty() > 0) text += t.text(l, "lowStock.incoming", Map.of("n", v.getIncomingQty()));
+            body.add("  " + text);
+        }
+        body.add("");
+        body.add(t.text(l, "lowStock.link", Map.of("link", publicUrl + "/admin/dashboard")));
+        body.add("");
+        body.add(t.text(l, "signature"));
+        String subject = t.text(l, "lowStock.subject", Map.of("n", crossed.size(), "ref", o.getReference()));
+        for (User owner : users.findByRoleInOrderByRoleDescEmailAsc(List.of(Role.ADMIN, Role.SUPER_ADMIN))) {
+            if (!owner.isActive()) continue;
+            // Not tied to the order: its emails are the customer's; the reference is in the subject and the text.
+            emails.save(new OutboundEmail(EmailKind.LOW_STOCK, owner.getEmail(), l, subject, String.join("\n", body), null));
+        }
     }
 
     /** The order is paid: what was bought, the total, and how it reaches the customer. */
