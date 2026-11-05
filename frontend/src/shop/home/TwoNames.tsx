@@ -23,7 +23,7 @@ function Part({ d, x, w, line, className }: { d: string; x: number; w: number; l
 
 /**
  * "Two names. One family. One story.": AK from Akylbek and VEN from Venera slide in from either side and meet at the
- * gold heart (the ampersand, written with a pen as the section arrives), each with the name it comes from underneath. Then a few plain sentences about the family and, on the
+ * gold ram's-horn heart (the ampersand, written with a pen as the section arrives; a line under the names says what it is), each with the name it comes from underneath. Then a few plain sentences about the family and, on the
  * home page, a way to the whole story (on the story page it is the page's own heading). Understated on purpose: the letters do the work.
  */
 export function TwoNames({ page = false }: { page?: boolean }) {
@@ -48,6 +48,7 @@ export function TwoNames({ page = false }: { page?: boolean }) {
             <figcaption><strong>Venera</strong></figcaption>
           </figure>
         </div>
+        <p className="av-names__horn">{t("names.horn")}</p>
         <p className="av-names__lead">{t("story.lead")}</p>
         {!page && <Button to="/story" variant="secondary">{t("names.cta")}</Button>}
       </div>

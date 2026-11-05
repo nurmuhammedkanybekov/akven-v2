@@ -23,8 +23,8 @@ Nurmuhammed Kanybekov · supervised by Guettala Walid
 
 ## In short
 
-AK&VEN is my family's brand of Korean-made socks: **AK** from Akylbek, **VEN** from Venera, and the ampersand, drawn
-as a heart, for what they built together. My parents have traded at Dordoi Bazaar in Bishkek, Kyrgyzstan, since the
+AK&VEN is my family's brand of Korean-made socks: **AK** from Akylbek, **VEN** from Venera, and between them a gold
+Kyrgyz ram's horn (кочкор мүйүз) shaped as a heart, for what they built together. My parents have traded at Dordoi Bazaar in Bishkek, Kyrgyzstan, since the
 early 2000s and have sold socks there since 2018, from container 70-E. At the bazaar nobody pays the label price:
 customers bargain, buy for the whole family, and shops from the regions buy by the case.
 

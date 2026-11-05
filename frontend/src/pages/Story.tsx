@@ -6,6 +6,7 @@ import { DordoiStory } from "../shop/home/DordoiStory";
 import { TwoNames } from "../shop/home/TwoNames";
 import { UpClose } from "../shop/home/UpClose";
 import { StoryJourney } from "../shop/story/StoryJourney";
+import { DayAtStall, StoryLetter } from "../shop/story/StoryLetter";
 
 /** A family's worth of socks, one for each of them. */
 const FAMILY: SockSpec[] = [
@@ -17,7 +18,7 @@ const FAMILY: SockSpec[] = [
 ];
 
 /**
- * Our story: the two names, the family's years and the journey of a pair, the stall at Dordoi as the scene that plays on scroll, and the plain facts (since when,
+ * Our story: the two names, a letter from the family, the family's years, a day at the stall and the journey of a pair, the stall at Dordoi as the scene that plays on scroll, and the plain facts (since when,
  * where the socks are made, where they are sold, who runs it), with the way to the stall.
  */
 export function StoryPage() {
@@ -26,7 +27,9 @@ export function StoryPage() {
   return (
     <>
       <TwoNames page />
+      <StoryLetter />
       <StoryJourney />
+      <DayAtStall />
       <DordoiStory />
       <UpClose />
       <section className="av-block" aria-labelledby="facts-title">

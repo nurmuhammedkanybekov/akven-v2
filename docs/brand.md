@@ -21,12 +21,15 @@ The concept came as an AI-generated image with a pixel-traced vector package, wh
 when enlarged. The mark used here was traced again from the reference image, upscaled eightfold, into smooth curves
 (potrace), and lives in `frontend/src/brand/mark.ts` as one even-odd path: crisp from a favicon to a sign, in any single
 colour, for labels and stamps. The name AK&VEN is set in Cinzel SemiBold capitals, heavy enough to stand beside the
-mark's thick strokes. The ampersand is not a letter from a font but written: a heart drawn in one stroke from its dip,
-down the left side, up the right, and on through itself as the leg of the &, with a small upturned flick. It is
-stroked by a simulated broad-nib pen held at 45 degrees (`scripts/calligraphy.mjs`), so it is thick where the stroke
-crosses the nib and a hairline where it runs along it, like the swoop of the mark, and turned into a plain filled
-shape. Earlier versions used Cinzel's own "&" (too heavy, read as a third name) and the italic "Et" of Cormorant
-Garamond, which stays one switch away in the generator (`AMP_STYLE`). The heart is gold on the ink and white logos (and
+mark's thick strokes. The ampersand is not a letter from a font but an ornament: **кочкор мүйүз**, the ram's horn of
+Kyrgyz felt carpets (shyrdak), the oldest pattern in the country's crafts. Two horns grow from one root and meet below
+as a heart, with a small diamond between them and a bud where they join: Akylbek and Venera, one family. One horn is
+stroked by a simulated broad-nib pen held at 45 degrees (`scripts/calligraphy.mjs`), thick where the stroke crosses the
+nib and a hairline where it runs along it, like the swoop of the mark; the other is its mirror image, so the ornament
+is exactly symmetric, and the result is a plain filled shape. The family found the earlier heart ampersand (a heart
+whose stroke ran on as the leg of the &) read as two hearts; it, Cinzel's own "&" (too heavy) and the italic "Et" of
+Cormorant Garamond stay one switch away in the generator (`AMP_STYLE`). The same horns, drawn as a line, make the band
+above the family's letter on the story page. The ornament is gold on the ink and white logos (and
 wherever the page sets `--logo-amp`, such as the header), the same gold on the gold logos. The generator also exports
 the pen's centreline, so the shop can let the heart **write itself**: in the header on arrival, in the footer, on the
 sign-in page and in "Two names" (a mask along the pen's path, still under reduced motion). In the one-line

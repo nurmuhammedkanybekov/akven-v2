@@ -1278,3 +1278,58 @@ body::before {
   border-radius: 12px; background: var(--paper-2, #f6f1e7); margin-block: var(--space-3); }
 .av-guest p { margin: 0; }
 .av-find { display: grid; gap: var(--space-3); max-width: 30rem; }
+
+/* ---------- our story: what the gold means, a letter from the stall, a day at 70-E ---------- */
+
+.av-names__horn { max-width: 34rem; margin: 0 auto; font-family: var(--font-display); font-style: italic; font-size: 1.15rem; line-height: 1.5; color: var(--ink-2); text-align: center; text-wrap: balance; }
+
+.av-hornband { display: block; width: min(100%, 46rem); height: auto; margin: 0 auto; overflow: visible; }
+.av-hornband path { fill: none; stroke: var(--accent); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.av-hornband .av-hornband__thread { stroke-width: 1.2; opacity: 0.55; }
+.av-hornband .av-hornband__gem { fill: var(--accent); stroke: none; }
+.reveal [data-reveal]:not(.is-in) .av-hornband path:not(.av-hornband__gem) { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.reveal [data-reveal]:not(.is-in) .av-hornband .av-hornband__gem { opacity: 0; transform: scale(0.4); }
+.reveal [data-reveal].is-in .av-hornband path:not(.av-hornband__gem) { stroke-dasharray: 1 1; animation: av-pen-in 1.3s calc(0.25s + var(--i, 0) * 0.12s) cubic-bezier(0.55, 0.1, 0.3, 1) both; }
+.reveal [data-reveal].is-in .av-hornband .av-hornband__thread { animation-duration: 2s; animation-delay: 0s; }
+.reveal [data-reveal].is-in .av-hornband__gem { transform-box: fill-box; transform-origin: center; animation: av-count-pop 0.5s calc(1.2s + var(--i, 0) * 0.12s) var(--ease-spring) both; }
+
+.av-letter__inner { display: grid; gap: var(--space-5); justify-items: center; }
+.av-letter__band { color: var(--accent); }
+.av-letter__paper { position: relative; display: grid; gap: var(--space-3); width: min(100%, 40rem); padding: clamp(1.5rem, 5vw, 3.25rem); border-radius: 4px;
+  background: repeating-linear-gradient(to bottom, transparent 0 31px, color-mix(in srgb, var(--accent) 14%, transparent) 31px 32px), var(--surface);
+  box-shadow: 0 1px 0 var(--line), 0 30px 60px -40px rgb(15 25 48 / 0.55); transform: rotate(-0.6deg); }
+.av-letter__paper::before { content: ""; position: absolute; top: -12px; left: 50%; width: 92px; height: 24px; transform: translateX(-50%) rotate(2deg);
+  background: color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 2px; opacity: 0.8; }
+.av-letter__paper h2 { margin: 0 0 var(--space-2); }
+.av-letter__paper p { margin: 0; font-size: 1.0625rem; line-height: 1.75; color: var(--ink); text-wrap: pretty; }
+.av-letter__sign { display: grid; justify-items: end; gap: 2px; margin-top: var(--space-3) !important; color: var(--ink-2) !important; }
+.av-letter__sign .av-hand { font-size: 2rem; }
+.reveal .av-letter:not(.is-in) .av-letter__paper p { opacity: 0; transform: translateY(10px); }
+.reveal .av-letter.is-in .av-letter__paper p { transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out); transition-delay: calc(0.5s + var(--i, 0) * 0.28s); }
+
+.av-day__sky { position: relative; container-type: inline-size; aspect-ratio: 1000 / 260; max-width: 52rem; margin: var(--space-4) auto 0; overflow: hidden; }
+.av-day__sky svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.av-day__arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 2 9; stroke-linecap: round; opacity: 0.7; }
+.av-day__stall rect { fill: var(--ink); }
+.av-day__stall path { stroke: color-mix(in srgb, var(--on-ink) 30%, transparent); stroke-width: 2; }
+.av-day__stall text { fill: var(--accent-ink); font: 700 18px var(--font-body, sans-serif); letter-spacing: 0.08em; }
+/* The sun rides an arm from the centre of the arc's circle (500, 560 in the drawing): 52% of the width from it. */
+.av-day__arm { position: absolute; left: 50%; top: calc(560 / 260 * 100%); width: 0; height: 0; transform: rotate(0deg); }
+.av-day__sun { position: absolute; left: -14px; top: calc(-52cqw - 14px); width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe7a3, #f2b33d 60%, #d98a1c); box-shadow: 0 0 0 8px rgb(242 179 61 / 0.18), 0 0 30px 6px rgb(242 179 61 / 0.35); }
+.reveal .av-day:not(.is-in) .av-day__arm { transform: rotate(-46deg); }
+.reveal .av-day.is-in .av-day__arm { animation: av-sun 3.2s 0.3s cubic-bezier(0.4, 0.05, 0.4, 1) both; }
+@keyframes av-sun { from { transform: rotate(-46deg); } to { transform: rotate(44deg); } }
+.av-day__moments { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+.av-day__moments li { display: grid; gap: 4px; align-content: start; padding-top: var(--space-3); border-top: 2px solid var(--line); }
+.reveal .av-day:not(.is-in) .av-day__moments time { transform: translateY(6px); }
+.av-day__moments time { transition: transform 0.6s var(--ease-out); transition-delay: calc(0.4s + var(--i, 0) * 0.95s); font-family: var(--font-display); font-size: 1.6rem; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.av-day__moments strong { color: var(--ink); }
+.av-day__moments .av-small { color: var(--ink-2); }
+.reveal .av-day:not(.is-in) .av-day__moments li { border-top-color: var(--line); }
+.reveal .av-day.is-in .av-day__moments li { animation: av-day-light 0.6s calc(0.4s + var(--i, 0) * 0.95s) var(--ease-out) both; }
+@keyframes av-day-light { from { border-top-color: var(--line); } to { border-top-color: var(--accent); } }
+@media (max-width: 760px) { .av-day__moments { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .av-day__arm, .av-letter__paper p, .av-hornband path { animation: none !important; transition: none !important; } }
+/* The walking sock and the yarn ball reach the screen's edge on phones; their sections clip sideways, never the page. */
+.av-journey, .av-yarn, .av-names, .av-letter, .av-day { overflow-x: clip; }
