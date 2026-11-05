@@ -10,7 +10,12 @@ export function ForBusiness() {
       <div className="av-container av-biz">
         <Link to="/wholesale" className="av-biz__card av-biz__card--shops">
           <span className="av-biz__art" aria-hidden="true">
-            {[0, 1, 2, 3].map((i) => <SockArt key={i} cut="crew" main={C.charcoal} accent={C.grey} pattern="rib" />)}
+            {[
+              { main: C.cream, accent: C.navy, pattern: "oimo" as const, second: C.gold },
+              { main: C.navy, accent: C.gold, pattern: "argyle" as const, second: C.cream },
+              { main: C.mustard, accent: C.brick, pattern: "stripes" as const },
+              { main: C.sage, accent: C.forest, pattern: "rib" as const },
+            ].map((s, i) => <SockArt key={i} cut="crew" {...s} />)}
           </span>
           <strong>{t("biz.shops")}</strong>
           <span>{t("biz.shopsText")}</span>
