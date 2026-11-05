@@ -1333,3 +1333,50 @@ body::before {
 @media (prefers-reduced-motion: reduce) { .av-day__arm, .av-letter__paper p, .av-hornband path { animation: none !important; transition: none !important; } }
 /* The walking sock and the yarn ball reach the screen's edge on phones; their sections clip sideways, never the page. */
 .av-journey, .av-yarn, .av-names, .av-letter, .av-day { overflow-x: clip; }
+
+/* ---------- home: two crafts, one pair (bojagi and shyrdak) ---------- */
+
+.av-crafts { overflow-x: clip; background: linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--accent) 7%, var(--bg)) 55%, var(--bg)); }
+.av-crafts__inner { display: grid; gap: var(--space-5); justify-items: center; text-align: center; }
+.av-crafts__head { display: grid; gap: var(--space-2); max-width: 46rem; }
+.av-crafts__head h2, .av-crafts__head p { margin: 0; }
+.av-crafts__row { display: grid; grid-template-columns: minmax(0, 15rem) minmax(8rem, 1fr) minmax(0, 15rem); gap: var(--space-4); align-items: center; width: 100%; max-width: 62rem; }
+.av-crafts__cloth { display: grid; gap: var(--space-2); margin: 0; justify-items: center; }
+.av-crafts__cloth svg { width: 100%; height: auto; border-radius: 6px; box-shadow: 0 22px 40px -30px rgb(15 25 48 / 0.6); }
+.av-crafts__bojagi { transform: rotate(-3deg); }
+.av-crafts__shyrdak { transform: rotate(2.5deg); }
+.av-crafts__seams { fill: none; stroke: #f7f1e3; stroke-width: 1.6; stroke-dasharray: 3 2; opacity: 0.9; }
+.av-crafts__horn { fill: none; stroke: #efe2c4; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.av-crafts__cloth figcaption { display: grid; gap: 2px; font-size: var(--text-small); color: var(--ink-2); }
+.av-crafts__word { font-family: var(--font-display); font-size: 1.5rem; color: var(--ink); }
+.av-crafts__route { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 6px; }
+.av-crafts__city { font-family: var(--font-hand); font-size: 1.25rem; color: var(--accent-ink); white-space: nowrap; }
+.av-crafts__km { grid-column: 1 / -1; margin-top: 10px; font-size: var(--text-small); color: var(--ink-2); }
+.av-crafts__track { position: relative; height: 60px; }
+.av-crafts__track svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.av-crafts__track path { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 2 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+/* The sock flies the arc: across with one animation, up and down with another. */
+.av-crafts__flyer { position: absolute; left: 100%; bottom: 0; width: 34px; margin-left: -17px; }
+.av-crafts__flyer > span { display: block; transform: translateY(0) rotate(12deg); }
+.av-crafts__flyer svg { width: 34px; height: auto; }
+.reveal .av-crafts:not(.is-in) .av-crafts__flyer { left: 0; }
+.reveal .av-crafts.is-in .av-crafts__flyer { animation: av-fly-x 3s 0.6s cubic-bezier(0.45, 0, 0.55, 1) both; }
+.reveal .av-crafts.is-in .av-crafts__flyer > span { animation: av-fly-y 3s 0.6s linear both; }
+@keyframes av-fly-x { from { left: 0; } to { left: 100%; } }
+@keyframes av-fly-y { 0% { transform: translateY(0) rotate(-20deg); } 50% { transform: translateY(-42px) rotate(0deg); } 100% { transform: translateY(0) rotate(12deg); } }
+.reveal .av-crafts:not(.is-in) .av-crafts__bojagi rect { opacity: 0; }
+.reveal .av-crafts.is-in .av-crafts__bojagi rect { animation: av-patch 0.5s calc(0.2s + var(--i, 0) * 0.07s) var(--ease-out) both; transform-box: fill-box; transform-origin: center; }
+@keyframes av-patch { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+.reveal .av-crafts:not(.is-in) .av-crafts__horn { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.reveal .av-crafts.is-in .av-crafts__horn { stroke-dasharray: 1 1; animation: av-pen-in 1.4s calc(1.4s + var(--i, 0) * 0.25s) cubic-bezier(0.55, 0.1, 0.3, 1) both; }
+.av-crafts__socks { margin: 0; font-size: 1.05rem; color: var(--ink-2); }
+.av-crafts__socks [lang] { font-family: var(--font-display); font-size: 1.35rem; color: var(--ink); }
+@media (max-width: 640px) {
+  .av-crafts__row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .av-crafts__route { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .av-crafts__flyer, .av-crafts__flyer > span, .av-crafts__bojagi rect, .av-crafts__horn { animation: none !important; } }
+
+/* A band of ram's horns between the shop and the family on the home page. */
+.av-hornsep { padding-block: var(--space-4) 0; color: var(--accent); }
+.av-hornsep .av-hornband { width: min(100%, 30rem); }
