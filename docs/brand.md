@@ -63,7 +63,7 @@ Three faces, each with Latin, Cyrillic and Cyrillic Extended, so Russian and Kyr
 English, all self-hosted:
 
 - **Headings in Cormorant Garamond** 600, a Garamond cut for display sizes: the serif of a family label, next to the
-  Cinzel capitals of the logo. The word a heading leans on is in *italic dark gold* ("for the whole family.").
+  Cinzel capitals of the logo. The word a heading leans on is in *italic dark gold* ("Chosen at Dordoi.").
 - **The family's handwriting in Caveat**: the label over a section, the note in the hero, the tags in the fitting room,
   the stall notes and the gift card. Short phrases only, never running text or anything to act on.
 - **Onest for everything you read and use**: text, buttons, forms, prices (tabular figures, so they line up).
@@ -105,7 +105,7 @@ Products first, then who is behind them and where, then the shop's own tools.
 
 | Section | What it shows |
 |---|---|
-| The hero | Words on the left (a handwritten "from container 70-E, Dordoi"; "Good socks *for the whole family.*"; who chooses them and since when; two ways in; three promises). The stamp turns in the corner of the still life. On the right a still life on warm beige in afternoon light: an open navy AK&VEN box of folded pairs on tissue, its lid with the gold logo, loose pairs in cream, navy, white and charcoal, a kraft tag. It is drawn from the shop's own sock drawings, not a photograph, and is the one place to put the family's own product photograph when it exists. The pairs settle into place on arrival and shift a little with the pointer, by depth |
+| The hero | Words on the left (a handwritten "from container 70-E, Dordoi"; "Made in Korea. *Chosen at Dordoi.*"; who chooses them and since when; two ways in; three promises). The stamp turns in the corner of the still life. On the right a still life on warm beige in afternoon light: an open navy AK&VEN box of folded pairs on tissue, its lid with the gold logo, loose pairs in cream, navy, white and charcoal, a kraft tag. It is drawn from the shop's own sock drawings, not a photograph, and is the one place to put the family's own product photograph when it exists. The pairs settle into place on arrival and shift a little with the pointer, by depth |
 | Trust | Five plain facts: Korean-made socks, a family business since 2018, container 70-E with whether it is open now, delivery to four countries, wholesale |
 | Who are they for? | Four editorial cards (for him, for her, for kids, gift sets): each a still life of that shelf's socks on its own soft backdrop; the picture grows slowly on hover and the arrow moves on |
 | The fitting room | Who is trying on, which shoes, how high, which size: the shop's own socks of that height are drawn on a leg (from each product's drawing, in the colour chosen), under rolled-up trousers and beside a tailor's tape, with the shoe over the foot so you see what shows and what stays hidden. Each height is rated for the shoes ("best", "works", "better not") with the reason; the shoe size gives the sock size from the chart. The same fitting room opens from every sock's product page ("Try it on") and is on the size guide |

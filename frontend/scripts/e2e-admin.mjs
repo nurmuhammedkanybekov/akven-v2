@@ -405,19 +405,19 @@ try {
   await step("the site speaks Russian and Kyrgyz, and remembers the choice", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("button", { name: "Русский" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Хорошие носки/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Сделано в Корее/ }).waitFor();
     await page.reload();
-    await page.getByRole("heading", { level: 1, name: /Хорошие носки/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Сделано в Корее/ }).waitFor();
     await a11y("the home page in Russian");
     await page.getByRole("button", { name: "Кыргызча" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Жакшы байпак/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Кореяда жасалган/ }).waitFor();
     await page.getByRole("button", { name: "English" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Good socks for the whole family/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
   });
 
   await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting room has its own page", async () => {
     await page.goto(`${BASE}/`);
-    await page.getByRole("heading", { name: /Good socks for the whole family/ }).waitFor();
+    await page.getByRole("heading", { name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
     await page.locator(".av-still__box").waitFor();
     await page.getByRole("link", { name: /For her/ }).waitFor();
     await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
