@@ -229,7 +229,7 @@ describe("the bag page", () => {
   it("shows the saved bag with a notice when the server cannot be reached", async () => {
     mockServer(() => new TypeError("offline"));
     renderCart();
-    expect(await screen.findByText(/You appear to be offline/)).toBeInTheDocument();
+    expect(await screen.findByText(/Looks like you.re offline/)).toBeInTheDocument();
     expect(screen.getByText("Mid-Long Sock")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Check out" })).toBeDisabled();
   });
