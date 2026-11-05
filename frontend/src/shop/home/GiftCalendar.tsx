@@ -56,7 +56,7 @@ export function GiftCalendar() {
               <span className="av-countdown__label">{next.days === 0 ? t("gift.today", { name: t(next.key) }) : t("gift.until", { name: t(next.key) })}</span>
             </div>
           </div>
-          <ol className="av-dates">
+          <ol className="av-dates" tabIndex={0}>
             {days.map((h, i) => (
               <li key={h.key} className={i === 0 ? "is-next" : undefined}>
                 <span className="av-dates__day">{fmt.format(h.date)}</span>

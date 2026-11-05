@@ -26,7 +26,7 @@ export function StallNotes() {
           <h2 id="notes-title">{t("notes.title")}</h2>
           <p className="av-lead">{t("notes.lead")}</p>
         </header>
-        <ul className="av-notes__board">
+        <ul className="av-notes__board" tabIndex={0}>
           {NOTES.map((n, i) => (
             <li key={n.text} className={`av-note av-note--${n.paper}`} style={{ "--i": i, "--r": `${TILT[i]}deg` } as React.CSSProperties}>
               <span className="av-note__pin" aria-hidden="true" />
