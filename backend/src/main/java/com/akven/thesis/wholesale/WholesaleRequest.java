@@ -40,7 +40,7 @@ public class WholesaleRequest {
     @Column(nullable = false)
     private int pairs;
 
-    @Column(length = 1000)
+    @Column(length = 4000)
     private String mix;
 
     @Column(length = 500)

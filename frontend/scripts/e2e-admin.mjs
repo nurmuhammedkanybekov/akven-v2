@@ -547,11 +547,22 @@ try {
     await ladder.getByText("−5%", { exact: true }).waitFor();
     // a shop builds a case and the mix goes into its request
     await page.goto(`${BASE}/wholesale`);
-    for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Twelve more: Classic, Men" }).click();
-    await page.getByRole("button", { name: "Twelve more: Sport, Kids" }).click();
-    await page.getByText(/204 to a full case/).waitFor();
+    // from the real shelves: open a sock, choose a colour and size by the dozen, see the stock beside it
+    const builder = page.locator(".av-casebuild");
+    await builder.getByRole("button", { name: "Men", exact: true }).click();
+    await builder.getByRole("searchbox", { name: "Find a sock by name" }).fill("Classic Rib");
+    const sock = builder.locator(".av-casebuild__sockhead").first();
+    await sock.waitFor();
+    await sock.click();
+    const firstMore = builder.locator(".av-casebuild__variants button[data-more]").first();
+    await firstMore.click();
+    await firstMore.click();
+    await builder.locator(".av-casebuild__variants button[data-more]").nth(1).click();
+    await builder.getByText(/204 to a full case/).waitFor();
+    await a11y("the case builder with a sock open");
     await page.getByRole("button", { name: "Put this mix in my request" }).click();
-    await page.locator(".av-casebuild__chosen").getByText(/Classic · Men: 24; Sport · Kids: 12/).waitFor();
+    await page.locator(".av-casebuild__mixlist li").first().getByText(/ × 24 \(/).waitFor();
+    assert.equal(await page.locator(".av-casebuild__mixlist li").count(), 2, "the request should list the two colour-and-size lines");
     await page.getByLabel("Shop or company name").fill("Ak-Jol Market");
     await page.getByLabel("Your number, Telegram or email").fill("call me");
     await page.getByRole("button", { name: "Send the request" }).click();
