@@ -4,7 +4,7 @@ import { DordoiStory } from "../shop/home/DordoiStory";
 import { LadderStrip } from "../shop/home/LadderStrip";
 import { FittingTeaser } from "../shop/home/FittingTeaser";
 import { ForBusiness } from "../shop/home/ForBusiness";
-import { HeroLine } from "../shop/home/HeroLine";
+import { HeroEditorial } from "../shop/home/HeroEditorial";
 import { HomeDuo } from "../shop/home/HomeDuo";
 import { TrustStrip } from "../shop/home/TrustStrip";
 import { TwoNames } from "../shop/home/TwoNames";
@@ -23,7 +23,7 @@ import { HornBand } from "../brand/Ornaments";
 export function HomePage() {
   return (
     <>
-      <HeroLine />
+      <HeroEditorial />
       <TrustStrip />
       <ForYou />
       <CategoryTiles />
