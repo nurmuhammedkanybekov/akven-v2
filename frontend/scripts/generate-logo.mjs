@@ -12,16 +12,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MARK, markMarkup } from "../src/brand/mark.ts";
-import { HEART, nib } from "./calligraphy.mjs";
+import { HEART, horn, nib } from "./calligraphy.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const load = (file) => { const b = fs.readFileSync(path.join(root, "node_modules/@fontsource", file)); return opentype.parse(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)); };
 // Cinzel 600: heavy enough to stand next to the mark's thick strokes, still a Roman capital.
 const font = load("cinzel/files/cinzel-latin-600-normal.woff");
-// The ampersand is a heart written with a broad pen (scripts/calligraphy.mjs): Akylbek and Venera, the stroke running
-// on through the heart as the leg of the &. Drawn by hand, in gold, while the capitals are carved. The other design the
-// family looked at, the italic "Et" of Cormorant Garamond, is one switch away: AMP_STYLE = "italic".
-const AMP_STYLE = "heart";
+// The ampersand is the Kyrgyz ram's horn (scripts/calligraphy.mjs): two horns from one root meeting as a heart, Akylbek
+// and Venera, written with a broad pen in gold while the capitals are carved. The earlier designs are one switch away:
+// AMP_STYLE = "heart" (a heart whose stroke runs on as the leg of the &) or "italic" (Cormorant Garamond's "Et").
+const AMP_STYLE = "horn";
 const italic = load("cormorant-garamond/files/cormorant-garamond-latin-600-italic.woff");
 const sans = load("onest/files/onest-latin-400-normal.woff");
 
@@ -37,9 +37,14 @@ function outline(text, size, tracking, face = font) {
 }
 
 // AK & VEN on one baseline: the ampersand rises a little above the capitals and dips below the line, as an italic does.
-const TRACK = 0.3, AMP = AMP_STYLE === "heart" ? 1.02 : 1.32;
+const TRACK = 0.3, AMP = AMP_STYLE === "horn" ? 0.92 : AMP_STYLE === "heart" ? 1.02 : 1.32;
 /** The ampersand with its left edge at x and the baseline at 0, and the pen's centreline when it is the heart. */
 function ampAt(x) {
+  if (AMP_STYLE === "horn") {
+    const probe = horn({ scale: SIZE * AMP });
+    const left = Math.min(...probe.d.match(/[ML]-?[\d.]+/g).map((m) => +m.slice(1)));
+    return horn({ scale: SIZE * AMP, dx: x - left });
+  }
   if (AMP_STYLE === "heart") {
     const probe = nib(HEART, { scale: SIZE * AMP });
     const left = Math.min(...probe.d.match(/M-?[\d.]+|L-?[\d.]+/g).map((m) => +m.slice(1)));

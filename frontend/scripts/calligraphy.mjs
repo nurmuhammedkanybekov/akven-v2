@@ -69,3 +69,35 @@ export function nib(segs, { scale = 1, dx = 0, dy = 0, w = 9.5, min = 1.8, angle
   const line = "M" + at(segs[0][0]).map(fx).join(" ") + segs.map(([, a, b, c]) => "C" + [a, b, c].map((p) => at(p).map(fx).join(" ")).join(" ")).join("");
   return { d: out.join(""), line };
 }
+
+/**
+ * The ram's horn (кочкор мүйүз), the oldest Kyrgyz ornament, found on felt carpets, yurt bands and saddles: two horns
+ * curling out of one root. Here the two horns meet below as a heart, Akylbek and Venera, with a small diamond between
+ * them and a bud where they join. One horn is written with the pen, the other is its mirror, so the ornament is exactly
+ * symmetric (a fixed nib alone would make the right horn thinner). The left horn, from the root up to its curl:
+ */
+export const HORN = [
+  [[47.5, 1], [40, -20], [8, -32], [6, -52]],
+  [[6, -52], [4, -72], [28, -80], [36, -68]],
+  [[36, -68], [42, -58], [34, -49], [27, -53]],
+];
+const HORN_AXIS = 47;
+
+/** The ram's horn as a filled shape, placed like nib() (an em of 100 becomes `scale` units), with its centreline for
+ * the writing animation: one line from the left curl down to the root and up into the right curl. */
+export function horn({ scale = 100, dx = 0, dy = 0, w = 10 } = {}) {
+  const k = scale / 100;
+  const left = nib(HORN, { scale: 100, w, min: 1.6, taperIn: 0, taperOut: 0.2 }).d;
+  // A mirror image runs the other way round; each outline is reversed so it fills where it meets the left horn.
+  const mirror = (d) => d.split("M").filter(Boolean).map((poly) => "M" + poly.replace(/Z$/, "").split("L").reverse()
+    .map((p) => { const [x, y] = p.split(" "); return `${fx(2 * HORN_AXIS - x)} ${y}`; }).join("L") + "Z").join("");
+  const diamond = "M47 -70L52 -63L47 -56L42 -63Z";
+  const bud = "M47 -9L51.5 -1.5L47 6L42.5 -1.5Z";
+  const place = (d) => d.replace(/(-?[\d.]+) (-?[\d.]+)/g, (_, x, y) => `${fx(dx + x * k)} ${fx(dy + y * k)}`);
+  const back = HORN.slice().reverse().map(([a, b, c, d]) => [d, c, b, a]);
+  const right = HORN.map((s) => s.map(([x, y]) => [2 * HORN_AXIS - x, y]));
+  const segs = [...back, ...right];
+  const pt = ([x, y]) => `${x} ${y}`;
+  const line = "M" + pt(segs[0][0]) + segs.map(([, a, b, c]) => "C" + [a, b, c].map(pt).join(" ")).join("");
+  return { d: place(left + mirror(left) + diamond + bud), line: place(line) };
+}
