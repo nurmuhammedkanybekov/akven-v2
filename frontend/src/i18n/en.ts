@@ -1337,6 +1337,16 @@ const shop = {
   "day.4": "The doors come down",
   "day.4s": "Until tomorrow. Orders placed in the evening are waiting for us in the morning.",
   "letter.names": "Akylbek & Venera",
+  "crafts.eyebrow": "Two crafts, one pair",
+  "crafts.title": "Knitted in Korea, chosen in Kyrgyzstan",
+  "crafts.lead": "Korea wraps its gifts in bojagi, cloth sewn from small patches. Kyrgyzstan lays shyrdak, felt cut into ram's horns. Both are made slowly, by hand, from many small pieces. Our socks travel about 4,400 km from one to the other, and the last part of the way is the family's hands at the stall.",
+  "crafts.bojagi": "bojagi, the Korean wrapping cloth",
+  "crafts.shyrdak": "shyrdak, the Kyrgyz felt carpet",
+  "crafts.from": "Korea",
+  "crafts.to": "Bishkek, 70-E",
+  "crafts.km": "about 4,400 km",
+  "crafts.socks": "both words mean socks.",
+  "crafts.cta": "How a pair travels",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;
