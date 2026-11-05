@@ -50,7 +50,7 @@ installation makes on its first start and keeps in its database; a key written i
 | `MEDIA_DIR` | `./data/media` | Where uploaded product photos are stored. Back this folder up |
 | `AUTH_MAX_FAILED_LOGINS`, `AUTH_LOCKOUT_MINUTES` | 5, 15 | Login lockout, per visitor address and account |
 | `AUTH_MAX_REGISTRATIONS_PER_HOUR` | 30 | New accounts one visitor address may create in an hour (generous: many shoppers share one mobile network address) |
-| `AKVEN_BIND` | `127.0.0.1` | Docker only: which network address the shop listens on. `0.0.0.0` opens it to other computers |
+| `AKVEN_BIND` | `127.0.0.1` | Docker only: which network address the shop listens on. `0.0.0.0` opens it to other computers (for a phone on the same Wi-Fi; never on a public server, where Caddy serves it, see deployment.md) |
 | `NEGOTIATION_PROVIDER` | `rule` | `rule` for the built-in assistant, `llm` for a language model. Only the starting choice: the super admin can switch it in Admin > AI assistant without a restart |
 | `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL` | Gemini defaults | Any OpenAI-compatible API (for a free local model use Ollama: `LLM_BASE_URL=http://localhost:11434/v1`, no key) |
 | `SHOP_CONTACTS` | empty | The real contacts, `KIND\|label\|value` separated by `;`, in display order. Applied on start whenever the list changes; phone numbers live here and in the database, never in the repository |

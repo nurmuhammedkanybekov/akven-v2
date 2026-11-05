@@ -53,7 +53,9 @@ services:
     depends_on:
       - backend
     ports:
-      # Only this computer can open the shop. On a server, set AKVEN_BIND=0.0.0.0 (behind HTTPS) to open it to everyone.
+      # Only this computer can open the shop, and that is right on a server too: Caddy on the same machine serves it
+      # over HTTPS (docs/deployment.md). Do not set AKVEN_BIND=0.0.0.0 on a server: Docker opens published ports
+      # around the ufw firewall, so the shop would also be public on port 8081 over plain HTTP.
       - "${AKVEN_BIND:-127.0.0.1}:8081:80"
 
 volumes:
