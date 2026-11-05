@@ -9,21 +9,20 @@ cd docs/thesis
 latexmk -pdf thesis.tex      # pdflatex + biber
 ```
 
-Needs a TeX Live with `latex-extra`, `fonts-recommended`, `lmodern` and `biber`.
+Needs a TeX Live with `latex-extra`, `science`, `pictures`, `lang-european` (Hungarian, which the class loads),
+`fonts-recommended`, `cm-super` and `biber`.
 
 ## Layout
 
-`akventhesis.cls` reproduces the page layout of the official ELTE Faculty of Informatics template
-([elteikthesis](https://github.com/mcserep/elteikthesis), MIT licence) and accepts the same commands. To build with
-the official class instead, put `elteikthesis.cls` and the ELTE seal (`images/elte_cimer_szines.pdf`, or the `.eps`
-from the template) next to `thesis.tex` and change the first line to `\documentclass{elteikthesis}`. With
-`akventhesis.cls` the seal is shown on the title page as soon as `images/elte_cimer_szines.pdf` exists.
+The document uses the official ELTE Faculty of Informatics class, `elteikthesis.cls` (version 2.4,
+[mcserep/elteikthesis](https://github.com/mcserep/elteikthesis), MIT licence, unchanged). The title page shows the
+ELTE seal (`images/elte_cimer_szines.pdf`, converted from the template's `.eps`), and the registered topic
+(`topicdeclaration.pdf`, submitted on 10 October 2026) follows it, as the faculty asks.
 
-## Before submission
+## Notes
 
-- Attach the signed **topic registration form** (`\includepdf` line after `\maketitle` in `thesis.tex`).
-- Add the **ELTE seal** for the title page (see above).
-- Check the **department** on the title page (`\department{...}` in `thesis.tex`).
-- Screenshots in `images/` were taken from the demo with `reducedMotion`, at 1280 × 800.
+- The title is exactly the registered one: *Design and Implementation of AkVen Integrated E-Commerce and Inventory
+  Management System*.
+- Screenshots in `images/` are taken from the demo with `reducedMotion`, at 1280 × 800.
 - The code excerpts in `listings/` are copied from the backend (non-ASCII characters replaced so pdflatex can read
   them); if that code changes, copy them again.

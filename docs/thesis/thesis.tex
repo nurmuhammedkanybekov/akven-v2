@@ -1,16 +1,18 @@
 % The thesis of AK&VEN. Build: latexmk -pdf thesis.tex (pdflatex + biber).
-% To use the official ELTE class instead, put elteikthesis.cls and the seal next to this file
-% (https://github.com/mcserep/elteikthesis) and change the class below to elteikthesis.
-\documentclass{akventhesis}
+% The official ELTE Faculty of Informatics class (https://github.com/mcserep/elteikthesis, MIT licence).
+\documentclass{elteikthesis}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{microtype}
 
-\title{AK\&VEN: An Online Shop for a Family Sock Business with a Price-Negotiating Assistant Bound by the Owners' Limits}
+\title{Design and Implementation of AkVen Integrated E-Commerce and Inventory Management System}
 \date{2026}
 
 \author{Nurmuhammed Kanybekov}
 \degree{Computer Science BSc}
 
-\supervisor{Guettala Walid}
-\affiliation{PhD Candidate}
+\supervisor{Walid Guettala}
+\affiliation{PhD candidate, MSc}
 
 \university{Eötvös Loránd University}
 \faculty{Faculty of Informatics}
@@ -30,8 +32,8 @@
 
 \maketitle
 
-% Topic registration form (mandatory): attach the signed form here.
-% \includepdf[pages=-]{topicdeclaration.pdf}
+% The topic registration form, as registered on 10 October 2026.
+\includepdf[pages=-]{topicdeclaration.pdf}
 
 \input{chapters/abstract.tex}
 \cleardoublepage
@@ -59,7 +61,7 @@
 
 \chapter*{\acklabel}
 \addcontentsline{toc}{chapter}{\acklabel}
-I thank my supervisor, Guettala Walid, for his guidance and for keeping the project honest about what it promises.
+I thank my supervisor, Walid Guettala, for his guidance and for keeping the project honest about what it promises.
 I thank my parents, Akylbek and Venera, whose stall at Dordoi Bazaar is the reason this shop exists, and who
 answered every question about socks, sizes, cases and customers. Their two names are on the label.
 
