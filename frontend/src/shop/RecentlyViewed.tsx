@@ -1,3 +1,4 @@
+import { stageFor } from "../components/ProductImage";
 import { Link } from "react-router-dom";
 import { Peg } from "../components/Clothesline";
 import { useT } from "../i18n/I18n";
@@ -22,7 +23,7 @@ export function RecentlyViewed({ except }: { except?: string }) {
           <li key={v.slug} style={{ "--i": i } as React.CSSProperties}>
             <Link to={`/products/${v.slug}`} className="av-seen__photo">
               <Peg className="av-seen__peg" />
-              {v.image ? <img src={v.image} alt="" width={160} height={200} loading="lazy" decoding="async" /> : <span className="av-seen__blank" />}
+              {v.image ? <img src={v.image} data-stage={stageFor(v.image)} alt="" width={160} height={200} loading="lazy" decoding="async" /> : <span className="av-seen__blank" />}
               <span className="av-seen__name">{v.name}</span>
             </Link>
           </li>

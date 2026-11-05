@@ -9,7 +9,7 @@ import type { MessageKey } from "../i18n/en";
 import { productMeta } from "../lib/labels";
 import { Badge } from "./Badge";
 import { Price } from "./Price";
-import { ProductImage } from "./ProductImage";
+import { ProductImage, stageFor } from "./ProductImage";
 import { QuickView } from "./QuickView";
 
 /**
@@ -33,7 +33,7 @@ export function ProductCard({ product, to, tint }: { product: ProductSummary; to
       <div className="av-card__media" style={tint ? { background: `var(--tint-${tint})` } : undefined}>
         <ProductImage image={product.image} />
         {product.hoverImage && (
-          <img className="av-card__hover" src={product.hoverImage.url} alt="" width={800} height={1000} loading="lazy" decoding="async" />
+          <img className="av-card__hover" data-stage={stageFor(product.hoverImage.url)} src={product.hoverImage.url} alt="" width={800} height={1000} loading="lazy" decoding="async" />
         )}
         {soldOut && <span className="av-card__badge"><Badge tone="danger">{t("card.soldOut")}</Badge></span>}
       </div>

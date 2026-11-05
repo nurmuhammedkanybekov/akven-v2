@@ -7,6 +7,7 @@ import { TwoNames } from "../shop/home/TwoNames";
 import { UpClose } from "../shop/home/UpClose";
 import { StoryJourney } from "../shop/story/StoryJourney";
 import { DayAtStall, StoryLetter } from "../shop/story/StoryLetter";
+import { TwoCrafts } from "../shop/home/TwoCrafts";
 
 /** A family's worth of socks, one for each of them. */
 const FAMILY: SockSpec[] = [
@@ -29,6 +30,7 @@ export function StoryPage() {
       <TwoNames page />
       <StoryLetter />
       <StoryJourney />
+      <TwoCrafts story />
       <DayAtStall />
       <DordoiStory />
       <UpClose />

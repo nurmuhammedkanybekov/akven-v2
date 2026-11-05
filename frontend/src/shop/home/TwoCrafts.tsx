@@ -18,7 +18,7 @@ const PATCHES: Array<[number, number, number, number, string]> = [
  * along as the section arrives; the patches settle in one by one and the horns are drawn. And one word in both
  * languages: 양말 and байпак both mean socks.
  */
-export function TwoCrafts() {
+export function TwoCrafts({ story = false }: { story?: boolean }) {
   const { t } = useT();
   return (
     <section className="av-block av-crafts" aria-labelledby="crafts-title" data-reveal>
@@ -65,7 +65,7 @@ export function TwoCrafts() {
         <p className="av-crafts__socks">
           <span lang="ko">양말</span> <span className="av-muted">(yangmal)</span> · <span lang="ky">байпак</span> <span className="av-muted">(baypak)</span> — {t("crafts.socks")}
         </p>
-        <Button to="/story" variant="secondary">{t("crafts.cta")}</Button>
+        {!story && <Button to="/story" variant="secondary">{t("crafts.cta")}</Button>}
       </div>
     </section>
   );
