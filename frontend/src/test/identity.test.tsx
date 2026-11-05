@@ -8,7 +8,7 @@ import { Logo } from "../brand/Logo";
 import { stepAt } from "../components/PriceLadder";
 import { bySize } from "../shop/useVariantChoice";
 import { colourDistance, MATCH_DISTANCE, TROUSERS } from "../shop/fitting/FittingRoom";
-import { CaseBuilder } from "../shop/wholesale/CaseBuilder";
+import { mixText } from "../shop/wholesale/CaseBuilder";
 import { Seal } from "../brand/Seal";
 import { I18nProvider } from "../i18n/I18n";
 import { CUTS, FIT, FittingRoom, SHOE_LIST } from "../shop/fitting/FittingRoom";
@@ -170,18 +170,9 @@ describe("the new helpers", () => {
     expect(colourDistance("#1F2A44", beige)).toBeGreaterThan(MATCH_DISTANCE);
   });
 
-  it("builds a case by the dozen and hands the mix to the request", async () => {
-    vi.mocked(fetch).mockImplementation(async (url) => new Response(JSON.stringify(String(url).startsWith("/api/catalog/terms")
-      ? { sections: [{ slug: "classic", name: "Classic" }, { slug: "sport", name: "Sport" }], cuts: [] } : {}), { status: 200 }));
-    const onUse = vi.fn();
-    wrap(<CaseBuilder onUse={onUse} />);
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Twelve more: Classic, Men" }));
-    await user.click(screen.getByRole("button", { name: "Twelve more: Classic, Men" }));
-    await user.click(screen.getByRole("button", { name: "Twelve more: Sport, Kids" }));
-    expect(screen.getByText("36 pairs")).toBeInTheDocument();
-    expect(screen.getByText(/204 to a full case/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Put this mix in my request" }));
-    expect(onUse).toHaveBeenCalledWith("Classic · Men: 24; Sport · Kids: 12", 36);
+  it("writes the case as one line per colour and size, with its code", () => {
+    expect(mixText([{ sku: "RC-BLK-M", slug: "rib-crew", name: "Rib Crew", color: "Black", colorHex: null, size: "M", price: 2, image: null, pairs: 24 },
+      { sku: "X-1", slug: "x", name: "Plain", color: null, colorHex: null, size: null, price: 2, image: null, pairs: 12 }]))
+      .toBe("Rib Crew, Black, M × 24 (RC-BLK-M)\nPlain × 12 (X-1)");
   });
 });

@@ -25,7 +25,7 @@ public final class WholesaleDtos {
                                @NotNull ContactKind contactKind,
                                @NotBlank @Size(max = 80) String contact,
                                @NotNull @Min(1) @Max(100000) Integer pairs,
-                               @Size(max = 1000) String mix,
+                               @Size(max = 4000) String mix,
                                @Size(max = 500) String note,
                                @Size(max = 200) String website,
                                @Pattern(regexp = "en|ru|ky") String lang) {}

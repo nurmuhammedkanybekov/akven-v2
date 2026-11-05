@@ -85,7 +85,7 @@ export function WholesalePage() {
       const pairs = mix ? mix.pairs : parseInt(form.pairs, 10) || 1;
       setReceived(await sendWholesaleRequest({
         kind: kind === "gifts" ? "GIFTS" : "WHOLESALE", company: form.name, city: form.city || null, contactKind,
-        contact: form.contact, pairs: Math.min(pairs, 100000), mix: mix?.text.slice(0, 1000) ?? null, note: form.note || null, website: form.website, lang,
+        contact: form.contact, pairs: Math.min(pairs, 100000), mix: mix?.text.slice(0, 4000) ?? null, note: form.note || null, website: form.website, lang,
       }));
     } catch (err) {
       setError(err instanceof ApiError && err.status !== 500 ? err.message : t("quote.err"));
@@ -221,7 +221,8 @@ export function WholesalePage() {
               {mix ? (
                 <div className="av-casebuild__chosen">
                   <span className="av-label">{t("case.mixLine")}</span>
-                  <p><strong>{t("bag.pairs", { n: mix.pairs })}</strong> — {mix.text}</p>
+                  <p><strong>{t("bag.pairs", { n: mix.pairs })}</strong></p>
+                  <ul className="av-casebuild__mixlist">{mix.text.split("\n").map((line) => <li key={line}>{line}</li>)}</ul>
                   <button type="button" className="av-linkbtn" onClick={() => { setMix(null); change(); }}>{t("case.clear")}</button>
                 </div>
               ) : (

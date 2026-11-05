@@ -110,6 +110,22 @@ class WholesaleRequestTest extends IntegrationTest {
     }
 
     @Test
+    void aCaseBuiltFromTheShelvesKeepsEveryLine() throws Exception {
+        // The case builder sends one line per colour and size with its code: sixty lines are about 3,000 characters.
+        StringBuilder mix = new StringBuilder();
+        for (int i = 0; i < 60; i++) mix.append(i == 0 ? "" : "\n").append("Classic Rib Crew, Navy, M × 12 (CRCM-NAV-M-").append(i).append(")");
+        String company = "Case Shop " + UUID.randomUUID().toString().substring(0, 6);
+        Map<String, Object> body = request(company, "PHONE", "+996 700 123 456");
+        body.put("mix", mix.toString());
+        body.put("pairs", 720);
+        send(body, address()).andExpect(status().isCreated());
+        assertThat(requests.findAll()).filteredOn(r -> r.getCompany().equals(company)).singleElement()
+                .satisfies(r -> assertThat(r.getMix()).isEqualTo(mix.toString()).contains("CRCM-NAV-M-59"));
+        body.put("mix", "x".repeat(4001));
+        send(body, address()).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void aBotFillingTheTrapFieldIsAnsweredButNothingIsKept() throws Exception {
         long before = requests.count();
         Map<String, Object> body = request("Spam Inc", "EMAIL", "spam@example.com");
