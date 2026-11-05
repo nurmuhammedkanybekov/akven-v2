@@ -1333,6 +1333,14 @@ const shop: Partial<Record<MessageKey, string>> = {
   "crafts.socks": "эки сөз тең «байпак» дегенди билдирет.",
   "crafts.cta": "Жуп кантип саякаттайт",
   "a.em.kind.ORDER_LINK": "Заказдын шилтемеси",
+  "visit.pickupH": "Контейнерден алып кетиңиз",
+  "visit.deliveryH": "Же биз жеткирип беребиз",
+  "visit.zoneCourier": "курьер",
+  "visit.zoneCargo": "карго",
+  "visit.zoneDays": "{a}–{b} күн",
+  "visit.zoneFree": "акысыз",
+  "visit.zoneOnReceipt": "ташуучуга төлөнөт",
+  "visit.zoneFreeFrom": "{amount} дан акысыз",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

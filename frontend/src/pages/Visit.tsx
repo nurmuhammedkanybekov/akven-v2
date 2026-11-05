@@ -6,6 +6,10 @@ import { useT } from "../i18n/I18n";
 import { EVERY_DAY, bishkekNow, isOpenOn, shortTime, weekdayNames } from "../lib/hours";
 import { RouteMap } from "../shop/home/RouteMap";
 import { useShopInfo } from "../shop/useShopInfo";
+import { getDeliveryZones } from "../api/endpoints";
+import { useAsync } from "../hooks/useAsync";
+import { useMoney } from "../shop/useMoney";
+import type { MessageKey } from "../i18n/en";
 
 /**
  * Dordoi is huge, so this page answers three questions well: is the stall open, where exactly is it, and how do I get
@@ -17,6 +21,8 @@ export function VisitPage() {
   const point = info?.pickupPoints[0];
   const whatsapp = info?.contacts.find((c) => c.kind === "WHATSAPP");
   const [copied, setCopied] = useState(false);
+  const zones = useAsync((signal) => getDeliveryZones(signal), []);
+  const { money } = useMoney();
 
   const address = point ? [point.market, point.section, point.passage && `${t("visit.passage")} ${point.passage}`,
     `${t("visit.container")} ${point.container}`, point.city].filter(Boolean).join(", ") : "";
@@ -78,12 +84,12 @@ export function VisitPage() {
               {point.openDays === EVERY_DAY && (
                 <p className="av-visit-card__big">{t("hours.everyDay")} <strong>{shortTime(point.opensAt)}–{shortTime(point.closesAt)}</strong></p>
               )}
-              <ul className="av-week">
-                {weekdayNames(lang).map((name, d) => {
+              <ul className="av-week av-week--tags">
+                {weekdayNames(lang, "short").map((name, d) => {
                   const today = bishkekNow(new Date()).day === d;
                   return (
                     <li key={d} className={today ? "is-today" : undefined} aria-current={today ? "date" : undefined}>
-                      <span>{name}{today && <em> · {t("hours.today")}</em>}</span>
+                      <span>{name}{today && <em>{t("hours.today")}</em>}</span>
                       <span>{isOpenOn(point.openDays, d) ? `${shortTime(point.opensAt!)}–${shortTime(point.closesAt!)}` : t("hours.closedDay")}</span>
                     </li>
                   );
@@ -97,18 +103,33 @@ export function VisitPage() {
 
       <RouteMap onVisitPage />
 
-      <section id="pickup" className="av-container av-block av-visit__grid">
-        <div className="av-stack">
-          <span className="av-eyebrow">{t("visit.pickupTitle")}</span>
-          <ol className="av-numbered">
-            <li><b>1</b><span>{t("visit.pickup1")}</span></li>
-            <li><b>2</b><span>{t("visit.pickup2")}</span></li>
-            <li><b>3</b><span>{t("visit.pickup3")}</span></li>
-          </ol>
-        </div>
-        <div className="av-stack">
-          <span className="av-eyebrow">{t("visit.deliveryTitle")}</span>
-          <p className="av-visit__delivery"><TruckIcon /><span>{t("visit.delivery")}</span></p>
+      <section id="pickup" className="av-visit-ways av-block" aria-labelledby="pickup-h" data-reveal>
+        <div className="av-container av-visit-ways__inner">
+          <div className="av-stack">
+            <span className="av-hand">{t("visit.pickupTitle")}</span>
+            <h2 id="pickup-h">{t("visit.pickupH")}</h2>
+            <ol className="av-kraftsteps">
+              {[1, 2, 3].map((n) => (
+                <li key={n}><span className="av-kraft">0{n}</span><span>{t(`visit.pickup${n}` as MessageKey)}</span></li>
+              ))}
+            </ol>
+          </div>
+          <div className="av-stack">
+            <span className="av-hand">{t("visit.deliveryTitle")}</span>
+            <h2>{t("visit.deliveryH")}</h2>
+            <p className="av-visit-ways__lead"><TruckIcon /><span>{t("visit.delivery")}</span></p>
+            {zones.data && zones.data.length > 0 && (
+              <ul className="av-zonelist">
+                {zones.data.filter((z) => z.active).slice(0, 8).map((z) => (
+                  <li key={z.id}>
+                    <span className="av-zonelist__name"><strong>{z.name}</strong><span className="av-small">{z.kind === "CARGO" ? t("visit.zoneCargo") : t("visit.zoneCourier")}{z.daysMin != null && ` · ${t("visit.zoneDays", { a: z.daysMin, b: z.daysMax ?? z.daysMin })}`}</span></span>
+                    <span className="av-zonelist__fee">{z.payOnReceipt ? t("visit.zoneOnReceipt") : z.fee > 0 ? money(Number(z.fee)) : t("visit.zoneFree")}
+                      {z.freeFrom != null && z.fee > 0 && <span className="av-small">{t("visit.zoneFreeFrom", { amount: money(Number(z.freeFrom)) })}</span>}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </section>
     </div>

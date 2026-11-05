@@ -1348,6 +1348,14 @@ const shop = {
   "crafts.socks": "both words mean socks.",
   "crafts.cta": "How a pair travels",
   "a.em.kind.ORDER_LINK": "Link to an order",
+  "visit.pickupH": "Pick it up at the stall",
+  "visit.deliveryH": "Or we'll bring it",
+  "visit.zoneCourier": "courier",
+  "visit.zoneCargo": "cargo",
+  "visit.zoneDays": "{a}–{b} days",
+  "visit.zoneFree": "free",
+  "visit.zoneOnReceipt": "paid to the carrier",
+  "visit.zoneFreeFrom": "free from {amount}",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;
