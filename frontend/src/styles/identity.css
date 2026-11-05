@@ -1338,7 +1338,8 @@ body::before {
 
 .av-crafts { overflow-x: clip; background: linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--accent) 7%, var(--bg)) 55%, var(--bg)); }
 .av-crafts__inner { display: grid; gap: var(--space-5); justify-items: center; text-align: center; }
-.av-crafts__head { display: grid; gap: var(--space-2); max-width: 46rem; }
+.av-crafts__head { display: grid; gap: var(--space-2); max-width: 46rem; justify-items: center; }
+.av-crafts__head .av-lead { max-width: 40rem; margin-inline: auto; text-align: center; text-wrap: pretty; }
 .av-crafts__head h2, .av-crafts__head p { margin: 0; }
 .av-crafts__row { display: grid; grid-template-columns: minmax(0, 15rem) minmax(8rem, 1fr) minmax(0, 15rem); gap: var(--space-4); align-items: center; width: 100%; max-width: 62rem; }
 .av-crafts__cloth { display: grid; gap: var(--space-2); margin: 0; justify-items: center; }

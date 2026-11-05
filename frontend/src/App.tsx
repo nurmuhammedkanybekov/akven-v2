@@ -71,9 +71,10 @@ export default function App() {
         <ToastProvider>
           <CartProvider>
           <RouteErrorBoundary>
+          {/* Outside the Suspense: a page whose code is still loading must not pause the scroll handling. */}
+          <ScrollManager />
           <Suspense fallback={<PageLoading />}>
           <RouteTitle />
-          <ScrollManager />
           <Routes>
             <Route element={<ShopLayout />}>
               <Route index element={<HomePage />} />

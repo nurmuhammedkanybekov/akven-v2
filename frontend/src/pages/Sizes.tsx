@@ -63,7 +63,7 @@ export function SizesPage() {
       {chart.loading && !chart.data && <Skeleton height={220} />}
       {chart.data && chart.data.rows.length === 0 && <p className="av-lead">{t("sizes.empty")}</p>}
       {chart.data && chart.data.rows.length > 0 && (
-        <div className="av-tablewrap">
+        <div className="av-tablewrap" tabIndex={0}>
           <table className="av-table av-sizes__table">
             <thead>
               <tr>

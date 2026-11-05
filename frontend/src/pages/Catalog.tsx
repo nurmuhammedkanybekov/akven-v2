@@ -155,7 +155,7 @@ export function CatalogPage({ category }: { category?: Category }) {
       </nav>
 
       {facets.data && facets.data.section.length > 0 && (
-        <div className="av-occasions" role="group" aria-label={t("shop.sections")}>
+        <div className="av-occasions" role="group" aria-label={t("shop.sections")} tabIndex={0}>
           {facets.data.section.map((o, i) => {
             const on = section === o.slug;
             return (
