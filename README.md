@@ -37,7 +37,11 @@ This shop keeps those habits online instead of replacing them with a fixed price
   Bishkek** (a taxi the family calls, or the father's own car above an amount the owners set); or **cargo** to the
   regions, Kazakhstan, Uzbekistan and Russia, where the customer pays the carrier on receipt. Fee and days are shown
   before paying.
-- **Shops buy by the case.** Build a case, send a request, get a reference; the family answers from an inbox.
+- **Shops buy by the case.** They pick the exact socks from the real shelves, colour by colour and size by size, a
+  dozen at a time, with the stock beside each; the list goes into a request the family answers from an inbox.
+- **It looks like where it comes from.** Kyrgyz shyrdak felt and ram's horns (кочкор мүйүз), Korean hanji paper,
+  bojagi patchwork and a red dojang seal run through the whole site, because the socks are knitted in Korea and chosen
+  in Kyrgyzstan.
 
 ## The idea: talking is not deciding
 
@@ -94,8 +98,12 @@ rule-based assistant (which over-promised six times by design) or for the model.
   delivery details, "collected / on its way / with the carrier", and a cancellation with its refund. They are written in
   the same transaction as the order (an outbox), sent through any SMTP server, retried when it is down, and readable
   in the admin; without a mail server they are kept there and the admin says so.
-- **Wholesale and company gifts:** an open case of packs, how a case is made, *Build a case*, and a request (no account
-  needed) that the shop keeps and answers with a reference.
+- **Wholesale and company gifts:** an open case of packs, how a case is made, and *Build a case* from the real
+  shelves: search or browse a shelf, open a sock, and choose dozens of each colour and size with today's stock beside
+  it (a warning when the case asks for more than there is); the case shows the price step it reaches and an estimate,
+  and its exact list (one line per colour and size, with the code) goes into a request that needs no account.
+- **Our story:** the family's two names, a letter from the stall in their own words, the years at Dordoi, the journey
+  of a pair from the Korean mills to container 70-E, a day at the stall from 8:00 to 16:00, and the bazaar scene.
 - **Find us:** whether the stall is open now in Bishkek time, the week's hours, the way inside the bazaar, Google Maps
   and 2GIS. The footer shows the stall's door with an open or closed sign.
 - **English, Russian and Kyrgyz**; prices in **US dollars, som or roubles**; light and dark; phone, tablet and laptop;
@@ -117,19 +125,23 @@ rule-based assistant (which over-promised six times by design) or for the model.
 
 **For the shop team** (the administration, in English, Russian and Kyrgyz)
 
-- **Everyone in the team:** products with colours, sizes, pictures per colour, stock and stock on the way; sections and
-  cuts; orders and the **hand-over screen** (code typed or scanned, plus the end of the phone number); negotiations with
-  proposed and allowed side by side; the dashboard; review moderation; the **wholesale inbox** with one-tap reply in the
-  customer's own messenger.
+- **Everyone in the team:** products (newest first, with pictures and colours) with sizes, pictures per colour, stock
+  and stock on the way; sections and cuts; orders found by number, name, phone or email and by how they travel; the
+  **hand-over desk** (code typed or scanned, plus the end of the phone number, and the pickup orders waiting to be
+  packed); negotiations with proposed and allowed side by side; a dashboard that tells the story of the period
+  (returning customers, pairs per order, how orders travel, sales by shelf, the busiest days, the best customers);
+  review moderation; the **wholesale inbox** with one-tap reply in the customer's own messenger.
 - **Owners:** the limit and cost of each sock, the price ladder and minimum order, som and rouble rates, **delivery
-  areas**, customers, contacts, the stall and its hours, the size chart, and the orders as a spreadsheet.
-- **Super admin:** the team's accounts, which assistant answers the chat (with a test box and the live comparison),
-  and the audit log of every change.
+  areas**, customers with their orders and spending, contacts, the stall and its hours, the size chart, the emails sent
+  to customers, and the orders as a spreadsheet. Prices can be read in dollars, som or roubles.
+- **Super admin:** the team's accounts, which assistant answers the chat (with a test box, a connection test that says
+  in plain words why the AI is not answering, and the live comparison), and the history of every change, by part of
+  the shop and by who made it, with the values before and after.
 
 ![The dashboard](docs/design/readme-admin.jpg)
 
-**Not built, on purpose:** a real payment provider, e-mail and SMS notifications, taxes. The language model is
-optional: without a key the built-in rules answer.
+**Not built, on purpose:** a real payment provider (the demo wallet is simulated), SMS, taxes, and the Telegram bot
+([planned](docs/telegram-bot-plan.md)). The language model is optional: without a key the built-in rules answer.
 
 ## Run it in five minutes
 
@@ -140,7 +152,7 @@ docker compose up --build
 ```
 
 Then open **http://localhost:8081**. The first build takes a few minutes; the backend is ready when its log says
-`Successfully applied 35 migrations`.
+`Successfully applied 41 migrations`.
 
 | Demo account | Email | Password | Can do |
 |---|---|---|---|
@@ -149,7 +161,9 @@ Then open **http://localhost:8081**. The first build takes a few minutes; the ba
 | Staff | `staff@akven.test` | `changeme-staff` | Products, stock, orders, reviews and wholesale requests, but not prices |
 | Customer | Sign in → Create an account | | Shop, ask for a price, check out, follow orders |
 
-Docker Compose starts the shop **in demo mode** (`SPRING_PROFILES_ACTIVE=demo`): the demo catalog, these accounts, and a
+Docker Compose starts the shop **in demo mode** (`SPRING_PROFILES_ACTIVE=demo`): the demo catalog, three months of
+imagined shop life (25 customers from Bishkek, Osh, Almaty, Tashkent and Moscow, 150 orders in every state and way of
+delivery, price conversations, reviews, wholesale requests and emails), these accounts, and a
 **simulated wallet** that moves no money and says so at checkout. Without demo mode the shop is safe by default: no demo
 data, the demo accounts switched off, and no payments taken until a real provider is connected (future work). The demo
 accounts are also switched off in demo mode once a real super admin is set in `.env`, unless `DEMO_ACCOUNTS=on`.
@@ -182,9 +196,9 @@ flowchart LR
 
 | Layer | Technology |
 |---|---|
-| Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, role-gated routes. About 1,600 texts per language in English, Russian and Kyrgyz, with typed keys |
-| API | Spring Boot 3.5, Java 17, 107 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` (demo mode; `API_DOCS=true` elsewhere) |
-| Data | PostgreSQL 16 with pgvector. 35 Flyway versions: 19 schema migrations, 16 demo-data migrations (demo profile only). Check constraints repeat the rules that must never break |
+| Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, role-gated routes. About 1,900 texts per language in English, Russian and Kyrgyz, with typed keys |
+| API | Spring Boot 3.5, Java 17, 112 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` (demo mode; `API_DOCS=true` elsewhere) |
+| Data | PostgreSQL 16 with pgvector. 41 Flyway versions: 23 schema migrations, 18 demo-data migrations (demo profile only). Check constraints repeat the rules that must never break |
 | Assistant | A `Negotiator` interface: rule-based, and a language model over any OpenAI-compatible API (Gemini by default), with fallback to the rules and a run-time switch |
 | Delivery | Docker Compose (database, backend, nginx). CI on GitHub Actions (six jobs) and on the ELTE GitLab |
 
@@ -198,17 +212,22 @@ the thesis:
 - **Every change by the team is audited** in the same transaction, with the state before and after.
 - **Each customer sees only their own** family, saved socks, details and orders: the account comes from the token, never
   from the request.
-- **The look comes from the stall:** kraft tags, the family's handwriting, socks on a washing line, fabrics, paper and
-  container 70-E. All 1,300 product pictures are drawn by a script from the same sock shapes as the interface.
+- **The look comes from the stall and its two countries:** kraft tags, the family's handwriting, socks on a washing
+  line and container 70-E; Kyrgyz shyrdak felt and ram's horns; Korean hanji paper, bojagi patchwork and the red
+  dojang seal. All 1,300 product pictures are drawn by a script from the same sock shapes as the interface, on a
+  transparent ground, so each stands on a crafted backdrop chosen by the shop (and a cut-out photo would too).
+- **Smooth on a phone:** textures are small pictures drawn once, cards move only what the graphics card can move, and
+  endless animations rest while they are off screen; measured with the CPU slowed to phone speed.
 
 ## Quality and tests
 
 | Check | Command | Result |
 |---|---|---|
-| Backend, in-memory database | `cd backend && mvn verify` | 257 tests, **97% line coverage**; the build fails below 80% |
+| Backend, in-memory database | `cd backend && mvn verify` | 271 tests, **96% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 204 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
+| Frontend | `cd frontend && npm test && npm run build` | 208 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
 | In a real browser | `cd frontend && npm run e2e` | 28 steps: the owner's, the customer's (with and without an account) and the super admin's work in three languages, with accessibility rules on every page |
+| Other browsers | `cd frontend && npm run e2e:browsers` (in CI) | The customer's path in Safari's engine (WebKit) and Firefox, on a phone and a laptop |
 
 What the tests demonstrate, among others:
 
