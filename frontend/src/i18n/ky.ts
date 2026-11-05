@@ -1270,6 +1270,19 @@ const shop: Partial<Record<MessageKey, string>> = {
   "a.od.collected": "Контейнерден алынды",
   "a.od.sent": "Жөнөтүлдү",
   "a.od.cancelledStep": "Жокко чыгарылды, акча кайтарылды",
+  "a.as.lastOk": "ИИнин акыркы жообу",
+  "a.as.lastError": "ИИ жооп берген жок {when}",
+  "a.as.fallbackNote": "Кардарлар баары бир жооп алышты: ички эрежелер иштеди. Себебин оңдоп, «Байланышты текшерүү» басыңыз.",
+  "a.as.check": "Байланышты текшерүү",
+  "a.as.checkOk": "ИИ {ms} мс ичинде жооп берди.",
+  "a.ac.whoCan": "Ким эмне кыла алат",
+  "a.ac.can.products": "Байпактар, кампа, бөлүмдөр, пикирлер",
+  "a.ac.can.orders": "Буйрутмалар, берүү, дүң, каттар",
+  "a.ac.can.prices": "Баалар, арзандатуу чеги, жеткирүү аймактары",
+  "a.ac.can.people": "Кардарлар, байланыштар, контейнер, өлчөмдөр",
+  "a.ac.can.system": "Аккаунттар, ИИ жардамчы, өзгөрүүлөр журналы",
+  "a.ac.yes": "ооба",
+  "a.ac.no": "жок",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

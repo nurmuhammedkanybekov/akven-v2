@@ -90,7 +90,12 @@ public class LlmNegotiator implements Negotiator {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new IllegalStateException("The language model could not answer: " + e.getClass().getSimpleName(), e);
+            // Our own messages are safe to show (they never carry the key or the provider's text); others only say what kind of failure.
+            String why = e instanceof java.net.http.HttpTimeoutException ? "it did not answer in time (check the connection to " + "the service)"
+                    : e instanceof java.net.ConnectException || e instanceof java.nio.channels.UnresolvedAddressException ? "the service could not be reached (check LLM_BASE_URL and the internet)"
+                    : e instanceof java.io.IOException && e.getMessage() != null && e.getMessage().startsWith("The language model") ? e.getMessage()
+                    : e.getClass().getSimpleName();
+            throw new IllegalStateException(why.startsWith("The language model") ? why : "The language model could not answer: " + why + ".", e);
         }
         return parse(raw, ctx.quantity(), ctx.language());
     }

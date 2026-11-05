@@ -52,11 +52,23 @@ public class OpenAiCompatibleChatClient implements ChatClient {
             response = http.send(request.build(), HttpResponse.BodyHandlers.ofString());
         }
         if (response.statusCode() / 100 != 2) {
-            throw new IOException("The language model answered with HTTP " + response.statusCode());   // never include the body or the key
+            throw new IOException(explain(response.statusCode(), model));   // never include the body or the key
         }
         JsonNode content = mapper.readTree(response.body()).path("choices").path(0).path("message").path("content");
         if (!content.isTextual()) throw new IOException("The language model returned no text.");
         return content.asText();
+    }
+
+    /** What an HTTP answer from the model's service most likely means, in words the super admin can act on. */
+    static String explain(int status, String model) {
+        String why = switch (status) {
+            case 400 -> "the request was refused: check LLM_MODEL (\"" + model + "\") and that this model supports JSON answers";
+            case 401, 403 -> "the key was refused: check LLM_API_KEY, and that the key is allowed to use this model";
+            case 404 -> "the model \"" + model + "\" was not found at this service: check LLM_MODEL and LLM_BASE_URL";
+            case 429 -> "too many requests or the plan's quota is used up: wait, or raise the plan's limit";
+            default -> status >= 500 ? "the service had a problem on its side: try again later" : "unexpected answer";
+        };
+        return "The language model answered with HTTP " + status + ": " + why + ".";
     }
 
     /** The provider's Retry-After in seconds, kept between a quarter of a second and two seconds. */

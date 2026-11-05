@@ -1285,6 +1285,19 @@ const shop = {
   "a.od.collected": "Collected at the stall",
   "a.od.sent": "Sent on its way",
   "a.od.cancelledStep": "Cancelled and refunded",
+  "a.as.lastOk": "Last good AI answer",
+  "a.as.lastError": "The AI failed {when}",
+  "a.as.fallbackNote": "Customers still got an answer: the built-in rules stepped in. Fix the cause above, then press \"Test the connection\".",
+  "a.as.check": "Test the connection",
+  "a.as.checkOk": "The AI answered in {ms} ms.",
+  "a.ac.whoCan": "Who can do what",
+  "a.ac.can.products": "Socks, stock, sections, reviews",
+  "a.ac.can.orders": "Orders, hand-over, wholesale, emails",
+  "a.ac.can.prices": "Prices, discount limits, delivery areas",
+  "a.ac.can.people": "Customers, contacts, the stall, sizes",
+  "a.ac.can.system": "Accounts, the AI assistant, the audit log",
+  "a.ac.yes": "yes",
+  "a.ac.no": "no",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;
