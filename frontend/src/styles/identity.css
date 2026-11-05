@@ -1383,20 +1383,17 @@ body::before {
 .av-hornsep .av-hornband { width: min(100%, 30rem); }
 
 /* ---------- the ground every product picture stands on ----------
-   Drawn socks are transparent; the picture's own background is one of these (chosen per picture, ProductImage.stageFor):
-   hanji, the Korean mulberry paper with its long fibres; Kyrgyz felt with a ram's horn pressed into it and a stitched
-   edge; and quiet bojagi patchworks with sewn seams. A photograph covers its ground; a cut-out photo stands on it. */
-img[data-stage] { background-color: #f1ebdf; background-repeat: no-repeat; background-position: center; background-size: cover; }
-img[data-stage="hanji"] { background-color: #f3ede1; background-image: radial-gradient(ellipse 75% 60% at 50% 34%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 70%, rgb(0 0 0 / 0.05)), url("/media/tex/fibre-13.png"); background-size: cover, 260px 260px; background-repeat: no-repeat, repeat; }
-img[data-stage="hanji-rose"] { background-color: #f2e3dc; background-image: radial-gradient(ellipse 75% 60% at 50% 34%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 70%, rgb(0 0 0 / 0.05)), url("/media/tex/fibre-13.png"); background-size: cover, 260px 260px; background-repeat: no-repeat, repeat; }
-img[data-stage="felt-sage"] { background-color: #dfe4d4; background-image: radial-gradient(ellipse 75% 60% at 50% 34%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 70%, rgb(0 0 0 / 0.05)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -90 114 100'%3E%3Cpath d='M27 -53C34 -49 42 -58 36 -68C28 -80 4 -72 6 -52C8 -32 40 -20 47 1C54 -20 86 -32 88 -52C90 -72 66 -80 58 -68C52 -58 60 -49 67 -53' fill='none' stroke='%23d3d9c6' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M47 -70L52 -63L47 -56L42 -63Z' fill='%23d3d9c6'/%3E%3C/svg%3E"), url("/media/tex/felt-1.png");
-  background-size: cover, 38% auto, 200px 200px; background-position: center, 104% 101%, 0 0; background-repeat: no-repeat, no-repeat, repeat;
-  outline: 1.5px dashed rgb(120 110 80 / 0.35); outline-offset: -12px; }
-img[data-stage="felt-sky"] { background-color: #dde5ea; background-image: radial-gradient(ellipse 75% 60% at 50% 34%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 70%, rgb(0 0 0 / 0.05)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -90 114 100'%3E%3Cpath d='M27 -53C34 -49 42 -58 36 -68C28 -80 4 -72 6 -52C8 -32 40 -20 47 1C54 -20 86 -32 88 -52C90 -72 66 -80 58 -68C52 -58 60 -49 67 -53' fill='none' stroke='%23d0dbe2' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M47 -70L52 -63L47 -56L42 -63Z' fill='%23d0dbe2'/%3E%3C/svg%3E"), url("/media/tex/felt-1.png");
-  background-size: cover, 38% auto, 200px 200px; background-position: center, 104% 101%, 0 0; background-repeat: no-repeat, no-repeat, repeat;
-  outline: 1.5px dashed rgb(70 90 110 / 0.3); outline-offset: -12px; }
-img[data-stage="bojagi"] { background-color: #efe6d6; background-image: radial-gradient(ellipse 75% 60% at 50% 34%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 70%, rgb(0 0 0 / 0.05)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000' preserveAspectRatio='none'%3E%3Crect width='800' height='1000' fill='%23efe6d6'/%3E%3Crect x='0' y='0' width='330' height='420' fill='%23f4ede1'/%3E%3Crect x='330' y='0' width='470' height='260' fill='%23e9dcc8'/%3E%3Crect x='560' y='260' width='240' height='420' fill='%23f1e4dc'/%3E%3Crect x='0' y='680' width='420' height='320' fill='%23e6ddcb'/%3E%3Crect x='420' y='680' width='380' height='320' fill='%23f4ede1'/%3E%3Cpath d='M330 0V420H0M330 260H800M560 260V680H800M0 680H800M420 680V1000' fill='none' stroke='%23fbf7ef' stroke-width='3' stroke-dasharray='9 7'/%3E%3C/svg%3E"); background-size: cover, 100% 100%; }
-img[data-stage="bojagi-celadon"] { background-color: #dfe7de; background-image: radial-gradient(ellipse 75% 60% at 50% 34%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06) 70%, rgb(0 0 0 / 0.05)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000' preserveAspectRatio='none'%3E%3Crect width='800' height='1000' fill='%23dfe7de'/%3E%3Crect x='0' y='0' width='330' height='420' fill='%23e9eee4'/%3E%3Crect x='330' y='0' width='470' height='260' fill='%23d3ded5'/%3E%3Crect x='560' y='260' width='240' height='420' fill='%23e6e9dc'/%3E%3Crect x='0' y='680' width='420' height='320' fill='%23dbe4e2'/%3E%3Crect x='420' y='680' width='380' height='320' fill='%23e9eee4'/%3E%3Cpath d='M330 0V420H0M330 260H800M560 260V680H800M0 680H800M420 680V1000' fill='none' stroke='%23f6f8f2' stroke-width='3' stroke-dasharray='9 7'/%3E%3C/svg%3E"); background-size: cover, 100% 100%; }
+   A calm studio ground: one soft colour per sock (oat, blush, sage, mist, sand or lilac, chosen per product by
+   ProductImage.stageFor), soft light from above and a hint of hanji paper. Kept plain on purpose: a shelf of patterned
+   grounds was busy, and the craft belongs to the sections around the socks, not inside every picture. Drawn socks are
+   transparent and stand on it; a photograph covers it; a cut-out photo stands on it too. */
+img[data-stage] { background-color: #f1eadd; background-image: radial-gradient(ellipse 80% 62% at 50% 30%, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0) 72%), linear-gradient(180deg, rgb(0 0 0 / 0) 70%, rgb(60 40 20 / 0.06)), url("/media/tex/fibre-035.png"); background-size: cover, cover, 260px 260px; background-repeat: no-repeat, no-repeat, repeat; }
+img[data-stage="hanji"] { background-color: #f1eadd; }
+img[data-stage="hanji-rose"] { background-color: #f3e6e2; }
+img[data-stage="felt-sage"] { background-color: #e5ebe1; }
+img[data-stage="felt-sky"] { background-color: #e3e9ef; }
+img[data-stage="bojagi"] { background-color: #efe5d4; }
+img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
 
 
 /* Textures the whole shop draws from: hanji fibres, a faint paper for the page itself, felt, and the oimo stitch. */
@@ -1485,3 +1482,8 @@ img[data-stage="bojagi-celadon"] { background-color: #dfe7de; background-image: 
 @media (prefers-reduced-motion: reduce) { .av-still__runner, .av-still__dojang { animation: none !important; } }
 /* The chat's "AK&VEN assistant" label sits on its own line above the message (it ran into the first word). */
 .av-bubble .av-bubble__who { display: flex; align-items: center; margin-bottom: 4px; }
+
+/* Things that sway or float without end and carry a drop shadow get their own layer: the shadow is drawn once and the
+   graphics card only moves it (otherwise Safari redraws the shadow on every frame). */
+.av-cl__swing, .av-duo__sock, .av-hang__sway, .av-line__sway, .av-shophead__art svg, .av-auth__socks svg, .av-door__sign, .av-gbox__tag, .av-still__sock { will-change: transform; }
+.av-still__sock svg { filter: drop-shadow(0 18px 14px rgba(84, 58, 24, 0.24)); }

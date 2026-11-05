@@ -46,9 +46,6 @@ const baseFor = (spec, fit) => { const b = sockBounds(spec.cut); const hPx = (b.
  */
 function frame(tint, body, { line = null, floor = 870 } = {}) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img">
-  <defs>
-    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="12" dy="18" stdDeviation="11" flood-color="#2a1d10" flood-opacity=".18"/></filter>
-  </defs>
   ${line != null ? `<path d="M-10 ${line + 4}Q400 ${line + 108} 810 ${line + 4}" fill="none" stroke="#000" stroke-opacity=".08" stroke-width="5"/><path d="M-10 ${line}Q400 ${line + 100} 810 ${line}" fill="none" stroke="#9a8569" stroke-width="3"/><path d="M-10 ${line - 1}Q400 ${line + 99} 810 ${line - 1}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>`
     : `<ellipse cx="400" cy="${floor}" rx="270" ry="22" fill="#000" fill-opacity=".09"/>`}
   ${body}
@@ -69,7 +66,21 @@ function hung(spec, id, { x, fit, rotate = 0, base }) {
   const top = spec.cut === "no-show" ? sockTop(spec.cut) - 4 : sockTop(spec.cut);
   const px = x, py = lineY(x, base) + 6;
   const tx = px - 50 * s, ty = py - top * s - 4;
-  return `<g filter="url(#sh)"><g transform="rotate(${rotate} ${px.toFixed(1)} ${py.toFixed(1)}) translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${s.toFixed(4)})">${sockMarkup(spec, id)}</g></g>` + peg(px, py, rotate);
+  const place = `rotate(${rotate} ${px.toFixed(1)} ${py.toFixed(1)}) translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${s.toFixed(4)})`;
+  const markup = sockMarkup(spec, id);
+  return softShadow(markup, place) + `<g transform="${place}">${markup}</g>` + peg(px, py, rotate);
+}
+
+/**
+ * A soft shadow without an SVG filter: three faint copies of the sock's outline, each a little further down and to
+ * the right. A filter (feDropShadow) looked the same but had to be recomputed by the browser for every card, which
+ * made shelves stutter, worst of all in Safari.
+ */
+function softShadow(markup, place) {
+  const outline = markup.match(/<clipPath id="c-[^"]+"><path d="([^"]+)"\/>/)?.[1];
+  if (!outline) return "";
+  return [[7, 11, 0.07], [11, 17, 0.06], [15, 23, 0.045]].map(([dx, dy, o]) =>
+    `<g transform="translate(${dx} ${dy})"><g transform="${place}"><path d="${outline}" fill="#2a1d10" fill-opacity="${o}"/></g></g>`).join("");
 }
 
 /** Where to peg a sock so that, hanging, it sits in the middle of the picture. */
