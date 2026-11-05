@@ -7,7 +7,7 @@ import { Header } from "../components/Header";
 import { YarnProgress } from "../components/YarnProgress";
 import { ThemeToggle, useTheme } from "../components/useTheme";
 import { useT } from "../i18n/I18n";
-import { useReveal } from "../shop/useReveal";
+import { useReveal, useCalmOffscreen } from "../shop/useReveal";
 import { useSaved, useSavedSync } from "../shop/useSaved";
 
 export function ShopLayout() {
@@ -17,6 +17,7 @@ export function ShopLayout() {
   const { t } = useT();
   const saved = useSaved();
   useReveal();
+  useCalmOffscreen();
   useSavedSync(session && !isStaff ? session.email : null);
   return (
     <>

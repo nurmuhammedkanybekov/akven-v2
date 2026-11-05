@@ -11,10 +11,12 @@ export function imageKind(url: string): "art" | "photo" {
  * with a ram's horn pressed into it, and two quiet bojagi patchworks. */
 export const STAGES = ["hanji", "hanji-rose", "felt-sage", "felt-sky", "bojagi", "bojagi-celadon"] as const;
 
-/** The same picture always gets the same backdrop; neighbouring socks on a shelf mostly get different ones. */
+/** A product's pictures all get the same backdrop (the sock on its own and the pair, "-1" and "-2", share one, so the
+ * ground does not jump when the second picture shows on hover); neighbouring socks on a shelf mostly get different ones. */
 export function stageFor(url: string): (typeof STAGES)[number] {
+  const key = url.replace(/[?#].*$/, "").replace(/-\d+\.(svg|png|jpe?g|webp)$/i, "");
   let h = 2166136261;
-  for (let i = 0; i < url.length; i++) { h ^= url.charCodeAt(i); h = Math.imul(h, 16777619); }
+  for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619); }
   return STAGES[(h >>> 0) % STAGES.length];
 }
 
