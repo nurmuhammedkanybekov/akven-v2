@@ -52,7 +52,10 @@ export function Reviews({ slug }: { slug: string }) {
             <li key={x.id} style={{ "--i": i } as React.CSSProperties}>
               <div className="av-reviews__head"><Stars value={x.rating} /><span className="av-small av-muted">{formatDay(x.createdAt.slice(0, 10))}</span></div>
               <p className="av-reviews__body">{x.body}</p>
-              <span className="av-small"><strong>{x.author || t("rv.anon")}</strong> · {t("rv.buyer")}</span>
+              <span className="av-say2__who av-reviews__who">
+                <span className="av-say2__seal" aria-hidden="true">{(x.author || t("rv.anon")).trim().charAt(0).toUpperCase()}</span>
+                <span className="av-small"><strong>{x.author || t("rv.anon")}</strong> · {t("rv.buyer")}</span>
+              </span>
             </li>
           ))}
         </ol>
