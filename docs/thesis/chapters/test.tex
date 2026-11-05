@@ -24,9 +24,9 @@ Table~\ref{tab:tests} summarises the suites as they stand at the end of the proj
 		\toprule
 		\textbf{Suite} & \textbf{Command} & \textbf{Result} \\
 		\midrule
-		Backend & \texttt{mvn verify} & 257 tests, 97\% line coverage; the build fails below 80\% \\
+		Backend & \texttt{mvn verify} & 271 tests, 96\% line coverage; the build fails below 80\% \\
 		Real PostgreSQL & \texttt{-Dtest=PostgresIntegrationTest} & 11 tests over real HTTP on PostgreSQL 16 \\
-		Frontend & \texttt{npm test} & 204 tests, type check and production build \\
+		Frontend & \texttt{npm test} & 208 tests, type check and production build \\
 		Browser journey & \texttt{npm run e2e} & 28 steps in three languages, axe rules on every page \\
 		\bottomrule
 	\end{tabularx}

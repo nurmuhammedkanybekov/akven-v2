@@ -35,7 +35,7 @@ docker compose up --build
 \end{lstlisting}
 
 The first build takes a few minutes. The backend has started when its log ends with
-\texttt{Successfully applied 35 migrations}; the database tables are created and, in the demo, filled with the
+\texttt{Successfully applied 41 migrations}; the database tables are created and, in the demo, filled with the
 catalogue. To start again from an empty database, run \texttt{docker compose down -v} and start again.
 
 \subsection{Demo accounts}
@@ -103,13 +103,18 @@ plain words what the shop keeps and why.
 
 \subsection{The home page}
 
-The home page (Figure~\ref{fig:home}) opens on the socks: a still life of the everyday colours in an AK\&VEN box, two
-buttons and the facts that matter. Below follow the four shelves as washing lines on their own fabrics
-(Figure~\ref{fig:shelves}), the newest socks, the price ladder, the fitting room, what families say, a gift box, the
-family planner, the story of the two names, and a short scene in which container 70-E opens as the visitor scrolls.
+The home page (Figure~\ref{fig:home}) opens with one line about the shop, \emph{Made in Korea. Chosen at Dordoi.},
+beside a still life of the everyday colours in an AK\&VEN box on bojagi tissue and a felt runner, with the stall's
+round stamp and a red dojang seal. Two buttons lead to the socks and to the story, and three facts sit underneath:
+sizes from newborn to grandpa, pickup at Dordoi or delivery, and a family-run stall since 2018. Below follow the
+reasons to order (a felt band), what the visitor looked at last, the four shelves as washing lines on their own
+fabrics (Figure~\ref{fig:shelves}), the bestsellers with their rank stamped in red, the price ladder as kraft tags on
+felt, the fitting room, what families say (each review a note on hanji paper with the writer's initial in a seal), a
+gift box and a family set, the story of the two names, a short scene in which container 70-E opens as the visitor
+scrolls, the notes pinned at the stall, and a way in for shops and companies.
 
 \shot{u-home.jpg}{The home page}{fig:home}
-\shot{u-home-shelves.jpg}{Shop by who it is for: each shelf on its own fabric, with its socks on the line}{fig:shelves}
+\shot{u-home-shelves.jpg}{Who are they for? Each shelf on its own fabric, with its socks on the line}{fig:shelves}
 
 \subsection{The shelves: browsing and filtering}
 
@@ -229,8 +234,11 @@ pegged photos under the shelves and on product pages, and can be cleared.
 
 The wholesale page (Figure~\ref{fig:wholesale}) is for shops, market stalls, teams and companies. It explains who
 orders, how a case is made, and the facts a buyer needs (packs of 10 to 12, about 240 pairs to a case, the four
-countries). In \emph{Build a case} (Figure~\ref{fig:case}) the buyer chooses dozens from each shelf and watches the case
-fill; the mix goes into the request. The request (Figure~\ref{fig:request}) needs the name of the shop, a city and a
+countries). In \emph{Build a case} (Figure~\ref{fig:case}) the buyer works from the real shelves: search or browse a
+shelf, open a sock, and choose dozens of each colour and size with today's stock beside it (with a warning when the
+case asks for more than there is). The case, drawn as a cardboard carton with the stall's stamp, fills as pairs are
+added and shows the price step it reaches and an estimate; its exact list, one line per colour and size with the
+product code, goes into the request. The request (Figure~\ref{fig:request}) needs the name of the shop, a city and a
 way to answer (WhatsApp, Telegram, a call or e-mail). It is kept by the shop and answered with a reference number such
 as W-5018A33E, and the same text can be sent to the family's messenger. Wholesale prices are not published, because
 they follow the dollar rate, the factory price and the delivery; the family answers with a price.
@@ -242,7 +250,10 @@ they follow the dollar rate, the factory price and the delivery; the family answ
 \subsection{Finding the stall}
 
 \emph{Find us at Dordoi} (Figure~\ref{fig:visit}) tells whether the stall is open now, the week's hours, the address
-step by step inside the bazaar, and links to Google Maps and 2GIS. The address can be copied in one tap.
+step by step inside the bazaar, and links to Google Maps and 2GIS. The address can be copied in one tap. Two further
+parts answer the questions people ask most: how collecting an order works (three short steps, as kraft tags), and where
+the shop delivers, read live from the delivery areas the owners set in the administration, each with its way (courier
+or cargo), days, fee and the amount above which it is free, or ``paid to the carrier''.
 
 \shot{u-visit.jpg}{Find us at Dordoi}{fig:visit}
 

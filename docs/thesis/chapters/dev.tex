@@ -110,7 +110,7 @@ security refines this inside the services.
 \section{Data model}
 \label{sec:data}
 
-Figure~\ref{fig:er-core} shows the core tables; the full schema of 35 Flyway versions (19 schema migrations and 16
+Figure~\ref{fig:er-core} shows the core tables; the full schema of 41 Flyway versions (23 schema migrations and 18
 demo-data migrations) is generated from the database into the \texttt{docs/diagrams} folder.
 
 \begin{figure}[H]
@@ -175,7 +175,7 @@ area's name, fee and days), so editing or deleting a product or a delivery area 
 
 \section{REST API}
 
-The API has 107 endpoints. Table~\ref{tab:api} groups them; the full list with request and response shapes is
+The API has 112 endpoints. Table~\ref{tab:api} groups them; the full list with request and response shapes is
 generated at \texttt{/swagger-ui/index.html}.
 
 \begin{longtable}{p{5.6cm} p{8.4cm}}
@@ -404,7 +404,7 @@ administration, checkout, orders, the style guide) are loaded on demand, which k
 	\item[\texttt{shop/}] features shared by several pages: the family, saved and recently viewed socks, the fitting room,
 	the home page's sections, the wholesale case builder;
 	\item[\texttt{brand/}] the logo and the sock drawing, shared with the script that draws the product pictures;
-	\item[\texttt{i18n/}] all texts in English, Russian and Kyrgyz (about 1,600 keys per language) with typed keys, so a
+	\item[\texttt{i18n/}] all texts in English, Russian and Kyrgyz (about 1,900 keys per language) with typed keys, so a
 	missing translation is a compile error, and plural rules through \texttt{Intl.PluralRules};
 	\item[\texttt{styles/}] design tokens for the light and dark themes and the components.
 \end{description}
@@ -418,10 +418,34 @@ the interface uses objects of the stall: socks pegged on a washing line (a \text
 drawn socks by the cuff and lets them swing from the peg), shelves on knitted, ribbed, spotted and wrapping-paper fabrics,
 contacts as paper tags, the promises in the footer as sewn-in labels, forms as sheets of paper pegged up, and the stall's
 door with an open or closed sign in Bishkek time. All product pictures are drawn by a script from the same sock shapes
-the interface uses, hanging on the line, so the shop looks consistent until real photographs replace them.
+the interface uses, hanging on the line, on a transparent ground, so each stands on a calm backdrop chosen by the
+shop and the shop looks consistent until real photographs (cut out, they would stand on the same backdrops) replace
+them.
 
-Motion follows two rules that keep it smooth on cheap phones: only \texttt{transform} and \texttt{opacity} are animated,
-and nothing that changes the layout runs while scrolling. Every animation stops for visitors who prefer reduced motion.
+\paragraph{Two countries in one design.} The socks are knitted in Korea and chosen in Kyrgyzstan, and the design says
+so with a small, consistent set of motifs used across the whole site rather than as decoration in one corner. From
+Kyrgyzstan: shyrdak felt (the dark bands, the footer, the wholesale and \emph{Find us} headers), the ram's horn
+(\textit{kochkor müyüz}) as a rosette pressed into the felt and as the heart between AK and VEN in
+the logo, and the oimo stitch along the edges. From Korea: hanji paper under cards and notes, bojagi patchwork in the
+hero's tissue paper, and a red dojang seal, which stamps the bestseller ranks and carries each reviewer's initial.
+Cards that hold the shop's own words are \emph{sewn}: a felt strip on top, a dashed stitch inside the edge. One
+rule keeps it calm: patterns stay in frames, bands and headers, while the product pictures sit on plain single tones.
+
+\paragraph{Performance.} Motion follows two rules that keep it smooth on cheap phones: only \texttt{transform} and
+\texttt{opacity} are animated, and nothing that changes the layout runs while scrolling. Measurements in Chromium's
+performance panel with the CPU slowed four times showed three further costs, each removed:
+\begin{itemize}
+	\item the felt and paper textures were SVG noise filters (\texttt{feTurbulence}) recomputed on every repaint; they are
+	now small PNG tiles drawn once;
+	\item every product picture carried an SVG drop-shadow filter; the generator now draws the shadow as three offset
+	copies of the outline, so no picture contains a filter;
+	\item endless animations (the swinging socks, the turning stamp) kept the compositor busy off screen; an
+	\texttt{IntersectionObserver} pauses them while they are out of view.
+\end{itemize}
+Hint layers (\texttt{will-change}) on every card were tried and measured worse (more layer work than they saved), so
+they are used only on the few elements that sway. Every animation stops for visitors who prefer reduced motion. A
+small \texttt{ScrollManager} restores the scroll position on Back and Forward, opens a new page at the top at once,
+and keeps the position when only a filter in the address changes.
 Colour contrast is checked by a test against WCAG 2.2 AA~\cite{wcag} for every pair of text and background tokens in
 both themes.
 
