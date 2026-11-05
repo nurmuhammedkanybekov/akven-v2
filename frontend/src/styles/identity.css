@@ -1483,3 +1483,5 @@ img[data-stage="bojagi-celadon"] { background-color: #dfe7de; background-image: 
 .av-still__light { mix-blend-mode: normal; opacity: 0.45; }
 .av-hero6__promises li::before { border-radius: 0; transform: rotate(45deg); }
 @media (prefers-reduced-motion: reduce) { .av-still__runner, .av-still__dojang { animation: none !important; } }
+/* The chat's "AK&VEN assistant" label sits on its own line above the message (it ran into the first word). */
+.av-bubble .av-bubble__who { display: flex; align-items: center; margin-bottom: 4px; }
