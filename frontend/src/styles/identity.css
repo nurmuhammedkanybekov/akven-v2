@@ -1409,7 +1409,7 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
   background: currentColor; -webkit-mask: var(--tex-horn) center / contain no-repeat; mask: var(--tex-horn) center / contain no-repeat; opacity: 0.85; }
 /* The dark bands are felt, with a ram's-horn rosette pressed into their corner. */
 .av-trust, .av-ladderstrip, .av-footer { background-image: var(--tex-felt); background-size: 200px 200px; }
-.av-ladderstrip::before { content: ""; position: absolute; right: -40px; top: 50%; width: 260px; aspect-ratio: 1; transform: translateY(-50%) rotate(12deg);
+.av-ladderstrip::before { content: ""; position: absolute; inset: auto; right: -40px; top: 50%; width: 260px; aspect-ratio: 1; transform: translateY(-50%) rotate(12deg);
   background: var(--tex-rosette) center / contain no-repeat; opacity: 0.12; pointer-events: none; }
 .av-ladderstrip > * { position: relative; }
 /* A button pressed shows its seam, like a sewn edge. */
@@ -1566,3 +1566,32 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
 .av-casebuild__case .av-pairs svg.is-on { fill: #1f2a44; stroke: #1f2a44; }
 .av-whole3__way::before { left: auto; right: -60px; }
 .av-deep { background: url("/media/tex/felt-1.png") 0 0 / 200px 200px, radial-gradient(100% 120% at 0% 0%, var(--black-glow) 0%, var(--black) 50%, var(--black-deep) 100%); }
+
+/* The discount tags in one row on a wide screen. */
+@media (min-width: 1180px) {
+  .av-ladderstrip__inner { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .av-ladderstrip__steps { flex-wrap: nowrap; }
+}
+/* What families say: notes on hanji, sewn round the edge, a felt strip on top and the writer's initial in a red seal. */
+.av-say2 li { display: flex; flex-direction: column; position: relative; overflow: hidden; padding-top: calc(var(--space-5) + 12px); border-color: transparent;
+  background: url("/media/tex/fibre-035.png") 0 0 / 260px 260px, var(--surface); box-shadow: 0 24px 40px -34px rgb(40 28 14 / 0.6);
+  transition: transform 0.35s var(--ease-out); }
+.av-say2 li:hover { transform: translateY(-3px); }
+.av-say2 li::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px;
+  background: url("/media/tex/felt-1.png") 0 0 / 200px 200px, var(--strip, #1f2a44); }
+.av-say2 li:nth-child(3n+2) { --strip: #9a3030; }
+.av-say2 li:nth-child(3n+3) { --strip: #4f6b52; }
+.av-say2 li::after { content: "\201C"; position: absolute; right: 18px; top: 4px; font-family: var(--font-display); font-size: 6rem; line-height: 1;
+  color: var(--accent); opacity: 0.28; pointer-events: none; }
+.av-say2 blockquote { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.45; color: var(--ink); }
+.av-say2__who { display: flex; align-items: center; gap: var(--space-3); margin-top: auto; padding-top: var(--space-3); border-top: 1.5px dashed rgb(160 130 80 / 0.35); }
+.av-say2__seal { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; transform: rotate(-4deg);
+  background: #b3322e; color: #fbf3e6; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem;
+  box-shadow: inset 0 0 0 2px rgb(251 243 230 / 0.55), inset 0 0 0 4px #b3322e; }
+.av-say2__who .av-small { line-height: 1.4; }
+.av-say2__who a { color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .av-say2 li, .av-say2 li:hover { transition: none; transform: none; } }
+.av-say2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); }
+@media (max-width: 599px) { .av-ladderstrip__steps { display: grid; grid-template-columns: repeat(2, max-content); column-gap: var(--space-6); } }
+.av-reviews__who { border-top: 0; padding-top: var(--space-1); margin-top: 0; }
+.av-reviews__who .av-say2__seal { width: 28px; height: 28px; font-size: 0.95rem; }
