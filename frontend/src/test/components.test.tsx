@@ -122,7 +122,7 @@ describe("NegotiationOffer", () => {
     render(<NegotiationOffer listPrice={17.5} validatedDiscountPct={15} proposedDiscountPct={30} />);
     expect(screen.getByText(/assistant suggested 30%/)).toBeInTheDocument();
     expect(screen.getByText(/policy allows 15%/)).toBeInTheDocument();
-    expect(screen.getByText(/capped by the margin floor/)).toBeInTheDocument();
+    expect(screen.getByText(/the shop's lowest price/)).toBeInTheDocument();
   });
 });
 

@@ -29,7 +29,7 @@ describe("emails to customers, in the admin", () => {
   it("says plainly that nothing is sent without a mail server", async () => {
     list = { mode: "OFF", failed: 0, emails: { items: [email({})], page: 0, size: 30, totalItems: 1, totalPages: 1 } };
     show();
-    expect(await screen.findByText(/No mail server is set up, so emails are kept here and not sent/)).toBeInTheDocument();
+    expect(await screen.findByText(/Email isn't set up yet, so the emails wait here/)).toBeInTheDocument();
     expect(screen.getByRole("listitem")).toHaveTextContent("Kept, not sent");
     expect(screen.getByText(/To aida@example.com/)).toBeInTheDocument();
     expect(screen.getByText(/Ваш код для самовывоза/)).toBeInTheDocument();   // the words themselves, behind "Read the email"
