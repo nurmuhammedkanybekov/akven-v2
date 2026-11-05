@@ -35,7 +35,12 @@ public class AssistantAdmin {
     /** The audit log needs an entity id; settings have none, so this one stands for "the assistant setting". */
     static final UUID SETTING_ID = UUID.nameUUIDFromBytes("assistant.mode".getBytes(java.nio.charset.StandardCharsets.UTF_8));
 
-    public record Status(String mode, boolean aiConfigured, String model, String endpointHost, Map<String, Long> answersLast7Days) {}
+    /** lastAiError and its time: the last time the model failed and the rules answered instead; lastAiOkAt: the last good answer. */
+    public record Status(String mode, boolean aiConfigured, String model, String endpointHost, Map<String, Long> answersLast7Days,
+                         String lastAiError, Instant lastAiErrorAt, Instant lastAiOkAt) {}
+
+    /** One real call to the model, outside the shop: whether it answered, how fast, and if not, why. */
+    public record Check(boolean ok, long millis, String error, String reply) {}
 
     public record ModeRequest(@NotNull @Pattern(regexp = "ai|rules") String mode) {}
 
@@ -74,7 +79,8 @@ public class AssistantAdmin {
         for (Object[] row : turns.countByAssistantSince(Instant.now().minus(Duration.ofDays(7)))) {
             counts.put((String) row[0], ((Number) row[1]).longValue());
         }
-        return new Status(assistantSwitch.mode(), ai.configured(), ai.model(), ai.endpointHost(), counts);
+        return new Status(assistantSwitch.mode(), ai.configured(), ai.model(), ai.endpointHost(), counts,
+                FallbackNegotiator.lastFailure(), FallbackNegotiator.lastFailureAt(), FallbackNegotiator.lastOkAt());
     }
 
     @Transactional
@@ -104,6 +110,24 @@ public class AssistantAdmin {
         BigDecimal price = v.getPrice().multiply(BigDecimal.valueOf(100).subtract(validated)).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         String reply = NegotiationService.fill(NegotiationService.template(p, proposed, validated, r.language()), validated, price);
         return new TryResult(p.source(), proposed, validated, price, reply, millis);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public Check checkConnection() {
+        if (!ai.configured()) return new Check(false, 0, "The AI assistant has no key yet. Put LLM_API_KEY in the .env file and restart.", null);
+        Variant v = variants.findAll(org.springframework.data.domain.PageRequest.of(0, 1)).stream().findFirst()
+                .orElseThrow(() -> new NotFoundException("Add a sock first: the check asks about one."));
+        long start = System.nanoTime();
+        try {
+            Negotiator.Proposal p = ai.negotiator().propose(new NegotiationContext(v.getProduct().getName(), NegotiationService.label(v), v.getPrice(), 6,
+                    "Hello! How much for 6 pairs?", List.of(), "en", List.of(), List.of()));
+            FallbackNegotiator.recordOk();
+            return new Check(true, Duration.ofNanos(System.nanoTime() - start).toMillis(), null, p.replyTemplate());
+        } catch (RuntimeException e) {
+            FallbackNegotiator.recordFailure(e.getMessage());
+            return new Check(false, Duration.ofNanos(System.nanoTime() - start).toMillis(), e.getMessage(), null);
+        }
     }
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")

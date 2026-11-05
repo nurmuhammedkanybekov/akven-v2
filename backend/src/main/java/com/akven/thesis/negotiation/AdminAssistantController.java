@@ -30,6 +30,11 @@ public class AdminAssistantController {
         return service.tryMessage(body);
     }
 
+    @PostMapping("/check")
+    public AssistantAdmin.Check check() {
+        return service.checkConnection();
+    }
+
     @PostMapping("/evaluation")
     public NegotiationEvaluation.Report liveEvaluation() {
         return service.liveEvaluation();

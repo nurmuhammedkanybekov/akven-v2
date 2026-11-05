@@ -281,7 +281,9 @@ export interface AuditLine { id: string; at: string; actor: string; action: stri
   actorRole?: "GUEST" | "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN" | null }
 export type AuditArea = "orders" | "catalog" | "prices" | "delivery" | "people" | "chat" | "shop" | "messages";
 export type AssistantMode = "ai" | "rules";
-export interface AssistantStatus { mode: AssistantMode; aiConfigured: boolean; model: string; endpointHost: string | null; answersLast7Days: Record<string, number> }
+export interface AssistantStatus { mode: AssistantMode; aiConfigured: boolean; model: string; endpointHost: string | null; answersLast7Days: Record<string, number>;
+  lastAiError?: string | null; lastAiErrorAt?: string | null; lastAiOkAt?: string | null }
+export interface AssistantCheck { ok: boolean; millis: number; error: string | null; reply: string | null }
 export interface AssistantTry { assistant: string; proposedPct: number; validatedPct: number; offerPrice: number; reply: string; millis: number }
 
 /** A sold-out option and the customers waiting for it (the shop team's list). */

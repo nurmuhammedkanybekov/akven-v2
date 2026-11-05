@@ -7,7 +7,7 @@ import type {
   CartLineRequest, CheckoutBody, OrderStatus, OrderView, Quote, NegotiateResponse, NegotiationSessionView,
   PublicPricing, PricingPolicy, PriceTier, ShopInfo, ShopContact, ContactKind, PickupPoint, SizeChart, SizeMatch, SizeRow,
   FamilyMember, FamilyMemberInput, ProductReviews, ShowcaseReview, MyReview, ModerationLine, ReviewStatus, DayPoint,
-  SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AuditLine, CustomerAccount, TeamRole,
+  SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AssistantCheck, AuditLine, CustomerAccount, TeamRole,
   CustomerDetails, DeliveryZone, DeliveryZoneInput, WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
   EmailList, EmailStatus, OutboundEmail,
 } from "./types";
@@ -172,6 +172,7 @@ export const adminAuditLog = (p: { area?: string; who?: string; page?: number; p
 
 // ---- the assistant (super admin) ----
 export const adminAssistantStatus = () => api<AssistantStatus>("/api/admin/assistant");
+export const adminCheckAssistant = () => api<AssistantCheck>("/api/admin/assistant/check", { method: "POST" });
 export const adminSetAssistantMode = (mode: AssistantMode) => api<AssistantStatus>("/api/admin/assistant", { method: "PUT", body: { mode } });
 export const adminTryAssistant = (body: { sku: string; message: string; quantity: number; language: string }) =>
   api<AssistantTry>("/api/admin/assistant/try", { method: "POST", body });

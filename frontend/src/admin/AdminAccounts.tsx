@@ -34,18 +34,31 @@ function Accounts() {
   const [resetting, setResetting] = useState<Account | null>(null);
   return (
     <>
-      <NewAccount onCreated={list.reload} />
       <section className="av-card-form" aria-labelledby="team-h">
-        <h2 id="team-h" className="av-formtitle">{t("a.ac.team")}</h2>
+        <h2 id="team-h" className="av-formtitle">{t("a.ac.team")} {list.data && <span className="av-small av-muted">· {list.data.length}</span>}</h2>
         {list.loading && !list.data && <Skeleton height={160} />}
         {list.error && <Alert tone="danger">{list.error.message}</Alert>}
         {list.data && (
-          <ul className="av-termlist">
+          <ul className="av-team">
             {list.data.map((a) => <AccountRow key={`${a.id}-${a.role}-${a.active}`} account={a} onSaved={list.reload} onReset={() => setResetting(a)} />)}
           </ul>
         )}
-        <p className="av-small">{t("a.ac.roles")}</p>
       </section>
+      <section className="av-card-form" aria-labelledby="roles-h">
+        <h2 id="roles-h" className="av-formtitle">{t("a.ac.whoCan")}</h2>
+        <div className="av-tablewrap">
+          <table className="av-table av-roles">
+            <thead><tr><th scope="col"></th><th scope="col">{t("a.role.STAFF")}</th><th scope="col">{t("a.role.ADMIN")}</th><th scope="col">{t("a.role.SUPER_ADMIN")}</th></tr></thead>
+            <tbody>
+              {(["products", "orders", "prices", "people", "system"] as const).map((k, i) => (
+                <tr key={k}><th scope="row">{t(`a.ac.can.${k}`)}</th>
+                  {[i < 2, i < 4, true].map((yes, j) => <td key={j} aria-label={yes ? t("a.ac.yes") : t("a.ac.no")}>{yes ? "✓" : "—"}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <NewAccount onCreated={list.reload} />
       {resetting && <ResetPassword account={resetting} onClose={() => setResetting(null)} />}
     </>
   );
@@ -121,15 +134,16 @@ function AccountRow({ account, onSaved, onReset }: { account: Account; onSaved: 
   }
 
   return (
-    <li className="av-term">
-      <div className="av-term__main">
-        <strong>{account.displayName ?? account.email}</strong>{" "}
-        <Badge tone={account.role === "STAFF" ? "neutral" : "accent"}>{t(`a.role.${account.role}`)}</Badge>
-        {!account.active && <> <Badge tone="danger">{t("a.ac.disabled")}</Badge></>}
-        <br /><span className="av-small av-muted">{account.email}</span>
+    <li className={`av-team__card${account.active ? "" : " is-off"}`}>
+      <div className="av-team__who">
+        <span className="av-custcell__avatar" aria-hidden="true">{(account.displayName ?? account.email).charAt(0).toUpperCase()}</span>
+        <span><strong>{account.displayName ?? account.email}</strong>{" "}
+          <Badge tone={account.role === "STAFF" ? "neutral" : account.role === "SUPER_ADMIN" ? "ai" : "accent"}>{t(`a.role.${account.role}`)}</Badge>
+          {!account.active && <> <Badge tone="danger">{t("a.ac.disabled")}</Badge></>}
+          <br /><span className="av-small av-muted">{account.email}</span></span>
       </div>
       {fixed ? <span className="av-small av-muted">{t("a.ac.fixed")}</span> : (
-        <div className="av-row">
+        <div className="av-team__edit">
           <Input label={t("a.ac.name")} value={name} onChange={(e) => setName(e.target.value)} />
           <RoleSelect id={`role-${account.id}`} value={role} onChange={setRole} />
           <Button size="sm" disabled={!dirty} onClick={() => void save()}>{t("a.save")}</Button>

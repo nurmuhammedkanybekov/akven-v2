@@ -51,6 +51,14 @@ class AssistantAdminTest extends IntegrationTest {
     }
 
     @Test
+    void theConnectionCheckSaysPlainlyThatThereIsNoKey() throws Exception {
+        sendJson("POST", "/api/admin/assistant/check", tokenFor(Role.ADMIN), java.util.Map.of()).andExpect(status().isForbidden());
+        JsonNode check = json(sendJson("POST", "/api/admin/assistant/check", tokenFor(Role.SUPER_ADMIN), java.util.Map.of()).andExpect(status().isOk()));
+        assertThat(check.get("ok").asBoolean()).isFalse();
+        assertThat(check.get("error").asText()).contains("LLM_API_KEY");
+    }
+
+    @Test
     void aTestMessageShowsBothNumbersAndIsNotStored() throws Exception {
         Variant v = data.variant(5); // floor 15%
         int before = jdbc.queryForObject("select count(*) from negotiation_session", Integer.class);

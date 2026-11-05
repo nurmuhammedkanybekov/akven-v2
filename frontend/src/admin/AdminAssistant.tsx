@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { ApiError } from "../api/client";
-import { adminAssistantStatus, adminListProducts, adminLiveEvaluation, adminSetAssistantMode, adminTryAssistant } from "../api/endpoints";
-import type { AssistantMode, AssistantTry, EvaluationReport } from "../api/types";
+import { adminCheckAssistant, adminAssistantStatus, adminListProducts, adminLiveEvaluation, adminSetAssistantMode, adminTryAssistant } from "../api/endpoints";
+import type { AssistantCheck, AssistantMode, AssistantTry, EvaluationReport } from "../api/types";
 import { Alert, Skeleton } from "../components/Alert";
 import { Badge } from "../components/Badge";
 import { Button } from "../components/Button";
@@ -9,7 +9,7 @@ import { Input } from "../components/Field";
 import { useToast } from "../components/Toast";
 import { useAsync } from "../hooks/useAsync";
 import { LANGS, useT, type Lang } from "../i18n/I18n";
-import { formatPrice } from "../lib/format";
+import { formatDateTime, formatPrice } from "../lib/format";
 import { ComparisonReport } from "./AdminDashboard";
 import { SuperAdminOnly } from "./SuperAdminOnly";
 
@@ -34,6 +34,14 @@ function Status() {
   const toast = useToast();
   const status = useAsync(() => adminAssistantStatus(), []);
   const [busy, setBusy] = useState(false);
+  const [check, setCheck] = useState<AssistantCheck | null>(null);
+  const [checking, setChecking] = useState(false);
+  async function runCheck() {
+    setChecking(true); setCheck(null);
+    try { setCheck(await adminCheckAssistant()); status.reload(); }
+    catch (e) { setCheck({ ok: false, millis: 0, error: e instanceof ApiError ? e.message : t("a.err.generic"), reply: null }); }
+    finally { setChecking(false); }
+  }
   if (status.loading && !status.data) return <Skeleton height={160} />;
   if (status.error || !status.data) return <Alert tone="danger">{status.error?.message ?? t("a.err.generic")}</Alert>;
   const s = status.data;
@@ -57,7 +65,18 @@ function Status() {
         <div><dt>{t("a.as.model")}</dt><dd>{s.model} <Badge tone={s.aiConfigured ? "success" : "danger"}>{t(s.aiConfigured ? "a.as.keySet" : "a.as.keyMissing")}</Badge></dd></div>
         <div><dt>{t("a.as.where")}</dt><dd>{s.endpointHost ?? "—"}</dd></div>
         <div><dt>{t("a.as.week")}</dt><dd>{answers.length === 0 ? "—" : answers.map(([k, n]) => `${t(k === "llm" ? "a.ng.byAi" : k === "rules-fallback" ? "a.ng.byFallback" : "a.ng.byRules")}: ${n}`).join(" · ")}</dd></div>
+        <div><dt>{t("a.as.lastOk")}</dt><dd>{s.lastAiOkAt ? formatDateTime(s.lastAiOkAt) : "—"}</dd></div>
       </dl>
+      {s.lastAiError && (!s.lastAiOkAt || (s.lastAiErrorAt && s.lastAiErrorAt > s.lastAiOkAt)) && (
+        <Alert tone="danger"><strong>{t("a.as.lastError", { when: s.lastAiErrorAt ? formatDateTime(s.lastAiErrorAt) : "" })}</strong><br />{s.lastAiError}<br /><span className="av-small">{t("a.as.fallbackNote")}</span></Alert>
+      )}
+      <div className="av-row">
+        <Button variant="secondary" loading={checking} disabled={!s.aiConfigured} onClick={() => void runCheck()}>{t("a.as.check")}</Button>
+        {check && (check.ok
+          ? <span className="av-small" role="status">✓ {t("a.as.checkOk", { ms: check.millis })}</span>
+          : <span className="av-small av-error" role="alert">{check.error}</span>)}
+      </div>
+      {check?.ok && check.reply && <p className="av-small av-muted">“{check.reply}”</p>}
     </section>
   );
 }

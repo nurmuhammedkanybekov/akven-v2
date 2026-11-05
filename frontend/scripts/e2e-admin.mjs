@@ -86,7 +86,11 @@ try {
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL(`${BASE}/admin`);
     await page.getByRole("heading", { name: "Products" }).waitFor();
+    // newest first by default; by name, the alphabet's early socks come first
+    await page.locator(".av-prodcell").first().waitFor();
+    await page.getByLabel("Order").selectOption("name");
     await page.getByText("Bazaar Family Pack").first().waitFor();
+    await page.getByLabel("Order").selectOption("newest");
     await shot("admin-products", { fullPage: false });
   });
 

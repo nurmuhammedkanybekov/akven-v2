@@ -1270,6 +1270,19 @@ const shop: Partial<Record<MessageKey, string>> = {
   "a.od.collected": "Выдан в контейнере",
   "a.od.sent": "Отправлен",
   "a.od.cancelledStep": "Отменён, деньги возвращены",
+  "a.as.lastOk": "Последний ответ ИИ",
+  "a.as.lastError": "ИИ не ответил {when}",
+  "a.as.fallbackNote": "Покупатели всё равно получили ответ: сработали встроенные правила. Исправьте причину и нажмите «Проверить связь».",
+  "a.as.check": "Проверить связь",
+  "a.as.checkOk": "ИИ ответил за {ms} мс.",
+  "a.ac.whoCan": "Кто что может",
+  "a.ac.can.products": "Носки, склад, разделы, отзывы",
+  "a.ac.can.orders": "Заказы, выдача, опт, письма",
+  "a.ac.can.prices": "Цены, пределы скидок, зоны доставки",
+  "a.ac.can.people": "Покупатели, контакты, контейнер, размеры",
+  "a.ac.can.system": "Аккаунты, ИИ-помощник, журнал изменений",
+  "a.ac.yes": "да",
+  "a.ac.no": "нет",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

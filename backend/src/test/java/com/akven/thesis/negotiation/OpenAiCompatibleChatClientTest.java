@@ -96,4 +96,12 @@ class OpenAiCompatibleChatClientTest {
         busyAnswers.set(2);
         assertThatThrownBy(() -> client("k", Duration.ofSeconds(5)).complete("s", "u")).isInstanceOf(IOException.class).hasMessageContaining("429");
     }
+
+    @Test
+    void anErrorSaysWhatToFixInPlainWords() {
+        assertThat(OpenAiCompatibleChatClient.explain(401, "m")).contains("HTTP 401").contains("LLM_API_KEY");
+        assertThat(OpenAiCompatibleChatClient.explain(404, "gemini-x")).contains("\"gemini-x\" was not found").contains("LLM_MODEL");
+        assertThat(OpenAiCompatibleChatClient.explain(429, "m")).contains("quota");
+        assertThat(OpenAiCompatibleChatClient.explain(503, "m")).contains("on its side");
+    }
 }
