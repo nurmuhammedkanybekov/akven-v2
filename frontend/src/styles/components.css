@@ -498,7 +498,10 @@ body.av-locked { overflow: hidden; }
 @media (hover: none) { .av-quick { opacity: 1; transform: none; left: auto; padding: .45rem .8rem; font-size: .8125rem; } }
 @media (prefers-reduced-motion: reduce) { .av-quick { transition: none; } }
 .av-qv { width: min(58rem, calc(100vw - 1.5rem)); max-height: calc(100svh - 1.5rem); overflow-y: auto; overscroll-behavior: contain; }
-@media (max-width: 719px) { .av-qv__media { aspect-ratio: 1 / 1; max-height: 42svh; margin-inline: auto; } .av-qv__info { padding-top: 0; } }
+/* Phone: a square picture as wide as it can be within 46% of the screen height. The width is set outright; with only
+   aspect-ratio, max-height and auto margins, Safari shrank the box to its content and the sock all but vanished. */
+@media (max-width: 719px) { .av-qv__media { aspect-ratio: 1 / 1; width: min(100%, 46svh); max-height: none; justify-self: center; margin-inline: 0; }
+  .av-qv__media img, .av-qv__media .av-imgplaceholder { display: block; } .av-qv__info { padding-top: 0; } }
 .av-qv form { position: relative; padding: clamp(1rem, 3vw, 2rem); }
 .av-qv__close { position: absolute; top: .75rem; right: .75rem; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; cursor: pointer; background: var(--surface-2); color: var(--ink); }
 .av-qv__close svg { width: 20px; height: 20px; }

@@ -32,18 +32,18 @@ afterEach(() => localStorage.clear());
 
 describe("customer-facing errors from the server", () => {
   it("read in English by their code, with the values put back in", () => {
-    expect(inLanguage("en")).toEqual(["Only 4 left of Ala-Too Ankle.", "Your bank declined the payment. You have not been charged.",
-      "Fill this in.", "That does not look like an email: it needs an @ and a domain, like name@mail.com.", "A free area needs no free-from amount."]);
+    expect(inLanguage("en")).toEqual(["Only 4 left of Ala-Too Ankle.", "Your bank declined the payment. You haven't been charged.",
+      "Fill this in.", "That doesn't look like an email. It needs an @ and a domain, like name@mail.com.", "A free area needs no free-from amount."]);
   });
 
   it("read in Russian, and an error without a code keeps the server's sentence", () => {
-    expect(inLanguage("ru")).toEqual(["Ala-Too Ankle: осталось только 4.", "Ваш банк отклонил платёж. Деньги не списаны.",
-      "Заполните это поле.", "Это не похоже на адрес почты: нужен знак @ и домен, например name@mail.com.", "A free area needs no free-from amount."]);
+    expect(inLanguage("ru")).toEqual(["Ala-Too Ankle: осталось только 4.", "Банк отклонил платёж. Деньги не списаны.",
+      "Заполните это поле.", "Это не похоже на email: нужны @ и домен, например name@mail.com.", "A free area needs no free-from amount."]);
   });
 
   it("read in Kyrgyz", () => {
-    expect(inLanguage("ky")).toEqual(["Ala-Too Ankle: болгону 4 калды.", "Банкыңыз төлөмдү четке какты. Акча алынган жок.",
-      "Бул талааны толтуруңуз.", "Бул эл. почтага окшобойт: @ белгиси жана домен керек, мисалы name@mail.com.", "A free area needs no free-from amount."]);
+    expect(inLanguage("ky")).toEqual(["Ala-Too Ankle: болгону 4 калды.", "Банк төлөмдү четке какты. Акча алынган жок.",
+      "Бул талааны толтуруңуз.", "Бул email'ге окшобойт: @ жана домен керек, мисалы name@mail.com.", "A free area needs no free-from amount."]);
   });
 
   it("fall back to the server's sentence for a code the shop does not know yet", () => {

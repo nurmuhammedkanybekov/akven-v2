@@ -55,7 +55,7 @@ describe("sign-in form", () => {
     await waitFor(() => expect(screen.getByLabelText("Email")).toHaveFocus());
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "nur@mail" } });
     fireEvent.click(button);
-    expect(await screen.findByText(/does not look like an email/)).toBeInTheDocument();
+    expect(await screen.findByText(/doesn't look like an email/)).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

@@ -26,10 +26,16 @@ export function FittingTeaser() {
   return (
     <section className="av-block av-ftease" id="fitting" aria-labelledby="ftease-title" data-reveal>
       <div className="av-container av-ftease__grid">
-        <div className="av-ftease__copy">
+        <div className="av-ftease__copy av-ftease__head">
           <span className="av-hand">{t("fr.eyebrow")}</span>
           <h2 id="ftease-title">{t("fr.title")}</h2>
           <p className="av-lead">{t("ft.lead")}</p>
+        </div>
+        {/* On a phone the leg sits between the title and the choices, so a tap and its result are on screen together. */}
+        <div className="av-ftease__stage">
+          <Stage spec={{ ...SAMPLE[who], cut }} shoe="trainers" skin={SKIN[who]} cut={cut} shoesOn trousers="#2b3448" />
+        </div>
+        <div className="av-ftease__copy av-ftease__controls">
           <fieldset className="av-ftease__step">
             <legend>{t("fr.who")}</legend>
             <div className="av-fr__chips">
@@ -59,9 +65,6 @@ export function FittingTeaser() {
             <Button to={`/fitting?who=${who}&cut=${cut}`}>{t("ft.open")} →</Button>
           </div>
           <p className="av-small av-muted">{t("ft.more")}</p>
-        </div>
-        <div className="av-ftease__stage">
-          <Stage spec={{ ...SAMPLE[who], cut }} shoe="trainers" skin={SKIN[who]} cut={cut} shoesOn trousers="#2b3448" />
         </div>
       </div>
     </section>

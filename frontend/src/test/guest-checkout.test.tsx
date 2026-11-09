@@ -85,7 +85,7 @@ describe("a guest's order page", () => {
     await user.type(screen.getByLabelText("Email"), "aida@example.com");
     await user.type(screen.getByLabelText(/Order number/), "av-22222222");
     await user.click(screen.getByRole("button", { name: "Email me the link" }));
-    expect(await screen.findByText(/If AV-22222222 was ordered with that email, its link is on its way/)).toBeInTheDocument();
+    expect(await screen.findByText(/If AV-22222222 was ordered with that email, its link is on the way/)).toBeInTheDocument();
     expect(calls.find((c) => c.url === "/api/orders/find")!.body).toEqual({ email: "aida@example.com", reference: "AV-22222222" });
   });
 });

@@ -30,7 +30,7 @@ describe("languages", () => {
 
   it("switches language, fills in numbers, sets the page language and remembers the choice", async () => {
     render(<I18nProvider><LanguageSwitch /><Hello /></I18nProvider>);
-    expect(screen.getByText("for the whole family. · Add 4 more pairs to save 5% on every pair.")).toBeInTheDocument();
+    expect(screen.getByText("for the whole family. · Add 4 more pairs and every pair gets 5% cheaper.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Кыргызча" }));
     expect(screen.getByText(/бүт үй\u2011бүлө үчүн\./u)).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("ky");

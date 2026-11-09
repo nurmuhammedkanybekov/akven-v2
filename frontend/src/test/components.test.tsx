@@ -105,7 +105,7 @@ describe("ProductCard", () => {
   it("shows what a pair costs in a pack, but not for a gift box", () => {
     const pack = { ...SAMPLE_PRODUCTS[0], category: "KIDS" as const, minPrice: 11, minPairPrice: 3.67 };
     const { unmount } = render(<ProductCard product={pack} to="/x" />);
-    expect(screen.getByText("$3.67 a pair in a pack")).toBeInTheDocument();
+    expect(screen.getByText("$3.67 a pair in packs")).toBeInTheDocument();
     unmount();
     render(<ProductCard product={{ ...pack, category: "BUNDLES" }} to="/x" />);
     expect(screen.queryByText(/a pair/)).not.toBeInTheDocument();

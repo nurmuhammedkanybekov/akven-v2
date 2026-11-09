@@ -30,7 +30,7 @@ it("says plainly that payments are not set up when the shop runs without demo mo
         <Routes><Route path="/checkout" element={<CheckoutPage />} /></Routes>
       </CartProvider></ToastProvider></AuthProvider>
     </MemoryRouter>);
-  expect(await screen.findByText(/Online payment is not set up in this shop yet/)).toBeInTheDocument();
+  expect(await screen.findByText(/Online payment isn't set up yet/)).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /Pay with Apple Pay/ })).not.toBeInTheDocument();
   expect(screen.getByRole("link", { name: /send your order to the family as a message/ })).toHaveAttribute("href", "/cart");
   expect(urls).not.toContain("/api/orders");

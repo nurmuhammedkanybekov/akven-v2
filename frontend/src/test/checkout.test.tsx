@@ -206,7 +206,7 @@ describe("checkout", () => {
   it("does not let you pay while something in the bag is unavailable", async () => {
     mockServer(() => json({ ...QUOTE_OK, canCheckout: false, lines: [{ ...QUOTE_OK.lines[0], problem: "SOLD_OUT", note: "Sold out." }] }));
     renderCheckout();
-    await screen.findByText(/Something in your bag changed/);
+    await screen.findByText(/Your bag has changed/);
     expect(screen.getByRole("button", { name: "Pay with Apple Pay" })).toBeDisabled();
   });
 });
@@ -229,7 +229,7 @@ describe("the bag page", () => {
   it("shows the saved bag with a notice when the server cannot be reached", async () => {
     mockServer(() => new TypeError("offline"));
     renderCart();
-    expect(await screen.findByText(/Looks like you.re offline/)).toBeInTheDocument();
+    expect(await screen.findByText(/Your bag is safe/)).toBeInTheDocument();
     expect(screen.getByText("Mid-Long Sock")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Check out" })).toBeDisabled();
   });
@@ -237,7 +237,7 @@ describe("the bag page", () => {
   it("tells the shopper when a price changed since they added the item", async () => {
     mockServer(() => json({ ...QUOTE_OK, lines: [{ ...QUOTE_OK.lines[0], unitPrice: 11, listPrice: 11, lineTotal: 22 }], total: 22 }));
     renderCart();
-    expect(await screen.findByText(/Price is now \$11\.00 \(it was \$9\.50 when you added it\)/)).toBeInTheDocument();
+    expect(await screen.findByText(/Now \$11\.00 \(it was \$9\.50 when you added it\)/)).toBeInTheDocument();
   });
 
   it("shows an empty state, not an error, for an empty bag", () => {
