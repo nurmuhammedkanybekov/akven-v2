@@ -46,7 +46,7 @@ describe("instant search", () => {
     render(<MemoryRouter><SearchOverlay open onClose={() => undefined} /><Where /></MemoryRouter>);
     const user = userEvent.setup();
     await user.type(screen.getByRole("combobox"), "wool");
-    await screen.findByText(/Nothing found for “wool”/);
+    await screen.findByText(/No socks match “wool”/);
     await user.keyboard("{Enter}");
     expect(screen.getByTestId("where").textContent).toBe("/shop?q=wool");
   });

@@ -1132,10 +1132,18 @@ body::before {
 .av-ftease .av-fr__advice { max-width: 34rem; }
 .av-ftease__stage .av-fr__stage { max-width: 30rem; margin-inline: auto; }
 .av-ftease__stage .av-fr__svg { width: min(100%, 280px); }
+/* Desktop: the title and the choices on the left, the leg on the right across both rows. */
+@media (min-width: 900px) {
+  .av-ftease__grid { grid-template-areas: "head stage" "controls stage"; row-gap: var(--space-5); }
+  .av-ftease__head { grid-area: head; align-self: end; }
+  .av-ftease__controls { grid-area: controls; align-self: start; }
+  .av-ftease__stage { grid-area: stage; }
+}
+/* Phone: title, then a compact leg, then the choices, so what a tap changes is in view. */
 @media (max-width: 899px) {
-  .av-ftease__stage { order: -1; }
-  .av-ftease__stage .av-fr__stage { padding-block: var(--space-3) var(--space-2); }
-  .av-ftease__stage .av-fr__svg { width: min(100%, 210px); }
+  .av-ftease__grid { gap: var(--space-4); }
+  .av-ftease__stage .av-fr__stage { padding-block: var(--space-2) var(--space-1); }
+  .av-ftease__stage .av-fr__svg { width: min(100%, 165px); }
 }
 
 /* Gift box and family set, side by side: two cards, each wholly a link to where it is built. */
@@ -1608,3 +1616,28 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
 .av-pagein { animation: av-pagein 0.32s ease-out; }
 @keyframes av-pagein { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .av-pagein { animation: none; } }
+
+/* Touch screens: every link and control gets a finger-sized target (about 44px), measured by the phone sweep.
+   Small round controls keep their look and get an invisible larger hit area around them. */
+@media (pointer: coarse), (max-width: 719px) {
+  .av-footer nav a, .av-footer li > a, .av-crumbs a, .av-duo__also, .av-whole3__more { display: inline-flex; align-items: center; min-height: 44px; }
+  .av-footer li { line-height: 1.2; }
+  details > summary { min-height: 44px; display: flex; align-items: center; }
+  .av-header__logo { min-height: 44px; display: inline-flex; align-items: center; }
+  .av-duo__link { min-height: 44px; display: inline-flex; align-items: center; }
+  .av-swatch, .av-fr__dot, .av-fr__skin { position: relative; }
+  .av-swatch::after, .av-fr__dot::after, .av-fr__skin::after { content: ""; position: absolute; inset: -9px; border-radius: 50%; }
+}
+@media (pointer: coarse), (max-width: 719px) {
+  .av-footer__contact { min-height: 44px; display: inline-flex; align-items: center; }
+  .av-footer nav a, .av-footer li > a { padding-inline: 6px; margin-inline: -6px; }
+  .av-footer button { min-height: 44px; min-width: 44px; }
+}
+/* Phone footer: the stall's door above its details, and "Closed now" never broken across two lines. */
+@media (max-width: 599px) {
+  .av-footer__stall { grid-template-columns: 1fr; justify-items: start; padding-inline: 0; }
+  .av-footer__stall > :first-child:not(.av-footer__stallinfo) { width: 6.5rem; }
+}
+.av-footer .av-open strong, .av-footer .av-open > span { white-space: nowrap; }
+.av-footer .av-open { flex-wrap: wrap; row-gap: 2px; }
+.av-crumbs { align-items: center; }

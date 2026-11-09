@@ -132,7 +132,7 @@ export function WholesalePage() {
             <div><dt>2018</dt><dd>{t("whole.f1")}</dd></div>
             <div><dt>10–12</dt><dd>{t("whole.f2")}</dd></div>
             <div><dt>~240</dt><dd>{t("whole.f3")}</dd></div>
-            <div><dt>KG · KZ · UZ · RU</dt><dd>{t("whole.f4")}</dd></div>
+            <div><dt>4</dt><dd>{t("whole.f4")}</dd></div>
           </dl>
         </div>
       </section>

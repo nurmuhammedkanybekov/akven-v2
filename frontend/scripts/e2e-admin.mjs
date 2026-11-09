@@ -92,7 +92,7 @@ try {
     await page.getByLabel("Email").fill("admin@akven.test");
     await page.getByLabel("Password").fill("wrong-password");
     await page.getByRole("button", { name: "Sign in" }).click();
-    await page.getByText("That email and password do not match.").waitFor();
+    await page.getByText("That email and password don't match.").waitFor();
   });
   await step("the admin signs in and lands on the product list", async () => {
     await page.getByLabel("Password").fill("changeme-admin");
@@ -211,7 +211,7 @@ try {
     await page.getByRole("button", { name: "Remove it" }).click();
     await page.getByText("This product is hidden from the shop.").waitFor();
     await page.goto(productUrl);
-    await page.getByText("That product is not here").waitFor();
+    await page.getByText("That sock isn't here").waitFor();
     await page.goBack();
     await page.getByRole("button", { name: "Put back in the shop" }).click();
     await page.getByRole("button", { name: "Remove from the shop" }).waitFor();
@@ -299,7 +299,7 @@ try {
     await page.getByRole("button", { name: "Pay with Apple Pay (demo)" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Pay $19.00" }).click();
     await page.waitForURL(/\/orders\/[0-9a-f-]{36}/);
-    await page.getByText(/Thank you! Your order AV-[0-9A-F]{8} is paid/).waitFor();
+    await page.getByText(/Thank you! Order AV-[0-9A-F]{8} is paid/).waitFor();
     await page.getByText("Paid", { exact: true }).first().waitFor();
     // help is one tap away, with the order's reference already written into the message
     const ref = (await page.getByRole("heading", { level: 1 }).innerText()).match(/AV-[0-9A-F]{8}/)[0];
@@ -614,7 +614,7 @@ try {
     await a11y("the account page");
     await page.goto(`${BASE}/women`);
     await page.locator(".av-card").first().click();
-    await page.getByText(/this shelf fits: Venera \(38\)/).waitFor();
+    await page.getByText(/Fits your family: Venera \(38\)/).waitFor();
     await page.goto(`${BASE}/gift?for=Venera`);
     await page.getByLabel("Red").first().check();
     await page.getByLabel("Your words").fill("Happy birthday!");
@@ -687,7 +687,7 @@ try {
     await page.getByRole("dialog").getByRole("button", { name: /^Pay \$/ }).click();
     await page.waitForURL(/\/orders\/[0-9a-f-]{36}#t=[A-Za-z0-9_-]{20,}$/);
     await page.getByText(/This page is your order's private link/).waitFor();
-    await page.getByText(/Thank you! Your order AV-[0-9A-F]{8} is paid/).waitFor();
+    await page.getByText(/Thank you! Order AV-[0-9A-F]{8} is paid/).waitFor();
     await a11y("a guest's order page");
     await shot("shop-order-guest");
     const link = page.url();
@@ -700,7 +700,7 @@ try {
     await p2.getByLabel("Email", { exact: true }).fill(guestEmail);
     await p2.getByLabel(/Order number/).fill(ref.toLowerCase());
     await p2.getByRole("button", { name: "Email me the link" }).click();
-    await p2.getByText(new RegExp(`If ${ref} was ordered with that email, its link is on its way`)).waitFor();
+    await p2.getByText(new RegExp(`If ${ref} was ordered with that email, its link is on the way`)).waitFor();
     await p2.goto(link);                                                 // the key opens it on any device
     await p2.getByRole("heading", { level: 1, name: new RegExp(ref) }).waitFor();
     await elsewhere.close();
@@ -716,6 +716,7 @@ try {
   const said = await page.evaluate(() => `${location.pathname}${location.search}\n${document.body.innerText.slice(0, 600)}`).catch(() => "");
   if (said) console.error(`\nThe page at that moment: ${said.replace(/\n+/g, " | ")}`);
   if (failedCalls.length) console.error("\nFailed network calls:\n  " + failedCalls.join("\n  "));
+  if (problems.length) console.error("\nWhat the browser reported:\n  " + problems.join("\n  "));
   console.error("\nFAILED:", e.message, "\n(screenshot: frontend/browser-failures/e2e-failure.png)");
   process.exitCode = 1;
 } finally {
