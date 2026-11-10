@@ -13,7 +13,7 @@ const PATCHES: Array<[number, number, number, number, string]> = [
 ];
 
 /**
- * Two crafts, one pair: Korea wraps gifts in bojagi (cloth sewn from patches), Kyrgyzstan lays shyrdak (felt cut into
+ * Korea and Kyrgyzstan: Korea wraps gifts in bojagi (cloth sewn from patches), Kyrgyzstan lays shyrdak (felt cut into
  * ram's horns). Between them the route a pair travels, about 4,400 km from the mills to the stall, which a sock flies
  * along as the section arrives; the patches settle in one by one and the horns are drawn. And one word in both
  * languages: 양말 and байпак both mean socks.
