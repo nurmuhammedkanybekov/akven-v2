@@ -61,6 +61,11 @@ Then follow the steps below unchanged, with `your-domain` = `yourname.duckdns.or
    - `SPRING_PROFILES_ACTIVE=demo` for the public demo, or `SPRING_PROFILES_ACTIVE=prod` for the shop. Docker Compose
      starts in demo mode when this is missing, so the real shop must say `prod` (any value but `demo` works);
    - `AKVEN_BIND=127.0.0.1` (the default): only Caddy, on the same server, reaches the shop.
+   - Paying at handover (reserve online, pay in cash or by bank app at the stall or to the courier) is on by default
+     and needs no payment provider; `AKVEN_PAYMENTS_PAYATHANDOVER=false` turns it off.
+     `AKVEN_ORDERS_RESERVATIONHOURS` (48) is how long a reservation holds its pairs, and
+     `AKVEN_ORDERS_RESERVEMAXPAIRS` (60) the most pairs one reservation may hold. These three are read by the backend
+     container, so pass them through `docker-compose.yml` if you change them (the checkout text says 48 hours).
 5. **Start:** `docker compose up -d --build`, then `docker compose ps` until all three services are healthy.
 6. **HTTPS:** install Caddy (caddyserver.com/docs/install), copy [`deploy/Caddyfile`](../deploy/Caddyfile) to
    `/etc/caddy/Caddyfile`, put your domain in it and `sudo systemctl reload caddy`. Caddy gets the certificate itself.

@@ -90,12 +90,12 @@ sends a strict Content-Security-Policy (only this site's own scripts, styles, im
 
 | What | Command | Notes |
 |---|---|---|
-| Backend, in-memory database | `cd backend && mvn verify` | About 165 tests against H2 (no Postgres needed), plus a coverage check that fails the build below 80% line coverage. Report: `backend/target/site/jacoco/index.html` |
+| Backend, in-memory database | `cd backend && mvn verify` | 284 tests against H2 (no Postgres needed; the 11 PostgreSQL ones are skipped there), plus a coverage check that fails the build below 80% line coverage. Report: `backend/target/site/jacoco/index.html` |
 | Backend, real PostgreSQL | `AKVEN_PG_URL=jdbc:postgresql://localhost:5432/akven_it mvn test -Dtest=PostgresIntegrationTest` | Needs an **empty** database. Checks Flyway, schema validation, database constraints, and the last-pair and double-click races over real HTTP |
 | Frontend | `cd frontend && npx tsc --noEmit && npm test && npm run build` | Type check, about 135 component and logic tests (including contrast and translation checks), production build |
 | Whole system in a browser | `cd frontend && npm run e2e` | Needs the backend running on a fresh demo database. Walks the owner's, the staff's and the customer's journeys in a real browser, switches the site to Russian and Kyrgyz, and runs accessibility rules on every public page and owner screen |
 
-Current backend line coverage is about 97% overall, and about 97% on the entity classes (the model layer).
+Current backend line coverage is 96.1% overall (JaCoCo, measured on 10 November 2026).
 
 ## Continuous integration
 
