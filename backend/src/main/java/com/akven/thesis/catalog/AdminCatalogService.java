@@ -366,7 +366,7 @@ public class AdminCatalogService {
     }
 
     private static void requireCurrentVersion(Variant variant, Integer expected) {
-        if (expected != null && !expected.equals(variant.getVersion())) {
+        if (!expected.equals(variant.getVersion())) {
             throw new ConflictException("This variant was changed by someone else. Reload it and try again.");
         }
     }
