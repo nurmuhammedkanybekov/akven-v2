@@ -948,8 +948,8 @@ const shop = {
   "foot.p1s": "We keep it ready for you at the stall",
   "foot.p2": "Delivery to KG, KZ, UZ and RU",
   "foot.p2s": "Price and time shown at checkout",
-  "foot.p3": "Pay with your phone",
-  "foot.p3s": "Apple Pay or Google Pay; we never see your card",
+  "foot.p3": "Pay the way you like",
+  "foot.p3s": "Cash or bank app when you collect, or Apple Pay and Google Pay",
   "foot.p4": "The more pairs, the lower the price",
   "foot.p4s": "Mix any socks to reach a step",
   "foot.account": "You",
@@ -1375,6 +1375,16 @@ const shop = {
   "od.stepPaidDelivered": "Paid and delivered",
   "api.RESERVE_TOO_BIG": "To pay at handover, reserve up to {n} pairs. For more, send a wholesale request.",
   "nav.findSize": "Find your size",
+  "desc.shop": "All our Korean-made socks for men, women and kids, from container 70-E at Dordoi Bazaar. Mix any pairs: the more you take, the less each costs.",
+  "desc.men": "Men's socks made in Korea: office, sport and warm thermal pairs, chosen at Dordoi. Pick up at container 70-E or get them delivered.",
+  "desc.women": "Women's socks made in Korea: lace edges, soft crews, yoga grip and knee-highs, chosen at Dordoi. Pick up at container 70-E or get them delivered.",
+  "desc.kids": "Kids' socks made in Korea, from newborn sizes up: soft, colourful and hard-wearing, with grip for small feet. From container 70-E at Dordoi.",
+  "desc.gifts": "Sock gift sets and boxes you fill yourself, packed by hand at the stall with your card. For holidays, birthdays and whole teams.",
+  "desc.story": "AK&VEN is Akylbek and Venera: a family selling Korean socks at Dordoi Bazaar in Bishkek since 2018. Our story and our stall.",
+  "desc.visit": "Find container 70-E at Dordoi Bazaar, Bishkek: opening hours, how to get there, pickup with your code, and delivery across the region.",
+  "desc.wholesale": "Wholesale Korean socks by the case for shops in Kyrgyzstan, Kazakhstan, Uzbekistan and Russia. See what is in stock and ask for a quote.",
+  "desc.sizes": "Find your sock size from your shoe size, for every age, and see how high each sock sits on the leg before you buy.",
+  "desc.family": "Plan socks for the whole family: add everyone with their shoe size, and we work out each size and the price for the set.",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

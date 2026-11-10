@@ -1,4 +1,5 @@
 import { useLocation } from "react-router-dom";
+import { usePageDescription } from "../hooks/usePageMeta";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { useT } from "../i18n/I18n";
 import { en, type MessageKey } from "../i18n/en";
@@ -10,7 +11,13 @@ const SHOP: Record<string, MessageKey> = {
   "/orders": "nav.orders", "/fitting": "nav.fitting", "/family": "nav.family",
 };
 
-/** Names the tab after the page. A product page names it after the product itself (ProductPage). */
+/** What search engines show under each main page's title (a product page writes its own from the product). */
+const DESCRIPTION: Record<string, MessageKey> = {
+  "/shop": "desc.shop", "/men": "desc.men", "/women": "desc.women", "/kids": "desc.kids", "/bundles": "desc.gifts", "/gifts": "desc.gifts",
+  "/story": "desc.story", "/visit": "desc.visit", "/wholesale": "desc.wholesale", "/sizes": "desc.sizes", "/fitting": "desc.sizes", "/family": "desc.family",
+};
+
+/** Names the tab after the page, and describes the main pages. A product page names it after the product itself (ProductPage). */
 export function RouteTitle() {
   const { t } = useT();
   const path = useLocation().pathname.replace(/\/+$/, "") || "/";
@@ -22,5 +29,6 @@ export function RouteTitle() {
   } else if (path.startsWith("/orders/")) key = "nav.orders";
   else if (path !== "/" && !path.startsWith("/products/")) key = SHOP[path] ?? "title.notFound";
   usePageTitle(path.startsWith("/products/") ? undefined : key ? t(key) : null);
+  usePageDescription(DESCRIPTION[path] ? t(DESCRIPTION[path]) : null);
   return null;
 }
