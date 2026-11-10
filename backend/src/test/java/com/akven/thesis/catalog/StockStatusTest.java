@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 class StockStatusTest extends IntegrationTest {
 
+    @Autowired private VariantRepository variants;
     @Autowired private OrderTestData data;
     @Autowired private ShopPolicyRepository policies;
     @Autowired private AuditLogRepository auditLog;
@@ -44,8 +45,9 @@ class StockStatusTest extends IntegrationTest {
         return json(getJson("/api/products/" + slug, null).andExpect(status().isOk())).get("variants").get(0);
     }
 
-    private Map<String, Object> supply(Integer casePairs, int incoming, LocalDate eta) {
+    private Map<String, Object> supply(Variant v, Integer casePairs, int incoming, LocalDate eta) {
         Map<String, Object> m = new HashMap<>();
+        m.put("version", variants.findById(v.getId()).orElseThrow().getVersion());
         m.put("casePairs", casePairs);
         m.put("incomingQty", incoming);
         m.put("restockEta", eta == null ? null : eta.toString());
@@ -70,7 +72,7 @@ class StockStatusTest extends IntegrationTest {
     @Test
     void soldOutWithStockOnTheWayIsComingSoonWithTheDaysLeft() throws Exception {
         Variant v = data.variant(0);
-        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", tokenFor(Role.STAFF), supply(250, 120, TODAY.plusDays(12)))
+        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", tokenFor(Role.STAFF), supply(v, 250, 120, TODAY.plusDays(12)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.incomingQty").value(120))
                 .andExpect(jsonPath("$.casePairs").value(250));
@@ -106,13 +108,13 @@ class StockStatusTest extends IntegrationTest {
     void impossibleSupplyIsRefused() throws Exception {
         Variant v = data.variant(0);
         String staff = tokenFor(Role.STAFF);
-        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", staff, supply(null, 10, TODAY.minusDays(3)))
+        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", staff, supply(v, null, 10, TODAY.minusDays(3)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("The arrival date cannot be in the past."));
-        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", staff, supply(null, 0, TODAY.plusDays(3)))
+        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", staff, supply(v, null, 0, TODAY.plusDays(3)))
                 .andExpect(status().isBadRequest());
-        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", staff, supply(0, 0, null)).andExpect(status().isBadRequest());
-        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", tokenFor(Role.CUSTOMER), supply(null, 1, null))
+        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", staff, supply(v, 0, 0, null)).andExpect(status().isBadRequest());
+        sendJson("PUT", "/api/admin/variants/" + v.getId() + "/supply", tokenFor(Role.CUSTOMER), supply(v, null, 1, null))
                 .andExpect(status().isForbidden());
     }
 

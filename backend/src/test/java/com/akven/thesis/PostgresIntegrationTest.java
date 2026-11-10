@@ -49,9 +49,10 @@ class PostgresIntegrationTest {
         assertThat(status("POST", "/api/auth/login", null,
                 "{\"email\":\"admin@akven.test\",\"password\":\"wrong-password\"}")).isEqualTo(401);
 
-        String variantId = call("GET", "/api/admin/products?q=Merino%20Dress&pageSize=1", staff, null)
-                .get("items").get(0).get("variants").get(0).get("id").asText();
-        String policy = "{\"costPrice\":2.50,\"marginFloorPct\":18}";
+        JsonNode variant = call("GET", "/api/admin/products?q=Merino%20Dress&pageSize=1", staff, null)
+                .get("items").get(0).get("variants").get(0);
+        String variantId = variant.get("id").asText();
+        String policy = "{\"costPrice\":2.50,\"marginFloorPct\":18,\"version\":" + variant.get("version").asInt() + "}";
         assertThat(status("PUT", "/api/admin/variants/" + variantId + "/pricing-policy", staff, policy)).isEqualTo(403);
         assertThat(status("PUT", "/api/admin/variants/" + variantId + "/pricing-policy", admin, policy)).isEqualTo(200);
 

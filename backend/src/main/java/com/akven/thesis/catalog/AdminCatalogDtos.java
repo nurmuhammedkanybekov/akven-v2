@@ -67,8 +67,8 @@ public final class AdminCatalogDtos {
 
     /**
      * STAFF and ADMIN: everything about a listing except cost and margin floor.
-     * version is optional; when sent it must match the current row, so an edit made on
-     * a stale screen is rejected with 409 instead of silently overwriting someone else's change.
+     * version is required and must match the current row, so an edit made on a stale screen (or after a sale
+     * changed the stock) is rejected with 409 instead of silently overwriting someone else's change.
      */
     public record UpdateVariantRequest(
             @Size(max = 32) String size, @Size(max = 64) String color,
@@ -77,7 +77,7 @@ public final class AdminCatalogDtos {
             @NotNull @PositiveOrZero BigDecimal price,
             @NotNull @PositiveOrZero Integer stockQty,
             @NotNull Boolean active,
-            Integer version) {}
+            @NotNull Integer version) {}
 
     /**
      * STAFF and ADMIN: what is on the way and when it arrives, and how many pairs make one wholesale case.
@@ -87,13 +87,13 @@ public final class AdminCatalogDtos {
             @Positive @jakarta.validation.constraints.Max(100000) Integer casePairs,
             @NotNull @PositiveOrZero Integer incomingQty,
             java.time.LocalDate restockEta,
-            Integer version) {}
+            @NotNull Integer version) {}
 
     /** ADMIN only: the two values the negotiation guardrail is built on (FR-11). */
     public record PricingPolicyRequest(
             @NotNull @PositiveOrZero BigDecimal costPrice,
             @NotNull @DecimalMin("0.00") @DecimalMax("100.00") BigDecimal marginFloorPct,
-            Integer version) {}
+            @NotNull Integer version) {}
 
     // ---- images -----------------------------------------------------------------------------
 

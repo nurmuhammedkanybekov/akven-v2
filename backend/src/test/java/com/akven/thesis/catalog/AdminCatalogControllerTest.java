@@ -93,7 +93,7 @@ class AdminCatalogControllerTest extends IntegrationTest {
         UUID variantId = UUID.fromString(variant.get("id").asText());
 
         // STAFF cannot touch cost or floor (FR-11), even on an existing variant.
-        PricingPolicyRequest policy = new PricingPolicyRequest(new BigDecimal("3.00"), new BigDecimal("40.00"), null);
+        PricingPolicyRequest policy = new PricingPolicyRequest(new BigDecimal("3.00"), new BigDecimal("40.00"), versionOf(variantId));
         sendJson("PUT", "/api/admin/variants/" + variantId + "/pricing-policy", staff, policy)
                 .andExpect(status().isForbidden());
         assertThat(floorOf(variantId)).isEqualByComparingTo("15.00");
@@ -115,7 +115,7 @@ class AdminCatalogControllerTest extends IntegrationTest {
         UUID variantId = createVariant(staff, tokenFor(Role.ADMIN), "staff-edit-product", "SE-1");
 
         sendJson("PUT", "/api/admin/variants/" + variantId, staff,
-                new UpdateVariantRequest("L", "Navy", "#1F2A44", 3, new BigDecimal("9.50"), 77, true, null))
+                new UpdateVariantRequest("L", "Navy", "#1F2A44", 3, new BigDecimal("9.50"), 77, true, versionOf(variantId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.price").value(9.50))
                 .andExpect(jsonPath("$.stockQty").value(77))
@@ -129,7 +129,7 @@ class AdminCatalogControllerTest extends IntegrationTest {
         UUID variantId = createVariant(staff, tokenFor(Role.ADMIN), "below-cost-product", "BC-1");
 
         sendJson("PUT", "/api/admin/variants/" + variantId, staff,
-                new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("3.99"), 10, true, null))
+                new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("3.99"), 10, true, versionOf(variantId)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Price cannot be lower than the cost price."));
     }
@@ -144,6 +144,18 @@ class AdminCatalogControllerTest extends IntegrationTest {
                 new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("8.00"), 10, true, 0)).andExpect(status().isOk());
         sendJson("PUT", "/api/admin/variants/" + variantId, staff,
                 new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("9.00"), 10, true, 0)).andExpect(status().isConflict());
+    }
+
+    @Test
+    void anEditWithoutTheVersionIsRefused() throws Exception {
+        String staff = tokenFor(Role.STAFF);
+        UUID variantId = createVariant(staff, tokenFor(Role.ADMIN), "no-version-product", "NV-1");
+
+        // Without the version the server cannot tell a fresh screen from a stale one, so it does not guess.
+        sendJson("PUT", "/api/admin/variants/" + variantId, staff,
+                new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("8.00"), 3, true, null))
+                .andExpect(status().isBadRequest());
+        assertThat(variantRepository.findById(variantId).orElseThrow().getStockQty()).isNotEqualTo(3);
     }
 
     @Test
@@ -216,11 +228,11 @@ class AdminCatalogControllerTest extends IntegrationTest {
         variantRepository.saveAndFlush(v);
 
         sendJson("PUT", "/api/admin/variants/" + variantId, staff,
-                new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("8.00"), 19, true, null))
+                new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("8.00"), 19, true, versionOf(variantId)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Stock cannot be set below the quantity already reserved (20)."));
         sendJson("PUT", "/api/admin/variants/" + variantId, staff,
-                new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("8.00"), 20, true, null))
+                new UpdateVariantRequest("M", "Black", null, 1, new BigDecimal("8.00"), 20, true, versionOf(variantId)))
                 .andExpect(status().isOk());
     }
 
@@ -477,6 +489,10 @@ class AdminCatalogControllerTest extends IntegrationTest {
 
     private BigDecimal floorOf(UUID variantId) {
         return variantRepository.findById(variantId).orElseThrow().getMarginFloorPct();
+    }
+
+    private Integer versionOf(UUID variantId) {
+        return variantRepository.findById(variantId).orElseThrow().getVersion();
     }
 
     @Test
