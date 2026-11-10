@@ -1,6 +1,5 @@
 // The shop in the engines the Chromium run cannot speak for: WebKit (Safari on iPhone and Mac) and Firefox, on a
-// phone-sized and a laptop-sized screen. A customer's path, in short: the home page and its fitting-room teaser, the
-// fitting room, a shelf, a sock into the bag, the bag, the sign-in form's own messages, and Russian. On every page:
+// phone-sized and a laptop-sized screen. A customer's path, in short: the home page, the fitting room, a shelf, a sock into the bag, the bag, the sign-in form's own messages, and Russian. On every page:
 // no script errors and nothing wider than the screen. Needs the backend on :8080 with the demo catalogue and
 // `npx playwright-core install webkit firefox` (CI does both); run with `npm run e2e:browsers`.
 import { chromium, firefox, webkit } from "playwright-core";
@@ -49,42 +48,39 @@ for (const [engineName, engine] of engines) {
       assert.ok(!clipped, "the top bar's message is cut off");
     };
 
-    await step("the home page, and the fitting room's teaser leads into the room with the same choices", async () => {
+    await step("the home page, and the fitting room answers the choices", async () => {
       await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
       await page.getByRole("heading", { name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
       await fits();
-      const teaser = page.locator("#fitting");
+      await page.goto(`${BASE}/fitting`, { waitUntil: "networkidle" });
+      await page.getByRole("heading", { level: 1, name: "Try them on before you buy" }).waitFor();
+      const room = page.locator("#fitting");
       // Choose like a person does, then check what the page made of it: the choice itself, then the advice it gives.
       const state = () => page.evaluate(() => ({
-        who: document.querySelector("#fitting input[name=ft-who]:checked")?.closest("label")?.textContent,
-        cut: document.querySelector("#fitting input[name=ft-cut]:checked")?.closest("label")?.textContent,
-        advice: document.querySelector("#fitting .av-fr__advice")?.textContent,
+        who: document.querySelector("#fitting input[name=fr-who]:checked")?.closest("label")?.textContent,
+        cut: document.querySelector("#fitting input[name=fr-cut]:checked")?.closest("label")?.textContent,
       }));
-      await teaser.scrollIntoViewIfNeeded();
-      // The site scrolls smoothly, so that scroll is still animating here. WebKit can call a chip "stable" between two
-      // frames of it and then click where the chip was a moment ago, so wait until the page stands still for a few frames.
+      await room.scrollIntoViewIfNeeded();
+      // The site scrolls smoothly, so that scroll may still be animating here. WebKit can call a chip "stable" between
+      // two frames of it and then click where the chip was a moment ago, so wait until the page stands still.
       await page.evaluate(() => new Promise((done) => {
         let last = -1, still = 0;
         const tick = () => { still = window.scrollY === last ? still + 1 : 0; last = window.scrollY; still >= 5 ? done() : requestAnimationFrame(tick); };
         requestAnimationFrame(tick);
       }));
       // The section people choose in must not slide under the pointer (a sliding chip once took the tap elsewhere in WebKit).
-      const moves = await teaser.evaluate((el) => getComputedStyle(el).transform);
-      assert.equal(moves, "none", `the teaser slides while it is being used (transform ${moves})`);
-      await teaser.locator("label", { hasText: /^Her$/ }).click();
+      const moves = await room.evaluate((el) => getComputedStyle(el).transform);
+      assert.equal(moves, "none", `the fitting room slides while it is being used (transform ${moves})`);
+      await room.locator("label", { hasText: /^Her$/ }).click();
       try {
-        await page.waitForFunction(() => document.querySelector("#fitting input[name=ft-who]:checked")?.closest("label")?.textContent === "Her", null, { timeout: 5000 });
+        await page.waitForFunction(() => document.querySelector("#fitting input[name=fr-who]:checked")?.closest("label")?.textContent === "Her", null, { timeout: 5000 });
       } catch { throw new Error(`the Her choice did not take: ${JSON.stringify(await state())}`); }
-      await teaser.locator("label", { hasText: /^Ankle/ }).click();
+      await room.locator("label", { has: page.getByRole("radio", { name: /^Ankle/ }) }).click();
       try {
-        await page.waitForFunction(() => document.querySelector("#fitting input[name=ft-cut]:checked")?.closest("label")?.textContent?.startsWith("Ankle"), null, { timeout: 5000 });
+        await page.waitForFunction(() => document.querySelector("#fitting input[name=fr-cut]:checked")?.closest("label")?.textContent?.startsWith("Ankle"), null, { timeout: 5000 });
       } catch { throw new Error(`the Ankle choice did not take: ${JSON.stringify(await state())}`); }
-      try { await teaser.getByText(/Ankle with sneakers/).waitFor({ timeout: 5000 }); }
+      try { await room.getByText(/Ankle with sneakers/).first().waitFor({ timeout: 5000 }); }
       catch { throw new Error(`Ankle is chosen but the advice did not follow: ${JSON.stringify(await state())}`); }
-      await teaser.getByRole("link", { name: /Open the fitting room/ }).click();
-      try { await page.waitForURL(/\/fitting\?who=WOMEN&cut=ankle/, { timeout: 10000 }); }
-      catch { throw new Error(`the fitting room opened at ${page.url()}, not with Her and Ankle`); }
-      await page.getByRole("heading", { level: 1, name: "Try them on before you buy" }).waitFor();
       await fits();
     });
 
@@ -114,7 +110,7 @@ for (const [engineName, engine] of engines) {
       await fits();
     });
 
-    await step("Russian, from the first paint, with the shelf filter bar inside the screen", async () => {
+    await step("Russian from the first paint, and the shelf fits the screen", async () => {
       await page.evaluate(() => localStorage.setItem("akven-lang", "ru"));
       await page.goto(`${BASE}/men`, { waitUntil: "networkidle" });
       await page.locator("h1").first().waitFor();
