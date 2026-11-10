@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Logo } from "../brand/Logo";
 import type { ImageView } from "../api/types";
 import { useT } from "../i18n/I18n";
@@ -27,6 +28,8 @@ export function stageFor(url: string): (typeof STAGES)[number] {
  */
 export function ProductImage({ image, eager }: { image: ImageView | null | undefined; eager?: boolean }) {
   const { t } = useT();
+  // The picture fades in over its paper or felt backdrop once it has arrived, instead of painting in strips.
+  const [ready, setReady] = useState<string | null>(null);
   if (!image) {
     return (
       <div className="av-imgplaceholder" role="img" aria-label={t("img.soon")}>
@@ -35,5 +38,12 @@ export function ProductImage({ image, eager }: { image: ImageView | null | undef
       </div>
     );
   }
-  return <img src={image.url} alt={image.alt} width={800} height={1000} loading={eager ? "eager" : "lazy"} decoding="async" data-kind={imageKind(image.url)} data-stage={stageFor(image.url)} />;
+  const url = image.url;
+  const done = () => setReady(url);
+  return (
+    <img src={url} alt={image.alt} width={800} height={1000} loading={eager ? "eager" : "lazy"} decoding="async"
+      data-kind={imageKind(url)} data-stage={stageFor(url)} data-ready={ready === url ? "1" : "0"}
+      ref={(el) => { if (el?.complete && el.naturalWidth > 0 && ready !== url) done(); }}
+      onLoad={done} onError={done} />
+  );
 }
