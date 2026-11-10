@@ -247,7 +247,6 @@ body::before {
 }
 
 /* Section labels in the shop are the family's handwriting, like the tags on their shelves. */
-.av-shopmain .av-eyebrow { font-family: var(--font-hand); font-size: 1.45rem; font-weight: 600; line-height: 1.05; letter-spacing: 0; display: inline-block; rotate: -1.5deg; transform-origin: left bottom; }
 .av-shopmain .av-dordoi .av-eyebrow, .av-shopmain .av-on-dark .av-eyebrow { color: var(--accent); }
 
 /* A drawn sock on a product card sways from its cuff when you point at it, as if it hung on the line. */
@@ -649,7 +648,8 @@ body::before {
 .av-ladderstrip__inner { position: relative; display: grid; gap: var(--space-5); align-items: center; }
 @media (min-width: 960px) { .av-ladderstrip__inner { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto; gap: var(--space-7); } }
 .av-ladderstrip__copy { display: grid; gap: var(--space-2); }
-.av-ladderstrip__copy .av-hand { color: var(--accent); font-size: 1.5rem; }
+.av-ladderstrip__copy :is(.av-hand, .av-eyebrow) { color: var(--accent); }
+.av-ladderstrip__copy .av-hand { font-size: 1.5rem; }
 .av-ladderstrip h2 { color: var(--on-black); font-size: clamp(1.8rem, 1.3rem + 1.6vw, 2.8rem); }
 .av-ladderstrip p { margin: 0; color: var(--on-black-2); max-width: 44ch; }
 .av-ladderstrip__steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-4); }
@@ -669,7 +669,8 @@ body::before {
 }
 @media (min-width: 900px) { .av-whole3__hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
 .av-whole3__copy { display: grid; gap: var(--space-4); justify-items: start; position: relative; z-index: 1; }
-.av-whole3__copy .av-hand { color: var(--accent); font-size: 1.8rem; }
+.av-whole3__copy :is(.av-hand, .av-eyebrow) { color: var(--accent); }
+.av-whole3__copy .av-hand { font-size: 1.8rem; }
 .av-whole3__copy h1 { color: var(--on-black); font-size: clamp(2.4rem, 5.2vw, 4.4rem); line-height: 0.98; max-width: 14ch; margin: 0; }
 .av-whole3__copy .av-lead { color: var(--on-black-2); max-width: 34rem; margin: 0; }
 .av-whole3__facts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding-top: var(--space-5); border-top: 1px solid color-mix(in srgb, var(--on-black) 18%, transparent); }
@@ -1107,56 +1108,15 @@ body::before {
 
 /* ---- Home, shorter: teasers for the rooms that have pages of their own ---- */
 /* The fitting room's teaser: the choices on the left, the same leg as the full room on the right. */
-.av-ftease__grid { display: grid; gap: var(--space-6); align-items: center; }
-@media (min-width: 900px) { .av-ftease__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-8); } }
-.av-ftease__copy { display: grid; gap: var(--space-4); justify-items: start; }
-.av-ftease__copy h2 { margin: 0; }
-.av-ftease__copy .av-lead { margin: 0; max-width: 34rem; }
-.av-ftease__step { margin: 0; padding: 0; border: 0; min-width: 0; display: grid; gap: var(--space-2); }
-.av-ftease__step legend { padding: 0; margin-bottom: var(--space-2); font-weight: 600; color: var(--ink); }
-.av-ftease .av-fr__chip[data-fit="2"] > span::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; background: var(--validated); vertical-align: middle; }
-.av-ftease .av-fr__advice { max-width: 34rem; }
-.av-ftease__stage .av-fr__stage { max-width: 30rem; margin-inline: auto; }
-.av-ftease__stage .av-fr__svg { width: min(100%, 280px); }
 /* Desktop: the title and the choices on the left, the leg on the right across both rows. */
 @media (min-width: 900px) {
-  .av-ftease__grid { grid-template-areas: "head stage" "controls stage"; row-gap: var(--space-5); }
-  .av-ftease__head { grid-area: head; align-self: end; }
-  .av-ftease__controls { grid-area: controls; align-self: start; }
-  .av-ftease__stage { grid-area: stage; }
 }
 /* Phone: title, then a compact leg, then the choices, so what a tap changes is in view. */
 @media (max-width: 899px) {
-  .av-ftease__grid { gap: var(--space-4); }
-  .av-ftease__stage .av-fr__stage { padding-block: var(--space-2) var(--space-1); }
-  .av-ftease__stage .av-fr__svg { width: min(100%, 165px); }
 }
 
 /* Gift box and family set, side by side: two cards, each wholly a link to where it is built. */
-.av-duo { display: grid; gap: var(--space-5); }
-@media (min-width: 760px) { .av-duo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.av-duo__card { position: relative; display: grid; grid-template-rows: auto 1fr; overflow: hidden; border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 1px 0 var(--line), 0 24px 40px -32px rgb(40 28 14 / 0.45); transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out); }
-.av-duo__card:hover { transform: translateY(-3px); box-shadow: 0 1px 0 var(--line), 0 30px 46px -30px rgb(40 28 14 / 0.5); }
-.av-duo__card:has(.av-duo__link:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
-.av-duo__art { display: grid; place-items: center; height: clamp(12rem, 22vw, 16rem); padding: var(--space-4); overflow: hidden; }
-.av-duo__card--gift .av-duo__art { background: radial-gradient(120% 90% at 30% 15%, #fbf3e3, #ecdcc0); }
-.av-duo__card--gift .av-gbox { width: min(72%, 15.5rem); }
-.av-duo__card--family .av-duo__art { background: #efe6d6 radial-gradient(rgb(0 0 0 / 0.05) 1px, transparent 1.4px) 0 0 / 9px 9px; }
-.av-duo__copy { display: grid; gap: var(--space-2); align-content: start; padding: var(--space-5) var(--space-6) var(--space-6); }
-.av-duo__copy h2 { margin: 0; font-size: clamp(1.6rem, 1.2rem + 1vw, 2.1rem); }
-.av-duo__copy p { margin: 0; color: var(--ink-2); max-width: 32rem; }
-.av-duo__link { color: inherit; text-decoration: none; }
-.av-duo__link:focus-visible { outline: none; }
-.av-duo__link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
-.av-duo__go { margin-top: var(--space-2); font-weight: 650; color: var(--accent-ink); }
-.av-duo__also { position: relative; z-index: 2; justify-self: start; font-size: var(--text-small); color: var(--ink-2); }
 /* The family's line: the same sock in three sizes, pegged a little lower each time. */
-.av-duo__line { position: relative; display: flex; align-items: flex-start; justify-content: center; gap: 4%; padding-top: 2.4rem; }
-.av-duo__line::before { content: ""; position: absolute; left: 6%; right: 6%; top: 2.2rem; height: 18px; border-top: 2.5px solid #9a8569; border-radius: 50% / 100% 100% 0 0; transform: scaleY(-1); transform-origin: 50% 0; }
-.av-duo__sock { position: relative; width: calc(30% * var(--s)); transform-origin: 50% 0; }
-.av-duo__sock > svg:last-child { display: block; width: 100%; height: auto; filter: drop-shadow(6px 10px 8px rgb(42 29 16 / 0.18)); }
-.av-duo__peg { position: absolute; left: 50%; top: -8px; width: 18%; min-width: 9px; transform: translateX(-50%); z-index: 1; }
-@media (prefers-reduced-motion: reduce) { .av-duo__sock { animation: none; } }
 
 /* The stall scene plays over less scrolling on the home page than on the story page. */
 .av-dordoi.av-dordoi--short { height: 190svh; }
@@ -1174,12 +1134,7 @@ body::before {
   .av-note { scroll-snap-align: center; }
 }
 @media (max-width: 639px) {
-  .av-duo__art { height: 10.5rem; }
-  .av-duo__card--gift .av-gbox { width: min(56%, 12rem); }
-  .av-duo__copy { padding: var(--space-4) var(--space-5) var(--space-5); }
 }
-.av-ftease__legend { margin-left: var(--space-2); font-weight: 400; font-size: var(--text-small); color: var(--ink-3); }
-.av-ftease__legend i { display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--validated); vertical-align: middle; }
 /* The fitting room's own page: a short header beside its lead, so the leg is on the first screen. */
 .av-fitroom--page { padding-top: var(--space-6); }
 .av-fitroom--page .av-fitroom__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-6); }
@@ -1395,8 +1350,8 @@ img[data-stage] { background-color: #f0ebe2; background-image: radial-gradient(e
 :root { --tex-horn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -86 94 92'%3E%3Cpath d='M27 -53C34 -49 42 -58 36 -68C28 -80 4 -72 6 -52C8 -32 40 -20 47 1C54 -20 86 -32 88 -52C90 -72 66 -80 58 -68C52 -58 60 -49 67 -53' fill='none' stroke='%23000' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E"); --tex-rosette: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-60 -60 120 120'%3E%3Cpath transform='rotate(0) translate(0 -8) scale(0.5) translate(-47 -1)' d='M27 -53C34 -49 42 -58 36 -68C28 -80 4 -72 6 -52C8 -32 40 -20 47 1C54 -20 86 -32 88 -52C90 -72 66 -80 58 -68C52 -58 60 -49 67 -53' fill='none' stroke='%23c9a24b' stroke-width='6' stroke-linecap='round'/%3E%3Cpath transform='rotate(90) translate(0 -8) scale(0.5) translate(-47 -1)' d='M27 -53C34 -49 42 -58 36 -68C28 -80 4 -72 6 -52C8 -32 40 -20 47 1C54 -20 86 -32 88 -52C90 -72 66 -80 58 -68C52 -58 60 -49 67 -53' fill='none' stroke='%23c9a24b' stroke-width='6' stroke-linecap='round'/%3E%3Cpath transform='rotate(180) translate(0 -8) scale(0.5) translate(-47 -1)' d='M27 -53C34 -49 42 -58 36 -68C28 -80 4 -72 6 -52C8 -32 40 -20 47 1C54 -20 86 -32 88 -52C90 -72 66 -80 58 -68C52 -58 60 -49 67 -53' fill='none' stroke='%23c9a24b' stroke-width='6' stroke-linecap='round'/%3E%3Cpath transform='rotate(270) translate(0 -8) scale(0.5) translate(-47 -1)' d='M27 -53C34 -49 42 -58 36 -68C28 -80 4 -72 6 -52C8 -32 40 -20 47 1C54 -20 86 -32 88 -52C90 -72 66 -80 58 -68C52 -58 60 -49 67 -53' fill='none' stroke='%23c9a24b' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M0 -9L7 0L0 9L-7 0Z' fill='%23c9a24b'/%3E%3C/svg%3E"); }
 :root:not([data-theme="dark"]) body { background-image: var(--tex-paper); background-size: 260px 260px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body { background-image: none; } }
-.av-eyebrow::before { content: ""; display: inline-block; width: 1.25em; height: 1.1em; margin-right: 0.45em; vertical-align: -0.2em;
-  background: currentColor; -webkit-mask: var(--tex-horn) center / contain no-repeat; mask: var(--tex-horn) center / contain no-repeat; opacity: 0.85; }
+.av-eyebrow::before { content: ""; display: inline-block; width: 1.75em; height: 1px; margin-right: 0.75em; vertical-align: 0.3em;
+  background: currentColor; opacity: 0.7; }
 /* The dark bands are felt, with a ram's-horn rosette pressed into their corner. */
 .av-trust, .av-ladderstrip, .av-footer { background-image: var(--tex-felt); background-size: 200px 200px; }
 .av-ladderstrip::before { content: ""; position: absolute; inset: auto; right: -40px; top: 50%; width: 260px; aspect-ratio: 1; transform: translateY(-50%) rotate(12deg);
@@ -1413,15 +1368,12 @@ img[data-stage] { background-color: #f0ebe2; background-image: radial-gradient(e
   box-shadow: inset 0 0 0 2px #b8323a, inset 0 0 0 3.5px #fbf1e3, 0 6px 12px -6px rgb(120 20 20 / 0.7); transform: rotate(-6deg); pointer-events: none; }
 
 /* Cards that carry a whole block are sewn: a stitched edge inside, felt or hanji under the words. */
-.av-duo__card, .av-biz__card { position: relative; }
-.av-duo__card::after, .av-biz__card::after { content: ""; position: absolute; inset: 10px; border-radius: calc(var(--radius-lg) - 6px); border: 1.5px dashed rgb(160 130 80 / 0.38); pointer-events: none; }
+.av-biz__card { position: relative; }
+.av-biz__card::after { content: ""; position: absolute; inset: 10px; border-radius: calc(var(--radius-lg) - 6px); border: 1.5px dashed rgb(160 130 80 / 0.38); pointer-events: none; }
 .av-biz__card:first-child::after { border-color: rgb(239 226 196 / 0.4); }
-.av-duo__copy { background: var(--tex-fibres) 0 0 / 260px 260px, var(--surface); }
 .av-biz__card:first-child { background-image: var(--tex-felt); background-size: 200px 200px; }
 /* the company card: a corner of bojagi patchwork */
 .av-biz__card:last-child { background-image: linear-gradient(135deg, transparent 72%, rgb(255 255 255 / 0.35) 72% 80%, rgb(184 50 58 / 0.18) 80% 88%, rgb(47 79 138 / 0.16) 88%); }
-:root[data-theme="dark"] .av-duo__copy { background: var(--surface); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-duo__copy { background: var(--surface); } }
 
 /* ---------- smooth cards ----------
    A hover used to repaint each card's picture on every frame: the picture swayed and scaled, the second one wiped in
@@ -1475,7 +1427,7 @@ img[data-stage] { background-color: #f0ebe2; background-image: radial-gradient(e
 
 /* Things that sway or float without end and carry a drop shadow get their own layer: the shadow is drawn once and the
    graphics card only moves it (otherwise Safari redraws the shadow on every frame). */
-.av-cl__swing, .av-duo__sock, .av-hang__sway, .av-line__sway, .av-shophead__art svg, .av-auth__socks svg, .av-door__sign, .av-gbox__tag, .av-still__sock { will-change: transform; }
+.av-cl__swing, .av-hang__sway, .av-line__sway, .av-shophead__art svg, .av-auth__socks svg, .av-door__sign, .av-gbox__tag, .av-still__sock { will-change: transform; }
 .av-still__sock svg { filter: drop-shadow(0 18px 14px rgba(84, 58, 24, 0.24)); }
 
 /* ---------- wholesale and "find us", in the bazaar-way style ---------- */
@@ -1503,7 +1455,7 @@ img[data-stage] { background-color: #f0ebe2; background-image: radial-gradient(e
 .av-whole3__way::before { content: ""; position: absolute; left: -60px; bottom: -80px; width: 300px; aspect-ratio: 1; z-index: -1;
   background: var(--tex-rosette) center / contain no-repeat; opacity: 0.12; transform: rotate(-10deg); }
 .av-whole3__way h2 { color: #fbf4e6; }
-.av-whole3__way .av-hand { color: #d9b56a; }
+.av-whole3__way :is(.av-hand, .av-eyebrow) { color: #d9b56a; }
 .av-whole3__way .av-whole3__steps strong { color: #fbf4e6; }
 .av-whole3__way .av-whole3__steps span:not(.av-kraft) { color: rgb(244 236 220 / 0.78); }
 .av-whole3__way .av-whole3__steps li::before, .av-whole3__way .av-whole3__steps li::after { border-color: rgb(217 181 106 / 0.6) !important; }
@@ -1602,11 +1554,10 @@ img[data-stage] { background-color: #f0ebe2; background-image: radial-gradient(e
 /* Touch screens: every link and control gets a finger-sized target (about 44px), measured by the phone sweep.
    Small round controls keep their look and get an invisible larger hit area around them. */
 @media (pointer: coarse), (max-width: 719px) {
-  .av-footer nav a, .av-footer li > a, .av-crumbs a, .av-duo__also, .av-whole3__more { display: inline-flex; align-items: center; min-height: 44px; }
+  .av-footer nav a, .av-footer li > a, .av-crumbs a, .av-whole3__more { display: inline-flex; align-items: center; min-height: 44px; }
   .av-footer li { line-height: 1.2; }
   details > summary { min-height: 44px; display: flex; align-items: center; }
   .av-header__logo { min-height: 44px; display: inline-flex; align-items: center; }
-  .av-duo__link { min-height: 44px; display: inline-flex; align-items: center; }
   .av-swatch, .av-fr__dot, .av-fr__skin { position: relative; }
   .av-swatch::after, .av-fr__dot::after, .av-fr__skin::after { content: ""; position: absolute; inset: -9px; border-radius: 50%; }
 }

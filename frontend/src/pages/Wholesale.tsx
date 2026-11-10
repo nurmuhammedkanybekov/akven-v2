@@ -119,7 +119,7 @@ export function WholesalePage() {
       <section className="av-container">
         <div className="av-whole3__hero">
           <div className="av-whole3__copy">
-            <span className="av-hand">{t("whole.eyebrow")}</span>
+            <span className="av-eyebrow">{t("whole.eyebrow")}</span>
             <h1>{t("whole.title")}</h1>
             <p className="av-lead">{t("whole.pageLead")}</p>
             <div className="av-row">
@@ -139,7 +139,7 @@ export function WholesalePage() {
 
       <section className="av-container av-block" aria-labelledby="who-title" data-reveal>
         <header className="av-block__head">
-          <span className="av-hand">{t("whole.whoEyebrow")}</span>
+          <span className="av-eyebrow">{t("whole.whoEyebrow")}</span>
           <h2 id="who-title">{t("whole.whoTitle")}</h2>
         </header>
         <ul className="av-whole3__who">
@@ -158,7 +158,7 @@ export function WholesalePage() {
 
       <section className="av-whole3__way av-block" aria-labelledby="way-title" data-reveal>
         <div className="av-container">
-          <span className="av-hand">{t("whole.wayEyebrow")}</span>
+          <span className="av-eyebrow">{t("whole.wayEyebrow")}</span>
           <h2 id="way-title">{t("whole.wayTitle")}</h2>
           <ol className="av-whole3__steps">
             {[1, 2, 3, 4].map((n, i) => (
@@ -182,7 +182,7 @@ export function WholesalePage() {
       <section id="quote" className="av-container av-block" aria-labelledby="quote-title" data-reveal>
         <div className="av-quote">
           <div className="av-stack">
-            <span className="av-hand">{t("quote.eyebrow")}</span>
+            <span className="av-eyebrow">{t("quote.eyebrow")}</span>
             <h2 id="quote-title">{t("quote.title")}</h2>
             <p className="av-lead">{t("quote.lead")}</p>
             <ol className="av-numbered">
@@ -252,7 +252,7 @@ export function WholesalePage() {
 
       <section id="gifts" className="av-container av-block" aria-labelledby="gifts-title" data-reveal>
         <header className="av-block__head">
-          <span className="av-hand">{t("gift.eyebrow")}</span>
+          <span className="av-eyebrow">{t("gift.eyebrow")}</span>
           <h2 id="gifts-title">{t("quote.giftsTitle")}</h2>
           <p className="av-lead">{t("quote.giftsLead")}</p>
         </header>
@@ -265,7 +265,7 @@ export function WholesalePage() {
 
       <section className="av-container av-block av-whole3__faq" aria-labelledby="faq-title" data-reveal>
         <header>
-          <span className="av-hand">{t("faq.eyebrow")}</span>
+          <span className="av-eyebrow">{t("faq.eyebrow")}</span>
           <h2 id="faq-title">{t("faq.title")}</h2>
         </header>
         <div>

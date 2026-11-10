@@ -14,7 +14,7 @@ export function LadderStrip() {
     <section className="av-ladderstrip" aria-labelledby="ladderstrip-title" data-reveal>
       <div className="av-container av-ladderstrip__inner">
         <div className="av-ladderstrip__copy">
-          <span className="av-hand">{t("ls.eyebrow")}</span>
+          <span className="av-eyebrow">{t("ls.eyebrow")}</span>
           <h2 id="ladderstrip-title">{t("ls.title")}</h2>
           <p>{t("ls.lead")}</p>
         </div>

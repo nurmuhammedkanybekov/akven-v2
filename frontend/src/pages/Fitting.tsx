@@ -17,7 +17,7 @@ export function FittingPage() {
       <div className="av-container">
         <header className="av-fitroom__head">
           <div>
-            <span className="av-hand">{t("fr.eyebrow")}</span>
+            <span className="av-eyebrow">{t("fr.eyebrow")}</span>
             <h1 id="fitting-title">{t("fr.title")}</h1>
           </div>
           <p className="av-lead">{t("fr.lead")}</p>

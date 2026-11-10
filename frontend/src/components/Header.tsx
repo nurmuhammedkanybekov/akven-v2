@@ -165,7 +165,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
           {NAV.map((n, i) => (
             <NavLink key={n.to} to={n.to} style={{ "--i": i } as React.CSSProperties}>{t(n.key)}</NavLink>
           ))}
-          <NavLink to="/fitting" style={{ "--i": NAV.length } as React.CSSProperties}>{t("nav.fitting")}</NavLink>
+          <NavLink to="/sizes" style={{ "--i": NAV.length } as React.CSSProperties}>{t("nav.findSize")}</NavLink>
           <NavLink to="/family" style={{ "--i": NAV.length + 1 } as React.CSSProperties}>{t("nav.family")}</NavLink>
           <NavLink to="/wholesale" style={{ "--i": NAV.length + 2 } as React.CSSProperties}>{t("nav.wholesale")}</NavLink>
           <NavLink to="/saved" style={{ "--i": NAV.length + 3 } as React.CSSProperties}>{t("nav.savedTitle")}</NavLink>

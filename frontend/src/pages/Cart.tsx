@@ -201,7 +201,7 @@ function FillTheBox({ pairsToGo, pct, inBag }: { pairsToGo: number; pct: number;
   if (items.length === 0) return null;
   return (
     <section className="av-fillbox" aria-labelledby="fill-title">
-      <span className="av-hand">{t("fill.eyebrow")}</span>
+      <span className="av-eyebrow">{t("fill.eyebrow")}</span>
       <h2 id="fill-title">{pairsToGo > 0 && pct > 0 ? t("fill.title", { n: pairsToGo, pct }) : t("fill.titlePlain")}</h2>
       <div className="av-grid-products av-fillbox__grid">
         {items.map((p, i) => <ProductCard key={p.slug} product={p} to={`/products/${p.slug}`} tint={(i % 6) + 1} />)}

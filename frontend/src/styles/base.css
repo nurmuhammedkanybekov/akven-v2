@@ -38,12 +38,15 @@ h3 { font-family: var(--font-sans); font-size: var(--text-h3); line-height: 1.2;
 .av-small { font-size: var(--text-small); color: var(--ink-2); }
 .av-muted { color: var(--ink-3); }
 
-/* A short label over a heading: plain words, not a spaced-out caps line. */
+/* A short label over a heading: small capitals in gold ink after a gold hairline (identity.css). One style for every
+   page; handwriting is kept for the family's signatures and the stall's notes. */
 .av-eyebrow {
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--text-micro);
   font-weight: 600;
-  letter-spacing: -0.005em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.4;
   color: var(--accent-ink);
 }
 

@@ -65,7 +65,7 @@ export function CaseBuilder({ onUse }: { onUse: (mix: string, pairs: number) => 
   return (
     <section className="av-casebuild" aria-labelledby="case-title">
       <header>
-        <span className="av-hand">{t("case.eyebrow")}</span>
+        <span className="av-eyebrow">{t("case.eyebrow")}</span>
         <h2 id="case-title">{t("case.title")}</h2>
         <p className="av-lead">{t("case.lead")}</p>
       </header>
