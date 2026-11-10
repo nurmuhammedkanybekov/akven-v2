@@ -50,7 +50,7 @@ for (const [engineName, engine] of engines) {
 
     await step("the home page, and the fitting room answers the choices", async () => {
       await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
-      await page.getByRole("heading", { name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
+      await page.getByRole("heading", { name: /Korean socks\s*for the whole family/ }).waitFor();
       await fits();
       await page.goto(`${BASE}/fitting`, { waitUntil: "networkidle" });
       await page.getByRole("heading", { level: 1, name: "Try them on before you buy" }).waitFor();

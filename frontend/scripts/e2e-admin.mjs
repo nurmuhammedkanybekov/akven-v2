@@ -405,19 +405,19 @@ try {
   await step("the site speaks Russian and Kyrgyz, and remembers the choice", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("button", { name: "Русский" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Сделано в Корее/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Корейские носки/ }).waitFor();
     await page.reload();
-    await page.getByRole("heading", { level: 1, name: /Сделано в Корее/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Корейские носки/ }).waitFor();
     await a11y("the home page in Russian");
     await page.getByRole("button", { name: "Кыргызча" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Кореяда жасалган/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Корей байпактары/ }).waitFor();
     await page.getByRole("button", { name: "English" }).first().click();
-    await page.getByRole("heading", { level: 1, name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Korean socks\s*for the whole family/ }).waitFor();
   });
 
   await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting room and the stall notes have their own pages", async () => {
     await page.goto(`${BASE}/`);
-    await page.getByRole("heading", { name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
+    await page.getByRole("heading", { name: /Korean socks\s*for the whole family/ }).waitFor();
     await page.locator(".av-still__box").waitFor();
     await page.getByRole("link", { name: /For her/ }).waitFor();
     await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
@@ -448,7 +448,7 @@ try {
     await page.getByRole("main").getByRole("link", { name: "How to find us" }).waitFor();
     await a11y("the home page after using it");
     await page.goto(`${BASE}/story`);
-    await page.getByRole("heading", { name: "From Dordoi, with love." }).waitFor();
+    await page.getByRole("heading", { name: "Container 70-E, passage 8." }).waitFor();
     await page.getByRole("heading", { name: "Look closer at the knit" }).waitFor();
     await page.goto(`${BASE}/gifts`);
     await page.getByRole("button", { name: "Empty the box" }).click();

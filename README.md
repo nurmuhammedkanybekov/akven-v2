@@ -1,10 +1,11 @@
 # AK&VEN
 
-**The online shop of a family sock stall at Dordoi Bazaar, with a price-negotiating assistant that can never give away
-more than the owners allow.**
+**An online shop and stock system for a family sock stall at Dordoi Bazaar in Bishkek, with a chat assistant that
+can negotiate prices but can never go below the owners' limit.**
 
-Bachelor's thesis · ELTE Faculty of Informatics · 2026
-Nurmuhammed Kanybekov · supervised by Guettala Walid
+Bachelor's thesis, ELTE Faculty of Informatics, 2026
+*Design and Implementation of AkVen Integrated E-Commerce and Inventory Management System*
+Nurmuhammed Kanybekov · Supervisor: Guettala Walid
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 
@@ -12,271 +13,237 @@ Nurmuhammed Kanybekov · supervised by Guettala Walid
 
 ## Contents
 
-1. [In short](#in-short)
-2. [The idea: talking is not deciding](#the-idea-talking-is-not-deciding)
-3. [What the shop does](#what-the-shop-does)
-4. [Run it in five minutes](#run-it-in-five-minutes)
-5. [How it is built](#how-it-is-built)
-6. [Quality and tests](#quality-and-tests)
-7. [The thesis and the documentation](#the-thesis-and-the-documentation)
+1. [Background](#background)
+2. [The main idea: the assistant proposes, the server decides](#the-main-idea-the-assistant-proposes-the-server-decides)
+3. [Features](#features)
+4. [Running the project](#running-the-project)
+5. [Architecture](#architecture)
+6. [Testing](#testing)
+7. [Documentation](#documentation)
 8. [Repository layout](#repository-layout)
 
-## In short
+## Background
 
-AK&VEN is my family's brand of Korean-made socks: **AK** from Akylbek, **VEN** from Venera, and between them a gold
-Kyrgyz ram's horn (кочкор мүйүз) shaped as a heart, for what they built together. My parents have traded at Dordoi Bazaar in Bishkek, Kyrgyzstan, since the
-early 2000s and have sold socks there since 2018, from container 70-E. At the bazaar nobody pays the label price:
-customers bargain, buy for the whole family, and shops from the regions buy by the case.
+AK&VEN is my parents' sock business. The name joins their first names, **Ak**ylbek and **Ven**era. The family has
+traded at Dordoi Bazaar since the early 2000s and has sold Korean-made socks from container 70-E since 2018.
 
-This shop keeps those habits online instead of replacing them with a fixed price tag:
+Selling at a bazaar works differently from a typical web shop:
 
-- **Ask for your price.** A chat on every sock, in English, Russian or Kyrgyz, as at the stall.
-- **The more pairs, the lower the price.** Any socks can be mixed; the whole bag counts towards the next step.
-- **One set for the whole family.** Shoe sizes in, sock sizes and the price step out.
-- **Three ways to get the socks, the way the family works:** collect at 70-E with a six-digit code; a **courier in
-  Bishkek** (a taxi the family calls, or the father's own car above an amount the owners set); or **cargo** to the
-  regions, Kazakhstan, Uzbekistan and Russia, where the customer pays the carrier on receipt. Fee and days are shown
-  before paying.
-- **Shops buy by the case.** They pick the exact socks from the real shelves, colour by colour and size by size, a
-  dozen at a time, with the stock beside each; the list goes into a request the family answers from an inbox.
-- **It looks like where it comes from.** Kyrgyz shyrdak felt and ram's horns (кочкор мүйүз), Korean hanji paper,
-  bojagi patchwork and a red dojang seal run through the whole site, because the socks are knitted in Korea and chosen
-  in Kyrgyzstan.
+- customers expect to bargain;
+- families buy for several people at once, so larger quantities should cost less per pair;
+- shops from other regions buy whole cases;
+- many customers prefer to pay in cash or by bank app when they collect the goods.
 
-## The idea: talking is not deciding
+The project brings these habits online instead of replacing them with a fixed-price checkout. It also gives the
+family the tools to run the stall: stock with a full history, orders, deliveries and hand-over at the stall.
 
-A language model is good at conversation and not safe to trust with money: it can be confused, flattered or tricked
-into a discount the business cannot afford. So the assistant only **proposes**; a small deterministic component
-**decides**.
+## The main idea: the assistant proposes, the server decides
+
+A language model is good at conversation, but it cannot be trusted with money. A customer can confuse it, flatter it
+or inject instructions into it. In this system the assistant only **proposes** a price. A small deterministic
+component, the `PolicyValidator`, **decides** what the customer actually gets.
 
 ```mermaid
 flowchart LR
-    C[Customer] -- "Can you do 50% off?" --> N[Assistant<br/>rules or a language model]
-    N -- proposes 50% --> V{PolicyValidator<br/>deterministic}
-    L[(Limit set by the owners<br/>never shown to the model)] --> V
-    V -- "clamped to 15%" --> O[Offer shown, stored and charged]
-    V -. proposal and result both recorded .-> A[(Negotiations and dashboard)]
+    C[Customer] -- "Can you do 50% off?" --> N[Assistant<br/>rules or language model]
+    N -- proposes 50% --> V{PolicyValidator}
+    L[(Owner's limit<br/>never shown to the model)] --> V
+    V -- "limited to 15%" --> O[Offer that is shown, stored and charged]
+    V -. both values recorded .-> A[(Negotiation log)]
 ```
 
-- The model never sees the limit or the cost price, and the customer's text is passed to it as data.
-- Every proposal is clamped to the owners' limit for that sock **before** anything is shown, saved or charged, and
-  again at checkout. The database refuses an allowed discount larger than its proposal.
-- The model may not write a number in its own words, in any of the three languages; the shop fills in the allowed
-  numbers. A reply that tries is replaced.
-- Proposal and result are recorded side by side for every conversation.
+- The model never sees the limit or the cost price. The customer's message is passed to it as data, not as
+  instructions.
+- Every proposal is limited **before** it is shown or saved, and checked again at checkout. A database constraint
+  rejects any stored discount above the proposal.
+- The model may not write prices in its own words in any of the three languages. The server inserts the allowed
+  numbers, and a reply that contains its own price is replaced.
 
-The guarantee therefore does not depend on how well the model behaves. In a recorded run of a live model (Gemini) on
-16 simulated customers, including a prompt-injection attempt, **no final price went below the limit**, for the
-rule-based assistant (which over-promised six times by design) or for the model.
+The guarantee therefore does not depend on how well the model behaves. In a recorded run with a live model (Gemini)
+and 16 simulated customers, including a prompt-injection attempt, no final price went below the limit.
 
-## What the shop does
+## Features
 
-![The shelves on their fabrics, with socks on the washing line](docs/design/readme-lines.jpg)
+![Shelves for men, women and kids](docs/design/readme-lines.jpg)
 
-**For customers**
+### For customers
 
-- **Shelves with character.** Men, women, kids and gift boxes each open on their own fabric with their socks pegged on
-  a washing line. The owners' sections are drawn as occasions; heights, **sizes and colour swatches** filter with live
-  counts, every choice is a tag to remove, and the list grows twelve at a time. Everything lives in the address bar.
-- **The product page:** pictures that follow the colour, honest stock ("only a few left", "arrives in about 5 days",
-  "tell me when it's back"), **how the price falls** as pairs add up, the size finder, the same design for the rest of
-  the family, reviews from customers who received the sock, and a bar that keeps *Add to bag* in reach.
-- **Ask for a better price** in the chat: it remembers the conversation, answers about the sock, and shows the offer,
-  which stays valid for 24 hours, for at least the pairs it was made for, once.
-- **The fitting room:** our socks drawn on a leg with the chosen shoes and trousers, each height rated for them.
-- **The family planner and family profiles** (sizes, birthdays), **gift boxes** with a ribbon and a hand-written card,
-  the **sock finder** in three taps, and a **size guide** in the sizes each customer knows.
-- **The bag as one collection:** minimum order, the step reached, "add 4 more pairs to save 5%", **save for later**.
-- **Checkout without an account:** a guest gives an email; the order opens at a private link (an HMAC of the order
-  id, never stored, kept after the `#` so it reaches no server log) that is emailed too, and a lost link can be
-  emailed again without telling anyone which orders exist.
-- **Checkout:** pickup with a code and a QR code, a courier by **area** with its fee, days and free-from amount, or a
-  **cargo carrier** with its note and "paid to the carrier on receipt";
-  **remember my details** for next time; a simulated Apple Pay / Google Pay wallet (no money moves).
-- **Orders** with a timeline, cancel with refund until handover, and *order these again*.
-- **Emails in the customer's language** (English, Russian or Kyrgyz): the confirmation with the pickup code or the
-  delivery details, "collected / on its way / with the carrier", and a cancellation with its refund. They are written in
-  the same transaction as the order (an outbox), sent through any SMTP server, retried when it is down, and readable
-  in the admin; without a mail server they are kept there and the admin says so.
-- **Wholesale and company gifts:** an open case of packs, how a case is made, and *Build a case* from the real
-  shelves: search or browse a shelf, open a sock, and choose dozens of each colour and size with today's stock beside
-  it (a warning when the case asks for more than there is); the case shows the price step it reaches and an estimate,
-  and its exact list (one line per colour and size, with the code) goes into a request that needs no account.
-- **Our story:** the family's two names, a letter from the stall in their own words, the years at Dordoi, the journey
-  of a pair from the Korean mills to container 70-E, a day at the stall from 8:00 to 16:00, and the bazaar scene.
-- **Find us:** whether the stall is open now in Bishkek time, the week's hours, the way inside the bazaar, Google Maps
-  and 2GIS. The footer shows the stall's door with an open or closed sign.
-- **English, Russian and Kyrgyz**; prices in **US dollars, som or roubles**; light and dark; phone, tablet and laptop;
-  installable as an app, with the bag working offline; recently viewed and shareable saved socks; a privacy page that
-  says what is kept and why.
+- **Catalogue:** shelves for men, women, kids and gift sets, with filters for height, size and colour. Filters are kept
+  in the address bar, so a filtered page can be shared.
+- **Product page:** pictures for each colour, current stock ("only a few left", "arrives in about 5 days"), a
+  back-in-stock notification, and a table showing how the price per pair falls with quantity.
+- **Price negotiation:** a chat on every product in English, Russian or Kyrgyz. An accepted offer is valid for 24
+  hours.
+- **Quantity discounts:** any socks can be combined; the whole bag counts towards the next discount step.
+- **Size help:** a size guide, a size finder, a fitting room that shows a sock's height with chosen shoes, and saved
+  family profiles with shoe sizes.
+- **Gift boxes** with a box, ribbon and a handwritten card.
+- **Checkout without an account:** a guest order opens at a private link, which is also sent by email.
+- **Reserve and pay on collection:** the customer reserves the socks online and pays in cash or by bank app at the
+  stall or to the courier. The reservation holds the stock for 48 hours and is cancelled automatically if nobody
+  comes.
+- **Delivery options:** pickup at the stall with a six-digit code and QR code, a courier in Bishkek by area, or a
+  cargo company to other regions, Kazakhstan, Uzbekistan and Russia. The fee and delivery time are shown before the
+  order is placed.
+- **Orders:** a timeline, cancellation until hand-over, and "order these again".
+- **Emails** in the customer's language for every change of an order.
+- **Wholesale:** shops build a case from the real catalogue, colour by colour and size by size, with current stock
+  shown, and send it as a request without needing an account.
+- **General:** English, Russian and Kyrgyz; prices in US dollars, som or roubles; light and dark themes; works on
+  phones; installable as an app.
 
 <table>
 <tr>
-<td width="62%"><img src="docs/design/readme-chat.jpg" alt="The chat: asked for 50%, the assistant offers what the owners allow"></td>
+<td width="62%"><img src="docs/design/readme-chat.jpg" alt="The chat: the customer asks for 50%, the assistant offers what the owners allow"></td>
 <td><img src="docs/design/readme-phone-ky.jpg" alt="The home page on a phone, in Kyrgyz"></td>
 </tr>
 <tr>
-<td><em>Asked for 50%, the assistant offers what the owners allow.</em></td>
-<td><em>On a phone, in Kyrgyz.</em></td>
+<td><em>The customer asks for 50%; the assistant offers only what the owners allow.</em></td>
+<td><em>The home page on a phone, in Kyrgyz.</em></td>
 </tr>
 </table>
 
-![Wholesale: socks by the case](docs/design/readme-wholesale.jpg)
+### For the shop team
 
-**For the shop team** (the administration, in English, Russian and Kyrgyz)
+The administration is available in English, Russian and Kyrgyz, with three roles.
 
-- **Everyone in the team:** products (newest first, with pictures and colours) with sizes, pictures per colour, stock
-  and stock on the way; sections and cuts; orders found by number, name, phone or email and by how they travel; the
-  **hand-over desk** (code typed or scanned, plus the end of the phone number, and the pickup orders waiting to be
-  packed); negotiations with proposed and allowed side by side; a dashboard that tells the story of the period
-  (returning customers, pairs per order, how orders travel, sales by shelf, the busiest days, the best customers);
-  review moderation; the **wholesale inbox** with one-tap reply in the customer's own messenger.
-- **Owners:** the limit and cost of each sock, the price ladder and minimum order, som and rouble rates, **delivery
-  areas**, customers with their orders and spending, contacts, the stall and its hours, the size chart, the emails sent
-  to customers, and the orders as a spreadsheet. An **automatic low-stock alert** emails them the moment a sale leaves
-  a sock at the "few left" level. Prices can be read in dollars, som or roubles.
-- **Super admin:** the team's accounts, which assistant answers the chat (with a test box, a connection test that says
-  in plain words why the AI is not answering, and the live comparison), and the history of every change, by part of
-  the shop and by who made it, with the values before and after.
+- **Staff:** products, colours, sizes and pictures; stock and incoming deliveries; orders; the **hand-over desk**
+  (enter or scan the pickup code, take payment for reserved orders); reviews; the wholesale inbox.
+- **Inventory:** every stock change is recorded with its reason (opening stock, goods received, sale, cancellation,
+  manual correction). Staff record arriving goods with one form, and each product variant shows its stock history.
+  Stock is locked during checkout, so the last pair is never sold twice.
+- **Owners:** price limits and cost prices, the discount steps, exchange rates, delivery areas, customers, contacts,
+  opening hours, the size chart, sent emails, and order export to a spreadsheet. A low-stock alert is sent by email.
+- **Super admin:** team accounts, the choice of assistant (rule-based or language model) with a connection test, and
+  an audit log of every change with the values before and after.
 
 ![The dashboard](docs/design/readme-admin.jpg)
 
-**Not built, on purpose:** a real payment provider (the demo wallet is simulated), SMS, taxes, and the Telegram bot
-([planned](docs/telegram-bot-plan.md)). The language model is optional: without a key the built-in rules answer.
+**Not implemented, on purpose:** a real payment provider (card payments are simulated in the demo), SMS and taxes. A
+Telegram bot is [planned](docs/telegram-bot-plan.md). The language model is optional; without an API key the
+rule-based assistant answers.
 
-## Run it in five minutes
+## Running the project
 
-You need Docker (on a Mac, Docker Desktop or Colima). From the project folder:
+You need Docker (on a Mac: Docker Desktop or Colima). In the project folder run:
 
 ```bash
 docker compose up --build
 ```
 
-Then open **http://localhost:8081**. The first build takes a few minutes; the backend is ready when its log says
-`Successfully applied 43 migrations`.
+Then open **http://localhost:8081**. The first build takes a few minutes. The backend is ready when its log shows
+`Started AkVenApplication`.
 
-| Demo account | Email | Password | Can do |
+| Demo account | Email | Password | Permissions |
 |---|---|---|---|
-| Super admin | `superadmin@akven.test` | `changeme-super` | Everything an owner can, plus accounts, the assistant and the audit log |
-| Owner | `admin@akven.test` | `changeme-admin` | Everything in the shop, including prices, delivery areas and the size chart |
+| Super admin | `superadmin@akven.test` | `changeme-super` | Everything, plus team accounts, the assistant and the audit log |
+| Owner | `admin@akven.test` | `changeme-admin` | The whole shop, including prices, delivery areas and the size chart |
 | Staff | `staff@akven.test` | `changeme-staff` | Products, stock, orders, reviews and wholesale requests, but not prices |
-| Customer | Sign in → Create an account | | Shop, ask for a price, check out, follow orders |
+| Customer | Create an account on the site | | Shopping, negotiation, checkout, order tracking |
 
-Docker Compose starts the shop **in demo mode** (`SPRING_PROFILES_ACTIVE=demo`): the demo catalog, three months of
-imagined shop life (25 customers from Bishkek, Osh, Almaty, Tashkent and Moscow, 150 orders in every state and way of
-delivery, price conversations, reviews, wholesale requests and emails), these accounts, and a
-**simulated wallet** that moves no money and says so at checkout. Without demo mode the shop is safe by default: no demo
-data, the demo accounts switched off, and no payments taken until a real provider is connected (future work). The demo
-accounts are also switched off in demo mode once a real super admin is set in `.env`, unless `DEMO_ACCOUNTS=on`.
+Docker Compose starts the shop **in demo mode**. Demo mode loads a demo catalogue, three months of sample activity
+(customers, orders, negotiations, reviews and wholesale requests), the accounts above, and a simulated card payment
+that moves no money. Without demo mode the shop starts empty and safe: no demo data, no demo accounts and no card
+payments until a real provider is connected. Setting a real super admin in `.env` also switches the demo accounts off.
+
 A short tour:
 
-1. **Switch the language** in the top bar (EN · РУС · КЫР); the whole site follows.
-2. **Open a shelf**, pick a size and a colour, then take a filter off with its tag.
-3. **Plan a family set** (home page → *One set for the whole family*): change a shoe size and watch the sock size and
-   the price step.
-4. **Ask for a better price** as a customer: open a sock and type "50% off". The offer stays within the limit.
-5. **Check out** with a courier or cargo: choose an area or a carrier, see its fee and days, tick *Remember my details*, pay with the
-   simulated wallet.
-6. **Send a wholesale request**, then open **http://localhost:8081/admin** as the owner: answer it from the inbox, hand
-   an order over with its code, change a delivery area, read the dashboard.
-7. **As the super admin**, add a staff account, read the audit log, and try the assistant. To let a real model answer,
-   put `LLM_API_KEY=…` in `.env` (see `.env.example`), restart, and switch it on under *AI assistant*.
+1. Switch the language in the top bar (EN · РУС · КЫР).
+2. Open a shelf, choose a size and a colour, then remove a filter.
+3. Open a product and ask the chat for "50% off". The offer stays within the limit.
+4. Put socks in the bag and choose **Reserve, pay at the stall** at checkout.
+5. Open **http://localhost:8081/admin** as the owner. Hand the order over at the hand-over desk, record arriving
+   goods on a product and look at its stock history.
+6. As the super admin, read the audit log. To use a real language model, put `LLM_API_KEY=…` in `.env` (see
+   `.env.example`), restart, and switch it on under *AI assistant*.
 
-Start again from an empty database with `docker compose down -v`. Running without Docker, every setting and every test
-command are in [`docs/development.md`](docs/development.md).
+`docker compose down -v` deletes the local database so the next start is fresh. Running without Docker, all settings
+and test commands are described in [`docs/development.md`](docs/development.md).
 
-**Putting it online.** The same `docker compose` runs on one small Linux server behind Caddy, which gets the HTTPS
-certificate by itself (a free Oracle Cloud VM and a free DuckDNS name are enough for the thesis demo). Keep
-`AKVEN_BIND=127.0.0.1` so only Caddy reaches the shop, and set a real super admin in `.env`, which switches the demo
-accounts off. Every step, from renting the server to nightly backups, is in [`docs/deployment.md`](docs/deployment.md).
+**Deployment.** The same Docker Compose setup runs on a small Linux server behind Caddy, which provides HTTPS.
+`deploy/deploy.sh` backs up the database, updates the server to the latest `dev` commit and waits until
+`/api/version` reports that commit. The full guide is in [`docs/deployment.md`](docs/deployment.md).
 
-## How it is built
+## Architecture
 
 ```mermaid
 flowchart LR
     B[Browser<br/>React PWA] -- "REST / JSON, JWT" --> S[Spring Boot API]
     S --> P[PricingService] --> V[PolicyValidator]
-    S --> G[Negotiator<br/>rules · language model]
+    S --> G[Negotiator<br/>rules or language model]
     G --> V
     S --> D[(PostgreSQL 16<br/>Flyway migrations)]
 ```
 
 | Layer | Technology |
 |---|---|
-| Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, role-gated routes. About 1,900 texts per language in English, Russian and Kyrgyz, with typed keys |
-| API | Spring Boot 3.5, Java 17, 112 endpoints in 21 feature packages. JWT with four roles (customer, staff, owner, super admin) and a role hierarchy; method security on the services; one error format (RFC 7807); OpenAPI at `/swagger-ui/index.html` (demo mode; `API_DOCS=true` elsewhere) |
-| Data | PostgreSQL 16 with pgvector. 43 Flyway versions: 24 schema migrations, 19 demo-data migrations (demo profile only). Check constraints repeat the rules that must never break |
-| Assistant | A `Negotiator` interface: rule-based, and a language model over any OpenAI-compatible API (Gemini by default), with fallback to the rules and a run-time switch |
-| Delivery | Docker Compose (database, backend, nginx). CI on GitHub Actions (six jobs) and on the ELTE GitLab |
+| Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, with role-based routes. About 2,000 texts per language (English, Russian, Kyrgyz) with typed keys |
+| API | Spring Boot 3.5, Java 17, about 115 endpoints in 21 feature packages. JWT with four roles, method-level security, one error format (RFC 7807), OpenAPI at `/swagger-ui/index.html` in demo mode |
+| Data | PostgreSQL 16. 26 schema migrations and 19 demo-data migrations (Flyway). Check constraints enforce the rules that must never break |
+| Assistant | A `Negotiator` interface with a rule-based implementation and a language-model implementation over any OpenAI-compatible API (Gemini by default), with fallback to the rules |
+| Delivery | Docker Compose (database, backend, nginx). CI on GitHub Actions and on the ELTE GitLab |
 
-The design rests on a few deliberate choices, all explained in [`docs/architecture.md`](docs/architecture.md) and in
-the thesis:
+Key design decisions (explained in [`docs/architecture.md`](docs/architecture.md) and in the thesis):
 
-- **Prices are decided only on the server.** The browser shows quotes; checkout recomputes everything.
-- **Checkout is safe under races.** The options in the bag are locked in a fixed order before stock is read, so the
-  last pair is sold once and opposite carts cannot deadlock; an idempotency key makes a double click charge once.
-- **Receipts never change.** An order keeps a copy of the names, pictures, prices paid and delivery area.
-- **Every change by the team is audited** in the same transaction, with the state before and after.
-- **Each customer sees only their own** family, saved socks, details and orders: the account comes from the token, never
-  from the request.
-- **The look comes from the stall and its two countries:** kraft tags, the family's handwriting, socks on a washing
-  line and container 70-E; Kyrgyz shyrdak felt and ram's horns; Korean hanji paper, bojagi patchwork and the red
-  dojang seal. All 1,300 product pictures are drawn by a script from the same sock shapes as the interface, on a
-  transparent ground, so each stands on a crafted backdrop chosen by the shop (and a cut-out photo would too).
-- **Smooth on a phone:** textures are small pictures drawn once, cards move only what the graphics card can move, and
-  endless animations rest while they are off screen; measured with the CPU slowed to phone speed.
+- **Prices are calculated only on the server.** The browser displays quotes; checkout recalculates everything.
+- **Checkout is safe under concurrency.** Product variants are locked in a fixed order before stock is read, so the
+  last pair is sold only once and two carts cannot deadlock. An idempotency key makes a double click charge once.
+- **Every stock change has a reason.** A ledger records each movement, and a test checks that the ledger always adds up
+  to the stock on hand.
+- **Orders keep a snapshot** of names, prices paid and the delivery area, so receipts never change later.
+- **Every change by the team is audited** in the same transaction, with the values before and after.
+- **Customers can only see their own data.** The account is always taken from the token, never from the request.
 
-## Quality and tests
+## Testing
 
 | Check | Command | Result |
 |---|---|---|
-| Backend, in-memory database | `cd backend && mvn verify` | 284 tests (11 of them need PostgreSQL and run in their own job), **96% line coverage**; the build fails below 80% |
-| Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 213 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
-| In a real browser | `cd frontend && npm run e2e` | 29 steps: the owner's, the customer's (with and without an account) and the super admin's work in three languages, with accessibility rules on every page |
-| Other browsers | `cd frontend && npm run e2e:browsers` (in CI) | The customer's path in Safari's engine (WebKit) and Firefox, on a phone and a laptop |
+| Backend | `cd backend && mvn verify` | 284 tests, **96% line coverage**; the build fails below 80% |
+| Backend on PostgreSQL | see [`docs/development.md`](docs/development.md) | Migrations, constraints, and the last-pair and double-payment races over real HTTP |
+| Frontend | `cd frontend && npm test && npm run build` | 213 tests, including translation completeness and WCAG AA colour contrast |
+| End-to-end | `cd frontend && npm run e2e` | 29 steps in a real browser: the work of the owner, staff, customers (with and without an account) and the super admin, in three languages, with accessibility checks on every page |
+| Other browsers | `cd frontend && npm run e2e:browsers` (in CI) | The customer journey in WebKit (Safari) and Firefox, on a phone and a laptop |
 
-What the tests demonstrate, among others:
+The tests show, among other things, that:
 
-- No price ever goes below the owners' limit, whatever the assistant proposes, and a tampered offer is re-clamped.
-- The assistant cannot state a price of its own in English, Russian or Kyrgyz.
-- A fee or a price sent by the browser is ignored; delivery is charged by the area the server knows.
-- Five wrong passwords lock sign-in for fifteen minutes; sign-ups, chat messages and wholesale requests are
-  rate-limited; a disabled account or a new password ends its sessions at once.
-- Database constraints refuse impossible rows even when the application is bypassed.
+- no price goes below the owners' limit, whatever the assistant proposes, and a tampered offer is limited again;
+- the assistant cannot state its own price in English, Russian or Kyrgyz;
+- prices or delivery fees sent by the browser are ignored;
+- an unpaid reservation expires and returns its stock;
+- five wrong passwords lock sign-in for fifteen minutes, and sign-ups, chat messages and wholesale requests are
+  rate-limited;
+- database constraints reject invalid rows even if the application is bypassed.
 
-## The thesis and the documentation
+## Documentation
 
-| Document | What it covers |
+| Document | Contents |
 |---|---|
 | [`docs/thesis/thesis.pdf`](docs/thesis/thesis.pdf) | **The thesis**: specification, user documentation, developer documentation, testing and evaluation (ELTE IK format) |
-| [`docs/thesis/`](docs/thesis/) | Its LaTeX source; build with `latexmk -pdf thesis.tex` |
-| [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, use cases, requirements |
-| [`docs/traceability.md`](docs/traceability.md) | Each requirement: where it is implemented and which test shows it |
+| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk -pdf thesis.tex` |
+| [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, use cases and requirements |
+| [`docs/traceability.md`](docs/traceability.md) | Where each requirement is implemented and which test covers it |
 | [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator, security |
-| [`docs/user-guide.md`](docs/user-guide.md) | How the owners, the staff and the customers use the shop |
-| [`docs/development.md`](docs/development.md) | Running, settings, tests, CI, database |
-| [`docs/deployment.md`](docs/deployment.md) | Putting the shop online: why one small server, step by step, email, payments, a security checklist |
-| [`docs/telegram-bot-plan.md`](docs/telegram-bot-plan.md) | The planned Telegram bot: order messages, an AI helper that links to the shop, and handing over to the family |
+| [`docs/user-guide.md`](docs/user-guide.md) | How owners, staff and customers use the shop |
+| [`docs/development.md`](docs/development.md) | Running locally, settings, tests, CI, database |
+| [`docs/deployment.md`](docs/deployment.md) | Putting the shop online, step by step |
 | [`docs/api.md`](docs/api.md) | The API and its error codes |
-| [`docs/evaluation/`](docs/evaluation/) | The recorded live run of the assistant on 16 simulated customers |
+| [`docs/evaluation/`](docs/evaluation/) | The recorded run of the assistant with 16 simulated customers |
 | [`docs/diagrams/`](docs/diagrams/README.md) | Architecture, validation path, negotiation sequence, data model, use cases |
-| [`docs/brand.md`](docs/brand.md) | Logo, colours, type, motion; screenshots in [`docs/design/`](docs/design/) |
+| [`docs/brand.md`](docs/brand.md) | Logo, colours, typography and motion |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Branches and publishing to GitLab |
 
 ## Repository layout
 
 ```
-backend/     Spring Boot application, by feature: audit auth catalog delivery family negotiation order
-             payment pricing review saved shop sizes stock user wholesale ...
+backend/     Spring Boot application, one package per feature:
+             audit auth catalog delivery family negotiation order payment
+             pricing review saved shop sizes stock user wholesale ...
              src/main/resources/db/migration   schema migrations (always applied)
-             src/main/resources/db/seed        demo data (demo profile only)
+             src/main/resources/db/seed        demo data (demo mode only)
 frontend/    The shop and the administration (React + TypeScript)
-             src/i18n      English, Russian and Kyrgyz
-             src/brand     the logo and the drawn socks
-             scripts/      product pictures, logo, icons, screenshots and the end-to-end test
-docs/        Everything written down, including the thesis
+             src/i18n      English, Russian and Kyrgyz texts
+             scripts/      product pictures, icons, screenshots and end-to-end tests
+deploy/      Server update script and Caddy configuration
+docs/        Documentation, including the thesis
 docker-compose.yml, .github/workflows/ci.yml, .gitlab-ci.yml
 ```
-
-![The AK&VEN logo](docs/design/readme-logo.jpg)
