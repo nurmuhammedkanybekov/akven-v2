@@ -9,17 +9,17 @@ export function useDemoMode(): boolean {
 }
 
 /**
- * In demo mode the announcement bar says, on every page, that the shop is a demo and that orders and payments are not
- * real, and search engines are asked not to list it: a visitor must never believe an order placed here is real. It
- * takes the place of the rotating messages inside the bar, which is always there, so nothing on the page moves when
- * it appears (a separate strip above the header pushed the page down after it had painted).
+ * In demo mode card payments are simulated, so the announcement bar says on every page that online card payment is not
+ * live yet and points to what does work (reserve, pay at the stall), and search engines are asked not to list the
+ * site: nobody should believe a card payment made here is real. It takes the place of the rotating messages inside the
+ * bar, which is always there, so nothing on the page moves when it appears.
  */
 export function DemoNote() {
   const { t } = useT();
   useNoIndex();
   return (
     <p className="av-ann__text av-ann__text--demo" role="note">
-      <span className="av-ann__run"><span className="av-demotag">{t("pay.demoTag")}</span> {t("demo.ribbon")} <Link to="/visit">{t("demo.ribbonLink")}</Link></span>
+      <span className="av-ann__run">{t("demo.ribbon")} <Link to="/visit">{t("demo.ribbonLink")}</Link></span>
     </p>
   );
 }
