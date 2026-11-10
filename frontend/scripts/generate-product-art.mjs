@@ -42,14 +42,13 @@ const baseFor = (spec, fit) => { const b = sockBounds(spec.cut); const hPx = (b.
  * picture sits on one of the backdrops in the styles (Kyrgyz felt, Korean hanji paper, a quiet bojagi patchwork), so
  * drawn socks and photographs share one look and the backdrops can change without redrawing a single file. Socks hang
  * from a washing line on wooden pegs, the way the stall dries and shows them; boxes stand on the floor. (`tint` is
- * kept for the collection data; the backdrop no longer uses it.)
+ * kept for the collection data; the backdrop no longer uses it.) No logo in the corner: the sock is the picture.
  */
 function frame(tint, body, { line = null, floor = 870 } = {}) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img">
   ${line != null ? `<path d="M-10 ${line + 4}Q400 ${line + 108} 810 ${line + 4}" fill="none" stroke="#000" stroke-opacity=".08" stroke-width="5"/><path d="M-10 ${line}Q400 ${line + 100} 810 ${line}" fill="none" stroke="#9a8569" stroke-width="3"/><path d="M-10 ${line - 1}Q400 ${line + 99} 810 ${line - 1}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>`
     : `<ellipse cx="400" cy="${floor}" rx="270" ry="22" fill="#000" fill-opacity=".09"/>`}
   ${body}
-  <g transform="translate(716 936) scale(${(40 / MARK.h).toFixed(4)})" opacity=".55">${markMarkup("#b08d57", "wm")}</g>
 </svg>
 `;
 }
