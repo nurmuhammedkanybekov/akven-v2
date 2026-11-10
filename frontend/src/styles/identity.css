@@ -1589,7 +1589,6 @@ img[data-stage] { transition: opacity 0.45s var(--ease-out); }
 p { text-wrap: pretty; }
 
 /* Demo mode: the announcement bar says so (DemoNote). The tag is gold on the dark bar, the link underlined. */
-.av-ann__text--demo .av-demotag { background: var(--accent); color: #14110d; margin-right: 0.35em; }
 .av-ann__text--demo a { color: inherit; font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
 
 /* Owners: a variant's stock history (the ledger), opened on demand. */

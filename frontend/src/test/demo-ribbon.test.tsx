@@ -14,10 +14,10 @@ async function renderWith(payments: "SIMULATED" | "NONE") {
   render(<MemoryRouter><Bar /></MemoryRouter>);
 }
 
-it("in demo mode, every page says that orders and payments are not real and asks search engines not to list it", async () => {
+it("in demo mode, every page says that card payment is not live yet and asks search engines not to list it", async () => {
   await renderWith("SIMULATED");
-  expect(await screen.findByRole("note")).toHaveTextContent(/orders and payments here are not real/);
-  expect(screen.getByRole("link", { name: "Buy at the stall" })).toHaveAttribute("href", "/visit");
+  expect(await screen.findByRole("note")).toHaveTextContent(/Card payment online is coming soon/);
+  expect(screen.getByRole("link", { name: "Find us" })).toHaveAttribute("href", "/visit");
   expect(document.head.querySelector('meta[name="robots"]')).toHaveAttribute("content", "noindex");
 });
 
