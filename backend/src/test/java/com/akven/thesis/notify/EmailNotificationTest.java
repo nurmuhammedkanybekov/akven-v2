@@ -76,7 +76,7 @@ class EmailNotificationTest extends IntegrationTest {
                 .contains("Здравствуйте, Aida!")
                 .contains(order.at("/fulfillment/pickupCode").asText())
                 .contains("$20.00")
-                .contains("демо-оплата")                                   // the demo wallet says so, in the email too
+                .contains("тестовая оплата")                               // the test wallet says so, in the email too
                 .contains("/orders/" + order.get("id").asText())
                 .doesNotContain("{").doesNotContain("null");
     }
@@ -111,12 +111,12 @@ class EmailNotificationTest extends IntegrationTest {
         assertThat(handed.getKind()).isEqualTo(EmailKind.ORDER_HANDED_OVER);
         assertThat(handed.getSubject()).contains("ташуучуга");
 
-        // a paid order cancelled by the customer: the refund is reported (here: the demo payment was returned)
+        // a paid order cancelled by the customer: the refund is reported (here: the test payment was returned)
         JsonNode pickup = json(buy(bearer, data.variant(10), 1, Map.of(), "en", token()).andExpect(status().isCreated()));
         sendJson("POST", "/api/orders/" + pickup.get("id").asText() + "/cancel", bearer, Map.of()).andExpect(status().isOk());
         OutboundEmail cancelled = about(pickup.get("id").asText()).get(1);
         assertThat(cancelled.getKind()).isEqualTo(EmailKind.ORDER_CANCELLED);
-        assertThat(cancelled.getBody()).contains("You cancelled order").contains("demo payment");
+        assertThat(cancelled.getBody()).contains("You cancelled order").contains("test payment");
     }
 
     @Test

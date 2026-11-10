@@ -294,16 +294,16 @@ try {
     assert.equal(saved[0].quantity, 2);
   });
   await step("paying with a working wallet creates a paid order and the stock drops", async () => {
-    // demo mode says plainly that the wallet is simulated, before and after paying
-    await page.getByText(/the wallet is simulated, no card is charged and no real money moves/).waitFor();
-    await page.getByRole("button", { name: "Pay with Apple Pay (demo)" }).click();
+    // demo mode says plainly that the wallet is a test, before and after paying
+    await page.getByText(/This wallet is a test: no card is charged and no money moves/).waitFor();
+    await page.getByRole("button", { name: "Pay with Apple Pay (test)" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Pay $19.00" }).click();
     await page.waitForURL(/\/orders\/[0-9a-f-]{36}/);
     await page.getByText(/Thank you! Order AV-[0-9A-F]{8} is paid/).waitFor();
     await page.getByText("Paid", { exact: true }).first().waitFor();
     // help is one tap away, with the order's reference already written into the message
     const ref = (await page.getByRole("heading", { level: 1 }).innerText()).match(/AV-[0-9A-F]{8}/)[0];
-    await page.getByText("Demo payment: no real money was taken.").waitFor();
+    await page.getByText("Test payment: no money was taken.").waitFor();
     await page.getByText("Question about this order?").waitFor();
     assert.ok(decodeURIComponent(await page.locator(".av-orderhelp__link").first().getAttribute("href")).includes(ref), "the help link carries the order reference");
     await a11y("the paid order page");
@@ -441,7 +441,7 @@ try {
     await page.goto(`${BASE}/visit`);
     await page.getByRole("heading", { name: "Notes from the stall" }).waitFor();
     await page.goto(`${BASE}/`);
-    await page.getByRole("heading", { name: "Two names, one family." }).waitFor();
+    await page.getByRole("heading", { name: "AK&VEN stands for Akylbek and Venera." }).waitFor();
     await page.locator(".av-dordoi").scrollIntoViewIfNeeded();
     await page.evaluate(() => { const el = document.querySelector(".av-dordoi"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + el.offsetHeight - window.innerHeight); });
     await page.locator(".av-dordoi.is-done").waitFor();
@@ -589,7 +589,7 @@ try {
     // the story: the years and the journey of a pair
     await page.goto(`${BASE}/story`);
     await page.getByRole("heading", { name: "Our years at Dordoi" }).waitFor();
-    await page.getByRole("heading", { name: "The journey of a pair" }).waitFor();
+    await page.getByRole("heading", { name: "How a pair reaches you" }).waitFor();
     await a11y("the story page");
   });
 
@@ -676,7 +676,7 @@ try {
     await page.getByLabel("Email", { exact: true }).fill(guestEmail);
     await page.getByLabel("Name", { exact: true }).fill("Guest Test");
     await page.getByLabel("Phone").fill("+996 700 123 456");
-    await page.getByRole("button", { name: "Pay with Google Pay (demo)" }).click();
+    await page.getByRole("button", { name: "Pay with Google Pay (test)" }).click();
     await page.getByRole("dialog").getByRole("button", { name: /^Pay \$/ }).click();
     await page.waitForURL(/\/orders\/[0-9a-f-]{36}#t=[A-Za-z0-9_-]{20,}$/);
     await page.getByText(/This page is your order's private link/).waitFor();
