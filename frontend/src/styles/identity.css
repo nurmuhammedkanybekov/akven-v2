@@ -1017,16 +1017,13 @@ body::before {
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-family__sheet { background-color: var(--surface); } }
 .av-family__peg { position: absolute; top: -24px; left: 50%; width: 20px; height: auto; transform: translateX(-50%) rotate(3deg); filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.2)); }
 
-/* ---------- product page: the photo stays with you; haggling on kraft; reviews on a pegged note ---------- */
+/* ---------- product page: the photo stays with you while you read ---------- */
 @media (min-width: 900px) { .av-pdp__gallery { position: sticky; top: 96px; align-self: start; } }
-.av-chat { position: relative; background: #ead9b8; color: #2e2212; border: 0; border-radius: 6px;
-  outline: 1.5px dashed rgb(60 42 20 / 0.35); outline-offset: -8px;
-  background-image: radial-gradient(rgb(255 255 255 / 0.25) 1px, transparent 1.5px); background-size: 9px 9px; }
-.av-chat__title { font-family: var(--font-hand); font-weight: 700; font-size: 1.9rem; color: #3c2a14; transform: rotate(-1.5deg); transform-origin: 0 50%; }
-.av-chat a { color: #3c2a14; }
-.av-reviews__summary { position: relative; background: #fffdf8; border: 0; border-radius: 4px; box-shadow: 0 24px 40px -28px rgb(40 28 14 / 0.4); transform: rotate(-0.8deg);
-  background-image: repeating-linear-gradient(transparent 0 27px, rgb(31 42 68 / 0.04) 27px 28px); }
-.av-reviews__summary::before { content: ""; position: absolute; top: -10px; left: 50%; width: 46px; height: 20px; transform: translateX(-50%) rotate(-3deg); background: rgb(233 220 190 / 0.85); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+/* The price chat and the review summary are ordinary panels, like the price ladder above them: the product page
+   keeps one look, and the paper notes stay on the stall's own pages. */
+.av-chat { background: var(--surface-2); border: 0; border-radius: var(--radius-md); }
+.av-chat__title { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; }
+.av-reviews__summary { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); }
 :root[data-theme="dark"] .av-reviews__summary { background-color: var(--surface); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .av-reviews__summary { background-color: var(--surface); } }
 
@@ -1384,13 +1381,9 @@ body::before {
    ProductImage.stageFor), soft light from above and a hint of hanji paper. Kept plain on purpose: a shelf of patterned
    grounds was busy, and the craft belongs to the sections around the socks, not inside every picture. Drawn socks are
    transparent and stand on it; a photograph covers it; a cut-out photo stands on it too. */
-img[data-stage] { background-color: #f1eadd; background-image: radial-gradient(ellipse 80% 62% at 50% 30%, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0) 72%), linear-gradient(180deg, rgb(0 0 0 / 0) 70%, rgb(60 40 20 / 0.06)), url("/media/tex/fibre-035.png"); background-size: cover, cover, 260px 260px; background-repeat: no-repeat, no-repeat, repeat; }
-img[data-stage="hanji"] { background-color: #f1eadd; }
-img[data-stage="hanji-rose"] { background-color: #f3e6e2; }
-img[data-stage="felt-sage"] { background-color: #e5ebe1; }
-img[data-stage="felt-sky"] { background-color: #e3e9ef; }
-img[data-stage="bojagi"] { background-color: #efe5d4; }
-img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
+/* Every product picture stands on the same quiet paper, so a shelf reads as one collection and the socks are what
+   changes from card to card (the six coloured backdrops made the grid busy). */
+img[data-stage] { background-color: #f0ebe2; background-image: radial-gradient(ellipse 80% 62% at 50% 30%, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0) 72%), linear-gradient(180deg, rgb(0 0 0 / 0) 70%, rgb(60 40 20 / 0.06)), url("/media/tex/fibre-035.png"); background-size: cover, cover, 260px 260px; background-repeat: no-repeat, no-repeat, repeat; }
 
 
 /* Textures the whole shop draws from: hanji fibres, a faint paper for the page itself, felt, and the oimo stitch. */
@@ -1656,3 +1649,29 @@ p { text-wrap: pretty; }
 .av-stockhist__in { color: var(--success, #2f6b3a); font-variant-numeric: tabular-nums; font-weight: 600; }
 .av-stockhist__out { font-variant-numeric: tabular-nums; }
 .av-handover__pay { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--success-bg); color: var(--success); }
+/* Narrow phones in demo mode: the demo line takes the announcement bar's place instead of stacking a second strip
+   above the header (the switches are in the menu there anyway). */
+@media (max-width: 560px) {
+  .av-demoribbon ~ .av-ann { display: none; }
+  .av-demoribbon { font-size: 0.75rem; }
+}
+
+/* Shelf filters: one button on phones, always open on wider screens. */
+.av-filtertoggle { display: none; }
+@media (max-width: 719px) {
+  .av-filtertoggle { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-4);
+    margin-top: var(--space-3); border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--ink);
+    font: 600 0.9375rem/1 var(--font-sans); cursor: pointer; }
+  .av-filtertoggle svg { width: 18px; height: 18px; }
+  .av-filtertoggle[aria-expanded="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .av-filterpanel:not(.is-open) { display: none; }
+  .av-filterpanel.is-open { animation: av-pagein var(--dur) var(--ease); }
+}
+/* Phones: the shelf's title and count without the washing-line picture above them, so the socks come sooner. */
+@media (max-width: 559px) {
+  .av-shelfhead__line { display: none; }
+  .av-shelfhead__inner { min-height: 0; padding-block: var(--space-5); }
+}
+/* Checkout and order pages: the summary's heading has the same rank as the form's own sections ("Contact",
+   "Payment"), not a display size of its own. */
+.av-summary > h2 { font-size: var(--text-h3); }

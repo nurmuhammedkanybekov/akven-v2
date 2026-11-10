@@ -37,3 +37,4 @@ export const SparkIcon = () => <Icon><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6
 export const ShieldIcon = () => <Icon><path d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z" /><path d="m9 12 2.2 2.2L15.5 10" /></Icon>;
 export const WalletIcon = () => <Icon><rect x="3.5" y="6.5" width="17" height="12" rx="2" /><path d="M3.5 10h17M15.5 14.5h2" /></Icon>;
 export const ArrowUpIcon = () => <Icon><path d="M12 19V5M6 11l6-6 6 6" /></Icon>;
+export const FilterIcon = () => <Icon><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></Icon>;
