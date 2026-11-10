@@ -109,9 +109,10 @@ round stamp and a red dojang seal. Two buttons lead to the socks and to the stor
 sizes from newborn to grandpa, pickup at Dordoi or delivery, and a family-run stall since 2018. Below follow the
 reasons to order (a felt band), what the visitor looked at last, the four shelves as washing lines on their own
 fabrics (Figure~\ref{fig:shelves}), the bestsellers with their rank stamped in red, the price ladder as kraft tags on
-felt, the fitting room, what families say (each review a note on hanji paper with the writer's initial in a seal), a
-gift box and a family set, the story of the two names, a short scene in which container 70-E opens as the visitor
-scrolls, the notes pinned at the stall, and a way in for shops and companies.
+felt, what families say (each review a note on hanji paper with the writer's initial in a seal), the story of the two
+names, a short scene in which container 70-E opens as the visitor scrolls, and a way in for shops and companies. The
+fitting room, gift boxes, the family planner and the notes pinned at the stall have pages of their own, one tap away
+in the menu.
 
 \shot{u-home.jpg}{The home page}{fig:home}
 \shot{u-home-shelves.jpg}{Who are they for? Each shelf on its own fabric, with its socks on the line}{fig:shelves}
@@ -123,7 +124,8 @@ products. The tabs switch between all socks, men, women, children and gift boxes
 occasions (Classic, Casual, Sport, Thermal, Home, Heritage); below them, a bar that stays in reach while scrolling
 filters by height (no-show to knee-high), by size and by colour, shows only socks in stock and sorts by newest, name or
 price. Every number on a filter says how many products it would leave; a choice that would leave none is disabled. Each
-chosen filter appears as a tag that removes it with one tap (Figure~\ref{fig:filters}). The list grows twelve at a time
+chosen filter appears as a tag that removes it with one tap (Figure~\ref{fig:filters}). On a phone the filters fold
+behind one \emph{Filters} button, which shows how many are chosen, so the socks start on the first screen. The list grows twelve at a time
 with \emph{Show 12 more}, and a thread shows how much of the shelf has been seen. Everything is kept in the address, so
 a filtered shelf can be bookmarked, shared or reached again with the Back button.
 
@@ -204,8 +206,13 @@ and a phone number and how to receive the order: pickup at container 70-E, a cou
 or cargo to the regions, Kazakhstan, Uzbekistan or Russia. Each area or carrier shows its fee, the days it takes, from
 which amount delivery is free and the owners' note; a carrier paid on receipt says so, and the summary says how much
 more makes delivery free. \emph{Remember my details} keeps the name, phone, area and address for next time.
-Payment is with Apple Pay or Google Pay (Figure~\ref{fig:wallet}); the wallet in this thesis is simulated and the dialog
-says so, and it can be told to decline in order to show what happens then: nothing is charged and the bag stays.
+The customer then either reserves the order and pays in person, or pays online. \emph{Reserve, pay at the stall}
+(\emph{Order, pay on delivery} for a delivery) charges nothing: the socks are put aside for 48~hours and paid in cash
+or with a bank app at the stall or to the courier; if nobody comes, the reservation ends by itself, the socks go back
+on the shelf and the customer gets an email. Online payment is with Apple Pay or Google Pay
+(Figure~\ref{fig:wallet}); the wallet in this thesis is simulated and the dialog says so, and it can be told to decline
+in order to show what happens then: nothing is charged and the bag stays. While payments are simulated, a line above
+the header of every page says that the shop is a demo for a thesis and that orders and payments are not real.
 
 \shot{u-checkout.jpg}{Checkout with a delivery area}{fig:checkout}
 \shot[0.8]{u-wallet.jpg}{The simulated wallet}{fig:wallet}
@@ -214,8 +221,9 @@ says so, and it can be told to decline in order to show what happens then: nothi
 
 A paid order (Figure~\ref{fig:order}) shows its timeline (placed, paid, ready or on its way, delivered), the socks, the
 delivery area and time, and for pickup a six-digit code and a QR code. At the stall the customer says the code and the
-last four digits of their phone number. A paid order can be cancelled until it is handed over; the payment is refunded
-and the socks go back on the shelf. \emph{Order these again} fills the bag with the same socks. Each step is also
+last four digits of their phone number. A reserved order shows until when it is kept and the same pickup code; it is paid at
+handover. A paid or reserved order can be cancelled until it is handed over; a payment is refunded, and the socks go
+back on the shelf. \emph{Order these again} fills the bag with the same socks. Each step is also
 emailed in the customer's language. A guest's order lives at its private link; \emph{Find my order} emails a lost link
 again, given the email address and the order number.
 
@@ -282,16 +290,21 @@ groups the screens by who may use them: \emph{Shop} for everyone in the team, \e
 \paragraph{Products.} The list (Figure~\ref{fig:a-products}) can be searched and filtered (in the shop, removed). One
 screen (Figure~\ref{fig:a-edit}) adds or edits a product: name, audience, section, cut, description, fabric, quality,
 care and origin; its options (colour with swatch, size, pack, price, stock, stock on the way and when it arrives); and
-its pictures, each of which can belong to one colour. Pictures are uploaded as JPEG, PNG or WebP of up to 5~MB.
+its pictures, each of which can belong to one colour. \emph{Goods arrived} adds a delivery to an option's stock (and
+takes it off ``on the way''), and \emph{Stock history} (Figure~\ref{fig:a-stock}) lists every change to the stock with its reason: the opening
+count, a delivery, a sale linked to its order, a cancelled sale, or a count corrected by hand. Pictures are uploaded as JPEG, PNG or WebP of up to 5~MB.
 Removing a product hides it from the shop; it can be restored. Every change appears in the product's history.
 
 \shot{a-products.jpg}{Products}{fig:a-products}
 \shot{a-product-edit.jpg}{Adding a product}{fig:a-edit}
+\shot{a-stock.jpg}{Goods arrived, and an option's stock history}{fig:a-stock}
 
 \paragraph{Orders and hand-over.} \emph{Orders} (Figure~\ref{fig:a-orders}) lists the orders by status; a gift order
 says how to pack it, a delivery order the area and the fee. An order can be marked as handed over or cancelled (with a
 refund). \emph{Hand over an order} (Figure~\ref{fig:a-handover}) is the stall's screen: the customer's code, typed or
-scanned from their QR code, and the last four digits of their phone number.
+scanned from their QR code, and the last four digits of their phone number. Reserved orders wait in the same list
+with the amount to take; for them, the team takes the money first, and confirming the handover records the payment
+and the sale. A reserved courier order is closed from its page with \emph{Paid and handed over}.
 
 \shot{a-orders.jpg}{Orders}{fig:a-orders}
 \shot{a-handover.jpg}{Handing an order over at the stall}{fig:a-handover}

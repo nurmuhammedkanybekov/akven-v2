@@ -24,10 +24,10 @@ Table~\ref{tab:tests} summarises the suites as they stand at the end of the proj
 		\toprule
 		\textbf{Suite} & \textbf{Command} & \textbf{Result} \\
 		\midrule
-		Backend & \texttt{mvn verify} & 273 tests, 96\% line coverage; the build fails below 80\% \\
+		Backend & \texttt{mvn verify} & 284 tests (11 on real PostgreSQL), 96\% line coverage; the build fails below 80\% \\
 		Real PostgreSQL & \texttt{-Dtest=PostgresIntegrationTest} & 11 tests over real HTTP on PostgreSQL 16 \\
-		Frontend & \texttt{npm test} & 208 tests, type check and production build \\
-		Browser journey & \texttt{npm run e2e} & 28 steps in three languages, axe rules on every page \\
+		Frontend & \texttt{npm test} & 213 tests, type check and production build \\
+		Browser journey & \texttt{npm run e2e} & 29 steps in three languages, axe rules on every page \\
 		\bottomrule
 	\end{tabularx}
 	\caption{The test suites}
@@ -39,7 +39,7 @@ pass.
 
 \section{Backend tests}
 
-The backend has 43 test classes. The most important ones, grouped by the property they show:
+The backend has 52 test classes. The most important ones, grouped by the property they show:
 
 \begingroup\small
 \begin{longtable}{p{5.3cm} p{8.7cm}}
@@ -68,6 +68,10 @@ The backend has 43 test classes. The most important ones, grouped by the propert
 	\texttt{CatalogControllerTest} & Filters, facet counts per dimension, sizes and colours counted for what can be
 	bought, cost and limit never in public responses. \\
 	\texttt{AdminCatalogControllerTest} & Staff may edit prices and stock but not limits; every change is audited. \\
+	\texttt{StockLedgerTest} & Every way the stock can change leaves one row with its reason; a variant's rows add up to
+	its stock and each row's ``stock after'' follows from the one before. \\
+	\texttt{PayAtHandoverTest} & A reservation holds its pairs without selling them; they are sold only when paid at the
+	stall; an uncollected reservation ends and gives them back; one reservation holds at most 60 pairs. \\
 	\texttt{AuthControllerTest}, \texttt{LoginAttemptServiceTest}, \texttt{RegistrationLimiterTest} & Sign-up, sign-in,
 	lockout after five failures, sign-up limits, memory that does not grow without end. \\
 	\texttt{AccountsTest}, \texttt{SuperAdminSetupTest} & Team accounts; a disabled account or a new password ends its
@@ -105,7 +109,7 @@ check follows the server's rules.
 
 \section{The browser journey}
 
-\texttt{npm run e2e} drives Chromium through Playwright against the real backend and the built frontend. Its 28 steps
+\texttt{npm run e2e} drives Chromium through Playwright against the real backend and the built frontend. Its 29 steps
 cover the owner adding a section and a product with two colours and a picture (and a disguised file being refused), the
 product appearing in the shop with its filter count, removing and restoring it, a visitor filling the bag and
 registering, a declined and then a successful payment, the last pair bought and returned by cancelling, the customer
@@ -113,7 +117,7 @@ asking for 90\% and being held to the limit, the team handing the order over and
 page's sections, the owners' screens, the super admin's accounts, assistant and audit log, quick view and prices in som,
 the family and the gift box, reviews and search, a wholesale request with a wrong and then a right phone number, the
 women's shelf filtered by size and colour, and a guest ordering without an account and opening the order from a
-second browser, first without the link's key (and asking for it by email), then with it. After each important page the axe rules~\cite{axe} run, and any serious or
+second browser, first without the link's key (and asking for it by email), then with it. The last step reserves an order to pay at the stall as a guest, and the team hands it over with the code and takes the money. After each important page the axe rules~\cite{axe} run, and any serious or
 critical finding fails the journey.
 
 The journey has caught problems that unit tests could not: a menu that flipped between two sizes in Russian, faded text

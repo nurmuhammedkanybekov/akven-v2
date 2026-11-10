@@ -337,9 +337,55 @@ moment, and a double click must not charge twice. The method therefore:
 	\item marks the order paid with the provider's reference, gives a pickup code, and audits each step.
 \end{enumerate}
 
-The order's status machine lives in the entity: pending, paid, fulfilled, or cancelled from pending or paid (with a
-refund and the stock returned). The simulated wallet accepts only token shapes of Apple Pay and Google Pay and refuses
-anything that looks like a card number.
+The order's status machine lives in the entity (Figure~\ref{fig:orderstates} gives it in words): an order starts
+\emph{pending} while it is being paid; a wallet payment makes it \emph{paid}, and the team's handover makes it
+\emph{fulfilled}; a pending, paid or reserved order can be \emph{cancelled} (a paid one with a refund and its pairs
+back on the shelf). The simulated wallet accepts only token shapes of Apple Pay and Google Pay and refuses anything
+that looks like a card number.
+
+\paragraph{Reserve now, pay at handover.} Most customers of the stall pay in cash or with a bank app, and an online
+payment provider for Kyrgyzstan is future work. So a customer may also choose to pay in person. The order then becomes
+\emph{reserved}: its pairs are held exactly as during a wallet payment (\texttt{reserved\_qty}), so nobody else can buy
+them, but they are not sold and nothing is charged. A pickup order gets its code at once. At the stall the team checks
+the code and the last digits of the phone, takes the money and confirms; only then is the order sold, in one
+transaction: the variants are locked, the pairs leave the shelf, the ledger records the sale, and the low-stock check
+runs. A courier order is confirmed the same way from its page. A reservation holds its pairs for 48~hours; a
+scheduled job ends the ones nobody collected, locks each order again first (so a handover at the same moment always
+wins), gives the pairs back and writes to the customer. Because holding pairs costs the customer nothing, one
+reservation may hold at most 60~pairs; larger orders go through the wholesale request. The database keeps the rule
+that a reserved order always has its deadline (a check constraint), and pickup codes are unique among paid and reserved
+orders (a partial unique index).
+
+\paragraph{The stock ledger.} Stock used to be a single number per variant that each change overwrote, so ``why is
+it seven?'' had no answer in the data. Now every change to a variant's stock writes one row in \texttt{stock\_movement}
+with its reason (opening count, goods arrived, sale, cancelled sale, count corrected by hand), the order or the person
+behind it, and the stock right after it. The row is written by the same transaction as the change
+(\texttt{Propagation.MANDATORY} makes a call outside a transaction fail), and rows are only ever added. Two properties
+follow and are tested: a variant's rows add up to its stock, and each row's \emph{stock after} is the previous one plus
+its own change, so the history reads like a bank statement. Typing a new number into the stock field is kept as a
+correction by the difference, which is safe because an edit must name the version it was made on: a sale in between
+makes the edit fail instead of being overwritten. The owners see the history on each variant, with every sale linked
+to its order, and record a delivery with ``Goods arrived'', which also takes the pairs off ``on the way''.
+
+\begin{figure}[H]
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		From & Event & To \\
+		\midrule
+		(new) & checkout with a wallet & pending \\
+		pending & wallet approves & paid \\
+		pending & wallet declines or is unreachable & cancelled \\
+		(new) & checkout, pay at handover & reserved \\
+		paid & handed over & fulfilled \\
+		reserved & paid in person and handed over & fulfilled \\
+		reserved & time is up, or cancelled & cancelled (pairs back) \\
+		paid & cancelled & cancelled (refund, pairs back) \\
+		\bottomrule
+	\end{tabular}
+	\caption{The states of an order and what moves it between them}
+	\label{fig:orderstates}
+\end{figure}
 
 \section{Further domain features}
 
@@ -436,6 +482,18 @@ the logo, and the oimo stitch along the edges. From Korea: hanji paper under car
 hero's tissue paper, and a red dojang seal, which stamps the bestseller ranks and carries each reviewer's initial.
 Cards that hold the shop's own words are \emph{sewn}: a felt strip on top, a dashed stitch inside the edge. One
 rule keeps it calm: patterns stay in frames, bands and headers, while the product pictures sit on plain single tones.
+
+\paragraph{A calm shopping path.} A design review late in the project found the opposite problem: the shopping pages
+were as decorated as the story pages, and the stylesheets had grown in layers (92 different font sizes, 42 corner
+radii, 100 shadows, 27 animations that never stopped). The rule since then is that the stall's warmth lives in a few
+signature places (the hero, the story, the container scene, the footer) and the path from shelf to checkout stays
+quiet: every product picture stands on the same paper colour and carries no logo; small labels are one style (small gold
+capitals after a hairline) and handwriting is kept for the family's own words; on a phone the filters of a shelf fold
+behind one button, so the first socks show on the first screen. Motion uses three durations (150, 250 and 400~ms):
+fast for feedback such as a button press or the bag's count, the middle one for panels and pictures, the slow one only
+for larger changes. Animations that looped without meaning were removed; what still loops tells something (a
+spinner, the loading thread, the ``open now'' dot, the lights of the container scene while it is on screen). The home
+page went from twelve sections to nine; the parts that left it kept their own pages.
 
 \paragraph{Performance.} Motion follows two rules that keep it smooth on cheap phones: only \texttt{transform} and
 \texttt{opacity} are animated, and nothing that changes the layout runs while scrolling. Measurements in Chromium's
