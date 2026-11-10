@@ -1654,3 +1654,8 @@ img[data-stage] { transition: opacity 0.45s var(--ease-out); }
 :root { accent-color: var(--ink); scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent; }
 /* Long prose reads at a comfortable measure and never ends on one lonely word. */
 p { text-wrap: pretty; }
+
+/* Demo mode: one quiet line above everything, so nobody mistakes the demo for the real shop. */
+.av-demoribbon { margin: 0; padding: 6px var(--space-4); background: var(--surface-2); color: var(--ink); border-bottom: 1px solid var(--line, color-mix(in srgb, var(--ink) 12%, transparent)); font-size: var(--text-small); line-height: 1.4; text-align: center; text-wrap: balance; }
+.av-demoribbon a { color: inherit; font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
+@media (pointer: coarse), (max-width: 719px) { .av-demoribbon a { display: inline-flex; align-items: center; min-height: 44px; } .av-demoribbon { padding-block: 2px; } }
