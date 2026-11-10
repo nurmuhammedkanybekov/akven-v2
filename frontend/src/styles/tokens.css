@@ -44,8 +44,11 @@
   --gutter: 1rem;
 
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* Motion: three durations and two curves for the whole shop. Small feedback (hover, press, a badge) is fast;
+     panels and pictures take the middle; only larger scene changes use the slow one. */
   --dur-fast: 150ms;
   --dur: 250ms;
+  --dur-slow: 400ms;
 
   /* ---- light theme (default) ---- */
   --paper: #f7f4ee;          /* page background: ivory */

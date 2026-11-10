@@ -47,11 +47,9 @@ import "./styles/identity.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import { installPointerFx } from "./lib/pointerFx";
 import { installScrollHints } from "./lib/scrollHints";
 import { loadLang, savedLang } from "./i18n/I18n";
 
-installPointerFx();
 installScrollHints();
 
 // The visitor's language arrives before the first paint, so a Russian or Kyrgyz page never flashes in English.

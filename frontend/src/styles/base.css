@@ -72,6 +72,14 @@ h3 { font-family: var(--font-sans); font-size: var(--text-h3); line-height: 1.2;
 
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
 
+/* Expandable sections (details) open and close smoothly where the browser can animate to "auto"; elsewhere they
+   simply open, as before. */
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details::details-content { block-size: 0; overflow: clip; transition: block-size var(--dur) var(--ease), content-visibility var(--dur) allow-discrete; }
+  details[open]::details-content { block-size: auto; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
