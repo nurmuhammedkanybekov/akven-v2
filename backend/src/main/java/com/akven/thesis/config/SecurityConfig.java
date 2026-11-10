@@ -106,7 +106,7 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 // Live API docs (OpenApiConfig) — documentation, not data, so no auth required.
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/catalog/**", "/api/pricing", "/api/shop/info", "/api/shop/delivery-zones", "/api/sizes", "/api/sizes/find", "/media/uploads/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/catalog/**", "/api/pricing", "/api/shop/info", "/api/version", "/api/shop/delivery-zones", "/api/sizes", "/api/sizes/find", "/media/uploads/**").permitAll()
                 // Registration and login must be reachable without a token; everything else
                 // under /api/auth/** (e.g. /api/auth/me) stays behind anyRequest().authenticated().
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/cart/quote", "/api/wholesale/requests").permitAll()

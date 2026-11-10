@@ -18,7 +18,10 @@ services:
       retries: 20
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        AKVEN_COMMIT: ${AKVEN_COMMIT:-unknown}   # set by deploy/deploy.sh; shown at /api/version
     depends_on:
       db:
         condition: service_healthy

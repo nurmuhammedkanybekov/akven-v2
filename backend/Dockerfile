@@ -11,5 +11,8 @@ RUN useradd --system --create-home akven && mkdir -p /data/media && chown akven 
 USER akven
 COPY --from=build /app.jar /app.jar
 ENV MEDIA_DIR=/data/media
+# The commit this image was built from, shown at /api/version (deploy/deploy.sh passes it).
+ARG AKVEN_COMMIT=unknown
+ENV AKVEN_COMMIT=$AKVEN_COMMIT
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]
