@@ -194,7 +194,7 @@ body::before {
 .av-seal__inner { fill: none; stroke: #b08a4a; stroke-width: 1; stroke-dasharray: 2 4; }
 .av-seal__text { font: 600 15px/1 var(--font-sans); letter-spacing: 0.18em; fill: #6b4f1e; }
 .av-seal__heart { fill: #b8913f; }
-.av-seal__turn { transform-origin: 50% 50%; animation: av-seal-turn 40s linear infinite; will-change: transform; }
+.av-seal__turn { transform-origin: 50% 50%; }
 @keyframes av-seal-turn { to { transform: rotate(360deg); } }
 .av-still__seal { position: absolute; z-index: 6; left: 3%; top: auto; bottom: 4%; width: clamp(96px, 17%, 150px); height: auto; rotate: -10deg; filter: drop-shadow(0 6px 10px rgb(60 42 20 / 0.18)); }
 @media (prefers-reduced-motion: reduce) { .av-seal__turn { animation: none; } }
@@ -311,19 +311,8 @@ body::before {
 
 /* ---------- buttons, icons and links ---------- */
 
-/* The fill grows out of the point where the pointer came in (the middle, for touch and keyboard), and shrinks back
-   towards where it left. The main buttons carry a sheen of gold light across them on hover. */
-.av-btn::before {
-  inset: -2px; opacity: 1; clip-path: circle(0% at var(--px, 50%) var(--py, 50%));
-  transition: clip-path 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.av-btn:hover::before, .av-btn:focus-visible::before { opacity: 1; clip-path: circle(150% at var(--px, 50%) var(--py, 50%)); }
-.av-btn--primary::after, .av-btn--accent::after {
-  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
-  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.35) 50%, transparent 65%) no-repeat;
-  background-size: 250% 100%; background-position: 120% 0;
-}
-.av-btn--primary:hover::after, .av-btn--accent:hover::after { background-position: -120% 0; transition: background-position 0.9s var(--ease-out); }
+/* Buttons fill with their colour on hover (components.css) and give a little on press. No effects that follow the
+   pointer: they read as decoration and could freeze half-drawn. */
 .av-btn > * { position: relative; z-index: 2; }
 .av-btn svg { transition: transform 0.4s var(--ease-spring); }
 .av-btn:hover svg:last-child { transform: translateX(3px); }
@@ -361,7 +350,7 @@ body::before {
 /* ---------- quick view ---------- */
 
 .av-qv { border-radius: var(--radius-lg); }
-.av-qv[open] { animation: av-qv-in 0.5s var(--ease-out); }
+.av-qv[open] { animation: av-qv-in 0.3s var(--ease-out); }
 @keyframes av-qv-in { from { transform: translateY(28px) scale(0.97); } }
 .av-qv::backdrop { background: rgb(15 25 48 / 0.5); backdrop-filter: blur(4px); animation: av-fade 0.4s var(--ease) both; }
 @keyframes av-fade { from { opacity: 0; } }
@@ -404,7 +393,7 @@ body::before {
 
 .av-cartline { transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), max-height 0.32s var(--ease); max-height: 400px; }
 .av-cartline.is-leaving { opacity: 0; transform: translateX(-24px) scale(0.98); max-height: 0; padding-block: 0; margin-block: 0; overflow: hidden; }
-.av-cartlines > li { animation: av-qv-rise 0.5s var(--ease-out) both; }
+.av-cartlines > li { animation: av-qv-rise 0.35s var(--ease-out) both; }
 .av-cart__main { display: grid; gap: var(--space-7); min-width: 0; align-content: start; }
 .av-fillbox { display: grid; gap: var(--space-3); }
 .av-fillbox h2 { font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.2rem); }
@@ -414,14 +403,14 @@ body::before {
 
 .av-emptybox { position: relative; width: 220px; height: 170px; margin: 0 auto var(--space-5); }
 .av-emptybox__box { position: absolute; left: 20px; right: 20px; bottom: 0; height: 90px; border-radius: 6px; background: #d8bf94 linear-gradient(180deg, rgb(0 0 0 / 0.12), transparent 30%); box-shadow: 0 16px 24px -16px rgb(60 42 20 / 0.6); }
-.av-emptybox__box::before { content: ""; position: absolute; left: -10px; right: -10px; top: -14px; height: 18px; border-radius: 4px; background: #c9ad7f; transform: rotate(-6deg); transform-origin: left; animation: av-lid 3s ease-in-out infinite alternate; }
+.av-emptybox__box::before { content: ""; position: absolute; left: -10px; right: -10px; top: -14px; height: 18px; border-radius: 4px; background: #c9ad7f; transform: rotate(-6deg); transform-origin: left; animation: av-lid 1.5s ease-in-out 2 alternate; }
 @keyframes av-lid { to { transform: rotate(-14deg) translateY(-4px); } }
-.av-emptybox__sock { position: absolute; left: 70px; top: 0; width: 80px; height: auto; rotate: 18deg; animation: av-peek 3s ease-in-out infinite alternate; }
+.av-emptybox__sock { position: absolute; left: 70px; top: 0; width: 80px; height: auto; rotate: 18deg; animation: av-peek 1.5s ease-in-out 2 alternate; }
 @keyframes av-peek { from { translate: 0 30px; } to { translate: 0 0; } }
 .av-emptybox__note { position: absolute; right: -40px; top: 10px; font-size: 1.3rem; rotate: 6deg; }
 @media (prefers-reduced-motion: reduce) { .av-emptybox__box::before, .av-emptybox__sock { animation: none; } }
 
-.av-bagdrawer[open] .av-bagdrawer__line { animation: av-qv-rise 0.5s var(--ease-out) 0.1s both; }
+.av-bagdrawer[open] .av-bagdrawer__line { animation: av-qv-rise 0.35s var(--ease-out) 0.1s both; }
 .av-bagdrawer__total { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--line); }
 .av-bagdrawer__all ul { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: 6px; }
 .av-bagdrawer__all li { display: flex; align-items: center; gap: var(--space-3); animation: av-qv-rise 0.45s var(--ease-out) both; animation-delay: calc(0.2s + var(--i) * 0.05s); }
@@ -451,7 +440,7 @@ body::before {
 .av-journey__line { position: absolute; left: 0; right: 0; top: 36px; width: 100%; height: 40px; overflow: visible; }
 .av-journey__line path { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 0.012 0.012; vector-effect: non-scaling-stroke; }
 .av-journey__walker { position: absolute; top: -6px; left: 0; width: 56px; z-index: 2; translate: -50% 0; }
-.av-journey__walker svg { width: 100%; height: auto; rotate: -8deg; animation: av-walk 0.8s ease-in-out infinite alternate; }
+.av-journey__walker svg { width: 100%; height: auto; rotate: -8deg; }
 @keyframes av-walk { to { rotate: 8deg; translate: 0 -3px; } }
 @supports (animation-timeline: view()) {
   .av-journey__walker { animation: av-route linear both; animation-timeline: view(); animation-range: entry 40% exit 30%; }
@@ -550,7 +539,7 @@ body::before {
 /* ---------- more motion ---------- */
 
 /* Section headings rise out of a mask as their section arrives. */
-.reveal [data-reveal] h2 { clip-path: inset(-0.2em -0.2em -0.3em -0.2em); transition: transform 0.9s var(--ease-out), clip-path 0.9s var(--ease-out); }
+.reveal [data-reveal] h2 { clip-path: inset(-0.2em -0.2em -0.3em -0.2em); transition: transform 0.5s var(--ease-out), clip-path 0.5s var(--ease-out); }
 .reveal [data-reveal]:not(.is-in) h2 { transform: translateY(0.45em); clip-path: inset(-0.2em -0.2em 100% -0.2em); }
 
 /* The heart beats when a sock is saved. */
@@ -813,7 +802,7 @@ body::before {
 .av-cl__line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .av-cl__line path { stroke: #9a8569; stroke-width: 2.5px; }
 .av-cl__item { position: absolute; display: block; }
-.av-cl__swing { position: relative; display: block; animation: av-sway 5.5s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -1.7s); will-change: transform; }
+.av-cl__swing { position: relative; display: block; }
 .av-cl__swing > svg:first-child { display: block; width: 100%; height: auto; filter: drop-shadow(8px 14px 10px rgb(42 29 16 / 0.18)); }
 .av-cl__peg { position: absolute; left: var(--cx); top: var(--cy); width: 9%; min-width: 9px; height: auto; transform: translate(-50%, -50%); }
 @keyframes av-sway { from { transform: rotate(-1.6deg); } to { transform: rotate(1.6deg); } }
@@ -870,7 +859,7 @@ body::before {
 .av-door__left, .av-door__right { transform-box: fill-box; transition: transform 0.9s var(--ease-out); }
 .av-door__left { transform-origin: 0 50%; } .av-door__right { transform-origin: 100% 50%; }
 .av-door.is-open .av-door__left { transform: scaleX(0.9); } .av-door.is-open .av-door__right { transform: scaleX(0.9); }
-.av-door__sign { transform-origin: 110px 66px; animation: av-sway 4.5s ease-in-out infinite alternate; }
+.av-door__sign { transform-origin: 110px 66px; }
 .av-footer__stall:hover .av-door__sign { animation: av-swing 1.4s var(--ease-out) both; }
 @media (prefers-reduced-motion: reduce) { .av-door__sign { animation: none !important; } }
 
@@ -1167,7 +1156,7 @@ body::before {
 /* The family's line: the same sock in three sizes, pegged a little lower each time. */
 .av-duo__line { position: relative; display: flex; align-items: flex-start; justify-content: center; gap: 4%; padding-top: 2.4rem; }
 .av-duo__line::before { content: ""; position: absolute; left: 6%; right: 6%; top: 2.2rem; height: 18px; border-top: 2.5px solid #9a8569; border-radius: 50% / 100% 100% 0 0; transform: scaleY(-1); transform-origin: 50% 0; }
-.av-duo__sock { position: relative; width: calc(30% * var(--s)); animation: av-sway 5.5s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -1.7s); transform-origin: 50% 0; }
+.av-duo__sock { position: relative; width: calc(30% * var(--s)); transform-origin: 50% 0; }
 .av-duo__sock > svg:last-child { display: block; width: 100%; height: auto; filter: drop-shadow(6px 10px 8px rgb(42 29 16 / 0.18)); }
 .av-duo__peg { position: absolute; left: 50%; top: -8px; width: 18%; min-width: 9px; transform: translateX(-50%); z-index: 1; }
 @media (prefers-reduced-motion: reduce) { .av-duo__sock { animation: none; } }
@@ -1448,7 +1437,7 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
    page then spent its time arranging layers.) */
 @media (hover: hover) {
   .av-card:hover .av-card__media img, .av-card:hover .av-card__media img[data-kind="art"] { transform: none; animation: none; }
-  .av-card__media .av-card__hover { clip-path: none; opacity: 0; transition: opacity 0.45s var(--ease-out), transform 0.9s var(--ease-out); }
+  .av-card__media .av-card__hover { clip-path: none; opacity: 0; transition: opacity var(--dur) var(--ease-out), transform var(--dur-slow) var(--ease-out); }
   .av-card:hover .av-card__hover, .av-card:focus-visible .av-card__hover { clip-path: none; opacity: 1; }
   .av-card__media { transition: none; }
 }
@@ -1606,14 +1595,14 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
 /* Not found: one sock on the line, an empty peg where its pair should hang. */
 .av-lost { display: grid; justify-items: center; text-align: center; gap: var(--space-4); padding-block: var(--space-7) var(--space-9); }
 .av-lost__line { position: relative; width: min(520px, 100%); aspect-ratio: 2.2; }
-.av-lost__peg { position: absolute; left: 66%; top: 5%; width: 2.8%; min-width: 10px; height: auto; transform: rotate(-8deg); transform-origin: 50% 0; animation: av-lost-peg 3.6s ease-in-out infinite alternate; }
+.av-lost__peg { position: absolute; left: 66%; top: 5%; width: 2.8%; min-width: 10px; height: auto; transform: rotate(-8deg); transform-origin: 50% 0; animation: av-lost-peg 1.8s ease-in-out 2 alternate; }
 @keyframes av-lost-peg { to { transform: rotate(6deg); } }
 .av-lost__hand { margin: 0; font-size: 1.6rem; color: var(--accent-ink); transform: rotate(-2deg); }
 .av-lost h1 { margin: 0; }
 .av-lost .av-lead { max-width: 34rem; margin: 0; }
 @media (prefers-reduced-motion: reduce) { .av-lost__peg { animation: none; } }
 /* Between pages: the new one fades in (opacity only, so fixed bars inside it stay put). */
-.av-pagein { animation: av-pagein 0.32s ease-out; }
+.av-pagein { animation: av-pagein 0.2s ease-out; }
 @keyframes av-pagein { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .av-pagein { animation: none; } }
 
@@ -1647,8 +1636,8 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
    browser already has show at once (no transition runs on the first frame). */
 img[data-ready="0"] { opacity: 0; }
 img[data-stage] { transition: opacity 0.45s var(--ease-out); }
-.av-card__media img { transition: transform 0.9s var(--ease-out), opacity 0.45s var(--ease-out); }
-@media (hover: hover) { .av-card__media .av-card__hover { transition: opacity 0.45s var(--ease-out), transform 0.9s var(--ease-out); } }
+.av-card__media img { transition: transform var(--dur-slow) var(--ease-out), opacity var(--dur-slow) var(--ease-out); }
+@media (hover: hover) { .av-card__media .av-card__hover { transition: opacity var(--dur) var(--ease-out), transform var(--dur-slow) var(--ease-out); } }
 /* Selected text, checkboxes, range sliders and scrollbars in the shop's own colours. */
 ::selection { background: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--ink); }
 :root { accent-color: var(--ink); scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent; }

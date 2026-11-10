@@ -2,6 +2,18 @@ import { useId } from "react";
 import { MARK, markMarkup } from "./mark";
 import { LOGO } from "./logo.generated";
 
+/**
+ * The heart writes itself once per visit (browser tab session), not on every reload: decided once when the page loads,
+ * so a logo shown again later in the same load does not start over either.
+ */
+const WRITE_THIS_VISIT = (() => {
+  try {
+    if (sessionStorage.getItem("akven-logo-written") === "1") return false;
+    sessionStorage.setItem("akven-logo-written", "1");
+  } catch { /* storage blocked: write it, as before */ }
+  return true;
+})();
+
 interface LogoProps {
   /** "full" = the mark and AK&VEN on one line, "stacked" = the mark above AK&VEN and the tagline, "mark" = the AV alone. */
   variant?: "full" | "stacked" | "mark";
@@ -23,7 +35,7 @@ export function Logo({ variant = "full", metallic = false, height = 28, classNam
   const id = `lg${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const fill = metallic ? `url(#${id}-g)` : "currentColor";
   // Writing: the filled heart is shown through a mask, a wide stroke along the pen's own path that draws itself in.
-  const pen = write && LOGO.ampLine;
+  const pen = write && WRITE_THIS_VISIT && LOGO.ampLine;
   const amp = (t: string) =>
     (pen ? `<mask id="${id}-w" maskUnits="userSpaceOnUse" x="-1000" y="-400" width="3000" height="800"><path class="av-logo-pen" d="${LOGO.ampLine}" pathLength="1" fill="none" stroke="#fff" stroke-width="17" stroke-linecap="round"/></mask>` : "") +
     `<path transform="${t}" style="fill:${metallic ? fill : "var(--logo-amp, currentColor)"}" d="${LOGO.amp}"${pen ? ` mask="url(#${id}-w)"` : ""}/>`;

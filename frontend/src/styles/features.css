@@ -51,7 +51,7 @@
   animation: av-rise 0.6s var(--ease-out) both; animation-delay: calc(var(--i) * 90ms);
 }
 .av-bdays__icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--surface-2); color: var(--accent-ink); }
-.av-bdays li.is-today .av-bdays__icon { animation: av-wiggle 1.2s var(--ease) infinite; }
+.av-bdays li.is-today .av-bdays__icon { animation: av-wiggle 1.2s var(--ease) 2; }
 .av-bdays__text { flex: 1 1 220px; font-weight: 500; }
 
 .av-waitlist { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
@@ -70,8 +70,8 @@
 
 /* the picture of what was added flies to the bag, and the bag bumps */
 .av-fly { position: fixed; z-index: 1000; pointer-events: none; object-fit: cover; box-shadow: var(--shadow-2); will-change: transform; }
-.av-icon-btn.is-bump { animation: av-bump 0.55s var(--ease-spring); }
-@keyframes av-bump { 0% { transform: none; } 35% { transform: scale(1.28) rotate(-10deg); } 65% { transform: scale(0.94) rotate(4deg); } 100% { transform: none; } }
+.av-icon-btn.is-bump { animation: av-bump var(--dur-slow) var(--ease-spring); }
+@keyframes av-bump { 0% { transform: none; } 40% { transform: scale(1.16); } 100% { transform: none; } }
 
 /* ---- saved list ---------------------------------------------------------------------------- */
 
@@ -105,7 +105,7 @@
 .av-timeline li.is-done .av-timeline__dot::after { content: ""; display: block; width: 7px; height: 11px; margin: 2px auto 0; border: solid var(--on-accent); border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
 .av-timeline.is-cancelled li:last-child .av-timeline__dot { border-color: var(--danger); background: var(--danger); }
 .av-timeline li[aria-current="step"] .av-timeline__dot { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent); }
-.av-timeline:not(.is-cancelled) li[aria-current="step"]:not(:last-child) .av-timeline__dot { animation: av-pop-in 0.5s var(--ease-spring) both, av-pulse 1.8s ease-out 1.4s infinite; color: var(--accent); }
+.av-timeline:not(.is-cancelled) li[aria-current="step"]:not(:last-child) .av-timeline__dot { animation: av-pop-in 0.5s var(--ease-spring) both, av-pulse 1.8s ease-out 1.4s 2; color: var(--accent); }
 
 .av-confetti { position: fixed; inset: 0; z-index: 1000; pointer-events: none; overflow: hidden; }
 .av-confetti i { position: absolute; top: -24px; width: var(--w); height: calc(var(--w) * 0.55 + 3px); border-radius: 2px; animation: av-confetti 2.8s cubic-bezier(0.2, 0.6, 0.4, 1) both; }
@@ -183,11 +183,11 @@
 .av-gbox__tag {
   position: absolute; right: 0; bottom: 30%; z-index: 5; max-width: 34%; padding: 6px 10px; border-radius: 4px;
   background: #fbf8f1; color: #2b2620; font: 600 0.8rem/1.2 var(--font-sans); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-  transform-origin: 0 50%; animation: av-tag 3.2s ease-in-out infinite alternate;
+  transform-origin: 0 50%;
 }
 .av-gbox__tag::before { content: ""; position: absolute; left: -22%; top: 50%; width: 24%; border-top: 1.5px solid var(--rib); }
 .av-gbox__tag span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.av-gbox__tag.has-name { animation: av-tag 3.2s ease-in-out infinite alternate, av-pop-in 0.5s var(--ease-spring); }
+.av-gbox__tag.has-name { animation: av-pop-in 0.5s var(--ease-spring); }
 @keyframes av-tag { from { transform: rotate(4deg); } to { transform: rotate(10deg); } }
 
 /* the card, as it will read */

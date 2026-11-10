@@ -272,7 +272,7 @@
 .av-box__socks { --wind: 0deg; position: absolute; top: calc(11% - 4px); left: 6%; right: 6%; display: flex; justify-content: space-between; align-items: flex-start; }
 .av-hang { width: 15.5%; margin-inline: -1.2%; transform-origin: 50% 0; transform: rotate(calc(var(--wind) * (0.7 + var(--i) * 0.07))); transition: transform 1.4s cubic-bezier(0.2, 1.7, 0.35, 1); }
 .av-hang__peg { position: relative; z-index: 1; display: block; width: 26%; height: 18px; margin: 0 auto -10px; border-radius: 2px; background: linear-gradient(90deg, #c49a62, #9c7542); box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }
-.av-hang__sway { transform-origin: 50% 0; animation: av-sway calc(3.2s + var(--i) * 0.41s) ease-in-out calc(var(--i) * -0.7s) infinite alternate; }
+.av-hang__sway { transform-origin: 50% 0; animation: av-sway calc(3.2s + var(--i) * 0.41s) ease-in-out calc(var(--i) * -0.7s) 2 alternate; }
 .av-hang:hover .av-hang__sway { animation: av-swing 1.6s cubic-bezier(0.3, 0, 0.3, 1) both; }
 .av-hang svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 8px 6px rgba(60, 35, 5, 0.28)); }
 @keyframes av-sway { from { transform: rotate(-2.4deg); } to { transform: rotate(2.4deg); } }
@@ -332,7 +332,6 @@
 
 /* ---------- the washing line ---------- */
 .av-line { --wind: 0deg; position: relative; overflow: hidden; height: 230px; background: var(--paper); border-bottom: 1px solid var(--line); }
-.av-line__track { display: flex; width: max-content; animation: av-line 90s linear infinite; }
 .av-line:hover .av-line__track { animation-play-state: paused; }
 .av-line__run { position: relative; flex: none; height: 230px; }
 .av-line__rope { position: absolute; left: 0; top: 0; overflow: visible; }
@@ -340,7 +339,6 @@
 .av-line__sock { position: absolute; width: 84px; margin-left: -42px; transform-origin: 50% 0;
   transform: rotate(calc(var(--wind) * (0.8 + (var(--i) / 20)))); transition: transform 1.4s cubic-bezier(0.2, 1.7, 0.35, 1); }
 .av-line__peg { position: relative; z-index: 1; display: block; width: 10px; height: 22px; margin: -8px auto -12px; border-radius: 2px; background: linear-gradient(90deg, #c7a46e, #9c7542); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
-.av-line__sway { transform-origin: 50% 0; animation: av-sway calc(3s + var(--i) * 0.37s) ease-in-out calc(var(--i) * -0.6s) infinite alternate; }
 .av-line__sock:hover .av-line__sway { animation: av-swing 1.6s cubic-bezier(0.3, 0, 0.3, 1) both; }
 .av-line__sock svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 5px rgba(60, 40, 10, 0.18)); }
 @keyframes av-line { to { transform: translateX(-50%); } }

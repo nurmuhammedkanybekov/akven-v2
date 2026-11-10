@@ -14,7 +14,7 @@
 /* Sections slide up as they arrive, and the items in their grids follow one after another. */
 .reveal [data-reveal] { transition-timing-function: var(--ease-out); }
 .reveal [data-reveal] :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > * {
-  transform: translateY(26px); transition: transform 0.9s var(--ease-out);
+  transform: translateY(26px); transition: transform 0.5s var(--ease-out);
 }
 .reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > * { transform: none; }
 .reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > :nth-child(2) { transition-delay: 70ms; }
@@ -24,9 +24,9 @@
 .reveal [data-reveal].is-in :is(.av-cats, .av-grid-products, .av-facts2__figures, .av-facts2__steps, .av-biz, .av-builder__picks, .av-story2__facts) > :nth-child(n + 6) { transition-delay: 340ms; }
 
 /* Product cards lift a little, their picture grows slowly, and the shadow settles under them. */
-.av-card { transition: transform 0.5s var(--ease-out); }
-.av-card__media { transition: box-shadow 0.5s var(--ease-out); }
-.av-card__media img { transition: transform 0.9s var(--ease-out); }
+.av-card { transition: transform var(--dur-slow) var(--ease-out); }
+.av-card__media { transition: box-shadow var(--dur-slow) var(--ease-out); }
+.av-card__media img { transition: transform var(--dur-slow) var(--ease-out); }
 @media (hover: hover) {
   .av-card:hover { transform: translateY(-4px); }
   .av-card:hover .av-card__media { box-shadow: 0 22px 40px -26px rgba(15, 25, 48, 0.45); }
@@ -58,5 +58,5 @@
 .av-colorchoice[aria-pressed="true"] { animation: av-count-pop 0.4s var(--ease-spring); }
 
 /* The product picture changes colour with a soft wipe instead of a jump. */
-.av-pdp__main img, .av-qv__media img { animation: av-wipe 0.55s var(--ease-out); }
+.av-pdp__main img, .av-qv__media img { animation: av-wipe 0.3s var(--ease-out); }
 @keyframes av-wipe { from { clip-path: inset(0 0 0 12%); transform: translateX(-10px); } to { clip-path: inset(0); transform: none; } }
