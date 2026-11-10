@@ -1358,6 +1358,8 @@ const shop = {
   "visit.zoneFreeFrom": "free from {amount}",
   "a.em.kind.LOW_STOCK": "Running low (to the owners)",
   "nf.hand": "this one lost its pair…",
+  "demo.ribbon": "Demo for a university thesis: orders and payments here are not real.",
+  "demo.ribbonLink": "Buy at the stall",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

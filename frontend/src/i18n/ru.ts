@@ -1343,6 +1343,8 @@ const shop: Partial<Record<MessageKey, string>> = {
   "visit.zoneFreeFrom": "бесплатно от {amount}",
   "a.em.kind.LOW_STOCK": "Заканчивается (владельцам)",
   "nf.hand": "этот потерял свою пару…",
+  "demo.ribbon": "Демо-версия для дипломной работы: заказы и оплата здесь не настоящие.",
+  "demo.ribbonLink": "Купить в контейнере",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };
