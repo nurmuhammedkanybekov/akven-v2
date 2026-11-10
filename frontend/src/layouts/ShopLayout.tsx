@@ -2,7 +2,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useCart } from "../cart/CartContext";
 import { BagDrawer } from "../components/BagDrawer";
-import { DemoRibbon } from "../components/DemoRibbon";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import { YarnProgress } from "../components/YarnProgress";
@@ -24,7 +23,6 @@ export function ShopLayout() {
   return (
     <>
       <a className="av-skip-link" href="#main">{t("skip")}</a>
-      <DemoRibbon />
       <YarnProgress />
       <Header
         cartCount={cart.count}

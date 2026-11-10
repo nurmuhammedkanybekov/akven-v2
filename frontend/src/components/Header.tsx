@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { DemoNote, useDemoMode } from "./DemoRibbon";
 import { Logo } from "../brand/Logo";
 import { LanguageSwitch, useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
@@ -52,6 +53,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
   const { t, lang } = useT();
   const { pathname } = useLocation();
   const msg = useRotation(MESSAGES.length, 5000);
+  const demo = useDemoMode();
   const headerRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLAnchorElement>(null);
@@ -121,7 +123,7 @@ export function Header({ cartCount = 0, savedCount = 0, accountTo = "/login", ac
     <>
       <div className="av-ann">
         <div className="av-container av-ann__bar">
-          <AnnText key={msg} text={t(MESSAGES[msg])} />
+          {demo ? <DemoNote /> : <AnnText key={msg} text={t(MESSAGES[msg])} />}
           <div className="av-ann__langs">
             <CurrencySwitch />
             <span className="av-ann__sep" aria-hidden="true" />

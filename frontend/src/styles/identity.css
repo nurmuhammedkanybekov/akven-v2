@@ -1588,10 +1588,9 @@ img[data-stage] { transition: opacity 0.45s var(--ease-out); }
 /* Long prose reads at a comfortable measure and never ends on one lonely word. */
 p { text-wrap: pretty; }
 
-/* Demo mode: one quiet line above everything, so nobody mistakes the demo for the real shop. */
-.av-demoribbon { margin: 0; padding: 6px var(--space-4); background: var(--surface-2); color: var(--ink); border-bottom: 1px solid var(--line, color-mix(in srgb, var(--ink) 12%, transparent)); font-size: var(--text-small); line-height: 1.4; text-align: center; text-wrap: balance; }
-.av-demoribbon a { color: inherit; font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
-@media (pointer: coarse), (max-width: 719px) { .av-demoribbon a { display: inline-flex; align-items: center; min-height: 44px; } .av-demoribbon { padding-block: 2px; } }
+/* Demo mode: the announcement bar says so (DemoNote). The tag is gold on the dark bar, the link underlined. */
+.av-ann__text--demo .av-demotag { background: var(--accent); color: #14110d; margin-right: 0.35em; }
+.av-ann__text--demo a { color: inherit; font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
 
 /* Owners: a variant's stock history (the ledger), opened on demand. */
 .av-stockhist { margin-top: var(--space-3); }
@@ -1600,12 +1599,6 @@ p { text-wrap: pretty; }
 .av-stockhist__in { color: var(--success, #2f6b3a); font-variant-numeric: tabular-nums; font-weight: 600; }
 .av-stockhist__out { font-variant-numeric: tabular-nums; }
 .av-handover__pay { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--success-bg); color: var(--success); }
-/* Narrow phones in demo mode: the demo line takes the announcement bar's place instead of stacking a second strip
-   above the header (the switches are in the menu there anyway). */
-@media (max-width: 560px) {
-  .av-demoribbon ~ .av-ann { display: none; }
-  .av-demoribbon { font-size: 0.75rem; }
-}
 
 /* Shelf filters: one button on phones, always open on wider screens. */
 .av-filtertoggle { display: none; }
