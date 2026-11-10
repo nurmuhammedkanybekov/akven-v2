@@ -120,6 +120,22 @@ The journey has caught problems that unit tests could not: a menu that flipped b
 that became too faint to read while a shelf reloaded, and a stamp checked half way through its animation on a slow
 machine. Each was fixed in the product, not by weakening the test.
 
+\section{Phones}
+\label{sec:phones}
+
+Most of the stall's customers will open the shop on a phone, so the phone gets its own check besides the journey. A
+script opens 23 pages (the home page, every shelf, a product, the bag, checkout, the story, the wholesale and visit
+pages, the account pages and the owners' screens) at 360 and 390 pixels wide, in English, Russian and Kyrgyz, and
+reports three things on each: any element wider than the screen, any text cut off by its box, and any link or control
+smaller than a finger. The last limit is 44 by 44 CSS pixels, the size WCAG~2.2 names for touch targets.
+
+The first run found no overflow or clipped text, but it found small targets in the footer, the breadcrumbs, the colour
+swatches and the leg-picker dots, and two real bugs: the picture in quick view shrank almost to nothing in Safari,
+and in the ``Try them on'' teaser the leg moved off screen when a visitor switched between him, her and a child. After
+the fixes, the only targets under the limit are links inside running text, which WCAG exempts, and the round swatches,
+which keep their look and get an invisible larger hit area around them. The Safari fix was reasoned from the layout
+rules rather than measured, because WebKit could not run in the build container, so it is one of the checks to repeat by hand on an iPhone.
+
 \section{Evaluation of the two assistants}
 \label{sec:evaluation}
 

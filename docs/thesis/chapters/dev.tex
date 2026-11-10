@@ -478,6 +478,12 @@ the backend tests with the coverage gate, the tests on real PostgreSQL, a smoke 
 frontend type check, tests and build, the browser journey against the real stack, and a Docker Compose smoke test that
 starts the whole system and checks the security headers.
 
+\paragraph{Live deployment.} The same Compose file runs the public demo on a small ARM virtual machine (two cores,
+12~GB of memory, Ubuntu~24.04) in a cloud provider's Frankfurt region. The backend and the web server listen only on
+the machine itself; Caddy in front of them obtains and renews the HTTPS certificate automatically and is the only
+service open to the internet. The secrets (database password, super-admin account, mail settings and, when it is used, the
+language-model key) live in an \texttt{.env} file on the server that never enters the repository.
+
 \section{Design trade-offs and known limitations}
 
 \begin{itemize}
