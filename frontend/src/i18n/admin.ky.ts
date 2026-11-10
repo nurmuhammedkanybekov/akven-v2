@@ -267,7 +267,7 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
   "a.od.notPaid": "Төлөнгөн эмес",
   "a.od.discounted": "соодалашуу менен: {price} минус {pct}%",
   "a.ho.eyebrow": "Контейнерде",
-  "a.ho.lead": "Кардардан алты сандуу кодун жана телефонунун акыркы төрт санын сураңыз.",
+  "a.ho.lead": "Кардардан алты сандуу кодду жана телефонунун акыркы төрт санын сураңыз. Коюлган заказ үчүн адегенде төлөмдү алыңыз: ырастоо аны төлөндү деп белгилейт.",
   "a.ho.scan": "Кардардын QR кодун сканерлөө",
   "a.ho.camera": "Кардардын QR кодуна багытталган камера",
   "a.ho.noCamera": "Камера ачылган жок. Кодду кол менен жазыңыз.",
@@ -665,4 +665,9 @@ export const adminKy: Record<keyof typeof adminEn, string> = {
   "a.stock.SALE": "Сатылды",
   "a.stock.CANCELLED": "Заказ жокко чыгарылды",
   "a.stock.CORRECTION": "Кол менен эсептелди",
+  "ost.RESERVED": "Коюлду, алганда төлөнөт",
+  "a.orders.reserved": "Коюлгандар",
+  "a.od.paidAndHanded": "{total} төлөндү, берилди",
+  "a.ho.paidNow": "Азыр контейнерде төлөндү: {total}",
+  "a.ho.toPay": "Контейнерде {total} төлөйт",
 };

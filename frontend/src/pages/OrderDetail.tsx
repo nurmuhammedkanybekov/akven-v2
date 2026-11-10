@@ -77,6 +77,9 @@ export function OrderDetailPage() {
     <div className="av-container av-page">
       {justPaid && o.status === "PAID" && <Confetti />}
       {!o.guest && <nav className="av-crumbs" aria-label={t("pdp.crumbs")}><Link to="/orders">{t("od.yours")}</Link><span aria-hidden="true">/</span><span>{o.reference}</span></nav>}
+      {justPaid && o.status === "RESERVED" && (
+        <Alert tone="success">{t("od.thanksReserved", { ref: o.reference, until: o.reservedUntil ? formatDateTime(o.reservedUntil) : "" })}</Alert>
+      )}
       {justPaid && o.status === "PAID" && (
         <Alert tone="success">{t(o.fulfillment.method === "PICKUP" ? "od.thanksPickup" : "od.thanksDelivery", { ref: o.reference, phone: o.fulfillment.contactPhone })}</Alert>
       )}
@@ -88,7 +91,7 @@ export function OrderDetailPage() {
       <Timeline order={o} />
       {o.guest && <GuestLink />}
 
-      {o.pickup?.code && o.status === "PAID" && <PickupCode code={o.pickup.code} point={o.pickup.point} />}
+      {o.pickup?.code && (o.status === "PAID" || o.status === "RESERVED") && <PickupCode code={o.pickup.code} point={o.pickup.point} />}
 
       <div className="av-cart">
         <ul className="av-cartlines">
@@ -116,13 +119,15 @@ export function OrderDetailPage() {
               {o.fulfillment.delivery.payOnReceipt && <><br /><span className="av-small">{t("od.carrierOnReceipt")}</span></>}</dd></div>}
             {o.fulfillment.country && <div><dt className="av-eyebrow">{t("order.country")}</dt><dd>{t(`country.${o.fulfillment.country}` as MessageKey)}</dd></div>}
             {o.fulfillment.note && <div><dt className="av-eyebrow">{t("od.note")}</dt><dd>{o.fulfillment.note}</dd></div>}
-            {o.payment && <div><dt className="av-eyebrow">{t("od.paidWith")}</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"}{o.payment.simulated && <> <span className="av-demotag">{t("pay.demoTag")}</span><br /><span className="av-small av-muted">{t("pay.demoPaid")}</span></>} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}
+            {o.payOnHandover && o.status === "RESERVED" && <div><dt className="av-eyebrow">{t("od.payAtHandover")}</dt><dd>{o.reservedUntil && t("od.heldUntil", { when: formatDateTime(o.reservedUntil) })}</dd></div>}
+            {o.payOnHandover && o.paidAt && <div><dt className="av-eyebrow">{t("od.paidWithLabel")}</dt><dd>{t("od.paidAtHandover")}</dd></div>}
+            {o.payment && !o.payOnHandover && <div><dt className="av-eyebrow">{t("od.paidWith")}</dt><dd>{o.payment.method === "APPLE_PAY" ? "Apple Pay" : "Google Pay"}{o.payment.simulated && <> <span className="av-demotag">{t("pay.demoTag")}</span><br /><span className="av-small av-muted">{t("pay.demoPaid")}</span></>} <span className="av-small av-muted">{o.payment.reference}</span></dd></div>}
             {o.fulfilledAt && <div><dt className="av-eyebrow">{t("od.completed")}</dt><dd>{formatDateTime(o.fulfilledAt)}</dd></div>}
             {o.cancelledAt && <div><dt className="av-eyebrow">{t("od.cancelledAt")}</dt><dd>{formatDateTime(o.cancelledAt)}</dd></div>}
           </dl>
           {o.gift && <GiftSummary gift={o.gift} />}
           <OrderAgain order={o} />
-          {(o.status === "PAID" || o.status === "PENDING") && <Button variant="secondary" onClick={() => setConfirm(true)}>{t("od.cancel")}</Button>}
+          {(o.status === "PAID" || o.status === "PENDING" || o.status === "RESERVED") && <Button variant="secondary" onClick={() => setConfirm(true)}>{t("od.cancel")}</Button>}
           <OrderHelp reference={o.reference} />
         </aside>
       </div>
@@ -145,6 +150,11 @@ function Timeline({ order: o }: { order: OrderView }) {
   const steps: Array<{ key: MessageKey; at: string | null; done: boolean }> = o.status === "CANCELLED"
     ? [{ key: "od.stepPlaced", at: o.createdAt, done: true }, ...(o.paidAt ? [{ key: "od.stepPaid" as MessageKey, at: o.paidAt, done: true }] : []),
        { key: "od.stepCancelled", at: o.cancelledAt, done: true }]
+    : o.payOnHandover
+    // Paid in person: put aside for the customer, then paid and handed over in one moment.
+    ? [{ key: "od.stepPlaced", at: o.createdAt, done: true },
+       { key: "od.stepReserved", at: o.createdAt, done: true },
+       { key: pickup ? "od.stepPaidCollected" : "od.stepPaidDelivered", at: o.fulfilledAt, done: !!o.fulfilledAt }]
     : [{ key: "od.stepPlaced", at: o.createdAt, done: true },
        { key: "od.stepPaid", at: o.paidAt, done: !!o.paidAt },
        { key: pickup ? "od.stepReady" : "od.stepOnWay", at: null, done: !!o.paidAt },

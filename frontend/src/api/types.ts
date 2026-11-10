@@ -135,8 +135,10 @@ export interface VariantUpdateInput {
 // ---- cart and orders ----
 
 export type FulfillmentMethod = "PICKUP" | "DELIVERY";
-export type PaymentMethod = "APPLE_PAY" | "GOOGLE_PAY";
-export type OrderStatus = "PENDING" | "PAID" | "FULFILLED" | "CANCELLED";
+/** PAY_AT_HANDOVER charges nothing online: the order is reserved and paid in person. */
+export type PaymentMethod = "APPLE_PAY" | "GOOGLE_PAY" | "PAY_AT_HANDOVER";
+/** RESERVED: held for the customer, who pays at handover (at the stall or to the courier). */
+export type OrderStatus = "PENDING" | "RESERVED" | "PAID" | "FULFILLED" | "CANCELLED";
 export type LineProblem = "NONE" | "UNAVAILABLE" | "SOLD_OUT" | "NOT_ENOUGH_STOCK";
 
 export interface CartLineRequest { sku: string; quantity: number; negotiationSessionId?: string }
@@ -165,6 +167,8 @@ export type Country = "KG" | "KZ" | "UZ" | "RU";
 export interface OrderView {
   id: string; reference: string; status: OrderStatus; total: number; createdAt: string; paidAt: string | null;
   fulfilledAt: string | null; cancelledAt: string | null;
+  /** Paid in person at handover; while RESERVED the pairs are held until reservedUntil. */
+  payOnHandover?: boolean; reservedUntil?: string | null;
   fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null;
     /** Delivery orders: the area, fee and days as they were when the order was placed. */
     delivery?: { zone: string | null; fee: number; daysMin: number | null; daysMax: number | null; kind?: DeliveryKind | null; payOnReceipt?: boolean } | null };
@@ -184,7 +188,7 @@ export interface OrderView {
 export interface CheckoutBody {
   items: CartLineRequest[];
   fulfillment: { method: FulfillmentMethod; contactName: string; contactPhone: string; address: string | null; note: string | null; country?: Country | null; zoneId?: string | null };
-  payment: { method: PaymentMethod; token: string };
+  payment: { method: PaymentMethod; token?: string };
   gift?: GiftInput | null;
   /** The language the customer is using: the emails about the order are written in it. */
   lang?: Lang;
@@ -230,7 +234,7 @@ export interface PickupPoint {
 }
 /** payments: NONE = no provider (checkout takes no payment), SIMULATED = the demo wallet (no money moves), LIVE = real. */
 export type PaymentMode = "NONE" | "SIMULATED" | "LIVE";
-export interface ShopInfo { contacts: ShopContact[]; pickupPoints: PickupPoint[]; payments?: PaymentMode }
+export interface ShopInfo { contacts: ShopContact[]; pickupPoints: PickupPoint[]; payments?: PaymentMode; payAtHandover?: boolean }
 
 export type SizeSystem = "FOOT_CM" | "KR_MM" | "LOCAL" | "EU";
 export interface SizeRange { min: number; max: number }

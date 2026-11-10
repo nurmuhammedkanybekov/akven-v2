@@ -1345,6 +1345,20 @@ const shop: Partial<Record<MessageKey, string>> = {
   "nf.hand": "этот потерял свою пару…",
   "demo.ribbon": "Демо-версия для дипломной работы: заказы и оплата здесь не настоящие.",
   "demo.ribbonLink": "Купить в контейнере",
+  "co.payLater": "Отложить, оплата в контейнере",
+  "co.payLaterDelivery": "Заказать, оплата при получении",
+  "co.payLaterS": "Сейчас платить ничего не нужно. Мы держим носки для вас 48 часов; оплата наличными или через банковское приложение при получении.",
+  "co.payLaterDeliveryS": "Сейчас платить ничего не нужно. Оплата наличными или через банковское приложение, когда носки приедут.",
+  "co.paymentOrS": "Или оплатите сейчас через Apple Pay или Google Pay. Данные карты мы не видим.",
+  "od.thanksReserved": "Спасибо! Заказ {ref} отложен для вас до {until}. Оплата при получении.",
+  "od.payAtHandover": "Оплата при получении",
+  "od.heldUntil": "Отложен для вас до {when}",
+  "od.paidWithLabel": "Оплата",
+  "od.paidAtHandover": "Лично, при получении",
+  "od.stepReserved": "Отложен для вас",
+  "od.stepPaidCollected": "Оплачен и получен",
+  "od.stepPaidDelivered": "Оплачен и доставлен",
+  "api.RESERVE_TOO_BIG": "С оплатой при получении можно отложить до {n} пар. Для большего заказа отправьте оптовую заявку.",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

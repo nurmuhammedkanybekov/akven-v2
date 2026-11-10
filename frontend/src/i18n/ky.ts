@@ -1345,6 +1345,20 @@ const shop: Partial<Record<MessageKey, string>> = {
   "nf.hand": "бул жубун жоготуп алды…",
   "demo.ribbon": "Дипломдук иш үчүн демо-версия: бул жердеги заказдар жана төлөмдөр чыныгы эмес.",
   "demo.ribbonLink": "Контейнерден сатып алуу",
+  "co.payLater": "Коюп туруу, төлөм контейнерде",
+  "co.payLaterDelivery": "Заказ берүү, төлөм алганда",
+  "co.payLaterS": "Азыр эч нерсе төлөбөйсүз. Байпактарды сиз үчүн 48 саат кармап турабыз; алганда накталай же банк тиркемеси аркылуу төлөйсүз.",
+  "co.payLaterDeliveryS": "Азыр эч нерсе төлөбөйсүз. Байпактар келгенде накталай же банк тиркемеси аркылуу төлөйсүз.",
+  "co.paymentOrS": "Же азыр Apple Pay же Google Pay аркылуу төлөңүз. Картаңыздын маалыматын биз көрбөйбүз.",
+  "od.thanksReserved": "Рахмат! {ref} заказы сиз үчүн {until} чейин коюлду. Алганда төлөйсүз.",
+  "od.payAtHandover": "Алганда төлөнөт",
+  "od.heldUntil": "Сиз үчүн {when} чейин коюлду",
+  "od.paidWithLabel": "Төлөм",
+  "od.paidAtHandover": "Алганда, өзү",
+  "od.stepReserved": "Сиз үчүн коюлду",
+  "od.stepPaidCollected": "Төлөнүп, алынды",
+  "od.stepPaidDelivered": "Төлөнүп, жеткирилди",
+  "api.RESERVE_TOO_BIG": "Алганда төлөө менен {n} жупка чейин коюуга болот. Көбүрөөк керек болсо, дүң заказга өтүнмө жибериңиз.",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

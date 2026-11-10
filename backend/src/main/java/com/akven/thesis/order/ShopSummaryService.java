@@ -118,7 +118,8 @@ public class ShopSummaryService {
                         Math.max(0, v.available()), v.getIncomingQty(), v.getRestockEta()))
                 .toList();
 
-        int toHandOver = orders.findByStatus(OrderStatus.PAID).size();
+        // Waiting for the team: paid orders, and reservations that will be paid at handover.
+        int toHandOver = orders.findByStatus(OrderStatus.PAID).size() + orders.findByStatus(OrderStatus.RESERVED).size();
         return new ShopSummary(days, new Sales(paidOrders.size(), revenue, pairs, average), toHandOver, threshold, soldOut, low,
                 insights(paidOrders.values(), sold, since, pairs));
     }

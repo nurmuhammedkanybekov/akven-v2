@@ -47,6 +47,9 @@ public final class ShopDtos {
         }
     }
 
-    /** payments: NONE (checkout takes no payment yet), SIMULATED (demo wallet, no money moves) or LIVE. */
-    public record ShopInfo(List<ContactView> contacts, List<PickupPointView> pickupPoints, PaymentMode payments) {}
+    /**
+     * payments: NONE (no online payment yet), SIMULATED (demo wallet, no money moves) or LIVE. payAtHandover: orders can
+     * also be reserved and paid in person at handover, whatever the online mode.
+     */
+    public record ShopInfo(List<ContactView> contacts, List<PickupPointView> pickupPoints, PaymentMode payments, boolean payAtHandover) {}
 }

@@ -76,11 +76,16 @@ public class OrderService {
     private final Notifier notifier;
     private final OrderLinks links;
     private final StockLedger ledger;
+    /** How long a reservation (pay at handover) holds its pairs, and the most pairs one reservation may hold. */
+    private final int reservationHours;
+    private final int reserveMaxPairs;
 
     public OrderService(OrderRepository orders, VariantRepository variants, UserRepository users, PricingService pricing,
                         PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections,
                         ShopInfoService shopInfo, PickupCodes pickupCodes, DeliveryService delivery, Notifier notifier,
-                        OrderLinks links, StockLedger ledger) {
+                        OrderLinks links, StockLedger ledger,
+                        @org.springframework.beans.factory.annotation.Value("${akven.orders.reservation-hours:48}") int reservationHours,
+                        @org.springframework.beans.factory.annotation.Value("${akven.orders.reserve-max-pairs:60}") int reserveMaxPairs) {
         this.orders = orders;
         this.variants = variants;
         this.users = users;
@@ -95,6 +100,8 @@ public class OrderService {
         this.notifier = notifier;
         this.links = links;
         this.ledger = ledger;
+        this.reservationHours = reservationHours;
+        this.reserveMaxPairs = reserveMaxPairs;
     }
 
     private final ProductImageRepository images;
@@ -147,6 +154,17 @@ public class OrderService {
             throw new BusinessRuleException("MINIMUM_ORDER", Map.of("n", collection.minimumPairs()), collection.minimumMessage());
         }
 
+        PaymentMethod method = request.payment().method();
+        if (!method.online()) {
+            // Holding pairs costs nothing to the one who reserves them, so one reservation may not empty the shelf.
+            int pairs = byVariant.entrySet().stream()
+                    .mapToInt(e -> e.getValue() * (e.getKey().getPackSize() == null ? 1 : e.getKey().getPackSize())).sum();
+            if (pairs > reserveMaxPairs) {
+                throw new BusinessRuleException("RESERVE_TOO_BIG", Map.of("n", reserveMaxPairs),
+                        "To pay at handover, reserve up to " + reserveMaxPairs + " pairs; for more, ask for a wholesale order.");
+            }
+        }
+
         FulfillmentInputs f = new FulfillmentInputs(request);
         // The area decides the fee; the browser only says which area. Its country wins over a country sent alongside.
         DeliveryZone zone = f.method == FulfillmentMethod.DELIVERY ? delivery.zoneFor(request.fulfillment().zoneId(), request.fulfillment().zoneId() == null ? f.country : null) : null;
@@ -197,7 +215,18 @@ public class OrderService {
         }
         audit(customerEmail, "ORDER_PLACED", order, null);
 
-        PaymentMethod method = request.payment().method();
+        if (!method.online()) {
+            // Pay at handover: the pairs stay held (reserved) until the customer pays the team; nothing is sold yet.
+            order.reserve(java.time.Instant.now().plus(java.time.Duration.ofHours(reservationHours)));
+            if (order.getFulfillmentMethod() == FulfillmentMethod.PICKUP) {
+                order.givePickupCode(pickupCodes.next());
+            }
+            orders.save(order);
+            audit(customerEmail, "ORDER_RESERVED", order, Map.of("status", "PENDING"));
+            notifier.orderConfirmed(order);
+            return new CheckoutResult(forCustomer(order), false);
+        }
+
         PaymentResult result;
         try {
             result = payments.charge(new PaymentRequest(method, request.payment().token(), order.getTotal(), order.getReference()));
@@ -214,20 +243,35 @@ public class OrderService {
         if (order.getFulfillmentMethod() == FulfillmentMethod.PICKUP) {
             order.givePickupCode(pickupCodes.next());
         }
-        // A sock that this sale takes from above the "few left" level to at or below it is news for the owners.
+        sell(order.getItems(), order);
+        orders.save(order);
+        audit(customerEmail, "ORDER_PAID", order, Map.of("status", "PENDING"));
+        notifier.orderConfirmed(order);
+        return new CheckoutResult(forCustomer(order), false);
+    }
+
+    /**
+     * The held pairs are sold: off the shelf, into the ledger, and a sock that this sale takes from above the
+     * "few left" level to at or below it is news for the owners. {@code items} must belong to variants locked by the
+     * caller (checkout locks them; handover locks them here first).
+     */
+    private void sell(List<OrderItem> items, Order order) {
         int fewLeft = collections.policy().getFewLeftThreshold();
         List<Variant> crossed = new ArrayList<>();
-        for (OrderItem item : order.getItems()) {
+        for (OrderItem item : items) {
             Variant v = item.getVariant();
             v.commitSale(item.getQuantity());
             ledger.record(v, -item.getQuantity(), StockReason.SALE, order.getId(), null, null);
             if (v.available() <= fewLeft && v.available() + item.getQuantity() > fewLeft) crossed.add(v);
         }
-        orders.save(order);
-        audit(customerEmail, "ORDER_PAID", order, Map.of("status", "PENDING"));
-        notifier.orderConfirmed(order);
         notifier.lowStock(order, crossed, fewLeft);
-        return new CheckoutResult(forCustomer(order), false);
+    }
+
+    /** A reserved order is paid at handover: lock its variants (as checkout does), sell, and close the order. */
+    private void payAtHandover(Order o) {
+        variants.lockByIdIn(o.getItems().stream().map(i -> i.getVariant().getId()).collect(Collectors.toSet()));
+        sell(o.getItems(), o);
+        o.handOverPaid();
     }
 
     /** The order as the customer sees it; a guest also gets the token of the private link (it is never stored). */
@@ -360,12 +404,15 @@ public class OrderService {
     @Transactional
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public OrderView handOver(String actorEmail, String code, String phoneEnd) {
-        Order o = orders.findByPickupCodeAndStatus(code, OrderStatus.PAID)
+        Order found = orders.findByPickupCodeAndStatusIn(code, List.of(OrderStatus.PAID, OrderStatus.RESERVED))
                 .filter(x -> x.getContactPhone() != null && x.getContactPhone().replaceAll("[^0-9]", "").endsWith(phoneEnd))
                 .orElseThrow(() -> new NotFoundException("No order waiting for pickup matches this code and phone number."));
-        o.fulfil();
+        Order o = orders.lockById(found.getId()).orElseThrow();
+        OrderStatus before = o.getStatus();
+        if (before == OrderStatus.RESERVED) payAtHandover(o);         // the team took the money just now
+        else o.fulfil();
         orders.save(o);
-        audit.record(actorEmail, "ORDER_HANDED_OVER", "ORDER", o.getId(), Map.of("status", "PAID"), snapshot(o));
+        audit.record(actorEmail, "ORDER_HANDED_OVER", "ORDER", o.getId(), Map.of("status", before), snapshot(o));
         notifier.orderHandedOver(o);
         return OrderMapper.toView(o, true);
     }
@@ -374,9 +421,11 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public OrderView fulfil(String actorEmail, UUID orderId) {
         Order o = orders.lockById(orderId).orElseThrow(() -> new NotFoundException("Order not found."));
-        o.fulfil();
+        OrderStatus before = o.getStatus();
+        if (before == OrderStatus.RESERVED) payAtHandover(o);         // paid to the courier, or at the stall
+        else o.fulfil();
         orders.save(o);
-        audit.record(actorEmail, "ORDER_FULFILLED", "ORDER", o.getId(), Map.of("status", "PAID"), snapshot(o));
+        audit.record(actorEmail, "ORDER_FULFILLED", "ORDER", o.getId(), Map.of("status", before), snapshot(o));
         notifier.orderHandedOver(o);
         return OrderMapper.toView(o, true);
     }
@@ -385,6 +434,29 @@ public class OrderService {
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public OrderView cancelAsStaff(String actorEmail, UUID orderId) {
         return cancel(actorEmail, orderId, true, null);
+    }
+
+    /**
+     * Reservations nobody collected in time are cancelled: their pairs go back on the shelf and the customer hears
+     * so. Each order is locked and checked again, so a handover at the same moment wins and is never undone.
+     * Returns how many ended.
+     */
+    @Transactional
+    public int expireReservations(java.time.Instant now) {
+        int ended = 0;
+        for (Order due : orders.findByStatusAndReservedUntilBefore(OrderStatus.RESERVED, now)) {
+            Order o = orders.lockById(due.getId()).orElse(null);
+            if (o == null || o.getStatus() != OrderStatus.RESERVED || !o.getReservedUntil().isBefore(now)) continue;
+            o.cancel();
+            List<Variant> locked = variants.lockByIdIn(o.getItems().stream().map(i -> i.getVariant().getId()).collect(Collectors.toSet()));
+            Map<UUID, Variant> byId = locked.stream().collect(Collectors.toMap(Variant::getId, v -> v));
+            for (OrderItem item : o.getItems()) byId.get(item.getVariant().getId()).releaseReservation(item.getQuantity());
+            orders.save(o);
+            audit.recordAsGuest("ORDER_RESERVATION_EXPIRED", "ORDER", o.getId(), Map.of("status", OrderStatus.RESERVED), snapshot(o));   // no person: the clock
+            notifier.reservationExpired(o);
+            ended++;
+        }
+        return ended;
     }
 
     // ---- shared -----------------------------------------------------------------------------
@@ -405,7 +477,7 @@ public class OrderService {
         Map<UUID, Variant> byId = locked.stream().collect(Collectors.toMap(Variant::getId, v -> v));
         for (OrderItem item : o.getItems()) {
             Variant v = byId.get(item.getVariant().getId());
-            if (before == OrderStatus.PENDING) v.releaseReservation(item.getQuantity());
+            if (before == OrderStatus.PENDING || before == OrderStatus.RESERVED) v.releaseReservation(item.getQuantity());
             else {
                 v.restock(item.getQuantity());
                 ledger.record(v, item.getQuantity(), StockReason.CANCELLED, o.getId(), actorEmail, null);
@@ -421,6 +493,7 @@ public class OrderService {
         orders.save(o);
         audit(actorEmail, "ORDER_CANCELLED", o, Map.of("status", before));
         if (before == OrderStatus.PAID) notifier.orderCancelled(o, asStaff);
+        if (before == OrderStatus.RESERVED) notifier.reservationCancelled(o, asStaff);
         return OrderMapper.toView(o, asStaff);
     }
 

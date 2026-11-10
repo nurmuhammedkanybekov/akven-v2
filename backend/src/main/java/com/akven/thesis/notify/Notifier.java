@@ -95,7 +95,8 @@ public class Notifier {
         List<String> body = new ArrayList<>();
         body.add(t.text(l, "greeting", v));
         body.add("");
-        body.add(t.text(l, "confirmed.intro", v));
+        boolean reserved = o.getStatus() == com.akven.thesis.order.OrderStatus.RESERVED;
+        body.add(t.text(l, reserved ? "reserved.intro" : "confirmed.intro", v));
         body.add("");
         body.add(t.text(l, "confirmed.items"));
         for (OrderItem i : o.getItems()) {
@@ -107,7 +108,7 @@ public class Notifier {
             body.add("  " + t.text(l, "confirmed.item", line).replace(",  –", " –"));
         }
         if (o.getFulfillmentMethod() == FulfillmentMethod.DELIVERY) body.add(t.text(l, "confirmed.delivery", v));
-        body.add(t.text(l, "confirmed.total", v));
+        body.add(t.text(l, reserved ? "reserved.total" : "confirmed.total", v));
         if (SimulatedWalletProvider.isSimulatedReference(o.getPaymentRef())) body.add(t.text(l, "demo"));
         body.add("");
         if (o.getFulfillmentMethod() == FulfillmentMethod.PICKUP) {
@@ -121,7 +122,7 @@ public class Notifier {
         }
         if (o.getGiftBox() != null) body.add(t.text(l, "confirmed.gift"));
         if (o.isGuest()) { body.add(""); body.add(t.text(l, "confirmed.guest")); }
-        queue(EmailKind.ORDER_CONFIRMED, o, t.text(l, "confirmed.subject", v), body);
+        queue(EmailKind.ORDER_CONFIRMED, o, t.text(l, reserved ? "reserved.subject" : "confirmed.subject", v), body);
     }
 
     /** The private link again, because the customer asked for it with the order's email and reference. */
@@ -156,6 +157,24 @@ public class Notifier {
         queue(EmailKind.ORDER_CANCELLED, o, t.text(l, "cancelled.subject", v), body);
     }
 
+    /** A reservation was cancelled before it was paid: nothing to return, the pairs are back on the shelf. */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void reservationCancelled(Order o, boolean byShop) {
+        String l = o.getLang();
+        Map<String, Object> v = values(o);
+        queue(EmailKind.ORDER_CANCELLED, o, t.text(l, "cancelled.subject", v),
+                List.of(t.text(l, "greeting", v), "", t.text(l, byShop ? "cancelled.shop" : "cancelled.mine", v), t.text(l, "reserved.nothingPaid")));
+    }
+
+    /** Nobody collected a reservation in time: it ended and the pairs went back on the shelf. */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void reservationExpired(Order o) {
+        String l = o.getLang();
+        Map<String, Object> v = values(o);
+        queue(EmailKind.ORDER_CANCELLED, o, t.text(l, "expired.subject", v),
+                List.of(t.text(l, "greeting", v), "", t.text(l, "expired.body", v)));
+    }
+
     /** "We got it": only the reference and the number of pairs, so the form cannot carry someone else's words to a stranger. */
     @Transactional
     public void wholesaleReceived(String to, String lang, String reference, int pairs) {
@@ -181,6 +200,8 @@ public class Notifier {
         emails.save(new OutboundEmail(kind, to, l, subject, text, o.getId()));
     }
 
+    private static final java.time.format.DateTimeFormatter UNTIL = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
     private Map<String, Object> values(Order o) {
         String l = o.getLang();
         Map<String, Object> v = new HashMap<>();
@@ -193,6 +214,7 @@ public class Notifier {
         v.put("address", o.getDeliveryAddress());
         v.put("zone", o.getDeliveryZoneName());
         v.put("phone", o.getContactPhone());
+        v.put("until", o.getReservedUntil() == null ? "" : UNTIL.format(o.getReservedUntil().atZone(java.time.ZoneId.of("Asia/Bishkek"))));
         v.put("method", o.getPaymentMethod() == null ? "" : o.getPaymentMethod().equals("APPLE_PAY") ? "Apple Pay" : "Google Pay");
         Integer min = o.getDeliveryDaysMin(), max = o.getDeliveryDaysMax();
         v.put("days", min == null && max == null ? "" : Objects.equals(min, max) || min == null || max == null

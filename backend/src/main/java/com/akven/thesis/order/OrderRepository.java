@@ -13,9 +13,12 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID>, JpaSpecificationExecutor<Order> {
 
-    boolean existsByPickupCodeAndStatus(String pickupCode, OrderStatus status);
+    boolean existsByPickupCodeAndStatusIn(String pickupCode, java.util.Collection<OrderStatus> statuses);
 
-    java.util.Optional<Order> findByPickupCodeAndStatus(String pickupCode, OrderStatus status);
+    java.util.Optional<Order> findByPickupCodeAndStatusIn(String pickupCode, java.util.Collection<OrderStatus> statuses);
+
+    /** Reservations whose time is up: they are cancelled and their pairs go back on the shelf. */
+    List<Order> findByStatusAndReservedUntilBefore(OrderStatus status, java.time.Instant now);
 
     long countByCustomerIdAndStatusIn(UUID customerId, java.util.Collection<OrderStatus> statuses);
 
