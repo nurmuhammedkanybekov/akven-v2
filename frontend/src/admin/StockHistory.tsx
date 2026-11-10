@@ -44,7 +44,7 @@ export function StockHistory({ variantId, refresh }: { variantId: string; refres
                   <td>
                     {m.orderId && <Link to={`/admin/orders/${m.orderId}`}>{t("a.v.historyOrder")}</Link>}
                     {m.actor && <span>{m.actor}</span>}
-                    {m.note && <span className="av-muted"> · {m.note}</span>}
+                    {m.note && <span className="av-muted">{m.actor || m.orderId ? " · " : ""}{m.note}</span>}
                   </td>
                 </tr>
               ))}
