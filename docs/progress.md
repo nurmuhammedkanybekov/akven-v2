@@ -27,7 +27,7 @@ Delivered ahead of the date, and well beyond the 30 to 50 percent asked for.
 
 | Item | State |
 |---|---|
-| Test coverage over 80% on the model layer | Met: about 97%, and the build fails below 80% |
+| Test coverage over 80% on the model layer | Met: 96% of all backend lines, and the build fails below 80% |
 | CI/CD running | GitHub Actions green. The same checks are defined for GitLab and need their first run there |
 | Real language model with retrieval | Model connected and tested live. Retrieval is keyword-based; vector search over product embeddings (pgvector) is the next step |
 | Collection pricing | Done: the order minimum counts pairs across the whole cart (mixing socks is allowed, a pack counts all its pairs), trusted customers have a lower minimum, the price ladder lowers the price per pair, and each order line records which rule set its price. Owners change all of it in the admin API, every change is audited, and the database refuses impossible values |

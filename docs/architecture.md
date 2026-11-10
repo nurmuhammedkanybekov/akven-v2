@@ -127,6 +127,16 @@ violation, margin-invariant violation, duplicate email by case, and
   back in order; the role, shoe size and pairs are checked by the database as well as by the API. A gift is five
   nullable columns on `customer_order` rather than a table, because an order is packed in at most one box; one check
   says a gift has both a box and a ribbon, and that card words never appear without a box.
+- **The stock ledger (V41).** `stock_movement` is one row per change to a variant's stock: the opening count, goods
+  that arrived, a sale, a cancelled sale, or a count corrected by hand. It is only ever added to, in the same
+  transaction as the change, and keeps the stock right after it (`stock_after`), so the rows of a variant add up to
+  its `stock_qty` (`StockLedgerTest`). A sale and a cancellation must name their order and nothing else may (a check
+  constraint). The migration opened the ledger with the stock of that day.
+- **Reserve now, pay at handover (V42).** A new order state, `RESERVED`, between `PENDING` and `FULFILLED`: the pairs
+  are held (`reserved_qty`), not sold, until `reserved_until`; the team takes the money at handover and only then is
+  the order sold (stock, ledger, low-stock check). A scheduled job ends reservations that were not collected and gives
+  their pairs back. `pay_on_handover` marks such orders; a check says a reserved order always has both. Pickup codes are
+  unique among paid and reserved orders.
 
 ## Status
 

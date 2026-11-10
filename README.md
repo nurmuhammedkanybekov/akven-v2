@@ -230,10 +230,10 @@ the thesis:
 
 | Check | Command | Result |
 |---|---|---|
-| Backend, in-memory database | `cd backend && mvn verify` | 273 tests, **96% line coverage**; the build fails below 80% |
+| Backend, in-memory database | `cd backend && mvn verify` | 284 tests (11 of them need PostgreSQL and run in their own job), **96% line coverage**; the build fails below 80% |
 | Backend on real PostgreSQL | see [`docs/development.md`](docs/development.md) | 11 tests: migrations, constraints, the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 208 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
-| In a real browser | `cd frontend && npm run e2e` | 28 steps: the owner's, the customer's (with and without an account) and the super admin's work in three languages, with accessibility rules on every page |
+| Frontend | `cd frontend && npm test && npm run build` | 213 tests: checkout sends no price or card, every text exists in Russian and Kyrgyz, WCAG AA contrast of every colour pair |
+| In a real browser | `cd frontend && npm run e2e` | 29 steps: the owner's, the customer's (with and without an account) and the super admin's work in three languages, with accessibility rules on every page |
 | Other browsers | `cd frontend && npm run e2e:browsers` (in CI) | The customer's path in Safari's engine (WebKit) and Firefox, on a phone and a laptop |
 
 What the tests demonstrate, among others:

@@ -46,7 +46,7 @@ These came from the family's real way of working and are numbered as in the thes
 | NFR-5 browse and hold the cart offline | **Partial** | The bag works offline (`cart` tests, service worker); product pages are not cached, so the catalog itself is not browsable offline. Orders cannot be placed offline |
 | NFR-6 conversational response time | Done | Measured against the live Gemini model (gemini-3.5-flash-lite, 11 October 2026): about 1 to 2 seconds per message; the rule-based assistant is instant. A busy free plan (HTTP 429) is retried once after a short wait, then the rules answer. The rate limit is 20 messages per 10 minutes per customer |
 | NFR-7 mutations auditable without reading logs | Done | `audit_log_entry` table with before and after state |
-| NFR-8 validator testable without the model | Done | `PolicyValidatorTest`; model-layer line coverage about 97% (JaCoCo, gate at 80%) |
+| NFR-8 validator testable without the model | Done | `PolicyValidatorTest`; backend line coverage 96% (JaCoCo, gate at 80%) |
 | NFR-9 one PWA for customer and admin | Done | One React app, role-gated routes, manifest and service worker. The admin is in English, Russian and Kyrgyz like the shop (`i18n/admin.*.ts`), so the owners can use it in their own language |
 | NFR-10 automated build and test in CI | **Partial** | `.gitlab-ci.yml` is in place and the same checks run green on GitHub Actions; the first run on the ELTE GitLab is still to be done |
 | NFR-11 responsive on phone, tablet, laptop | Done | Layouts built for three breakpoints; screenshots at the three widths in `docs/design/`; the capture script fails on any sideways overflow; accessibility rules run in the browser test |

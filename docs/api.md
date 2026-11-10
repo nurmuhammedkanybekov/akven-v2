@@ -25,6 +25,9 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 |---|---|
 | `GET /actuator/health` | Liveness check (inside the server; the web server does not pass it through) |
 | `GET /api/version` | The Git commit the running build came from and when it started (public) |
+| `GET /api/sitemap.xml` | The sitemap of the public pages and the socks on sale (public; served as `/sitemap.xml`) |
+| `POST /api/admin/variants/{id}/receive` | Goods arrived: adds pairs to the stock and takes them off "on the way" (STAFF, ADMIN) |
+| `GET /api/admin/variants/{id}/stock` | The variant's stock history, newest first (STAFF, ADMIN) |
 | `POST /api/auth/register` | Customer self-registration; a password of 8 to 72 characters (BCrypt reads no further, so a longer one is refused rather than cut); at most 30 new accounts an hour from one address (`429` with `Retry-After`) |
 | `POST /api/auth/login` | Issues a JWT for an existing account |
 | `GET /api/auth/me` | Current authenticated user (requires a bearer token) |
@@ -69,7 +72,7 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 | `GET /api/admin/stock-requests`, `PUT /api/admin/stock-requests/{id}/answered` | Sold-out options with the customers waiting for them (email and since when), most-wanted first; mark a customer as told (STAFF / ADMIN, audited) |
 | `PUT /api/admin/customers/{id}/password`, `PUT /api/admin/customers/{id}/active` | Set a new password for a customer `{password}` (at least 8 characters), or switch a customer account off or on `{active}`; both end the customer's sessions and are audited. Team accounts are not reachable here (ADMIN) |
 | `GET /api/admin/audit` | The whole audit log, newest first, with the actor's email (SUPER_ADMIN) |
-| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer. Deliveries take `fulfillment.country` (`KG`, `KZ`, `UZ`, `RU`; `KG` when left out). An optional `gift` `{box: KRAFT\|NAVY\|RED, ribbon: GOLD\|RED\|WHITE, to?, from?, message?, hidePrices}` packs the order as a gift (names up to 60 characters, the card up to 300; kept as plain text, control characters removed); the order then shows `gift` to the customer and the shop team |
+| `POST /api/orders` | Checkout (signed in; `Idempotency-Key` header required; 402 declined, 409 not enough stock). A paid pickup order gets a six-digit `pickup.code`, shown only to the customer. Deliveries take `fulfillment.country` (`KG`, `KZ`, `UZ`, `RU`; `KG` when left out). An optional `gift` `{box: KRAFT\|NAVY\|RED, ribbon: GOLD\|RED\|WHITE, to?, from?, message?, hidePrices}` packs the order as a gift (names up to 60 characters, the card up to 300; kept as plain text, control characters removed); the order then shows `gift` to the customer and the shop team. `payment.method` `PAY_AT_HANDOVER` (no token) reserves the order instead: status `RESERVED`, `payOnHandover`, `reservedUntil` (48 h); the team takes the money at handover, and one reservation holds at most 60 pairs (`RESERVE_TOO_BIG`) |
 | `GET /api/orders`, `GET /api/orders/{id}`, `POST /api/orders/{id}/cancel` | The customer's own orders |
 | `/api/admin/**` | Catalog management: products, variants, sections and cuts, photo upload, retire and restore (STAFF / ADMIN; variant creation and margin floor ADMIN only), audit trail (ADMIN) |
 | `/swagger-ui/index.html` | Live, browsable API docs (springdoc-openapi — every `@RestController` shows up automatically) |
