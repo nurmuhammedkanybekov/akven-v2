@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ApiError } from "../api/client";
-import { adminUpdatePricing, adminUpdateSupply, adminUpdateVariant } from "../api/endpoints";
+import { adminReceiveStock, adminUpdatePricing, adminUpdateSupply, adminUpdateVariant } from "../api/endpoints";
 import type { AdminVariant } from "../api/types";
 import { Alert } from "../components/Alert";
 import { Badge } from "../components/Badge";
@@ -10,6 +10,7 @@ import { Input } from "../components/Field";
 import { Switch } from "../components/Switch";
 import { useToast } from "../components/Toast";
 import { useT } from "../i18n/I18n";
+import { StockHistory } from "./StockHistory";
 
 /** One existing colour/size option. Staff change listing, price and stock; only an admin sees and edits cost and discount limit. */
 export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVariant; isAdmin: boolean; onSaved: (v: AdminVariant) => void }) {
@@ -25,7 +26,10 @@ export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVaria
   const [floor, setFloor] = useState(String(variant.marginFloorPct));
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [busy, setBusy] = useState<"listing" | "pricing" | "supply" | null>(null);
+  const [busy, setBusy] = useState<"listing" | "pricing" | "supply" | "receive" | null>(null);
+  const [arrived, setArrived] = useState("");
+  const [arrivedNote, setArrivedNote] = useState("");
+  const [historyKey, setHistoryKey] = useState(0);
   const [incoming, setIncoming] = useState(String(variant.incomingQty ?? 0));
   const [eta, setEta] = useState(variant.restockEta ?? "");
   const [casePairs, setCasePairs] = useState(variant.casePairs?.toString() ?? "");
@@ -45,7 +49,7 @@ export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVaria
         size: size.trim() || null, color: color.name.trim() || null, colorHex: color.hex, packSize: pack.trim() ? Number(pack) : null,
         price: Number(price), stockQty: Number(stock), active: v.active, version: v.version,
       });
-      setV(saved); onSaved(saved); toast(t("a.saved"));
+      setV(saved); onSaved(saved); setHistoryKey((k) => k + 1); toast(t("a.saved"));
     } catch (e) { fail(e); } finally { setBusy(null); }
   }
   async function saveActive(active: boolean) {
@@ -60,6 +64,18 @@ export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVaria
     try {
       const saved = await adminUpdateSupply(v.id, { casePairs: casePairs.trim() ? Number(casePairs) : null, incomingQty: Number(incoming) || 0, restockEta: eta || null, version: v.version });
       setV(saved); onSaved(saved); toast(t("a.v.incomingSaved"));
+    } catch (e) { fail(e); } finally { setBusy(null); }
+  }
+  /** Goods arrived: added to the shelf (and taken off "on the way") by the server, which writes the ledger row. */
+  async function receive() {
+    setBusy("receive"); setError(null); setFieldErrors({});
+    try {
+      const n = Number(arrived);
+      const saved = await adminReceiveStock(v.id, { quantity: n, note: arrivedNote.trim() || null });
+      setV(saved); onSaved(saved);
+      setStock(String(saved.stockQty)); setIncoming(String(saved.incomingQty ?? 0)); setEta(saved.restockEta ?? "");
+      setArrived(""); setArrivedNote(""); setHistoryKey((k) => k + 1);
+      toast(t("a.v.received", { n }));
     } catch (e) { fail(e); } finally { setBusy(null); }
   }
   async function savePricing() {
@@ -97,6 +113,14 @@ export function VariantCard({ variant, isAdmin, onSaved }: { variant: AdminVaria
           <div className="av-field"><span className="av-label">&nbsp;</span><Button size="sm" variant="secondary" loading={busy === "supply"} disabled={!supplyDirty} onClick={saveSupply}>{t("a.v.saveIncoming")}</Button></div>
         </div>
       </div>
+      <div className="av-variantcard__pricing">
+        <div className="av-formgrid av-formgrid--4">
+          <Input label={t("a.v.receiveQty")} type="number" min={1} step={1} value={arrived} error={fieldErrors.quantity} onChange={(e) => setArrived(e.target.value)} />
+          <Input label={t("a.v.receiveNote")} value={arrivedNote} maxLength={200} error={fieldErrors.note} hint={t("a.v.receiveNoteHint")} onChange={(e) => setArrivedNote(e.target.value)} />
+          <div className="av-field"><span className="av-label">&nbsp;</span><Button size="sm" variant="secondary" loading={busy === "receive"} disabled={!(Number(arrived) > 0) || listingDirty} onClick={receive}>{t("a.v.receiveBtn")}</Button></div>
+        </div>
+      </div>
+      <StockHistory variantId={v.id} refresh={historyKey + v.version} />
       {isAdmin && (
         <div className="av-variantcard__pricing">
           <div className="av-formgrid av-formgrid--4">

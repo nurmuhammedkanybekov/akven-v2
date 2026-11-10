@@ -9,7 +9,7 @@ import type {
   FamilyMember, FamilyMemberInput, ProductReviews, ShowcaseReview, MyReview, ModerationLine, ReviewStatus, DayPoint,
   SizeSystem, NegotiationStats, EvaluationReport, Account, AssistantMode, AssistantStatus, AssistantTry, AssistantCheck, AuditLine, CustomerAccount, TeamRole,
   CustomerDetails, DeliveryZone, DeliveryZoneInput, WholesaleRequestInput, WholesaleReceived, WholesaleInbox, WholesaleLine, WholesaleStatus,
-  EmailList, EmailStatus, OutboundEmail,
+  EmailList, EmailStatus, OutboundEmail, StockMovement,
 } from "./types";
 
 function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -84,7 +84,7 @@ export const adminCreateVariant = (productId: string, body: VariantCreateInput) 
   api<AdminVariant>(`/api/admin/products/${productId}/variants`, { method: "POST", body });
 export const adminUpdateVariant = (id: string, body: VariantUpdateInput) =>
   api<AdminVariant>(`/api/admin/variants/${id}`, { method: "PUT", body });
-export const adminUpdatePricing = (id: string, body: { costPrice: number; marginFloorPct: number; version?: number }) =>
+export const adminUpdatePricing = (id: string, body: { costPrice: number; marginFloorPct: number; version: number }) =>
   api<AdminVariant>(`/api/admin/variants/${id}/pricing-policy`, { method: "PUT", body });
 
 // ---- admin: photos ----
@@ -144,8 +144,11 @@ export const adminUpdateSize = (id: string, body: SizeRowInput) => api<SizeRow>(
 export const adminDeleteSize = (id: string) => api<void>(`/api/admin/sizes/${id}`, { method: "DELETE" });
 
 // ---- stock on the way ----
-export const adminUpdateSupply = (id: string, body: { casePairs: number | null; incomingQty: number; restockEta: string | null; version?: number }) =>
+export const adminUpdateSupply = (id: string, body: { casePairs: number | null; incomingQty: number; restockEta: string | null; version: number }) =>
   api<AdminVariant>(`/api/admin/variants/${id}/supply`, { method: "PUT", body });
+export const adminReceiveStock = (id: string, body: { quantity: number; note: string | null }) =>
+  api<AdminVariant>(`/api/admin/variants/${id}/receive`, { method: "POST", body });
+export const adminStockHistory = (id: string) => api<StockMovement[]>(`/api/admin/variants/${id}/stock`);
 
 // ---- owners' dashboard ----
 export const adminSummary = (days: number) => api<ShopSummary>(`/api/admin/summary${qs({ days })}`);

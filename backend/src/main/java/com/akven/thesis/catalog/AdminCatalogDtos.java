@@ -89,6 +89,20 @@ public final class AdminCatalogDtos {
             java.time.LocalDate restockEta,
             @NotNull Integer version) {}
 
+    /** STAFF and ADMIN: goods that arrived, with an optional note (a delivery or invoice number, for example). */
+    public record ReceiveStockRequest(
+            @NotNull @Positive @jakarta.validation.constraints.Max(100000) Integer quantity,
+            @Size(max = 200) String note) {}
+
+    /** One line of a variant's stock history; actor is null for a sale (the order says who bought). */
+    public record StockMovementView(UUID id, int delta, String reason, int stockAfter, UUID orderId, String actor,
+                                    String note, java.time.Instant at) {
+        static StockMovementView of(com.akven.thesis.stock.StockMovement m) {
+            return new StockMovementView(m.getId(), m.getDelta(), m.getReason().name(), m.getStockAfter(), m.getOrderId(),
+                    m.getActor(), m.getNote(), m.getCreatedAt());
+        }
+    }
+
     /** ADMIN only: the two values the negotiation guardrail is built on (FR-11). */
     public record PricingPolicyRequest(
             @NotNull @PositiveOrZero BigDecimal costPrice,

@@ -89,6 +89,11 @@ export interface AdminVariant {
   stockQty: number; reservedQty: number; availableQty: number; active: boolean; version: number;
   casePairs: number | null; incomingQty: number; restockEta: string | null;
 }
+/** One change to a variant's stock (the stock ledger). actor is null for a sale. */
+export type StockReason = "OPENING" | "RECEIVED" | "SALE" | "CANCELLED" | "CORRECTION";
+export interface StockMovement {
+  id: string; delta: number; reason: StockReason; stockAfter: number; orderId: string | null; actor: string | null; note: string | null; at: string;
+}
 export interface AdminProduct {
   id: string; slug: string; name: string; category: Category;
   section: AdminTermRef | null; cut: AdminTermRef | null;
@@ -124,7 +129,7 @@ export interface VariantCreateInput {
 }
 export interface VariantUpdateInput {
   size: string | null; color: string | null; colorHex: string | null; packSize: number | null;
-  price: number; stockQty: number; active: boolean; version?: number;
+  price: number; stockQty: number; active: boolean; version: number;
 }
 
 // ---- cart and orders ----

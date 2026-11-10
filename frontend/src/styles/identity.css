@@ -1659,3 +1659,10 @@ p { text-wrap: pretty; }
 .av-demoribbon { margin: 0; padding: 6px var(--space-4); background: var(--surface-2); color: var(--ink); border-bottom: 1px solid var(--line, color-mix(in srgb, var(--ink) 12%, transparent)); font-size: var(--text-small); line-height: 1.4; text-align: center; text-wrap: balance; }
 .av-demoribbon a { color: inherit; font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
 @media (pointer: coarse), (max-width: 719px) { .av-demoribbon a { display: inline-flex; align-items: center; min-height: 44px; } .av-demoribbon { padding-block: 2px; } }
+
+/* Owners: a variant's stock history (the ledger), opened on demand. */
+.av-stockhist { margin-top: var(--space-3); }
+.av-stockhist > summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.av-stockhist .av-tablewrap { margin-top: var(--space-2); }
+.av-stockhist__in { color: var(--success, #2f6b3a); font-variant-numeric: tabular-nums; font-weight: 600; }
+.av-stockhist__out { font-variant-numeric: tabular-nums; }

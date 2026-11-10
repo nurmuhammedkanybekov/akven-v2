@@ -1,6 +1,8 @@
 package com.akven.thesis.order;
 
 import com.akven.thesis.audit.AuditService;
+import com.akven.thesis.stock.StockLedger;
+import com.akven.thesis.stock.StockReason;
 import com.akven.thesis.catalog.ProductImageRepository;
 import com.akven.thesis.catalog.Variant;
 import com.akven.thesis.catalog.VariantRepository;
@@ -73,11 +75,12 @@ public class OrderService {
     private final DeliveryService delivery;
     private final Notifier notifier;
     private final OrderLinks links;
+    private final StockLedger ledger;
 
     public OrderService(OrderRepository orders, VariantRepository variants, UserRepository users, PricingService pricing,
                         PaymentService payments, AuditService audit, ProductImageRepository images, CollectionPricing collections,
                         ShopInfoService shopInfo, PickupCodes pickupCodes, DeliveryService delivery, Notifier notifier,
-                        OrderLinks links) {
+                        OrderLinks links, StockLedger ledger) {
         this.orders = orders;
         this.variants = variants;
         this.users = users;
@@ -91,6 +94,7 @@ public class OrderService {
         this.delivery = delivery;
         this.notifier = notifier;
         this.links = links;
+        this.ledger = ledger;
     }
 
     private final ProductImageRepository images;
@@ -216,6 +220,7 @@ public class OrderService {
         for (OrderItem item : order.getItems()) {
             Variant v = item.getVariant();
             v.commitSale(item.getQuantity());
+            ledger.record(v, -item.getQuantity(), StockReason.SALE, order.getId(), null, null);
             if (v.available() <= fewLeft && v.available() + item.getQuantity() > fewLeft) crossed.add(v);
         }
         orders.save(order);
@@ -401,7 +406,10 @@ public class OrderService {
         for (OrderItem item : o.getItems()) {
             Variant v = byId.get(item.getVariant().getId());
             if (before == OrderStatus.PENDING) v.releaseReservation(item.getQuantity());
-            else v.restock(item.getQuantity());
+            else {
+                v.restock(item.getQuantity());
+                ledger.record(v, item.getQuantity(), StockReason.CANCELLED, o.getId(), actorEmail, null);
+            }
         }
         if (before == OrderStatus.PAID) {
             try {

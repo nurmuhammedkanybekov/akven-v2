@@ -1,6 +1,9 @@
 package com.akven.thesis.catalog;
 
 import com.akven.thesis.audit.AuditLogEntry;
+import com.akven.thesis.stock.StockLedger;
+import com.akven.thesis.stock.StockMovementRepository;
+import com.akven.thesis.stock.StockReason;
 import com.akven.thesis.audit.AuditLogRepository;
 import com.akven.thesis.audit.AuditService;
 import com.akven.thesis.catalog.AdminCatalogDtos.*;
@@ -57,6 +60,8 @@ public class AdminCatalogService {
     private final ProductImageRepository imageRepository;
     private final CatalogTermRepository termRepository;
     private final MediaStorage mediaStorage;
+    private final StockLedger ledger;
+    private final StockMovementRepository movements;
 
     /** Pictures per product: a few of the product, and one or two for each colour. */
     private static final int MAX_IMAGES = 40;
@@ -67,7 +72,9 @@ public class AdminCatalogService {
     public AdminCatalogService(ProductRepository productRepository, VariantRepository variantRepository,
                                AuditLogRepository auditLogRepository, AuditService auditService,
                                ProductImageRepository imageRepository, CatalogTermRepository termRepository,
-                               MediaStorage mediaStorage) {
+                               MediaStorage mediaStorage, StockLedger ledger, StockMovementRepository movements) {
+        this.ledger = ledger;
+        this.movements = movements;
         this.imageRepository = imageRepository;
         this.termRepository = termRepository;
         this.mediaStorage = mediaStorage;
@@ -245,6 +252,7 @@ public class AdminCatalogService {
         variant.setColorHex(normalizeHex(r.colorHex()));
         variant.setStockQty(r.stockQty());
         Variant saved = variantRepository.saveAndFlush(variant);
+        ledger.record(saved, saved.getStockQty(), StockReason.OPENING, null, actor, null);
         auditService.record(actor, "VARIANT_CREATED", VARIANT, saved.getId(), null, snapshot(saved));
         return AdminVariantView.of(saved);
     }
@@ -260,8 +268,11 @@ public class AdminCatalogService {
         }
         requirePriceCoversCost(r.price(), variant.getCostPrice());
         Map<String, Object> before = snapshot(variant);
+        int stockBefore = variant.getStockQty();
         variant.updateListing(blankToNull(r.size()), blankToNull(r.color()), normalizeHex(r.colorHex()), r.packSize(),
                 r.price(), r.stockQty(), r.active());
+        // Typing a new number is a count of the shelf: the ledger keeps the difference, so the history still adds up.
+        ledger.record(variant, variant.getStockQty() - stockBefore, StockReason.CORRECTION, null, actor, null);
         variantRepository.saveAndFlush(variant);
         auditService.record(actor, "VARIANT_UPDATED", VARIANT, variantId, before, snapshot(variant));
         return AdminVariantView.of(variant);
@@ -283,6 +294,32 @@ public class AdminCatalogService {
         variantRepository.saveAndFlush(variant);
         auditService.record(actor, "VARIANT_SUPPLY_UPDATED", VARIANT, variantId, before, snapshot(variant));
         return AdminVariantView.of(variant);
+    }
+
+    /**
+     * Goods arrived: the pairs go on the shelf, and what was "on the way" shrinks by the same amount (the arrival date
+     * is cleared once nothing is on the way any more). Adding is right whatever the screen showed, so no version is
+     * needed; the row is locked so a sale at the same moment cannot interleave with the ledger's running total.
+     */
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    public AdminVariantView receiveStock(String actor, UUID variantId, ReceiveStockRequest r) {
+        requireVariant(variantId);
+        Variant variant = variantRepository.lockByIdIn(List.of(variantId)).get(0);
+        Map<String, Object> before = snapshot(variant);
+        variant.receive(r.quantity());
+        ledger.record(variant, r.quantity(), StockReason.RECEIVED, null, actor, blankToNull(r.note()));
+        variantRepository.saveAndFlush(variant);
+        auditService.record(actor, "VARIANT_STOCK_RECEIVED", VARIANT, variantId, before, snapshot(variant));
+        return AdminVariantView.of(variant);
+    }
+
+    /** The newest changes to one variant's stock, with their reasons (at most 100). */
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    @Transactional(readOnly = true)
+    public List<StockMovementView> stockHistory(UUID variantId) {
+        requireVariant(variantId);
+        return movements.findByVariantIdOrderByCreatedAtDescIdDesc(variantId, org.springframework.data.domain.PageRequest.of(0, 100))
+                .stream().map(StockMovementView::of).toList();
     }
 
     /** FR-11: the only way to change costPrice or marginFloorPct, and ADMIN only. */
