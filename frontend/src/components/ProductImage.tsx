@@ -8,8 +8,8 @@ export function imageKind(url: string): "art" | "photo" {
   return /\.svg(\?|#|$)/i.test(url) ? "art" : "photo";
 }
 
-/** The backdrops a product picture can stand on (CSS: img[data-stage]): two of Korean hanji paper, two of Kyrgyz felt
- * with a ram's horn pressed into it, and two quiet bojagi patchworks. */
+/** The backdrops a product picture can stand on (CSS: img[data-stage]). Today all six share one quiet paper colour, so
+ * a shelf reads as one collection; the names stay so a backdrop can be given back to one picture without a data change. */
 export const STAGES = ["hanji", "hanji-rose", "felt-sage", "felt-sky", "bojagi", "bojagi-celadon"] as const;
 
 /** A product's pictures all get the same backdrop (the sock on its own and the pair, "-1" and "-2", share one, so the

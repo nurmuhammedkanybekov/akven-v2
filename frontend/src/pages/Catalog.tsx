@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Link, NavLink, useSearchParams } from "react-router-dom";
 import { getFacets, listProducts, type CatalogQuery } from "../api/endpoints";
 import type { Category, FacetOption, PageResponse, ProductSummary } from "../api/types";
@@ -8,7 +8,7 @@ import { Button } from "../components/Button";
 import { Clothesline } from "../components/Clothesline";
 import { HeightIcon, isCut } from "../shop/fitting/HeightIcon";
 import { Chip } from "../components/Chip";
-import { CloseIcon } from "../components/icons";
+import { CloseIcon, FilterIcon } from "../components/icons";
 import { ProductCard } from "../components/ProductCard";
 import { RecentlyViewed } from "../shop/RecentlyViewed";
 import { SOCK_COLOURS as C, SockArt, type SockSpec } from "../brand/SockArt";
@@ -112,6 +112,7 @@ export function CatalogPage({ category }: { category?: Category }) {
   const more = products.data ? products.data.page + 1 < products.data.totalPages && upTo + 1 < MAX_PAGES : false;
 
   const names = (list: FacetOption[] | undefined, slug?: string) => list?.find((o) => o.slug === slug)?.name ?? slug;
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const active: Array<{ name: string; label: string }> = [
     section && { name: "section", label: names(facets.data?.section, section)! },
     cut && { name: "cut", label: names(facets.data?.cut, cut)! },
@@ -154,6 +155,12 @@ export function CatalogPage({ category }: { category?: Category }) {
         ))}
       </nav>
 
+      {/* On a phone the filters fold behind one button, so the socks start on the first screen; on wider screens they
+          are always open. The chosen filters stay visible as tags either way. */}
+      <button type="button" className="av-filtertoggle" aria-expanded={filtersOpen} aria-controls="shop-filters" onClick={() => setFiltersOpen(!filtersOpen)}>
+        <FilterIcon /> {t("shop.filters")}{active.length > 0 ? ` · ${active.length}` : ""}
+      </button>
+      <div id="shop-filters" className={`av-filterpanel${filtersOpen ? " is-open" : ""}`}>
       {facets.data && facets.data.section.length > 0 && (
         <div className="av-occasions" role="group" aria-label={t("shop.sections")} tabIndex={0}>
           {facets.data.section.map((o, i) => {
@@ -207,6 +214,7 @@ export function CatalogPage({ category }: { category?: Category }) {
             </select>
           </label>
         </div>
+      </div>
       </div>
 
       {active.length > 0 && (
