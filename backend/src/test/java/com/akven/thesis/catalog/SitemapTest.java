@@ -31,6 +31,7 @@ class SitemapTest extends IntegrationTest {
                 .contains("<loc>http://localhost:8081/shop</loc>")
                 .contains("/products/" + onSale.getSlug() + "</loc>")
                 .doesNotContain("/products/" + retired.getSlug() + "<")
-                .doesNotContain("/admin").doesNotContain("/checkout");
+                // pages only for the team or for one buyer are not in it (other tests' product slugs may contain "admin")
+                .doesNotContain("8081/admin<").doesNotContain("8081/admin/").doesNotContain("8081/checkout<");
     }
 }
