@@ -23,7 +23,8 @@ Errors always use one format, RFC 7807 problem details (`{"title", "status", "de
 
 | Endpoint | Purpose |
 |---|---|
-| `GET /actuator/health` | Liveness check |
+| `GET /actuator/health` | Liveness check (inside the server; the web server does not pass it through) |
+| `GET /api/version` | The Git commit the running build came from and when it started (public) |
 | `POST /api/auth/register` | Customer self-registration; a password of 8 to 72 characters (BCrypt reads no further, so a longer one is refused rather than cut); at most 30 new accounts an hour from one address (`429` with `Retry-After`) |
 | `POST /api/auth/login` | Issues a JWT for an existing account |
 | `GET /api/auth/me` | Current authenticated user (requires a bearer token) |

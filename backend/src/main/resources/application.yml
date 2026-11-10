@@ -73,6 +73,7 @@ management:
 # Never commit real values for these — set via CI/CD variables or a local .env
 # that's in .gitignore. See docs/architecture.md, Security section.
 akven:
+  commit: ${AKVEN_COMMIT:unknown}   # the Git commit this build came from (deploy/deploy.sh sets it); see GET /api/version
   jwt:
     # Leave JWT_SECRET unset and the shop makes its own random key on first start (kept in its database). Or set a
     # random value of at least 32 bytes (openssl rand -base64 48). A key written in this file is never used.

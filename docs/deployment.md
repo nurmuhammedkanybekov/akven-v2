@@ -69,10 +69,14 @@ Then follow the steps below unchanged, with `your-domain` = `yourname.duckdns.or
 8. **Backups:** `sh scripts/backup.sh` every night from cron (database and photos into `backups/`), and copy them off
    the server (for example with `rclone` to cloud storage). Restore once on a laptop to be sure it works; the
    script's header shows how.
-9. **Updates:** back up, then `git pull && docker compose up -d --build`. Flyway applies new database migrations at
-   start.
-10. **Watching it:** a free uptime monitor (UptimeRobot, Better Stack) on `https://your-domain/actuator/health`, and
-    *Admin > Emails to customers* for emails a mail server refused.
+9. **Updates:** `sh deploy/deploy.sh` backs up, moves the checkout to the newest commit of `dev`, rebuilds and waits
+   until the shop answers with that commit. It does nothing when `dev` has not moved, so it can run from cron:
+   `*/5 * * * * cd ~/akven-v2 && sh deploy/deploy.sh >> ~/deploy.log 2>&1`. Flyway applies new database migrations
+   at start. `https://your-domain/api/version` shows the commit that is live.
+10. **Watching it:** a free uptime monitor (UptimeRobot, Better Stack) on `https://your-domain/api/version`, which
+    only answers when the backend is up (`/actuator/health` is not passed through the web server: from outside it
+    returns the shop's page and would always look healthy), and *Admin > Emails to customers* for emails a mail
+    server refused.
 
 ## Email
 
