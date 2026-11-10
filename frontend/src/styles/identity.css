@@ -1641,3 +1641,16 @@ img[data-stage="bojagi-celadon"] { background-color: #e9e6ef; }
 .av-footer .av-open strong, .av-footer .av-open > span { white-space: nowrap; }
 .av-footer .av-open { flex-wrap: wrap; row-gap: 2px; }
 .av-crumbs { align-items: center; }
+
+/* ---------- small premium details ---------- */
+/* A product picture fades in over its backdrop once it has arrived, instead of painting in strips. Pictures the
+   browser already has show at once (no transition runs on the first frame). */
+img[data-ready="0"] { opacity: 0; }
+img[data-stage] { transition: opacity 0.45s var(--ease-out); }
+.av-card__media img { transition: transform 0.9s var(--ease-out), opacity 0.45s var(--ease-out); }
+@media (hover: hover) { .av-card__media .av-card__hover { transition: opacity 0.45s var(--ease-out), transform 0.9s var(--ease-out); } }
+/* Selected text, checkboxes, range sliders and scrollbars in the shop's own colours. */
+::selection { background: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--ink); }
+:root { accent-color: var(--ink); scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent; }
+/* Long prose reads at a comfortable measure and never ends on one lonely word. */
+p { text-wrap: pretty; }
