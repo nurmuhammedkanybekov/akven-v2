@@ -33,7 +33,7 @@ final class OrderMapper {
                                 o.getPickupPoint() == null ? null : PickupPointView.of(o.getPickupPoint())),
                 o.getGiftBox() == null ? null : new GiftView(o.getGiftBox(), o.getGiftRibbon(), o.getGiftTo(), o.getGiftFrom(),
                         o.getGiftMessage(), o.isGiftHidePrices()),
-                o.isGuest(), null);
+                o.isGuest(), null, o.isPayOnHandover(), o.getReservedUntil());
     }
 
     private static String shorten(String reference) {

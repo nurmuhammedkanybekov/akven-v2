@@ -33,7 +33,12 @@ export function CheckoutPage() {
   const { quote, loading, offline } = useQuote(cart.lines, session?.email ?? null);
   const gift = useGift();
   // NONE: this installation takes no payments (started outside demo mode); SIMULATED: the demo wallet.
-  const payments = useShopInfo()?.payments;
+  const info = useShopInfo();
+  const payments = info?.payments;
+  // Until the shop's info arrives (or if it cannot be read) the wallets stay offered, as before; the server decides.
+  const online = payments !== "NONE";
+  // Reserve now and pay in person (cash or a bank app) at the stall or to the courier: needs no payment provider.
+  const payLater = info?.payAtHandover === true;
 
   // Without an account the customer orders as a guest: the email takes the account's place.
   const guest = !session;
@@ -105,10 +110,12 @@ export function CheckoutPage() {
     setFieldErrors(errs);
     return Object.keys(errs).length === 0;
   }
-  function choose(pay: PaymentMethod, e?: FormEvent) {
+  function choose(how: PaymentMethod, e?: FormEvent) {
     e?.preventDefault();
     setError(null);
-    if (validate()) setSheet(pay);
+    if (!validate()) return;
+    if (how === "PAY_AT_HANDOVER") void pay(how, false);     // nothing to confirm in a wallet: the order is only reserved
+    else setSheet(how);
   }
 
   async function pay(payment: PaymentMethod, declined: boolean) {
@@ -118,7 +125,7 @@ export function CheckoutPage() {
         items: cart.lines.map((l) => ({ sku: l.sku, quantity: l.quantity, negotiationSessionId: l.negotiationSessionId })),
         fulfillment: { method, contactName: name.trim(), contactPhone: phone.trim(), address: method === "DELIVERY" ? address.trim() : null, note: note.trim() || null,
           country: method === "DELIVERY" ? zone?.country ?? country : null, zoneId: method === "DELIVERY" ? zone?.id ?? null : null },
-        payment: { method: payment, token: newWalletToken(payment, declined) },
+        payment: payment === "PAY_AT_HANDOVER" ? { method: payment } : { method: payment, token: newWalletToken(payment, declined) },
         gift: giftForCheckout(gift),
         lang,
         ...(guest ? { email: email.trim() } : {}),
@@ -151,7 +158,7 @@ export function CheckoutPage() {
       {quote && !quote.canCheckout && <Alert tone="danger">{t("co.changed")} <Link to="/cart">{t("co.review")}</Link></Alert>}
 
       <div className="av-cart">
-        <form className="av-card-form" noValidate onSubmit={(e) => choose("APPLE_PAY", e)} aria-label={t("co.formLabel")}>
+        <form className="av-card-form" noValidate onSubmit={(e) => choose(payLater ? "PAY_AT_HANDOVER" : "APPLE_PAY", e)} aria-label={t("co.formLabel")}>
           {guest && (
             <div className="av-guest">
               <p><strong>{t("co.guestTitle")}</strong> {t("co.guestLead")}</p>
@@ -218,16 +225,18 @@ export function CheckoutPage() {
           {!guest && <label className="av-check"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> {t(hadDetails ? "co.rememberAgain" : "co.remember")}</label>}
 
           <h2 className="av-formtitle">{t("co.payment")}</h2>
-          <p className="av-small">{t("co.paymentS")}</p>
+          {payLater && <p className="av-small">{t(method === "DELIVERY" ? "co.payLaterDeliveryS" : "co.payLaterS")}</p>}
+          {online && <p className="av-small">{t(payLater ? "co.paymentOrS" : "co.paymentS")}</p>}
           {payments === "SIMULATED" && <p className="av-demonote"><span className="av-demotag">{t("pay.demoTag")}</span> {t("pay.demoCheckout")}</p>}
           {/* On a phone the order sits under the form: the amount is said here, before anyone presses "Pay". */}
           <p className="av-topay" aria-live="polite"><span>{t("co.toPay")}</span> <strong className="av-price">{money(total)}</strong> <a href="#order-summary">{t("co.seeOrder")}</a></p>
-          {payments === "NONE" ? (
+          {!online && !payLater ? (
             <Alert>{t("co.noPayments")} <Link to="/cart">{t("co.noPaymentsBag")}</Link></Alert>
           ) : (
           <div className="av-row">
-            <Button size="lg" type="button" onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.apple")}{payments === "SIMULATED" ? ` (${t("pay.demoTag")})` : ""}</Button>
-            <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.google")}{payments === "SIMULATED" ? ` (${t("pay.demoTag")})` : ""}</Button>
+            {payLater && <Button size="lg" type="button" loading={busy && !sheet} onClick={() => choose("PAY_AT_HANDOVER")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t(method === "DELIVERY" ? "co.payLaterDelivery" : "co.payLater")}</Button>}
+            {online && <Button size="lg" type="button" variant={payLater ? "secondary" : "primary"} onClick={() => choose("APPLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.apple")}{payments === "SIMULATED" ? ` (${t("pay.demoTag")})` : ""}</Button>}
+            {online && <Button size="lg" type="button" variant="secondary" onClick={() => choose("GOOGLE_PAY")} disabled={!quote?.canCheckout || offline || busy || noDelivery}>{t("co.google")}{payments === "SIMULATED" ? ` (${t("pay.demoTag")})` : ""}</Button>}
           </div>
           )}
         </form>

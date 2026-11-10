@@ -128,6 +128,13 @@ public class Order extends AuditableEntity {
     private boolean giftHidePrices;
 
     private Instant paidAt;
+
+    /** Paid at handover instead of online; while RESERVED, the pairs are held until reservedUntil. */
+    @Column(name = "pay_on_handover", nullable = false)
+    private boolean payOnHandover;
+
+    @Column(name = "reserved_until")
+    private Instant reservedUntil;
     private Instant fulfilledAt;
     private Instant cancelledAt;
 
@@ -222,6 +229,28 @@ public class Order extends AuditableEntity {
         this.paidAt = Instant.now();
     }
 
+    /** PENDING -> RESERVED: nothing is charged online; the pairs are held until {@code until}. */
+    public void reserve(Instant until) {
+        if (status != OrderStatus.PENDING) {
+            throw new ConflictException("Only a pending order can be reserved (it is " + status + ").");
+        }
+        this.payOnHandover = true;
+        this.reservedUntil = until;
+        this.status = OrderStatus.RESERVED;
+    }
+
+    /** RESERVED -> FULFILLED: the customer paid the team at handover and took the socks. */
+    public void handOverPaid() {
+        if (status != OrderStatus.RESERVED) {
+            throw new ConflictException("Only a reserved order can be paid at handover (it is " + status + ").");
+        }
+        Instant now = Instant.now();
+        this.paymentRef = "AT_HANDOVER";
+        this.paidAt = now;
+        this.status = OrderStatus.FULFILLED;
+        this.fulfilledAt = now;
+    }
+
     /** PAID -> FULFILLED. */
     public void fulfil() {
         if (status != OrderStatus.PAID) {
@@ -261,6 +290,8 @@ public class Order extends AuditableEntity {
     public Integer getDeliveryDaysMax() { return deliveryDaysMax; }
     public DeliveryKind getDeliveryKind() { return deliveryKind; }
     public boolean isDeliveryPayOnReceipt() { return deliveryPayOnReceipt; }
+    public boolean isPayOnHandover() { return payOnHandover; }
+    public Instant getReservedUntil() { return reservedUntil; }
     public String getIdempotencyKey() { return idempotencyKey; }
     public PickupPoint getPickupPoint() { return pickupPoint; }
     public String getPickupCode() { return pickupCode; }

@@ -73,6 +73,7 @@ function HandedOver({ order: o }: { order: OrderView }) {
     <section className="av-card-form av-handover__done" aria-live="polite">
       <p className="av-handover__tick" aria-hidden="true">✓</p>
       <h2 className="av-formtitle">{t("a.ho.giveTo", { name: o.fulfillment.contactName })}</h2>
+      {o.payOnHandover && <p className="av-handover__pay"><strong>{t("a.ho.paidNow", { total: money(o.total) })}</strong></p>}
       <p className="av-small">{t("a.ho.done", { ref: o.reference, name: o.fulfillment.contactName, n: o.items.reduce((n, i) => n + i.quantity, 0), total: money(o.total) })}</p>
       <ul className="av-handover__items">
         {o.items.map((i) => (
@@ -90,8 +91,14 @@ function HandedOver({ order: o }: { order: OrderView }) {
 /** Paid pickup orders not collected yet, oldest first: the team can pack the bags before the customers come. */
 function Waiting() {
   const { t } = useT();
-  const list = useAsync(() => adminListOrders({ status: "PAID", way: "PICKUP", page: 0, pageSize: 50 }), []);
-  const waiting = [...(list.data?.items ?? [])].reverse();
+  const { money } = useMoney();
+  // Paid orders and reservations (paid at the stall) both wait here, oldest first.
+  const list = useAsync(async () => {
+    const [paid, reserved] = await Promise.all([adminListOrders({ status: "PAID", way: "PICKUP", page: 0, pageSize: 50 }),
+      adminListOrders({ status: "RESERVED", way: "PICKUP", page: 0, pageSize: 50 })]);
+    return { items: [...paid.items, ...reserved.items] };
+  }, []);
+  const waiting = [...(list.data?.items ?? [])].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
   const since = (iso: string | null) => {
     if (!iso) return "";
     const h = Math.round((Date.now() - Date.parse(iso)) / 3600000);
@@ -111,8 +118,9 @@ function Waiting() {
             </div>
             <span className="av-handover__who"><strong>{o.fulfillment.contactName}</strong><br />
               <Link className="av-small" to={`/admin/orders/${o.id}`}>{o.reference}</Link>
-              <span className="av-small av-muted"> · {t("bag.pairs", { n: o.items.reduce((n, i) => n + i.quantity, 0) })}{o.gift ? " · 🎁" : ""}</span></span>
-            <span className="av-small av-muted av-handover__since">{since(o.paidAt)}</span>
+              <span className="av-small av-muted"> · {t("bag.pairs", { n: o.items.reduce((n, i) => n + i.quantity, 0) })}{o.gift ? " · 🎁" : ""}</span>
+              {o.status === "RESERVED" && <><br /><span className="av-small"><strong>{t("a.ho.toPay", { total: money(o.total) })}</strong></span></>}</span>
+            <span className="av-small av-muted av-handover__since">{since(o.paidAt ?? o.createdAt)}</span>
           </li>
         ))}
       </ul>

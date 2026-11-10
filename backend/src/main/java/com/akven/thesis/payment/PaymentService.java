@@ -24,14 +24,25 @@ public class PaymentService {
 
     private final List<PaymentProvider> providers;
 
+    /** Whether customers may reserve and pay at handover (cash or bank app at the stall, or to the courier). */
+    private final boolean payAtHandover;
+
     @Autowired
-    public PaymentService(ObjectProvider<PaymentProvider> providers) {
-        this(providers.orderedStream().toList());
+    public PaymentService(ObjectProvider<PaymentProvider> providers,
+                          @org.springframework.beans.factory.annotation.Value("${akven.payments.pay-at-handover:true}") boolean payAtHandover) {
+        this(providers.orderedStream().toList(), payAtHandover);
     }
 
     public PaymentService(List<PaymentProvider> providers) {
-        this.providers = List.copyOf(providers);
+        this(providers, true);
     }
+
+    public PaymentService(List<PaymentProvider> providers, boolean payAtHandover) {
+        this.providers = List.copyOf(providers);
+        this.payAtHandover = payAtHandover;
+    }
+
+    public boolean payAtHandover() { return payAtHandover; }
 
     /** How this installation takes payments, for the shop to tell its customers: none set up, a demo, or real. */
     public PaymentMode mode() {
@@ -41,6 +52,12 @@ public class PaymentService {
 
     /** Refuses a checkout before anything is reserved when no provider can take this method. */
     public void requireAvailable(PaymentMethod method) {
+        if (!method.online()) {
+            if (!payAtHandover) {
+                throw new BusinessRuleException("PAYMENT_METHOD_UNAVAILABLE", Map.of(), "That payment method is not available.");
+            }
+            return;
+        }
         if (providers.isEmpty()) {
             throw new BusinessRuleException("PAYMENT_NOT_SET_UP", Map.of(), "Online payment is not set up in this shop yet.");
         }

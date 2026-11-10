@@ -5,6 +5,7 @@ import { Badge, type BadgeTone } from "./Badge";
 
 const SHOWN: Record<OrderStatus, { label: MessageKey; tone: BadgeTone }> = {
   PENDING: { label: "ost.PENDING", tone: "accent" },
+  RESERVED: { label: "ost.RESERVED", tone: "accent" },
   PAID: { label: "ost.PAID", tone: "success" },
   FULFILLED: { label: "ost.FULFILLED", tone: "success" },
   CANCELLED: { label: "ost.CANCELLED", tone: "danger" },

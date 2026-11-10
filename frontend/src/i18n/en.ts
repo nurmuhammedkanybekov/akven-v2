@@ -1360,6 +1360,20 @@ const shop = {
   "nf.hand": "this one lost its pair…",
   "demo.ribbon": "Demo for a university thesis: orders and payments here are not real.",
   "demo.ribbonLink": "Buy at the stall",
+  "co.payLater": "Reserve, pay at the stall",
+  "co.payLaterDelivery": "Order, pay on delivery",
+  "co.payLaterS": "Nothing to pay now. We keep the socks for you for 48 hours; pay in cash or with your bank app when you collect them.",
+  "co.payLaterDeliveryS": "Nothing to pay now. Pay in cash or with your bank app when the socks arrive.",
+  "co.paymentOrS": "Or pay now with Apple Pay or Google Pay. We never see your card.",
+  "od.thanksReserved": "Thank you! Order {ref} is put aside for you until {until}. You pay when you collect it.",
+  "od.payAtHandover": "Pay at handover",
+  "od.heldUntil": "Kept for you until {when}",
+  "od.paidWithLabel": "Paid",
+  "od.paidAtHandover": "In person, at handover",
+  "od.stepReserved": "Put aside for you",
+  "od.stepPaidCollected": "Paid and collected",
+  "od.stepPaidDelivered": "Paid and delivered",
+  "api.RESERVE_TOO_BIG": "To pay at handover, reserve up to {n} pairs. For more, send a wholesale request.",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

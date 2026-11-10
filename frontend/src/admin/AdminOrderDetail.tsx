@@ -44,7 +44,8 @@ export function AdminOrderDetail() {
         <div className="av-row">
           <OrderStatusBadge status={o.status} />
           {o.status === "PAID" && <Button loading={busy} onClick={() => run(() => adminFulfilOrder(o.id), t("a.od.completedToast"))}>{t("a.od.complete")}</Button>}
-          {(o.status === "PAID" || o.status === "PENDING") && <Button variant="secondary" onClick={() => setConfirm("cancel")}>{t("a.od.cancel")}</Button>}
+          {o.status === "RESERVED" && <Button loading={busy} onClick={() => run(() => adminFulfilOrder(o.id), t("a.od.completedToast"))}>{t("a.od.paidAndHanded", { total: formatPrice(o.total) })}</Button>}
+          {(o.status === "PAID" || o.status === "PENDING" || o.status === "RESERVED") && <Button variant="secondary" onClick={() => setConfirm("cancel")}>{t("a.od.cancel")}</Button>}
         </div>
       </header>
       {error && <Alert tone="danger">{error}</Alert>}

@@ -267,7 +267,7 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "a.od.notPaid": "Не оплачен",
   "a.od.discounted": "по договорённости: {price} минус {pct}%",
   "a.ho.eyebrow": "На контейнере",
-  "a.ho.lead": "Спросите у покупателя шестизначный код и последние четыре цифры телефона.",
+  "a.ho.lead": "Спросите у покупателя шестизначный код и последние четыре цифры телефона. Для отложенного заказа сначала примите оплату: подтверждение отмечает его оплаченным.",
   "a.ho.scan": "Сканировать QR-код покупателя",
   "a.ho.camera": "Камера, направленная на QR-код покупателя",
   "a.ho.noCamera": "Камера не открылась. Введите код вручную.",
@@ -665,4 +665,9 @@ export const adminRu: Record<keyof typeof adminEn, string> = {
   "a.stock.SALE": "Продано",
   "a.stock.CANCELLED": "Заказ отменён",
   "a.stock.CORRECTION": "Пересчёт вручную",
+  "ost.RESERVED": "Отложен, оплата при получении",
+  "a.orders.reserved": "Отложенные",
+  "a.od.paidAndHanded": "Оплачено {total}, выдан",
+  "a.ho.paidNow": "Оплачено сейчас в контейнере: {total}",
+  "a.ho.toPay": "Оплата {total} в контейнере",
 };

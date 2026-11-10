@@ -1666,3 +1666,4 @@ p { text-wrap: pretty; }
 .av-stockhist .av-tablewrap { margin-top: var(--space-2); }
 .av-stockhist__in { color: var(--success, #2f6b3a); font-variant-numeric: tabular-nums; font-weight: 600; }
 .av-stockhist__out { font-variant-numeric: tabular-nums; }
+.av-handover__pay { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--success-bg); color: var(--success); }

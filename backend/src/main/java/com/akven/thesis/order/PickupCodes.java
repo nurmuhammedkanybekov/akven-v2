@@ -20,7 +20,7 @@ class PickupCodes {
     String next() {
         for (int i = 0; i < ATTEMPTS; i++) {
             String code = String.format("%06d", random.nextInt(1_000_000));
-            if (!orders.existsByPickupCodeAndStatus(code, OrderStatus.PAID)) {
+            if (!orders.existsByPickupCodeAndStatusIn(code, java.util.List.of(OrderStatus.PAID, OrderStatus.RESERVED))) {
                 return code;
             }
         }

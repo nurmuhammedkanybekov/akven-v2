@@ -50,7 +50,8 @@ public final class OrderDtos {
     }
 
     /** The wallet token only. There is deliberately no field for a card number. */
-    public record PaymentInput(@NotNull PaymentMethod method, @NotBlank @Size(max = 128) String token) {}
+    /** token: the wallet's one-time token; empty for PAY_AT_HANDOVER, where nothing is charged online. */
+    public record PaymentInput(@NotNull PaymentMethod method, @Size(max = 128) String token) {}
 
     /** Pack the order as a gift. The card's words are plain text; they are shown as text and never as markup. */
     public record GiftInput(@NotNull GiftBox box,
@@ -126,12 +127,13 @@ public final class OrderDtos {
     public record OrderView(UUID id, String reference, OrderStatus status, BigDecimal total, Instant createdAt,
                             Instant paidAt, Instant fulfilledAt, Instant cancelledAt, FulfillmentView fulfillment,
                             PaymentView payment, List<OrderItemView> items, String customerEmail, PickupView pickup,
-                            GiftView gift, boolean guest, String accessToken) {
+                            GiftView gift, boolean guest, String accessToken,
+                            boolean payOnHandover, Instant reservedUntil) {
 
         /** The order as its guest sees it right after paying: with the token of the private link, sent only then. */
         public OrderView withAccessToken(String token) {
             return new OrderView(id, reference, status, total, createdAt, paidAt, fulfilledAt, cancelledAt, fulfillment, payment, items,
-                    customerEmail, pickup, gift, guest, token);
+                    customerEmail, pickup, gift, guest, token, payOnHandover, reservedUntil);
         }
     }
 

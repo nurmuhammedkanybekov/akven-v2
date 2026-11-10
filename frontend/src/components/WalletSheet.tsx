@@ -7,7 +7,7 @@ import { Dialog } from "./Dialog";
 import { Switch } from "./Switch";
 import { useT } from "../i18n/I18n";
 
-const NAME: Record<PaymentMethod, string> = { APPLE_PAY: "Apple Pay", GOOGLE_PAY: "Google Pay" };
+const NAME: Record<PaymentMethod, string> = { APPLE_PAY: "Apple Pay", GOOGLE_PAY: "Google Pay", PAY_AT_HANDOVER: "" };
 
 interface Props {
   method: PaymentMethod | null;

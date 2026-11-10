@@ -706,6 +706,40 @@ try {
     await elsewhere.close();
   });
 
+  await step("a guest reserves and pays at the stall: the team checks the code, takes the money, and the order is done", async () => {
+    await page.evaluate(() => localStorage.removeItem("akven-cart-v1"));
+    await page.goto(`${BASE}/men`);
+    const card = page.locator(".av-card-wrap").first();
+    await card.hover();
+    await card.getByRole("button", { name: /^Quick view/ }).click();
+    await page.locator("dialog.av-qv").getByRole("button", { name: "Add to bag" }).click();
+    await closeBagDrawer();
+    await page.goto(`${BASE}/checkout`);
+    await page.getByLabel("Email", { exact: true }).fill(`reserve-${stamp}@example.com`);
+    await page.getByLabel("Name", { exact: true }).fill("Reserve Test");
+    await page.getByLabel("Phone").fill("+996 700 987 654");
+    await page.getByRole("button", { name: "Reserve, pay at the stall" }).click();
+    await page.waitForURL(/\/orders\/[0-9a-f-]{36}#t=/);
+    await page.getByText(/Order AV-[0-9A-F]{8} is put aside for you until/).waitFor();
+    const code = (await page.locator(".av-pickup__code").innerText()).replace(/\D/g, "");
+    assert.match(code, /^\d{6}$/);
+    await a11y("a reserved order");
+    await shot("shop-order-reserved");
+
+    await page.goto(`${BASE}/login`);
+    await page.getByLabel("Email").fill("staff@akven.test");
+    await page.getByLabel("Password").fill("changeme-staff");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL(`${BASE}/admin`);
+    await page.goto(`${BASE}/admin/handover`);
+    await page.getByText(/Takes \$[0-9.]+ at the stall/).first().waitFor();   // waiting, with the amount to take
+    await page.getByLabel("Pickup code").fill(code);
+    await page.getByLabel("Last four digits of the phone").fill("7654");
+    await page.getByRole("button", { name: "Check and hand over" }).click();
+    await page.getByText(/Paid now at the stall: \$[0-9.]+/).waitFor();
+    await a11y("handover of a reserved order");
+  });
+
   assert.deepEqual(problems, [], `the browser reported problems:\n${problems.join("\n")}`);
   console.log("\nAll steps passed. Screenshots in docs/design/.");
 } catch (e) {

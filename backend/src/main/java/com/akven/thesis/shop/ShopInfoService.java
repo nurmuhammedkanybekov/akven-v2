@@ -39,7 +39,8 @@ public class ShopInfoService {
     @Transactional(readOnly = true)
     public ShopInfo publicInfo() {
         return new ShopInfo(contacts.findByActiveTrueOrderByPositionAscKindAsc().stream().map(ContactView::of).toList(),
-                points.findByActiveTrueOrderByPositionAscNameAsc().stream().map(PickupPointView::of).toList(), payments.mode());
+                points.findByActiveTrueOrderByPositionAscNameAsc().stream().map(PickupPointView::of).toList(), payments.mode(),
+                payments.payAtHandover());
     }
 
     /** The point new pickup orders are assigned to: the first active one, if the owners have entered any. */

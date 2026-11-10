@@ -277,7 +277,7 @@ export const adminEn = {
   "a.od.notPaid": "Not paid",
   "a.od.discounted": "negotiated: {price} less {pct}%",
   "a.ho.eyebrow": "At the stall",
-  "a.ho.lead": "Ask the customer for their six-digit pickup code and the last four digits of their phone.",
+  "a.ho.lead": "Ask the customer for their six-digit pickup code and the last four digits of their phone. For a reserved order, take the payment first: confirming marks it paid.",
   "a.ho.scan": "Scan the customer's QR code",
   "a.ho.camera": "Camera, pointed at the customer's QR code",
   "a.ho.noCamera": "The camera could not be opened. Type the code instead.",
@@ -686,4 +686,9 @@ export const adminEn = {
   "a.stock.SALE": "Sold",
   "a.stock.CANCELLED": "Order cancelled",
   "a.stock.CORRECTION": "Counted by hand",
+  "ost.RESERVED": "Reserved, pay at handover",
+  "a.orders.reserved": "Reserved",
+  "a.od.paidAndHanded": "Paid {total} and handed over",
+  "a.ho.paidNow": "Paid now at the stall: {total}",
+  "a.ho.toPay": "Takes {total} at the stall",
 } as const;

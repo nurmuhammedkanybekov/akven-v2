@@ -17,7 +17,7 @@ const WAY_ICON: Record<Way, string> = { PICKUP: "🏪", COURIER: "🚕", CARGO: 
 const WAY_KEY = { PICKUP: "co.pickup", COURIER: "co.courier", CARGO: "co.cargo" } as const;
 const wayOf = (o: OrderView): Way => o.fulfillment.method === "PICKUP" ? "PICKUP" : o.fulfillment.delivery?.kind === "CARGO" ? "CARGO" : "COURIER";
 
-const TABS = [["PAID", "a.orders.toFulfil"], ["FULFILLED", "a.orders.completed"], ["CANCELLED", "a.orders.cancelled"], ["", "a.all"]] as const;
+const TABS = [["PAID", "a.orders.toFulfil"], ["RESERVED", "a.orders.reserved"], ["FULFILLED", "a.orders.completed"], ["CANCELLED", "a.orders.cancelled"], ["", "a.all"]] as const;
 
 export function AdminOrders() {
   const { money: formatPrice } = useMoney();
