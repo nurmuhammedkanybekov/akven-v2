@@ -154,6 +154,16 @@ public class Variant extends AuditableEntity {
         stockQty += qty;
     }
 
+    /** Goods arrived: on the shelf now, and no longer "on the way" (the date goes once nothing more is coming). */
+    public void receive(int qty) {
+        if (qty <= 0) {
+            throw new IllegalStateException("Cannot receive " + qty);
+        }
+        stockQty += qty;
+        incomingQty = Math.max(0, incomingQty - qty);
+        if (incomingQty == 0) restockEta = null;
+    }
+
     public void setColorHex(String colorHex) { this.colorHex = colorHex; }
 
     public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }

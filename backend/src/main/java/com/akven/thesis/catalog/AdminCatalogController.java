@@ -103,6 +103,16 @@ public class AdminCatalogController {
         return service.updateSupply(auth.getName(), id, body);
     }
 
+    @PostMapping("/variants/{id}/receive")
+    public AdminVariantView receiveStock(Authentication auth, @PathVariable UUID id, @Valid @RequestBody ReceiveStockRequest body) {
+        return service.receiveStock(auth.getName(), id, body);
+    }
+
+    @GetMapping("/variants/{id}/stock")
+    public List<StockMovementView> stockHistory(@PathVariable UUID id) {
+        return service.stockHistory(id);
+    }
+
     @PutMapping("/variants/{id}/pricing-policy")
     public AdminVariantView updatePricingPolicy(Authentication auth, @PathVariable UUID id,
                                                 @Valid @RequestBody PricingPolicyRequest body) {
