@@ -542,7 +542,7 @@ try {
     await a11y("the catalog in som");
     await page.getByRole("button", { name: "US dollars" }).first().click();
     await page.goto(`${BASE}/visit`);
-    await page.getByText("Every day").waitFor();
+    await page.locator(".av-visit-card__big", { hasText: /^Every day/ }).waitFor();   // the hours, not the notes below that also say "every day"
     await page.getByText(/8:00–16:00/).first().waitFor();
     await page.locator("main .av-open").waitFor();
     await a11y("the visit page");
