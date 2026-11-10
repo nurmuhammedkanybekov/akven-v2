@@ -14,7 +14,7 @@ export function PrivacyPage() {
   return (
     <div className="av-page av-container av-privacy">
       <header className="av-stack">
-        <span className="av-hand">{t("pv.eyebrow")}</span>
+        <span className="av-eyebrow">{t("pv.eyebrow")}</span>
         <h1>{t("pv.title")}</h1>
         <p className="av-lead">{t("pv.lead")}</p>
       </header>

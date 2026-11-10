@@ -18,7 +18,7 @@ export function FittingDialog({ initial, onClose }: {
             onClick={(e) => { if (e.target === ref.current) onClose(); }}>
       <div className="av-frdialog__panel">
         <header className="av-frdialog__head">
-          <div><span className="av-hand">{t("fr.eyebrow")}</span><h2 id="fr-dialog-title">{t("fr.title")}</h2></div>
+          <div><span className="av-eyebrow">{t("fr.eyebrow")}</span><h2 id="fr-dialog-title">{t("fr.title")}</h2></div>
           <button type="button" className="av-icon-btn" aria-label={t("qv.close")} onClick={onClose}><CloseIcon /></button>
         </header>
         <FittingRoom initial={initial} onPick={onClose} />

@@ -645,8 +645,8 @@ const shop: Partial<Record<MessageKey, string>> = {
   "search.clear": "Сбросить поиск",
   "bag.matchTitle": "Дополните семейный набор",
   "bag.view": "Открыть корзину ({n})",
-  "pdp.match": "Одинаковые на всю семью",
-  "pdp.matchS": "Один дизайн для него, для неё и для детей.",
+  "pdp.match": "Ещё из этой коллекции",
+  "pdp.matchS": "Для всей семьи: та же коллекция на других полках.",
   "pdp.soldWeek": "За эту неделю продано пар: {n}",
   "rv.eyebrow": "Отзывы",
   "rv.title": "Что говорят покупатели",
@@ -1359,6 +1359,7 @@ const shop: Partial<Record<MessageKey, string>> = {
   "od.stepPaidCollected": "Оплачен и получен",
   "od.stepPaidDelivered": "Оплачен и доставлен",
   "api.RESERVE_TOO_BIG": "С оплатой при получении можно отложить до {n} пар. Для большего заказа отправьте оптовую заявку.",
+  "nav.findSize": "Подобрать размер",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };

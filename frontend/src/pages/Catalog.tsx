@@ -127,7 +127,7 @@ export function CatalogPage({ category }: { category?: Category }) {
     <section className={`av-shelfhead av-fabric--${FABRIC[key]}`} aria-labelledby="shop-title">
       <div className="av-container av-shelfhead__inner">
         <div className="av-shelfhead__copy">
-          <span className="av-hand">{t("shop.eyebrow")}</span>
+          <span className="av-eyebrow">{t("shop.eyebrow")}</span>
           <h1 id="shop-title">{t(`shop.title.${key}` as MessageKey)}</h1>
           <p className="av-shelfhead__lead">{t(`shop.lead.${key}` as MessageKey)}</p>
           {q && (

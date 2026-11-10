@@ -1,3 +1,4 @@
+import { StallNotes } from "../shop/home/StallNotes";
 import { useState } from "react";
 import { Button } from "../components/Button";
 import { ClockIcon, CopyIcon, PinIcon, TruckIcon } from "../components/icons";
@@ -106,7 +107,7 @@ export function VisitPage() {
       <section id="pickup" className="av-visit-ways av-block" aria-labelledby="pickup-h" data-reveal>
         <div className="av-container av-visit-ways__inner">
           <div className="av-stack">
-            <span className="av-hand">{t("visit.pickupTitle")}</span>
+            <span className="av-eyebrow">{t("visit.pickupTitle")}</span>
             <h2 id="pickup-h">{t("visit.pickupH")}</h2>
             <ol className="av-kraftsteps">
               {[1, 2, 3].map((n) => (
@@ -115,7 +116,7 @@ export function VisitPage() {
             </ol>
           </div>
           <div className="av-stack">
-            <span className="av-hand">{t("visit.deliveryTitle")}</span>
+            <span className="av-eyebrow">{t("visit.deliveryTitle")}</span>
             <h2>{t("visit.deliveryH")}</h2>
             <p className="av-visit-ways__lead"><TruckIcon /><span>{t("visit.delivery")}</span></p>
             {zones.data && zones.data.length > 0 && (
@@ -132,6 +133,7 @@ export function VisitPage() {
           </div>
         </div>
       </section>
+      <StallNotes />
     </div>
   );
 }

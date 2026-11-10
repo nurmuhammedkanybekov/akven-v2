@@ -84,7 +84,7 @@ export function SizesPage() {
       )}
       <p className="av-small av-muted">{t("sizes.note")}</p>
       <section className="av-sizes__fit" aria-labelledby="sizes-fit" data-reveal>
-        <span className="av-hand">{t("fr.eyebrow")}</span>
+        <span className="av-eyebrow">{t("fr.eyebrow")}</span>
         <h2 id="sizes-fit">{t("fr.title")}</h2>
         <FittingRoom />
       </section>

@@ -660,8 +660,8 @@ const shop = {
   "search.clear": "Clear the search",
   "bag.matchTitle": "Complete the family set",
   "bag.view": "View the bag ({n})",
-  "pdp.match": "Match the whole family",
-  "pdp.matchS": "The same design for him, her and the children.",
+  "pdp.match": "More from this collection",
+  "pdp.matchS": "For the rest of the family: the same collection on the other shelves.",
   "pdp.soldWeek": "{n} {n:pair|pairs} sold this week",
   "rv.eyebrow": "Reviews",
   "rv.title": "What customers say",
@@ -1374,6 +1374,7 @@ const shop = {
   "od.stepPaidCollected": "Paid and collected",
   "od.stepPaidDelivered": "Paid and delivered",
   "api.RESERVE_TOO_BIG": "To pay at handover, reserve up to {n} pairs. For more, send a wholesale request.",
+  "nav.findSize": "Find your size",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

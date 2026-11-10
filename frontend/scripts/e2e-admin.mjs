@@ -415,7 +415,7 @@ try {
     await page.getByRole("heading", { level: 1, name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
   });
 
-  await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting room has its own page", async () => {
+  await step("the home page opens on the socks; the shelves, the Dordoi scene, the gift sets with the collection box and calendar work; the fitting room and the stall notes have their own pages", async () => {
     await page.goto(`${BASE}/`);
     await page.getByRole("heading", { name: /Made in Korea\.?\s*Chosen at Dordoi/ }).waitFor();
     await page.locator(".av-still__box").waitFor();
@@ -423,16 +423,8 @@ try {
     await page.getByRole("heading", { name: /Bestsellers|New on the shelf/ }).waitFor();
     await page.getByRole("group", { name: "Show socks for" }).getByRole("button", { name: "Women" }).click();
     await page.locator(".av-shelf .av-card").first().waitFor();
-    // the fitting room's teaser: her ankle sock on the leg, and the full room opens on the same choices
-    await page.getByRole("heading", { name: "Try them on before you buy" }).scrollIntoViewIfNeeded();
-    const teaser = page.locator("#fitting");
-    await teaser.locator("label", { has: page.getByRole("radio", { name: "Her" }) }).click();
-    await teaser.locator("label", { has: page.getByRole("radio", { name: /^Knee-high/ }) }).click();
-    await teaser.getByText(/Knee-high with sneakers/).waitFor();
-    await page.getByRole("link", { name: /One set for the whole family/ }).waitFor();
-    await page.getByRole("link", { name: /A gift box, built your way/ }).waitFor();
-    await page.locator("main").getByRole("link", { name: /Open the fitting room/ }).click();
-    await page.waitForURL(/\/fitting\?who=WOMEN&cut=knee-high/);
+    // the fitting room has its own page (a link can choose who and how high)
+    await page.goto(`${BASE}/fitting?who=WOMEN&cut=knee-high`);
     // the full room: boots and a no-show is advised against, and our own knee-highs go on the leg
     const fitting = page.locator("#fitting");
     await page.waitForFunction(() => document.querySelector("#fitting input[name=fr-who]:checked")?.closest("label")?.textContent === "Her");
@@ -446,8 +438,9 @@ try {
     await page.goto(`${BASE}/family`);
     await page.getByRole("heading", { level: 1, name: "Plan socks for the whole family" }).waitFor();
     await a11y("the family set page");
-    await page.goto(`${BASE}/`);
+    await page.goto(`${BASE}/visit`);
     await page.getByRole("heading", { name: "Notes from the stall" }).waitFor();
+    await page.goto(`${BASE}/`);
     await page.getByRole("heading", { name: "Two names, one family." }).waitFor();
     await page.locator(".av-dordoi").scrollIntoViewIfNeeded();
     await page.evaluate(() => { const el = document.querySelector(".av-dordoi"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + el.offsetHeight - window.innerHeight); });

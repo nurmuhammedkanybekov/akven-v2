@@ -645,8 +645,8 @@ const shop: Partial<Record<MessageKey, string>> = {
   "search.clear": "Издөөнү тазалоо",
   "bag.matchTitle": "Үй-бүлөлүк топтомду толуктаңыз",
   "bag.view": "Себетти ачуу ({n})",
-  "pdp.match": "Бүт үй-бүлөгө окшош",
-  "pdp.matchS": "Ага, аялга жана балдарга бирдей дизайн.",
+  "pdp.match": "Ушул коллекциядан дагы",
+  "pdp.matchS": "Бүт үй-бүлө үчүн: ошол эле коллекция башка текчелерде.",
   "pdp.soldWeek": "Ушул жумада {n} жуп сатылды",
   "rv.eyebrow": "Пикирлер",
   "rv.title": "Сатып алуучулар эмне дейт",
@@ -1359,6 +1359,7 @@ const shop: Partial<Record<MessageKey, string>> = {
   "od.stepPaidCollected": "Төлөнүп, алынды",
   "od.stepPaidDelivered": "Төлөнүп, жеткирилди",
   "api.RESERVE_TOO_BIG": "Алганда төлөө менен {n} жупка чейин коюуга болот. Көбүрөөк керек болсо, дүң заказга өтүнмө жибериңиз.",
+  "nav.findSize": "Өлчөмүңүздү табыңыз",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };
