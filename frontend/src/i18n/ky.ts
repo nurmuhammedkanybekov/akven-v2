@@ -1374,6 +1374,8 @@ const shop: Partial<Record<MessageKey, string>> = {
   "shop.priceUnder": "{price} чейин",
   "shop.priceBetween": "{from}–{to}",
   "shop.priceFrom": "{price} жана жогору",
+  "a.db.topProducts": "Эң көп сатылган товарлар",
+  "a.db.pairsN": "{n} жуп",
 };
 
 export const ky: Partial<Record<MessageKey, string>> = { ...shop, ...adminKy };

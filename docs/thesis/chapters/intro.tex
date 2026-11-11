@@ -3,7 +3,8 @@
 
 \section{Background}
 
-AK\&VEN is a family brand of Korean-made socks. The name joins the first letters of my parents' names, \textbf{AK}ylbek
+AK\&VEN (written \emph{AkVen} in the registered title) is a family business that imports Korean-made socks and
+sells them under its own brand. The name joins the first letters of my parents' names, \textbf{AK}ylbek
 and \textbf{VEN}era, with an ampersand drawn as the Kyrgyz ram's-horn ornament (\textit{kochkor müyüz}) shaped as a heart. My family has traded at Dordoi Bazaar in Bishkek since the
 early 2000s and has sold socks there since 2018, from a shipping container numbered 70-E. Dordoi is one of the largest
 markets in Central Asia: thousands of containers stacked in long rows, where families shop for the season and traders
@@ -69,6 +70,7 @@ like an app and can keep working offline with a service worker. For customers at
 connection this matters more than a native app store presence, and one application can serve customers and staff.
 
 \section{Motivation}
+\label{sec:motivation}
 
 The motivation is practical and personal. Until now the business has been run by hand. Stock is counted at the stall
 and kept in notebooks and in my parents' memory; orders arrive as messages on WhatsApp and Telegram; and how well a
@@ -130,6 +132,56 @@ continuous integration.
 Not built, on purpose: a real card payment provider (the wallet moves no money), SMS notifications, taxes, a payment
 rail through a Kyrgyz bank, demand forecasting and synchronisation with the family's messenger chats. These are
 discussed as future work in Chapter~\ref{ch:sum}.
+
+\section{Relation to the registered topic}
+\label{sec:registered}
+
+The thesis topic was registered on 10 October 2026 under the title \emph{Design and Implementation of AkVen Integrated
+E-Commerce and Inventory Management System}; the registration form is included after the title page.
+Table~\ref{tab:registered} lists each item of the registered description and where it is implemented, documented and
+tested. The price negotiation assistant goes beyond the registered features; it was added during the work and discussed
+with the supervisor, as the system's main technical contribution.
+
+{\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{5.2cm} >{\raggedright\arraybackslash}p{8.3cm}}
+	\toprule
+	\textbf{Registered item} & \textbf{Where it is addressed} \\
+	\midrule
+	\endhead
+	Replace manual stock tracking, order processing and sales analysis &
+	The whole system; motivation in Section~\ref{sec:motivation}, requirements in Chapter~\ref{ch:spec} \\
+	Built from scratch, without a content management system such as WordPress or Shopify &
+	Own React frontend, Spring Boot backend and PostgreSQL schema (Chapter~\ref{ch:dev}) \\
+	Three-layer architecture: frontend, business logic, database &
+	Section~\ref{sec:design-sys}, Figure~\ref{fig:arch} \\
+	Well-designed relational database with a normalised schema &
+	Section~\ref{sec:data}: third normal form, keys and check constraints \\
+	Product catalogue with filtering by colour, size, price and collection &
+	FR-1; Section~\ref{sec:shop}; \texttt{CatalogControllerTest} and the shelf filter tests \\
+	Product pages with multiple images and variant selection &
+	FR-1; Section~\ref{sec:shop} (a product) \\
+	User registration, login and personal order history &
+	FR-9, FR-27; Sections~\ref{sec:shop} and \ref{sec:security} \\
+	Shopping cart and checkout &
+	FR-2, FR-7, FR-8, FR-16, FR-31; Section~\ref{sec:orders} \\
+	Administration: create, edit and delete products with images and variants &
+	FR-10; Section~\ref{sec:admin} \\
+	Real-time inventory management with automatic low-stock alerts &
+	FR-29, FR-30; stock ledger, locking and alerts in Section~\ref{sec:orders}; \texttt{StockLedgerTest},
+	\texttt{LowStockAlertTest}, \texttt{OrderConcurrencyTest} \\
+	Order management with viewing and status updates &
+	FR-16, FR-31; Sections~\ref{sec:admin} and \ref{sec:orders}; Figure~\ref{fig:orderstates} \\
+	Sales analytics with charts of best-selling items and revenue trends &
+	FR-12, FR-26; the dashboard in Section~\ref{sec:admin}; \texttt{ShopSummaryTest} \\
+	Responsive design for desktop and mobile &
+	NFR-11; Section~\ref{sec:phones} \\
+	Secure authentication and role-based access control &
+	FR-9, FR-11, FR-14, NFR-1, NFR-2; Section~\ref{sec:security} \\
+	\bottomrule
+	\caption{The registered topic and where each item is addressed}
+	\label{tab:registered}
+\end{longtable}
+}
 
 \section{Structure of the thesis}
 

@@ -248,6 +248,8 @@ export interface ShopShare { key: string; orders: number; revenue: number }
 export interface ShopInsights {
   ways: ShopShare[]; shelves: ShopShare[];
   topCustomers: Array<{ name: string; email: string; guest: boolean; orders: number; spent: number }>;
+  /** The period's best-selling products by pairs, with their revenue (at most five). */
+  topProducts: Array<{ name: string; slug: string | null; pairs: number; revenue: number }>;
   returningCustomers: number; guestOrders: number; cancelled: number; ladderOrders: number; averagePairs: number;
   /** Paid orders per weekday, Monday first. */
   weekdays: number[];

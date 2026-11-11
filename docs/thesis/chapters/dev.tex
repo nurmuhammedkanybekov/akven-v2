@@ -80,6 +80,7 @@ layer: each package holds its entity, repository, service, controller and data-t
 browser journey.
 
 \section{System design}
+\label{sec:design-sys}
 
 \subsection{Layers inside the backend}
 
@@ -110,8 +111,13 @@ security refines this inside the services.
 \section{Data model}
 \label{sec:data}
 
-Figure~\ref{fig:er-core} shows the core tables; the full schema of 43 Flyway versions (24 schema migrations and 19
-demo-data migrations) is generated from the database into the \texttt{docs/diagrams} folder.
+Figure~\ref{fig:er-core} shows the core tables; the full schema of 45 Flyway versions (26 schema migrations and 19
+demo-data migrations) is generated from the database into the \texttt{docs/diagrams} folder. The schema is normalised
+to the third normal form: every fact is stored once (a product's name and description in \texttt{product}, each
+size and colour with its own price and stock in \texttt{product\_variant}, the customer in \texttt{app\_user}), and
+the tables refer to each other by keys. The deliberate exceptions are copies that must not change later: an order line
+keeps the product name, picture and price at the moment of sale, so that a receipt stays correct after the catalogue
+is edited.
 
 \begin{figure}[H]
 	\centering
@@ -322,6 +328,7 @@ There are two negotiators behind the same interface:
 \lstinputlisting[language=Java, caption={A reply may state no number of its own (Cyrillic shown as Java Unicode escapes)}, label=src:safe]{listings/ReplyCheck.java}
 
 \section{Orders, stock and payment}
+\label{sec:orders}
 
 Checkout (\texttt{OrderService}) is the place where races matter: two customers may buy the last pair at the same
 moment, and a double click must not charge twice. The method therefore:
