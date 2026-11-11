@@ -34,6 +34,9 @@ These came from the family's real way of working and are numbered as in the thes
 | FR-16 pickup, a Bishkek courier, or cargo paid on receipt | Done | `delivery/DeliveryZone` (kind, note, pay on receipt; V35), the order's own copy | `DeliveryZoneTest`, `checkout` frontend tests, browser test (cargo and courier) |
 | FR-27 order without an account, private link, find a lost link | Done | `order/OrderLinks` (HMAC key, never stored), `OrderService` (guest checkout, `sendLinkAgain`), `GuestLimiter`; V37 | `GuestCheckoutTest`, `guest-checkout` frontend tests, browser test (a guest in two browsers) |
 | FR-28 emails in the customer's language, kept without a mail server | Done | `notify/` (`Notifier` writes into the outbox in the order's transaction, `EmailSender` delivers and retries); Admin > Emails to customers; V36 | `EmailNotificationTest` (languages, retries with a stand-in SMTP server, clean-up), `emails` frontend tests, browser test |
+| FR-29 stock ledger: every change with its reason, goods received, history | Done | `stock/StockLedger` (`Propagation.MANDATORY`, written in the same transaction as the change), `stock_movement` table (V41); Admin > product > Goods arrived, Stock history | `StockLedgerTest` (every change leaves a row; the rows add up to the shelf) |
+| FR-30 no overselling, stock on the way, low-stock alert | Done | `OrderService` locks the variants in a fixed order before reading stock; `CHECK (stock_qty >= reserved_qty)`; `incoming_qty` and `restock_eta`; `Notifier` low-stock alert from `OrderService` | `PostgresIntegrationTest` (last-pair race over real HTTP), `StockStatusTest`, `LowStockAlertTest` |
+| FR-31 reserve now, pay at handover, automatic release | Done | `Order.reserve`, `OrderService.payAtHandover`, `ReservationExpiry` (every 5 minutes); V42 | `PayAtHandoverTest`, browser test (reserve, hand over, take the money) |
 
 ## Non-functional requirements
 

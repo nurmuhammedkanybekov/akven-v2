@@ -3,59 +3,72 @@
 
 \section{Conclusion}
 
-This thesis built AK\&VEN, a complete online shop for a family sock business at Dordoi Bazaar, in which the bazaar's
-habits continue online: customers ask for a better price in a conversation, buy for the whole family, mix any socks to
-reach a lower price per pair, and collect their order at the stall or have it delivered to four countries; shops send
-requests for whole cases. The shop and its administration are one installable web application in three languages; one
-API holds every business rule; and the database repeats the rules that must never be broken.
+This thesis designed and implemented AK\&VEN, an integrated e-commerce and inventory management system for a family
+sock business at Dordoi Bazaar. It replaces the manual processes described in the introduction with one application.
+Customers browse the real assortment, buy for the whole family, mix any socks to reach a lower price per pair, ask for
+a better price in a conversation, and either pay online or reserve their order and pay when they collect it at the
+stall or receive it from a courier. The owners and staff manage the catalogue, stock, prices, deliveries, orders and
+wholesale requests in an administration interface, and see their sales on a dashboard. The shop and the administration
+are one installable web application in three languages; one REST API holds every business rule; and the database
+repeats the rules that must never be broken.
 
-The core contribution is a design in which a language model may talk about money without being able to decide it. The
-model only proposes; a deterministic validator clamps every proposal to a limit the model never sees, again at
-checkout; the database refuses an allowed discount larger than its proposal; and the model's words may not contain a
-number of their own. Both the proposal and the result are recorded, so the gap between what the model wanted and what
-was allowed is visible for every conversation.
+The system has two technical contributions. The first is a design in which a language model may talk about money
+without being able to decide it. The model only proposes; a deterministic validator limits every proposal to a value
+the model never sees, again at checkout; the database refuses an allowed discount larger than its proposal; and the
+model's words may not contain a number of their own. Both the proposal and the result are recorded, so the gap between
+what the model wanted and what was allowed is visible for every conversation. The second is an inventory that stays
+correct and explainable: stock is locked in a fixed order during checkout, reserved stock is held separately from
+stock on the shelf, and every change is written to a ledger in the same transaction as the change itself.
 
 \section{Answers to the research questions}
 
 \paragraph{RQ1: Can a language model negotiate while a deterministic component guarantees the limit?} Yes. In the
 evaluation no final price went below the limit, whether the assistant was the rule-based one that over-promised six
-times or the language model, including a prompt-injection attempt; the automated tests show the same for an assistant
-that deliberately offers 80\%, for tampered offers at checkout and for rows written past the application. The guarantee
-rests on code and constraints, not on the model's behaviour.
+times or the language model, including during a prompt-injection attempt. The automated tests show the same for an
+assistant that deliberately offers 80\%, for offers tampered with at checkout and for rows written directly to the
+database. The guarantee rests on code and constraints, not on the model's behaviour.
 
 \paragraph{RQ2: How do the two negotiators compare?} On the sixteen simulated customers the language model was more
 cautious: an average final discount of 6\% against 11\%, half of the customers buying against four in five, and the
 validator stepping in once against six times. It answered naturally in all three languages within one or two seconds.
-The rules are the better seller for single messages; the model is the better conversationalist, and its caution comes
-largely from the prompt, which the owners' wishes can tune.
+The rule-based assistant is therefore the better seller for single messages, and the model the better
+conversationalist; its caution comes largely from the prompt, which can be tuned to the owners' wishes.
 
-\paragraph{RQ3: Can the bazaar's habits live in an online shop?} The shop expresses them as ordinary interface
-elements rather than as extra steps: a chat on the product page, a family planner, a price ladder for the whole bag shown
-in the bag and on every sock, pickup with a code at the container, delivery areas with honest fees and times, and a case
-builder with a request inbox for shops. The browser journey and the accessibility checks show that these work for a
-first-time visitor, on a phone, in Russian and Kyrgyz.
+\paragraph{RQ3: Can the bazaar's habits be expressed in an online shop?} Yes. The shop expresses them as ordinary
+interface elements rather than as extra steps: a chat on the product page, a family planner, a price ladder for the
+whole bag shown in the bag and on every product, pickup with a code at the container, payment at handover, delivery
+areas with clear fees and times, and a case builder with a request inbox for shops. The browser tests and the
+accessibility checks show that these work for a first-time visitor, on a phone, and in Russian and Kyrgyz.
+
+\paragraph{RQ4: Can the stock stay consistent and explainable?} Yes. Stock is never read before the affected variants
+are locked, always in the same order, so two customers buying the last pair cannot both succeed and two opposite bags
+cannot deadlock; this is tested against a real PostgreSQL database over HTTP. Reserved pairs are counted separately,
+and a check constraint keeps the reserved quantity from exceeding the stock. Every sale, cancellation, delivery of new
+goods and manual correction writes one ledger row in the same transaction, and a test confirms that the rows of each
+variant always add up to the stock on the shelf, so any number on the shelf can be traced back to its causes.
 
 \section{Future work}
 
 \begin{itemize}
-	\item \textbf{A real payment provider}, with payment moved outside the checkout transaction (reserve, pay, confirm)
-	and, later, a second rail through a Kyrgyz bank.
-	\item \textbf{A user study} with real customers of the stall, to measure acceptance and satisfaction of the two
-	assistants in full conversations rather than single messages.
-	\item \textbf{Vector retrieval} for the assistant with the prepared pgvector table, so it can answer from longer
+	\item \textbf{A real card payment provider}, with the payment moved outside the checkout transaction (reserve, pay,
+	confirm), and later a payment rail through a Kyrgyz bank. The reservation used for payment at handover already
+	provides the first step.
+	\item \textbf{A user study} with real customers of the stall, to measure how the two assistants are accepted in full
+	conversations rather than single messages.
+	\item \textbf{Vector retrieval} for the assistant, using the prepared pgvector table, so it can answer from longer
 	product descriptions and the family's notes.
-	\item \textbf{A Telegram bot} for the family and for customers. The shop already sends e-mails at the moments that
-	matter (an order placed, ready at the stall or sent, a sock running low); most of the stall's customers, however,
-	live in Telegram and WhatsApp. A bot would send the same messages from the same place in the code, let a customer
-	check an order by its number, and let the owners mark an order handed over from their phone.
-	\item \textbf{Real photographs} of the products, replacing the drawn pictures.
-	\item \textbf{Demand forecasting} from the orders, the waiting lists and the wholesale requests, to tell the family
-	what to reorder.
-	\item \textbf{Translations of the owners' data}: section and colour names in all three languages.
+	\item \textbf{A Telegram bot} for the family and for customers. The shop already sends emails at the moments that
+	matter, but most of the stall's customers use Telegram and WhatsApp. A bot would send the same messages, let a
+	customer check an order by its number, and let the owners mark an order as handed over from their phone.
+	\item \textbf{Real photographs} of the products, replacing the generated drawings.
+	\item \textbf{Demand forecasting} from the stock ledger, the orders, the waiting lists and the wholesale requests, to
+	suggest what and how much to reorder from the suppliers.
+	\item \textbf{Translations of the owners' data}, such as section and colour names, into all three languages.
 \end{itemize}
 
 \section{Final remarks}
 
-The project started from a simple observation at the stall: nobody pays the label price. The result is a shop that
-keeps that conversation and keeps the family in control of it. It is ready to be used by my parents once the real
-prices, photographs and payment provider are in place.
+The project started from a simple observation at the stall: nobody pays the label price, and nobody knows exactly
+what is left on the shelf. The result is a system that keeps the conversation with the customer, keeps the family in
+control of the price, and keeps the stock accurate. It is ready to be used by my parents once the real prices,
+photographs and a payment provider are in place.

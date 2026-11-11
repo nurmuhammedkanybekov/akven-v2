@@ -12,17 +12,19 @@ from the regions of Kyrgyzstan, from Kazakhstan, Uzbekistan and Russia buy goods
 Three habits shape how socks are sold there, and every one of them is missing from an ordinary online shop:
 \begin{itemize}
 	\item \textbf{The price is agreed, not read.} A customer asks, the seller answers, and the price moves with the
-	quantity, the season and the relationship. A fixed price tag feels cold, and a discount code feels like a trick.
+	quantity, the season and the relationship. A fixed price tag can feel impersonal to these
+	customers, and discount codes are unfamiliar to them.
 	\item \textbf{People buy for the whole family.} One visit covers the father, the mother and the children, each in
 	a different size; the larger the set, the lower the price per pair.
 	\item \textbf{Shops buy by the case.} A case holds about 240 pairs in packs of 10 or 12, often mixed, and the price
 	is given on request because it follows the dollar rate, the factory price and the delivery.
 \end{itemize}
 
-This thesis builds the brand's online shop so that these habits can continue online: a customer can ask for a better
-price in a conversation, plan one order for the whole family, mix any socks to reach a lower price step, and collect
-the order at the container or have it delivered. Shops and companies can build a case and send a request that the
-family answers.
+This thesis builds an integrated online shop and inventory system for the business, in which these habits can continue
+online: a customer can ask for a better price in a conversation, plan one order for the whole family, mix any socks to
+reach a lower price step, and collect the order at the container or have it delivered. Shops and companies can build a
+case and send a request that the family answers. Behind the shop, the same system keeps the stock, the orders and the
+sales of the business in one place.
 
 \section{Related work}
 \label{sec:related}
@@ -33,6 +35,14 @@ architecture was a model for this project in two respects: a single API serves b
 and the administration is only another client of that API with more rights. They assume fixed prices, however, with
 discounts expressed as coupons or price lists; none of them treats the price as the result of a conversation, and they
 are built for multi-tenant scale that a single family stall does not need.
+
+\paragraph{Inventory management.} Business systems such as Odoo~\cite{odoo} model stock as a sequence of moves between
+locations rather than as a single number, so that every quantity can be explained by the operations that produced it.
+The same idea appears in software architecture as event sourcing~\cite{fowlereventsourcing}, in which every change is
+stored as an event and the current state is derived from them. AK\&VEN adopts a lighter form suited to a single stall:
+the current stock is kept as a number for fast reads, and every change is also written to a ledger with its reason in
+the same database transaction. To prevent overselling, it relies on row-level locks in PostgreSQL~\cite{pglocking},
+taken in a fixed order during checkout.
 
 \paragraph{Negotiation dialogue.} Automated negotiation has been studied in natural-language processing for years.
 Lewis et al.~\cite{lewis2017deal} trained end-to-end models to negotiate the division of items and found that they
@@ -60,10 +70,17 @@ connection this matters more than a native app store presence, and one applicati
 
 \section{Motivation}
 
-The motivation is practical and personal. My parents' customers already write to them on WhatsApp and Telegram to ask
-for prices, sizes and whether a model is still in stock; the answers depend on who is free to reply, and nothing is
-kept in one place. An online shop would let customers see the whole assortment, choose sizes from the shop's own size
-chart and pay in advance, and let the family see orders, stock and requests in one list.
+The motivation is practical and personal. Until now the business has been run by hand. Stock is counted at the stall
+and kept in notebooks and in my parents' memory; orders arrive as messages on WhatsApp and Telegram; and how well a
+model sells is known only from experience. This causes three recurring problems. First, the recorded stock and the
+socks on the shelf drift apart, so a customer is sometimes promised a size that has already been sold. Second, orders
+are fulfilled late because they are scattered across chats and depend on who is free to reply. Third, the family has
+no clear view of which products, sizes and customers bring the most sales, which makes reordering from the Korean
+suppliers a matter of guesswork.
+
+An integrated system addresses all three: customers see the real assortment and stock, choose sizes from the shop's
+own size chart and place orders in one place; the family sees orders, stock, incoming goods and requests in one list,
+with every change of stock explained; and sales are summarised on a dashboard.
 
 The difficulty is that bargaining is part of the brand, and a language model is the obvious tool for a conversation in
 three languages, but it is not safe to let a model decide prices. A shop that can be talked into a 90\% discount loses
@@ -78,6 +95,9 @@ The objective is to design, implement, test and evaluate a complete online shop 
 	receive their order, in English, Russian or Kyrgyz, on a phone, a tablet or a laptop;
 	\item the owners and staff manage the catalogue, stock, prices, orders, requests and settings in an administration
 	interface in the same three languages;
+	\item stock stays correct under concurrent orders: every change is recorded with its reason, the last pair cannot
+	be sold twice, reserved stock is released when it is not collected, and the owners are warned when a product runs
+	low;
 	\item no price below the owners' limit can ever reach an order, whatever the assistant says, and this guarantee is
 	shown by automated tests and by an evaluation on simulated customers.
 \end{itemize}
@@ -92,18 +112,22 @@ The objective is to design, implement, test and evaluate a complete online shop 
 	discounts given, sales made and how often the limit had to step in?
 	\item Can the bazaar's habits (bargaining, family sets, price steps by quantity, wholesale by the case) be expressed
 	in an online shop without making it harder to use than an ordinary one?
+	\item Can the stock of a small shop stay consistent and explainable when online orders, reservations, cancellations,
+	deliveries of new goods and manual corrections happen at the same time?
 \end{enumerate}
 
 \section{Scope}
 
 Built in this thesis: the shop and the administration as one progressive web application; the REST API with
-authentication and four roles; the catalogue with sections, cuts, colours, sizes, pictures and stock; collection
-pricing; the negotiation assistant with a rule-based and a language-model implementation; cart, checkout with a
-\emph{simulated} Apple Pay and Google Pay wallet, pickup with a code and delivery areas with fees and times; family
-profiles, gift boxes, reviews, saved socks, wholesale requests and saved customer details; an audit log; the test suite;
-and deployment with Docker Compose and continuous integration.
+authentication and four roles; the catalogue with sections, cuts, colours, sizes, pictures and stock; inventory
+management with a stock ledger, incoming goods, reservations and low-stock alerts; collection pricing; the negotiation
+assistant with a rule-based and a language-model implementation; the bag and checkout with pickup at the stall, a
+courier and cargo carriers, payment through a \emph{simulated} Apple Pay and Google Pay wallet or in person at
+handover; guest checkout; email notifications; a sales dashboard and order export; family profiles, gift boxes,
+reviews, saved products and wholesale requests; an audit log; the test suite; and deployment with Docker Compose and
+continuous integration.
 
-Not built, on purpose: a real payment provider (no money moves), e-mail and SMS notifications, taxes, a second payment
+Not built, on purpose: a real card payment provider (the wallet moves no money), SMS notifications, taxes, a payment
 rail through a Kyrgyz bank, demand forecasting and synchronisation with the family's messenger chats. These are
 discussed as future work in Chapter~\ref{ch:sum}.
 
