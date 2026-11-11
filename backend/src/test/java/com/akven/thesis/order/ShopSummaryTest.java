@@ -55,6 +55,20 @@ class ShopSummaryTest extends IntegrationTest {
     }
 
     @Test
+    void theBestSellingProductsAreRankedByPairsWithTheirRevenue() throws Exception {
+        // More pairs than any other test sells, so this product leads the list in the shared test database.
+        Variant hit = data.variant(900);
+        buy(hit, 600);
+        JsonNode top = summary().at("/insights/topProducts");
+        assertThat(top.size()).isBetween(1, 5);
+        assertThat(top.get(0).get("name").asText()).isEqualTo(hit.getProduct().getName());
+        assertThat(top.get(0).get("pairs").asInt()).isEqualTo(600);
+        assertThat(top.get(0).get("revenue").decimalValue()).isPositive();
+        for (int i = 1; i < top.size(); i++)
+            assertThat(top.get(i).get("pairs").asInt()).as("ranked by pairs").isLessThanOrEqualTo(top.get(i - 1).get("pairs").asInt());
+    }
+
+    @Test
     void aSockRunningOutIsListedWithWhatIsOnTheWay() throws Exception {
         Variant lastOne = data.variant(1);
         JsonNode s = summary();

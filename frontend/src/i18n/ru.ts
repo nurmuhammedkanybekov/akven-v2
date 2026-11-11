@@ -1370,6 +1370,10 @@ const shop: Partial<Record<MessageKey, string>> = {
   "desc.wholesale": "Корейские носки оптом коробками для магазинов Кыргызстана, Казахстана, Узбекистана и России. Смотрите наличие и запрашивайте цену.",
   "desc.sizes": "Подберите размер носков по размеру обуви для любого возраста и посмотрите, как высоко сидит каждый носок, до покупки.",
   "desc.family": "Носки на всю семью: добавьте каждого с размером обуви, а мы подберём размеры и посчитаем цену набора.",
+  "shop.price": "Цена",
+  "shop.priceUnder": "До {price}",
+  "shop.priceBetween": "{from}–{to}",
+  "shop.priceFrom": "От {price}",
 };
 
 export const ru: Partial<Record<MessageKey, string>> = { ...shop, ...adminRu };
