@@ -9,6 +9,14 @@ import { CartPage } from "../pages/Cart";
 import { CheckoutPage } from "../pages/Checkout";
 import { resetGiftCache } from "../shop/useGift";
 
+/** Every field name in a request body, nested ones too. Values are left out: the wallet's token is random and may
+ * contain any letters, so only the names show whether the browser sent a price, a total, a card or a fee. */
+function keysOf(body: unknown): string[] {
+  if (Array.isArray(body)) return body.flatMap(keysOf);
+  if (body && typeof body === "object") return Object.entries(body).flatMap(([k, v]) => [k, ...keysOf(v)]);
+  return [];
+}
+
 const LINE = { sku: "SOCK-1", productSlug: "sock", productName: "Mid-Long Sock", variantLabel: "Navy, M", colorHex: "#1F2A44", imageUrl: null, unitPrice: 9.5, quantity: 2 };
 const QUOTE_OK = { lines: [{ sku: "SOCK-1", productSlug: "sock", productName: "Mid-Long Sock", variantLabel: "Navy, M", colorHex: "#1F2A44", imageUrl: null, quantity: 2,
   listPrice: 9.5, discountPct: 0, unitPrice: 9.5, lineTotal: 19, availableQty: 10, problem: "NONE", note: null }], total: 19, canCheckout: true };
@@ -107,7 +115,7 @@ describe("checkout", () => {
     expect(order.headers.Authorization).toBe("Bearer t");
     expect(order.body.payment.token).toMatch(/^sim_apple_[A-Za-z0-9]{12,64}$/);
     expect(order.body.items).toEqual([{ sku: "SOCK-1", quantity: 2 }]);            // which item and how many: no price anywhere
-    expect(JSON.stringify(order.body)).not.toMatch(/price|total|card/i);
+    expect(keysOf(order.body).join(" ")).not.toMatch(/price|total|card/i);
     expect(readCart()).toEqual([]);
   });
 
@@ -132,7 +140,7 @@ describe("checkout", () => {
     await screen.findByText("order page");
     const [order] = orderCalls();
     expect(order.body.fulfillment).toMatchObject({ method: "DELIVERY", country: "KZ", zoneId: "z-almaty" });
-    expect(JSON.stringify(order.body)).not.toMatch(/price|total|card|fee/i);
+    expect(keysOf(order.body).join(" ")).not.toMatch(/price|total|card|fee/i);
   });
 
   it("fills in the remembered details and keeps them up to date only when asked", async () => {
