@@ -1,5 +1,8 @@
 # Putting AK&VEN online
 
+Updating the running server at akven.duckdns.org step by step, with what you should see at each step, is in
+[`deploy-runbook.md`](deploy-runbook.md). This document explains the choices and a first installation.
+
 ## The short answer: localhost, Vercel, or a server?
 
 | Option | What it means for AK&VEN |
