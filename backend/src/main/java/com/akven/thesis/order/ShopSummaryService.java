@@ -61,12 +61,17 @@ public class ShopSummaryService {
 
     public record TopCustomer(String name, String email, boolean guest, int orders, BigDecimal spent) {}
 
+    /** A product among the period's best sellers: pairs sold and the money they brought, as recorded on the orders. */
+    public record TopProduct(String name, String slug, int pairs, BigDecimal revenue) {}
+
     /**
      * What the period's paid orders say: how they travelled, which shelves sold, who bought most, how many came back,
-     * how many were guests, how many reached a price step, pairs per order, and the busiest weekdays (Monday first).
+     * how many were guests, how many reached a price step, pairs per order, the busiest weekdays (Monday first), and
+     * the best-selling products by pairs.
      */
     public record Insights(List<Share> ways, List<Share> shelves, List<TopCustomer> topCustomers, int returningCustomers,
-                           int guestOrders, int cancelled, int ladderOrders, BigDecimal averagePairs, int[] weekdays) {}
+                           int guestOrders, int cancelled, int ladderOrders, BigDecimal averagePairs, int[] weekdays,
+                           List<TopProduct> topProducts) {}
 
     /** One day of sales in Bishkek time: paid orders, their total, and pairs. */
     public record DayPoint(LocalDate date, int orders, BigDecimal revenue, int pairs) {}
@@ -152,6 +157,14 @@ public class ShopSummaryService {
         BigDecimal avgPairs = paid.isEmpty() ? BigDecimal.ZERO : BigDecimal.valueOf(pairs).divide(BigDecimal.valueOf(paid.size()), 1, RoundingMode.HALF_UP);
         int[] weekdays = new int[7];
         paid.forEach(o -> weekdays[o.getPaidAt().atZone(CatalogService.SHOP_ZONE).getDayOfWeek().getValue() - 1]++);
-        return new Insights(ways, shelves, top, returning, guests, cancelled, ladder, avgPairs, weekdays);
+        // Grouped by the product the line was sold as, so a product renamed later still counts as one.
+        Map<UUID, List<OrderItem>> byProduct = sold.stream().collect(Collectors.groupingBy(i -> i.getVariant().getProduct().getId()));
+        List<TopProduct> topProducts = byProduct.values().stream()
+                .map(l -> new TopProduct(l.get(0).getProductName(), l.get(0).getProductSlug(),
+                        l.stream().mapToInt(i -> CollectionPricing.pairs(i.getVariant(), i.getQuantity())).sum(),
+                        l.stream().map(OrderItem::lineTotal).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .sorted(Comparator.comparingInt(TopProduct::pairs).reversed().thenComparing(TopProduct::revenue, Comparator.reverseOrder()))
+                .limit(5).toList();
+        return new Insights(ways, shelves, top, returning, guests, cancelled, ladder, avgPairs, weekdays, topProducts);
     }
 }

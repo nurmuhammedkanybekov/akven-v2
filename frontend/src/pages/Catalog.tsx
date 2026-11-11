@@ -17,6 +17,7 @@ import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/en";
 import { CATEGORIES, CATEGORY_PATH } from "../lib/labels";
 import { usePricing } from "../shop/useShopInfo";
+import { useMoney } from "../shop/useMoney";
 
 const SORTS: Array<[string, MessageKey]> = [["newest", "shop.sortNew"], ["name", "shop.sortName"], ["price_asc", "shop.sortLow"], ["price_desc", "shop.sortHigh"]];
 const PAGE = 12;
@@ -79,8 +80,12 @@ async function loadUpTo(query: CatalogQuery, upTo: number, signal: AbortSignal):
  * every choice can be taken off as a tag. Everything lives in the URL, so a view can be bookmarked, shared and reached
  * with Back. The list grows twelve at a time.
  */
+/** Price bands for one option, in US dollars; the labels follow the visitor's currency. */
+const PRICE_BANDS: Record<string, { min?: number; max?: number }> = { low: { max: 3.99 }, mid: { min: 4, max: 6.99 }, high: { min: 7 } };
+
 export function CatalogPage({ category }: { category?: Category }) {
   const { t } = useT();
+  const { money } = useMoney();
   const pricing = usePricing();
   const firstStep = [...(pricing?.tiers ?? [])].sort((a, b) => a.minPairs - b.minPairs)[0];
   const key: Shelf = category ?? "ALL";
@@ -91,12 +96,16 @@ export function CatalogPage({ category }: { category?: Category }) {
   const color = params.get("color") ?? undefined;
   const sort = params.get("sort") ?? "newest";
   const inStock = params.get("inStock") === "1";
+  const price = PRICE_BANDS[params.get("price") ?? ""] ? params.get("price")! : undefined;
+  const band = price ? PRICE_BANDS[price] : undefined;
+  const priceLabel = (b: string) => b === "low" ? t("shop.priceUnder", { price: money(4) })
+    : b === "mid" ? t("shop.priceBetween", { from: money(4), to: money(7) }) : t("shop.priceFrom", { price: money(7) });
   const upTo = Math.min(MAX_PAGES - 1, Math.max(0, Number(params.get("page") ?? 0) || 0));
   const q = (params.get("q") ?? "").trim().slice(0, 80) || undefined;
 
-  const query: CatalogQuery = { category, section, cut, size, color, q, inStock, sort, pageSize: PAGE };
+  const query: CatalogQuery = { category, section, cut, size, color, q, inStock, sort, pageSize: PAGE, minPrice: band?.min, maxPrice: band?.max };
   const products = useAsync((signal) => loadUpTo(query, upTo, signal), [JSON.stringify(query), upTo]);
-  const facetQuery = { category, section, cut, size, color, q, inStock };
+  const facetQuery = { category, section, cut, size, color, q, inStock, minPrice: band?.min, maxPrice: band?.max };
   const facets = useAsync((signal) => getFacets(facetQuery, signal), [JSON.stringify(facetQuery)]);
 
   function set(name: string, value: string | null) {
@@ -106,7 +115,7 @@ export function CatalogPage({ category }: { category?: Category }) {
     setParams(next, { replace: name === "page", preventScrollReset: true });
   }
   const toggle = (name: string, value: string, current?: string) => set(name, current?.toLowerCase() === value.toLowerCase() ? null : value);
-  const anyFilter = Boolean(section || cut || size || color || inStock || q);
+  const anyFilter = Boolean(section || cut || size || color || inStock || q || price);
   const total = products.data?.totalItems;
   const shown = products.data?.items.length ?? 0;
   const more = products.data ? products.data.page + 1 < products.data.totalPages && upTo + 1 < MAX_PAGES : false;
@@ -118,6 +127,7 @@ export function CatalogPage({ category }: { category?: Category }) {
     cut && { name: "cut", label: names(facets.data?.cut, cut)! },
     size && { name: "size", label: t("shop.sizeIs", { size }) },
     color && { name: "color", label: facets.data?.color?.find((c) => c.name.toLowerCase() === color.toLowerCase())?.name ?? color },
+    price && { name: "price", label: priceLabel(price) },
     inStock && { name: "inStock", label: t("shop.inStock") },
     q && { name: "q", label: `“${q}”` },
   ].filter(Boolean) as Array<{ name: string; label: string }>;
@@ -205,6 +215,10 @@ export function CatalogPage({ category }: { category?: Category }) {
             })}
           </div>
         )}
+        <div className="av-shelfbar__group" role="group" aria-label={t("shop.price")}>
+          <span className="av-shelfbar__label">{t("shop.price")}</span>
+          {Object.keys(PRICE_BANDS).map((b) => <Chip key={b} label={priceLabel(b)} pressed={price === b} onToggle={() => toggle("price", b, price)} />)}
+        </div>
         <div className="av-shelfbar__end">
           <Chip label={t("shop.inStock")} pressed={inStock} onToggle={() => set("inStock", inStock ? null : "1")} />
           <label className="av-shelfbar__sort">

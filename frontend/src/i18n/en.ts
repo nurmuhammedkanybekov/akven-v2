@@ -1385,6 +1385,10 @@ const shop = {
   "desc.wholesale": "Wholesale Korean socks by the case for shops in Kyrgyzstan, Kazakhstan, Uzbekistan and Russia. See what is in stock and ask for a quote.",
   "desc.sizes": "Find your sock size from your shoe size, for every age, and see how high each sock sits on the leg before you buy.",
   "desc.family": "Plan socks for the whole family: add everyone with their shoe size, and we work out each size and the price for the set.",
+  "shop.price": "Price",
+  "shop.priceUnder": "Under {price}",
+  "shop.priceBetween": "{from} to {to}",
+  "shop.priceFrom": "{price} and up",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;
