@@ -225,7 +225,8 @@ The tests show, among other things, that:
 | [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator, security |
 | [`docs/user-guide.md`](docs/user-guide.md) | How owners, staff and customers use the shop |
 | [`docs/development.md`](docs/development.md) | Running locally, settings, tests, CI, database |
-| [`docs/deployment.md`](docs/deployment.md) | Putting the shop online, step by step |
+| [`docs/deployment.md`](docs/deployment.md) | Putting the shop online: the choices and a first installation |
+| [`docs/deploy-runbook.md`](docs/deploy-runbook.md) | Updating the running server, step by step, with checks, rollback and troubleshooting |
 | [`docs/api.md`](docs/api.md) | The API and its error codes |
 | [`docs/evaluation/`](docs/evaluation/) | The recorded run of the assistant with 16 simulated customers |
 | [`docs/diagrams/`](docs/diagrams/README.md) | Architecture, validation path, negotiation sequence, data model, use cases |
