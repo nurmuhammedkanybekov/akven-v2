@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, expect, it, vi } from "vitest";
 
@@ -18,7 +18,8 @@ it("in demo mode, every page says that card payment is not live yet and asks sea
   await renderWith("SIMULATED");
   expect(await screen.findByRole("note")).toHaveTextContent(/Card payment online is coming soon/);
   expect(screen.getByRole("link", { name: "Find us" })).toHaveAttribute("href", "/visit");
-  expect(document.head.querySelector('meta[name="robots"]')).toHaveAttribute("content", "noindex");
+  // The tag is set in an effect that React runs just after the note is drawn, so wait for it rather than check once.
+  await waitFor(() => expect(document.head.querySelector('meta[name="robots"]')).toHaveAttribute("content", "noindex"));
 });
 
 it("a real shop shows no demo line and stays listed", async () => {
