@@ -1389,6 +1389,8 @@ const shop = {
   "shop.priceUnder": "Under {price}",
   "shop.priceBetween": "{from} to {to}",
   "shop.priceFrom": "{price} and up",
+  "a.db.topProducts": "Best-selling products",
+  "a.db.pairsN": "{n} {n:pair|pairs}",
 } as const;
 
 export const en = { ...shop, ...adminEn } as const;

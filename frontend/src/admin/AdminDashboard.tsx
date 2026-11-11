@@ -195,6 +195,11 @@ function Insights({ s }: { s: ShopSummary }) {
           <Bars rows={i.weekdays.map((n, d) => ({ label: dayName(d), value: n }))} />
         </section>
       </div>
+      <section className="av-card-form" aria-labelledby="bestp-h">
+        <h2 id="bestp-h" className="av-formtitle">{t("a.db.topProducts")}</h2>
+        {(i.topProducts ?? []).length === 0 ? <p className="av-small">{t("a.db.noPaid")}</p>
+          : <Bars rows={i.topProducts.map((p) => ({ label: p.name, value: p.pairs, note: `${t("a.db.pairsN", { n: p.pairs })} · ${money(Number(p.revenue))}` }))} />}
+      </section>
       <section className="av-card-form" aria-labelledby="top-h">
         <h2 id="top-h" className="av-formtitle">{t("a.db.topCustomers")}</h2>
         {i.topCustomers.length === 0 ? <p className="av-small">{t("a.db.noPaid")}</p> : (
