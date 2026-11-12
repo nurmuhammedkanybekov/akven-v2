@@ -37,8 +37,11 @@ export function useVariantChoice(product: ProductDetail, initialHex?: string | n
   function pick(change: Partial<Pick<VariantView, "color" | "colorHex" | "size" | "packSize">>) {
     const want = { color: current?.color, colorHex: current?.colorHex, size: current?.size, packSize: current?.packSize, ...change };
     const score = (v: VariantView) => (v.color === want.color ? 4 : 0) + (v.colorHex === want.colorHex ? 4 : 0) + (v.size === want.size ? 2 : 0) + (v.packSize === want.packSize ? 1 : 0);
+    // Two options can be the same colour, size and pack (the owners added one twice): the one in stock wins, whatever
+    // order the server lists them in, so a sock on the shelf is never shown as sold out.
+    const inStock = (v: VariantView) => (v.availableQty > 0 ? 1 : 0);
     const best = [...variants].filter((v) => Object.entries(change).every(([k, val]) => v[k as keyof VariantView] === val))
-      .sort((a, b) => score(b) - score(a))[0];
+      .sort((a, b) => score(b) - score(a) || inStock(b) - inStock(a))[0];
     if (best) setSku(best.sku);
   }
 
