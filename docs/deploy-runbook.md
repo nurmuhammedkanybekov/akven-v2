@@ -172,24 +172,84 @@ example after editing `.env`): `sh deploy/deploy.sh --force`.
 
 ---
 
-## Part 3. Copy the backups off the server
+## Part 3. Backups that survive the server
 
-A backup on the same disk does not survive the loss of the VM. Once a week, from the Mac:
+A backup on the same disk does not survive the loss of the VM, and the files contain customer emails and password
+hashes. So: encrypt them on the server, and copy them to your own computer.
+
+### 3.1 Encrypt the backups (once, on the server)
 
 ```sh
-laptop$ mkdir -p ~/akven-backups
-laptop$ scp "ubuntu@<server-ip>:akven-v2/backups/akven-*" ~/akven-backups/
+$ openssl rand -base64 32 > ~/.akven-backup-key && chmod 600 ~/.akven-backup-key
+$ cat ~/.akven-backup-key
 ```
 
-The files contain customer emails and password hashes: keep them in a private folder, never in git or a shared drive.
+Save the printed line in your password manager, then clear the screen (`clear`). **Without this line the backups
+cannot be opened**, so it must exist somewhere other than the server. Do not paste it into a chat or an email.
 
-To prove the backups work, restore the newest one once on the Mac (the laptop's local shop is replaced by it):
+From now on `scripts/backup.sh` (the nightly one and the one before every deploy) saves `*.enc` files. Check:
+
+```sh
+$ sh scripts/backup.sh && ls -lh backups/ | tail -2
+```
+
+### 3.2 Copy them to your computer
+
+```sh
+laptop$ sh scripts/pull-backups.sh ubuntu@<server-ip>
+```
+
+It copies only the new files into `~/akven-backups` (a private folder) and prints the newest database backup with its
+size. To do it every day at noon without thinking about it, add one line with `crontab -e` on the laptop:
+
+```
+0 12 * * * sh $HOME/akven-v2/scripts/pull-backups.sh ubuntu@<server-ip> >> $HOME/akven-backups/pull.log 2>&1
+```
+
+(adjust the path to where the project is on the laptop). The laptop must be awake at that time; a missed day is
+caught up the next day.
+
+### 3.3 Prove that a backup can be restored (once, and after big changes)
+
+A backup that was never restored is only a hope. On the laptop, with the passphrase from 3.1 saved in a file
+`~/akven-backup-key` (the laptop's local shop is replaced by the backup):
 
 ```sh
 laptop$ cd ~/akven-v2 && docker compose down -v && docker compose up -d db
-laptop$ gunzip -c ~/akven-backups/akven-<date>.sql.gz | docker compose exec -T db psql -U akven -d akven
+laptop$ openssl enc -d -aes-256-cbc -pbkdf2 -pass file:$HOME/akven-backup-key -in ~/akven-backups/akven-<date>.sql.gz.enc \
+          | gunzip | docker compose exec -T db psql -U akven -d akven
 laptop$ docker compose up -d
 ```
+
+Open `http://localhost:8081`: the orders and products of the server must be there. For a backup made before 3.1 (a
+plain `.sql.gz`), leave the `openssl` step out: `gunzip -c <file> | docker compose exec -T db psql -U akven -d akven`.
+
+### 3.4 Be told when the shop is down
+
+Nothing on the server can report that the server itself is gone, so the check has to come from outside. A free
+monitor is enough (for example UptimeRobot or Better Stack, both have a free plan):
+
+1. Create an account with the email you actually read.
+2. Add a monitor of type **HTTP(s) / keyword**: URL `https://akven.duckdns.org/api/version`, keyword `commit`,
+   every 5 minutes.
+3. Alert by email (and by Telegram or push, if you want it on the phone).
+
+`/api/version` answers only when Caddy, the web container, the backend and the database connection all work, so one
+monitor covers the whole chain. A deploy makes it fail for about a minute; set the alert to fire after 2 failed
+checks so deploys do not wake you.
+
+### 3.5 After a reboot
+
+Every container restarts by itself (`restart: unless-stopped` in `docker-compose.yml`), and Docker and Caddy start
+with the system. Check once that this is so on your server:
+
+```sh
+$ systemctl is-enabled docker caddy
+$ sudo reboot
+```
+
+Wait two minutes, then `curl -s https://akven.duckdns.org/api/version` from the laptop must answer. Install the
+pending security updates at the same time (`sudo apt update && sudo apt upgrade -y` before the reboot).
 
 ---
 
@@ -253,6 +313,8 @@ the rule-based assistant answers, which is fine for the demonstration.
 | The domain points nowhere | The VM's public IP changed (it can after the VM is stopped) or DuckDNS was not updated | Compare `curl -s ifconfig.me` on the server with the IP on duckdns.org and update it there |
 | `deploy.sh` says `another deploy is running` | A previous run is still building | Wait; it ends by itself. If a run was interrupted: `rm -f /tmp/akven-deploy.lock` |
 | `deploy.sh` says `the shop did not come back with <commit>` | The new version failed to start | `docker compose logs backend --tail 80`. To go back to the last working version, see Part 6 |
+| Nobody can sign in to the admin (the password is lost, or `SUPER_ADMIN_PASSWORD` in `.env` was changed and "does not work") | `.env` only creates the super admin the first time; after that the password lives in the database | `sh scripts/reset-admin-password.sh <the account's email>` asks for a new password (hidden) and sets it. To see which accounts exist, without any password: `docker compose exec -T db psql -U akven -d akven -c "select email, role, is_active from app_user where role <> 'CUSTOMER';"` |
+| `docker compose logs` shows only the last hours | Each container keeps at most 30 MB of logs, so the disk cannot fill up | Nothing to fix. For an older incident, look at the time in `~/deploy.log` and `~/backup.log` |
 | The page looks old after an update | The browser's offline cache | Reload with `Cmd+Shift+R`, or open a private window |
 
 ---
@@ -282,6 +344,9 @@ $ docker compose up -d db
 $ gunzip -c backups/akven-<date>.sql.gz | docker compose exec -T db psql -U akven -d akven
 $ docker compose up -d
 ```
+
+If the backup is encrypted (its name ends in `.enc`, see Part 3.1), open it in the same line instead:
+`openssl enc -d -aes-256-cbc -pbkdf2 -pass file:$HOME/.akven-backup-key -in backups/akven-<date>.sql.gz.enc | gunzip | docker compose exec -T db psql -U akven -d akven`.
 
 Orders placed between the backup and the restore are lost by this step, so use it only when the shop does not start
 otherwise.
