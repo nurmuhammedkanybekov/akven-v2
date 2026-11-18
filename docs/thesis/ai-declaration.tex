@@ -1,0 +1,27 @@
+% The Declaration on the use of AI tools and the summary of AI use, as a separate document for the supervisor's review.
+% Build after thesis.tex (it reads the section numbers from thesis.aux): latexmk -pdf ai-declaration.tex
+% Once approved, set \aideclarationtrue in thesis.tex so both appear inside the thesis.
+\documentclass{elteikthesis}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{microtype}
+\usepackage{amssymb}
+\usepackage{xr}
+\externaldocument{thesis}
+
+\newcommand{\neptuncode}{\rule{2.5cm}{0.4pt}}
+\newcommand{\declarationdate}{2026.\ \rule{2.5cm}{0.4pt}}
+\graphicspath{{images/}}
+
+\begin{document}
+\documentlang{english}
+\pagestyle{plain}
+
+\input{chapters/aideclaration.tex}
+
+\clearpage
+\renewcommand{\section}[1]{\noindent{\LARGE\bfseries Summary of AI use}\par\smallskip
+\noindent{\small (to be included in the developer documentation of the thesis as Section 4.14, \emph{#1})}\par\bigskip}
+\input{chapters/aiuse.tex}
+
+\end{document}

@@ -238,8 +238,10 @@ The tests show, among other things, that:
 
 This project was developed with an AI coding assistant (Claude by Anthropic, through Claude Code), and the thesis text
 was drafted and edited with it. I set the requirements, the architecture and the design decisions, reviewed every
-change, and accepted it only after the automated tests and CI passed. The signed *Declaration on the use of AI tools*
-in the thesis, and Section 4.14 of it, describe this in detail, as the ELTE Faculty of Informatics requires.
+change, and accepted it only after the automated tests and CI passed. The *Declaration on the use of AI tools*
+that the ELTE Faculty of Informatics requires, with a summary for the developer documentation, is in
+[`docs/thesis/ai-declaration.pdf`](docs/thesis/ai-declaration.pdf); it joins the thesis once the supervisor has
+reviewed it.
 
 ## Repository layout
 

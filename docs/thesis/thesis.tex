@@ -6,7 +6,12 @@
 \usepackage{microtype}
 \usepackage{amssymb}
 
-% Filled in on the Declaration on the use of AI tools (chapters/aideclaration.tex). Set both before submitting.
+% The Declaration on the use of AI tools (chapters/aideclaration.tex) and the summary of AI use (chapters/aiuse.tex).
+% Off for the draft sent to the supervisor on 22 November; the declaration goes to him separately
+% (ai-declaration.tex) and is switched on here once he has approved it.
+\newif\ifaideclaration
+\aideclarationfalse
+% Filled in on the declaration. Set both before submitting.
 \newcommand{\neptuncode}{\rule{2.5cm}{0.4pt}}
 \newcommand{\declarationdate}{2026.\ \rule{2.5cm}{0.4pt}}
 
@@ -40,8 +45,10 @@
 % The topic registration form, as registered on 10 October 2026.
 \includepdf[pages=-]{topicdeclaration.pdf}
 
+\ifaideclaration
 \input{chapters/aideclaration.tex}
 \cleardoublepage
+\fi
 
 \input{chapters/abstract.tex}
 \cleardoublepage
@@ -73,8 +80,10 @@ I would like to thank my supervisor, Walid Guettala, for his guidance, his trust
 work. I am also grateful to my parents, Akylbek and Venera, whose stall at Dordoi Bazaar is the reason this system
 exists, and who patiently answered my questions about their products, customers and daily work.
 
+\ifaideclaration
 The use of AI tools in this work is described in the Declaration on the use of AI tools at the beginning of the
 thesis and in Section~\ref{sec:ai-use}.
+\fi
 
 \phantomsection
 \addcontentsline{toc}{chapter}{\biblabel}

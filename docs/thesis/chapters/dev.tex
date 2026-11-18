@@ -444,27 +444,9 @@ the language-model key) live in an \texttt{.env} file on the server that never e
 deploys each new commit of the development branch after taking a backup, the containers restart by themselves after a
 reboot, and nightly backups are encrypted and copied off the server.
 
-\section{Use of AI tools in this work}
-\label{sec:ai-use}
-
-As the faculty's AI policy requires, this section summarises how AI tools were used across the whole work; the signed
-Declaration on the use of AI tools at the beginning of the thesis lists them in detail.
-
-The program was developed with an AI coding assistant, Claude by Anthropic, used through Claude Code. I wrote the
-requirements (Chapter~\ref{ch:spec}), chose the architecture and the technologies, and decided the important design
-questions: that the language model may only propose a discount and deterministic code decides
-(Section~\ref{sec:pricing}), that stock is locked in a fixed order and recorded in a ledger
-(Section~\ref{sec:orders}), and that customers may reserve and pay at the stall. For each change I described what was
-needed; the assistant wrote the code, the tests and the migrations; I reviewed the change, ran the test suites, and
-tried it in the browser and on a phone before accepting it. Continuous integration (Section~\ref{sec:running}) ran every
-suite on every change, and the evaluation (Section~\ref{sec:evaluation}) and the browser journey checked the system as a
-whole. Several defects that the assistant introduced or missed were found this way and corrected, for example tests that
-passed by chance and an option shown as sold out while the same colour was in stock.
-
-The thesis text was drafted and edited with the same assistant from my outline, my notes and the code; I checked every
-statement and number against the program and the test results and decided the structure and the content. The Russian
-and Kyrgyz texts of the interface were drafted with it and corrected by me. The language model inside the product
-(Section~\ref{sec:assistant}) is a component of the system, not a tool used to write it.
+\ifaideclaration
+\input{chapters/aiuse.tex}
+\fi
 
 \section{Design trade-offs and known limitations}
 
