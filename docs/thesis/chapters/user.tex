@@ -6,40 +6,28 @@ shop (Section~\ref{sec:shop}), and the staff, the owners and the super admin in 
 (Section~\ref{sec:admin}). The screenshots show the demo catalogue in English; every screen is also available in
 Russian and Kyrgyz.
 
-\section{System requirements}
-
-\subsection{Server}
-\begin{itemize}
-	\item Docker with Docker Compose~\cite{docker} (on macOS, Docker Desktop or Colima; on Linux, Docker Engine);
-	\item about 2~GB of free memory and 3~GB of disk space for the images and the database;
-	\item for the optional language model: an API key of a provider with an OpenAI-compatible chat API (Gemini by
-	default) and outbound internet access.
-\end{itemize}
-
-Without Docker, the backend needs Java 17 and Maven 3.9, the frontend Node.js 22, and the data PostgreSQL 16 with the
-pgvector extension; the developer documentation (Section~\ref{sec:running}) describes that setup.
-
-\subsection{Client}
-Any current browser (Chrome, Edge, Safari, Firefox) on a phone, tablet or computer. The shop can be installed as an
-app from the browser's menu (``Add to Home Screen'' or ``Install''); once installed it opens in its own window and the
-bag keeps working without a connection. JavaScript must be enabled.
-
-\section{Installation and start}
+\section{Requirements and installation}
 \label{sec:install}
 
-From the project folder, one command builds and starts the database, the backend and the web server:
+\paragraph{Server.} Docker with Docker Compose~\cite{docker}, about 2~GB of free memory and 3~GB of disk space. The
+optional language model needs an API key of a provider with an OpenAI-compatible chat API (Gemini by default) and
+outbound internet access. Without Docker, the backend needs Java 17 and Maven 3.9, the frontend Node.js 22, and the data
+PostgreSQL 16 with the pgvector extension (Section~\ref{sec:running}).
+
+\paragraph{Client.} Any current browser on a phone, tablet or computer, with JavaScript enabled. The shop can be
+installed as an app from the browser's menu (``Add to Home Screen''); the bag then keeps working without a connection.
+
+\paragraph{Start.} From the project folder, one command builds and starts the database, the backend and the web server:
 
 \begin{lstlisting}[language=bash, caption={Starting the shop}, label=src:start]
 docker compose up --build
 # then open http://localhost:8081 in a browser
 \end{lstlisting}
 
-The first build takes a few minutes. The backend has started when its log ends with
-\texttt{Successfully applied 45 migrations}; the database tables are created and, in the demo, filled with the
-catalogue. To start again from an empty database, run \texttt{docker compose down -v} and start again.
+The first build takes a few minutes. The backend has started when its log reports \texttt{Successfully applied 45
+migrations}. \texttt{docker compose down -v} removes the database, so the next start begins from scratch.
 
-\subsection{Demo accounts}
-\begin{table}[H]
+\begin{table}[!htbp]
 	\centering
 	\begin{tabular}{l l l}
 		\toprule
@@ -51,230 +39,153 @@ catalogue. To start again from an empty database, run \texttt{docker compose dow
 		Customer & \multicolumn{2}{l}{create one with Sign in, then Create an account} \\
 		\bottomrule
 	\end{tabular}
-	\caption{Demo accounts}
+	\caption{Demo accounts (demo mode only)}
 	\label{tab:demo}
 \end{table}
 
-These accounts exist only in the demo. On a real installation the first super admin is created from the
-environment, and the demo accounts are switched off at every start.
-
-\subsection{Configuration}
+\paragraph{Configuration.}
 \label{sec:config}
-
-Settings are read from environment variables, usually from a file \texttt{.env} next to
-\texttt{docker-compose.yml} (an example is in \texttt{.env.example}). None of them is required for the demo.
-
-\begin{table}[H]
-	\centering
-	\begin{tabularx}{\textwidth}{l X}
-		\toprule
-		\textbf{Variable} & \textbf{Meaning} \\
-		\midrule
-		\texttt{SUPER\_ADMIN\_EMAIL}, \texttt{\_PASSWORD} & The first super admin of a real installation; switches the demo
-		accounts off. \\
-		\texttt{DEMO\_ACCOUNTS=on} & Keeps the demo accounts for a presentation. \\
-		\texttt{LLM\_API\_KEY}, \texttt{LLM\_MODEL} & Lets a language model answer the chat (Gemini by default). \\
-		\texttt{SHOP\_CONTACTS} & The family's real phone numbers and messengers, kept out of the repository. \\
-		\texttt{JWT\_SECRET} & Optional signing key for logins; without it each installation creates its own. \\
-		\texttt{CORS\_ALLOWED\_ORIGINS} & The web addresses allowed to call the API from a browser. \\
-		\bottomrule
-	\end{tabularx}
-	\caption{The main settings}
-	\label{tab:config}
-\end{table}
+Settings are read from environment variables, usually from an ignored file \texttt{.env} next to
+\texttt{docker-compose.yml}. None is required for the demo. On a real installation \texttt{SUPER\_ADMIN\_EMAIL} and
+\texttt{SUPER\_ADMIN\_PASSWORD} create the first super admin and switch the demo accounts off;
+\texttt{LLM\_API\_KEY} lets the language model answer the chat; \texttt{SHOP\_CONTACTS} holds the family's real phone
+numbers, which are kept out of the repository; \texttt{CORS\_ALLOWED\_ORIGINS} lists the web addresses allowed to call
+the API; and \texttt{MAIL\_HOST} with its user and password lets the shop send its emails.
 
 \section{The shop}
 \label{sec:shop}
 
-\subsection{Everywhere: the header, languages, currencies and the footer}
+\subsection{Browsing}
 
-The header holds the shelves (Shop, Men, Women, Kids, Gift Sets, Our Story), the logo, a Wholesale button, and icons for
-the stall, search, saved socks, the account and the bag. The bar above it switches the currency (US dollars, Kyrgyz som,
-Russian roubles, converted at the owners' rates), the language (EN, RUS, KYR, the last two written in Cyrillic) and light or dark colours. The whole site,
-including messages from the server and the assistant's answers, follows the chosen language. On a phone the shelves
-move into a menu.
+The header holds the shelves (Shop, Men, Women, Kids, Gift Sets, Our Story), the logo, a Wholesale button, and icons
+for the stall, search, saved socks, the account and the bag. The bar above it switches the currency (US dollars, Kyrgyz
+som or Russian roubles at the owners' rates), the language (EN, RUS, KYR) and light or dark colours. The whole site,
+including messages from the server and the assistant's answers, follows the chosen language. The footer says whether
+the stall is open right now, gives the address with links to Google Maps and 2GIS, explains pickup, delivery and
+payment, and links to a plain-language privacy page.
 
-The footer (Figure~\ref{fig:footer}) answers the last questions a visitor has: whether the stall is open right now (the
-sign on container 70-E reads open or closed in Bishkek time), the address with links to Google Maps and 2GIS, how
-pickup, delivery and payment work, every page grouped, the contacts, and a link to the privacy page, which explains in
-plain words what the shop keeps and why.
+The home page (Figure~\ref{fig:home}, left) opens with \emph{Korean socks for the whole family.} beside a still life of
+an AK\&VEN box on bojagi tissue. Below follow the shelves, the bestsellers, the price ladder, reviews, the story of the
+two names and a way in for shops and companies.
 
-\shot{u-footer.jpg}{The footer: the stall's door with its open or closed sign, the promises as sewn labels, every page and the contacts}{fig:footer}
+A shelf (Figure~\ref{fig:home}, right) shows the owners' sections as occasions (Classic, Sport, Thermal, Home,
+\dots) and a bar that filters by height, size, colour and price band, shows only socks in stock, and sorts. Every
+filter shows how many products it would leave, and each chosen filter appears as a tag that removes it with one tap.
+Everything is kept in the address, so a filtered shelf can be bookmarked or shared. On every card the heart saves the
+sock, and \emph{Quick view} adds it to the bag without leaving the shelf.
 
-\subsection{The home page}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{u-home.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{u-catalog-filters.jpg}
+	\caption{The home page (left) and a shelf with its filters, the chosen size shown as a tag (right)}
+	\label{fig:home}
+\end{figure}
 
-The home page (Figure~\ref{fig:home}) opens with one line about the shop, \emph{Korean socks for the whole family.},
-beside a still life of the everyday colours in an AK\&VEN box on bojagi tissue and a felt runner, with the stall's
-round stamp and a red dojang seal. Two buttons lead to the socks and to the story, and three facts sit underneath:
-sizes from babies to adults, pickup at Dordoi or delivery, and a family-run stall since 2018. Below follow the
-reasons to order (a felt band), what the visitor looked at last, the four shelves as washing lines on their own
-fabrics (Figure~\ref{fig:shelves}), the bestsellers with their rank stamped in red, the price ladder as kraft tags on
-felt, what families say (each review a note on hanji paper with the writer's initial in a seal), the story of the two
-names, a short scene in which container 70-E opens as the visitor scrolls, and a way in for shops and companies. The
-fitting room, gift boxes, the family planner and the notes pinned at the stall have pages of their own, one tap away
-in the menu.
-
-\shot{u-home.jpg}{The home page}{fig:home}
-\shot{u-home-shelves.jpg}{Who are they for? Each shelf on its own fabric, with its socks on the line}{fig:shelves}
-
-\subsection{The shelves: browsing and filtering}
-
-A shelf (Figure~\ref{fig:catalog}) opens on its fabric with its socks pegged on the line and a tag with the number of
-products. The tabs switch between all socks, men, women, children and gift boxes. The owners' sections are drawn as
-occasions (Classic, Casual, Sport, Thermal, Home, Heritage); below them, a bar that stays in reach while scrolling
-filters by height (no-show to knee-high), by size, by colour and by price (three price bands shown in the visitor's
-currency), shows only socks in stock and sorts by newest, name or
-price. Every number on a filter says how many products it would leave; a choice that would leave none is disabled. Each
-chosen filter appears as a tag that removes it with one tap (Figure~\ref{fig:filters}). On a phone the filters fold
-behind one \emph{Filters} button, which shows how many are chosen, so the socks start on the first screen. The list grows twelve at a time
-with \emph{Show 12 more}, and a thread shows how much of the shelf has been seen. Everything is kept in the address, so
-a filtered shelf can be bookmarked, shared or reached again with the Back button.
-
-\shot{u-catalog.jpg}{The men's shelf}{fig:catalog}
-\shot{u-catalog-filters.jpg}{Occasions, heights, sizes and colours; the chosen size shown as a tag}{fig:filters}
-
-On every card the heart saves the sock, and \emph{Quick view} lets the visitor choose a colour and a size and add it to
-the bag without leaving the shelf.
-
-\subsection{A product}
-
-The product page (Figure~\ref{fig:product}) shows the pictures (the picture follows the chosen colour), the name, the
-price, the colours and sizes, the honest stock (in stock, only a few left, arriving in about $n$ days, or sold out with
-\emph{Tell me when it's back}), the quantity and \emph{Add to bag}. Under them come when the order can be collected, the
-delivery countries and the collection discount, then \emph{How the price falls} (Figure~\ref{fig:ladder}): a slider of
-pairs that shows the price of one pair and of all of them as the pairs add up, with the shop's price steps marked.
-Further down are the size finder, fabric, quality and care, the same design for the rest of the family, reviews and
-\emph{Complete the set}. When the buy button scrolls out of view, a small bar with the picture, the price and
-\emph{Add to bag} stays at the bottom of the screen.
-
-\shot{u-product.jpg}{A product page}{fig:product}
-\shot{u-product-ladder.jpg}{How the price falls: the price per pair and in total as the number of pairs grows}{fig:ladder}
-
-\subsection{Asking for a better price}
+\subsection{A product and asking for a better price}
 \label{sec:user-chat}
 
-A signed-in customer can ask for a better price in the chat on the product page (Figure~\ref{fig:chat}), in any of the
-three languages, in their own words: ``Can you give me 50\% off for 10 pairs?''. The assistant answers as the stall would,
-remembers the conversation, answers questions about the sock, and shows an offer with the old and the new price. The
-offer can be put into the bag with one tap. The rules of an offer are shown with it:
-\begin{itemize}
-	\item it never goes below the owners' limit for that sock, whatever was asked;
-	\item it is valid for 24 hours, for at least the number of pairs it was made for, and can be used once;
-	\item at checkout, the better of the offer and the collection discount applies, never both.
-\end{itemize}
-A customer can send twenty messages in ten minutes; after that the chat asks them to wait a little.
+The product page (Figure~\ref{fig:product}, left) shows the pictures of the chosen colour, the price, the colours and
+sizes, the honest stock (in stock, only a few left, arriving in about $n$ days, or sold out with \emph{Tell me when it's
+back}), the quantity and \emph{Add to bag}. \emph{How the price falls} shows the price of one pair and of all of them
+as the pairs add up. Further down are the size finder, fabric and care, reviews and \emph{Complete the set}.
 
-\shot{u-chat.jpg}{The chat: asked for 50\%, the assistant offers what the owners allow}{fig:chat}
+A signed-in customer can ask for a better price in the chat on the product page (Figure~\ref{fig:product}, right), in
+any of the three languages and in their own words: ``Can you give me 50\% off for 10 pairs?''. The assistant answers
+as the stall would and shows an offer with the old and the new price, which goes into the bag with one tap. An offer
+never goes below the owners' limit for that sock, is valid for 24 hours and once, and at checkout the better of the
+offer and the collection discount applies, never both. A customer can send twenty messages in ten minutes.
 
-\subsection{The fitting room, the size guide and the sock finder}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{u-product.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{u-chat.jpg}
+	\caption{A product page (left); the chat, asked for 50\%, offers what the owners allow (right)}
+	\label{fig:product}
+\end{figure}
 
-The fitting room (Figure~\ref{fig:fitting}) draws the shop's own socks on a leg: the visitor chooses who is trying on,
-the shoes (sneakers, dress shoes, loafers, boots or at home) and a height; each height is rated for those shoes with a
-reason, the shoe size gives the sock size, and the trousers can be set to the visitor's colour (\emph{Match my trousers}
-finds socks that go with them). The size guide gives the sizes each customer knows (EU and US in English, local sizes in
-Russian and Kyrgyz) and how to measure a foot. The sock finder asks who, how high and what for in three taps and shows
-the matching socks.
+\subsection{Finding the right sock}
 
-\shot{u-fitting.jpg}{The fitting room}{fig:fitting}
+The fitting room (Figure~\ref{fig:fitting}, left) draws the shop's own socks on a leg: the visitor chooses who is
+trying on, the shoes and a height; each height is rated for those shoes, and the shoe size gives the sock size. The
+size guide gives the sizes each customer knows and how to measure a foot, and the sock finder asks who, how high and
+what for in three taps. In the family planner a customer adds each person with their shoe size and number of pairs;
+signed in, the family is kept in the account. A gift box (Figure~\ref{fig:fitting}, right) is built in three steps: a
+box and ribbon, a hand-written card, and socks from any shelf.
 
-\subsection{The family planner and gift boxes}
-
-In the family planner on the home page (Figure~\ref{fig:family}) a customer adds each person and their shoe size and the
-number of pairs. The sock size comes from the size chart, and the price step reached by the whole set is shown. The list
-can be taken to the shop with these sizes or sent to the family in a message. Signed in, the family (names, sizes,
-birthdays) is kept in the account; product pages then say who in the family a shelf fits, and a birthday within a month
-suggests a gift box.
-
-\shot{u-home-family.jpg}{The family planner, kept on a sheet of paper pegged to the page}{fig:family}
-
-A gift box (Figure~\ref{fig:gift}) is built in three steps: a kraft, navy or red box with a ribbon, a hand-written card,
-and socks from any shelf. The drawing shows the socks in the box and the lid closing over them; the family packs it at
-the stall, and the order tells them how.
-
-\shot{u-gift.jpg}{Building a gift box}{fig:gift}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{u-fitting.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{u-gift.jpg}
+	\caption{The fitting room (left) and building a gift box (right)}
+	\label{fig:fitting}
+\end{figure}
 
 \subsection{The bag, checkout and payment}
 
-The bag (Figure~\ref{fig:bag}) counts all its pairs as one collection: it shows the minimum order, the step reached and
-how many more pairs reach the next one. Prices are always taken from the server; if a price or the stock changed since
-the sock was added, the bag says so. A line can be removed or saved for later, which moves it to the saved socks.
+The bag (Figure~\ref{fig:checkout}, left) counts all its pairs as one collection and shows the price step reached and
+how many more pairs reach the next one. Prices always come from the server; if a price or the stock changed, the bag
+says so.
 
-\shot{u-bag.jpg}{The bag as one collection}{fig:bag}
+Checkout (Figure~\ref{fig:checkout}, right) needs no account: a guest gives an email address, where the confirmation
+and a private link to the order go. It asks for a name, a phone number and how to receive the order: pickup at
+container 70-E, a courier in Bishkek, or cargo to the regions, Kazakhstan, Uzbekistan or Russia, each with its fee,
+days and free-delivery amount. The customer then either reserves and pays in person, or pays online.
+\emph{Reserve, pay at the stall} charges nothing: the socks are put aside for 48~hours and paid in cash or with a bank
+app at handover; if nobody comes, the reservation ends by itself and the socks go back on the shelf. Online payment uses
+Apple Pay or Google Pay; in this thesis the wallet is simulated, the dialog and the top bar of every page say so, and it
+can be told to decline to show that nothing is then charged.
 
-Checkout (Figure~\ref{fig:checkout}) needs no account: a guest gives an email address, where the confirmation and a
-private link to the order go; signing in adds saved details, agreed prices and the list of orders. It asks for a name
-and a phone number and how to receive the order: pickup at container 70-E, a courier in Bishkek and the Chui region,
-or cargo to the regions, Kazakhstan, Uzbekistan or Russia. Each area or carrier shows its fee, the days it takes, from
-which amount delivery is free and the owners' note; a carrier paid on receipt says so, and the summary says how much
-more makes delivery free. \emph{Remember my details} keeps the name, phone, area and address for next time.
-The customer then either reserves the order and pays in person, or pays online. \emph{Reserve, pay at the stall}
-(\emph{Order, pay on delivery} for a delivery) charges nothing: the socks are put aside for 48~hours and paid in cash
-or with a bank app at the stall or to the courier; if nobody comes, the reservation ends by itself, the socks go back
-on the shelf and the customer gets an email. Online payment is with Apple Pay or Google Pay
-(Figure~\ref{fig:wallet}); the wallet in this thesis is simulated and the dialog says so, and it can be told to decline
-in order to show what happens then: nothing is charged and the bag stays. While payments are simulated, the top bar of every page says
-that online card payment is coming soon and that socks can be reserved and paid for at the stall.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{u-bag.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{u-checkout.jpg}
+	\caption{The bag as one collection (left) and checkout with a delivery area (right)}
+	\label{fig:checkout}
+\end{figure}
 
-\shot{u-checkout.jpg}{Checkout with a delivery area}{fig:checkout}
-\shot[0.8]{u-wallet.jpg}{The simulated wallet}{fig:wallet}
+\subsection{Orders and the account}
 
-\subsection{Orders and pickup}
+An order (Figure~\ref{fig:order}, left) shows its timeline, the socks, the delivery and, for pickup, a six-digit code
+and a QR code; at the stall the customer gives the code and the last four digits of their phone number. A paid or
+reserved order can be cancelled until it is handed over; a payment is refunded and the socks go back on the shelf.
+Each step is also emailed in the customer's language. A guest's order lives at its private link, and \emph{Find my
+order} emails a lost link again. The account (Figure~\ref{fig:order}, right) holds the family, the saved contact and
+delivery details, the sold-out options the customer waits for, and the recent orders.
 
-A paid order (Figure~\ref{fig:order}) shows its timeline (placed, paid, ready or on its way, delivered), the socks, the
-delivery area and time, and for pickup a six-digit code and a QR code. At the stall the customer says the code and the
-last four digits of their phone number. A reserved order shows until when it is kept and the same pickup code; it is paid at
-handover. A paid or reserved order can be cancelled until it is handed over; a payment is refunded, and the socks go
-back on the shelf. \emph{Order these again} fills the bag with the same socks. Each step is also
-emailed in the customer's language. A guest's order lives at its private link; \emph{Find my order} emails a lost link
-again, given the email address and the order number.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{u-order.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{u-account.jpg}
+	\caption{An order with its pickup code (left) and the account (right)}
+	\label{fig:order}
+\end{figure}
 
-\shot{u-order.jpg}{A paid order}{fig:order}
+\subsection{Wholesale}
 
-\subsection{The account}
+The wholesale page is for shops, market stalls and companies. In \emph{Build a case} (Figure~\ref{fig:case}, left) the
+buyer works from the real shelves: open a sock and choose dozens of each colour and size, with today's stock beside it.
+The case fills as pairs are added and shows the price step it reaches. The request (Figure~\ref{fig:case}, right) needs
+the name of the shop, a city and a way to answer; it is kept by the shop with a reference such as W-5018A33E. Wholesale
+prices are not published, because they follow the dollar rate and the factory price; the family answers with a price.
 
-The account (Figure~\ref{fig:account}) holds the family, the saved contact and delivery details (to change or forget),
-the sold-out options the customer waits for, and the recent orders. Saved socks (the heart) are kept in the browser and,
-once signed in, with the account; the list can be shared as a link. Socks the customer looked at last appear as a row of
-pegged photos under the shelves and on product pages, and can be cleared.
-
-\shot{u-account.jpg}{The account}{fig:account}
-
-\subsection{Wholesale and company gifts}
-
-The wholesale page (Figure~\ref{fig:wholesale}) is for shops, market stalls, teams and companies. It explains who
-orders, how a case is made, and the facts a buyer needs (packs of 10 to 12, about 240 pairs to a case, the four
-countries). In \emph{Build a case} (Figure~\ref{fig:case}) the buyer works from the real shelves: search or browse a
-shelf, open a sock, and choose dozens of each colour and size with today's stock beside it (with a warning when the
-case asks for more than there is). The case, drawn as a cardboard carton with the stall's stamp, fills as pairs are
-added and shows the price step it reaches and an estimate; its exact list, one line per colour and size with the
-product code, goes into the request. The request (Figure~\ref{fig:request}) needs the name of the shop, a city and a
-way to answer (WhatsApp, Telegram, a call or e-mail). It is kept by the shop and answered with a reference number such
-as W-5018A33E, and the same text can be sent to the family's messenger. Wholesale prices are not published, because
-they follow the dollar rate, the factory price and the delivery; the family answers with a price.
-
-\shot{u-wholesale.jpg}{The wholesale page}{fig:wholesale}
-\shot{u-wholesale-case.jpg}{Building a case}{fig:case}
-\shot{u-wholesale-form.jpg}{A request sent, with its reference}{fig:request}
-
-\subsection{Finding the stall}
-
-\emph{Find us at Dordoi} (Figure~\ref{fig:visit}) tells whether the stall is open now, the week's hours, the address
-step by step inside the bazaar, and links to Google Maps and 2GIS. The address can be copied in one tap. Two further
-parts answer the questions people ask most: how collecting an order works (three short steps, as kraft tags), and where
-the shop delivers, read live from the delivery areas the owners set in the administration, each with its way (courier
-or cargo), days, fee and the amount above which it is free, or ``paid to the carrier''.
-
-\shot{u-visit.jpg}{Find us at Dordoi}{fig:visit}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{u-wholesale-case.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{u-wholesale-form.jpg}
+	\caption{Building a case from the real shelves (left) and a request sent with its reference (right)}
+	\label{fig:case}
+\end{figure}
 
 \subsection{On a phone}
 
-Every page is laid out for phones, tablets and laptops. Figure~\ref{fig:phone} shows the home page and the children's
-shelf on a phone in Kyrgyz.
+Every page is laid out for phones, tablets and laptops (Figure~\ref{fig:phone}). \emph{Find us at Dordoi} gives the
+week's hours, the way to the stall inside the bazaar and the delivery areas read live from the owners' settings.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.38\textwidth,frame]{u-phone-ky.jpg}\hspace{1cm}
-	\includegraphics[width=0.38\textwidth,frame]{u-phone-kids-ky.jpg}
+	\includegraphics[width=0.26\textwidth,frame]{u-phone-ky.jpg}\hspace{1cm}
+	\includegraphics[width=0.26\textwidth,frame]{u-phone-kids-ky.jpg}
 	\caption{The home page and the children's shelf on a phone, in Kyrgyz}
 	\label{fig:phone}
 \end{figure}
@@ -282,107 +193,98 @@ shelf on a phone in Kyrgyz.
 \section{The administration}
 \label{sec:admin}
 
-The administration is opened at \texttt{/admin} by a staff, owner or super admin account. Its menu (on the left)
-groups the screens by who may use them: \emph{Shop} for everyone in the team, \emph{Owners} for the owners and
-\emph{System} for the super admin. The language can be switched at the bottom of the menu.
+The administration is opened at \texttt{/admin} by a staff, owner or super admin account. Its menu groups the screens
+by who may use them: \emph{Shop} for the whole team, \emph{Owners} for the owners and \emph{System} for the super admin.
 
 \subsection{For the whole team}
 
-\paragraph{Products.} The list (Figure~\ref{fig:a-products}) can be searched and filtered (in the shop, removed). One
-screen (Figure~\ref{fig:a-edit}) adds or edits a product: name, audience, section, cut, description, fabric, quality,
-care and origin; its options (colour with swatch, size, pack, price, stock, stock on the way and when it arrives); and
-its pictures, each of which can belong to one colour. \emph{Goods arrived} adds a delivery to an option's stock (and
-takes it off ``on the way''), and \emph{Stock history} (Figure~\ref{fig:a-stock}) lists every change to the stock with its reason: the opening
-count, a delivery, a sale linked to its order, a cancelled sale, or a count corrected by hand. Pictures are uploaded as JPEG, PNG or WebP of up to 5~MB.
-Removing a product hides it from the shop; it can be restored. Every change appears in the product's history.
+\paragraph{Products and stock.} One screen (Figure~\ref{fig:a-edit}, left) adds or edits a product: name, audience,
+section, cut, description and care; its options (colour, size, pack, price, stock and stock on the way); and its
+pictures (JPEG, PNG or WebP up to 5~MB), each of which can belong to one colour. \emph{Goods arrived} adds a delivery
+to an option's stock, and \emph{Stock history} (Figure~\ref{fig:a-edit}, right) lists every change with its reason: the
+opening count, a delivery, a sale linked to its order, a cancelled sale, or a correction. Removing a product hides it
+from the shop; it can be restored.
 
-\shot{a-products.jpg}{Products}{fig:a-products}
-\shot{a-product-edit.jpg}{Adding a product}{fig:a-edit}
-\shot{a-stock.jpg}{Goods arrived, and an option's stock history}{fig:a-stock}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{a-product-edit.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{a-stock.jpg}
+	\caption{Adding a product (left); goods arrived and an option's stock history (right)}
+	\label{fig:a-edit}
+\end{figure}
 
-\paragraph{Orders and hand-over.} \emph{Orders} (Figure~\ref{fig:a-orders}) lists the orders by status; a gift order
-says how to pack it, a delivery order the area and the fee. An order can be marked as handed over or cancelled (with a
-refund). \emph{Hand over an order} (Figure~\ref{fig:a-handover}) is the stall's screen: the customer's code, typed or
-scanned from their QR code, and the last four digits of their phone number. Reserved orders wait in the same list
-with the amount to take; for them, the team takes the money first, and confirming the handover records the payment
-and the sale. A reserved courier order is closed from its page with \emph{Paid and handed over}.
+\paragraph{Orders and handover.} \emph{Orders} lists the orders by status; an order can be marked as handed over or
+cancelled with a refund. \emph{Hand over an order} (Figure~\ref{fig:a-orders}, right) is the stall's screen: the
+customer's code, typed or scanned from the QR code, and the last four digits of their phone. For a reserved order the
+team takes the money first, and confirming the handover records the payment and the sale.
 
-\shot{a-orders.jpg}{Orders}{fig:a-orders}
-\shot{a-handover.jpg}{Handing an order over at the stall}{fig:a-handover}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{a-orders.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{a-handover.jpg}
+	\caption{Orders (left) and handing an order over at the stall (right)}
+	\label{fig:a-orders}
+\end{figure}
 
-\paragraph{Sections and cuts} are the owners' own groups of the catalogue; they can be added, renamed, hidden,
-reordered, and deleted when no product uses them.
+\paragraph{Dashboard and negotiations.} The dashboard (Figure~\ref{fig:a-dashboard}, left) shows paid orders, revenue
+and pairs sold per day, the five best-selling products, orders waiting at the stall, socks running out (the owners are
+also emailed when a sale leaves a sock at the ``few left'' level), and how often the assistant's offers were capped and
+became orders. \emph{Negotiations} (right) lists every conversation with what the assistant proposed and what was
+allowed. \emph{Sections and cuts}, \emph{Reviews} (approved before they are shown) and \emph{Wholesale requests} (an
+inbox with a \emph{Reply} button for the customer's own messenger) complete the team's screens.
 
-\paragraph{Negotiations and the dashboard.} \emph{Negotiations} (Figure~\ref{fig:a-negotiations}) lists every
-conversation with what the assistant proposed and what was allowed. The dashboard (Figure~\ref{fig:a-dashboard}) shows
-paid orders, revenue and pairs sold per day as a chart, the five best-selling products with their pairs and revenue,
-orders waiting at the stall, socks running out with what is on the way
-(the owners also get an email the moment a sale leaves a sock at the ``few left'' level),
-customers waiting for a sold-out option, and for the assistant the offers per day, how often the limit stepped in and how
-many offers became orders.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{a-dashboard.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{a-negotiations.jpg}
+	\caption{The dashboard (left); negotiations, proposed and allowed side by side (right)}
+	\label{fig:a-dashboard}
+\end{figure}
 
-\shot{a-negotiations.jpg}{Negotiations: proposed and allowed, side by side}{fig:a-negotiations}
-\shot{a-dashboard.jpg}{The dashboard}{fig:a-dashboard}
+\subsection{For the owners and the super admin}
 
-\paragraph{Reviews and wholesale requests.} Reviews wait for approval before they are shown. \emph{Wholesale requests}
-(Figure~\ref{fig:a-wholesale}) is the inbox of requests from shops and companies, newest first: the reference, the
-company, the city, the pairs and the mix, the contact with a \emph{Reply} button that opens the customer's own WhatsApp,
-Telegram, phone or e-mail, a note for the family, and the status (new, in progress, answered, closed).
+\emph{Pricing} (Figure~\ref{fig:a-pricing}, left) sets the minimum order, the ladder of discounts by pairs and the
+currency rates; the limit and the cost price of each sock are set on its options and are visible only to the owners.
+\emph{Delivery areas} (right) define where the shop delivers, with fee, free-delivery amount, days and a note; orders
+keep their own copy. The owners also see every email the shop wrote, mark trusted customers or switch fake accounts off,
+enter the stall's contacts and hours, and edit the size chart.
 
-\shot{a-wholesale.jpg}{The inbox of wholesale requests}{fig:a-wholesale}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{a-pricing.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{a-delivery.jpg}
+	\caption{Pricing (left) and delivery areas (right)}
+	\label{fig:a-pricing}
+\end{figure}
 
-\subsection{For the owners}
+The super admin manages the team's accounts (a disabled account or a new password ends its sessions at once). Under
+\emph{AI assistant} (Figure~\ref{fig:a-assistant}, left) they choose who answers the chat, the language model or the
+rules, see whether a key is set (never the key itself), try a message, and repeat the evaluation of
+Section~\ref{sec:evaluation} against the live model. The \emph{Audit log} (right) shows every change with who made it and
+the values before and after.
 
-\paragraph{Pricing} (Figure~\ref{fig:a-pricing}) sets the minimum order, the ladder of discounts by pairs, and the som
-and rouble rates with their rounding. The limit of each sock (how much it may be discounted at most) and its cost price
-are set on the product's options and are visible only to the owners.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.49\textwidth,frame]{a-assistant.jpg}\hfill
+	\includegraphics[width=0.49\textwidth,frame]{a-audit.jpg}
+	\caption{Choosing and trying the assistant (left) and the audit log (right)}
+	\label{fig:a-assistant}
+\end{figure}
 
-\shot{a-pricing.jpg}{Pricing}{fig:a-pricing}
-
-\paragraph{Delivery areas} (Figure~\ref{fig:a-delivery}) are where the shop delivers: for each area the country, a name,
-whether it is a courier area or a cargo carrier, the fee in US dollars, the amount from which delivery is free, the
-shortest and longest time in days, a note for customers, and for a carrier whether the customer pays it on receipt.
-An area can be hidden from checkout or deleted; orders that used it keep their copy.
-
-\paragraph{Emails to customers} lists every email the shop wrote: to whom, about what, in which language, whether it
-went out, and the email itself; the order's page shows its own. Without a mail server the page says that the emails are
-kept and not sent, and \emph{Send again} delivers one once a server is set up.
-
-\shot{a-delivery.jpg}{Delivery areas}{fig:a-delivery}
-
-\paragraph{Customers, contacts and the stall, and the size chart.} The owners can mark trusted customers, give a
-customer a new password or switch a fake account off; enter the contacts shown in the shop and the stall's address and
-opening hours; and edit the size chart from which the shop derives every sock size.
-
-\subsection{For the super admin}
-
-\emph{Accounts} adds staff and owner accounts, changes their role, disables them or sets a new password; a disabled
-account or a new password ends its sessions at once. \emph{AI assistant} (Figure~\ref{fig:a-assistant}) chooses who
-answers the chat (the language model or the rules), shows whether a key is set (never the key itself), offers a box to
-try a message, and repeats the evaluation of Section~\ref{sec:evaluation} against the live model. The \emph{Audit log}
-(Figure~\ref{fig:a-audit}) shows every change with who made it and the values before and after.
-
-\shot{a-assistant.jpg}{Choosing and trying the assistant}{fig:a-assistant}
-\shot{a-audit.jpg}{The audit log}{fig:a-audit}
-
-\section{Troubleshooting}
+\section{Troubleshooting and limitations}
 
 \begin{description}
-	\item[The page shows an older version.] Reload without the cache (Ctrl+Shift+R, or Cmd+Shift+R on a Mac); an
-	installed app updates on its next start.
+	\item[The page shows an older version.] Reload without the cache (Ctrl+Shift+R, or Cmd+Shift+R on a Mac).
 	\item[``Too many attempts'' at sign-in.] After five wrong passwords for an account from one address, sign-in waits
 	for fifteen minutes; the message says how long.
-	\item[The chat says to wait a little.] A customer can send twenty messages in ten minutes.
-	\item[The assistant answers but the language model is not used.] Without \texttt{LLM\_API\_KEY}, or when the model
-	does not answer in time, the rules answer; the super admin sees which one answered under AI assistant.
-	\item[A delivery country is missing at checkout.] The country has no area shown at checkout; the owners add one under
-	Delivery areas.
-	\item[The backend does not start.] Check that port 8080 and 5432 are free and that Docker has enough memory; the
+	\item[The language model is not used.] Without \texttt{LLM\_API\_KEY}, or when the model does not answer in time,
+	the rules answer; the super admin sees which one answered.
+	\item[A delivery country is missing at checkout.] It has no visible area; the owners add one under Delivery areas.
+	\item[The backend does not start.] Check that ports 8080 and 5432 are free and that Docker has enough memory; the
 	backend log names the reason.
 \end{description}
 
-\section{Limitations}
-
-Payment is simulated: no money moves and the wallet does not contact Apple or Google. The shop sends no e-mails or SMS;
-customers follow their orders in the account. Product pictures are drawings until the family photographs the real
-socks. The section and colour names come from the owners' data and are shown as entered, in one language.
+Card payment is simulated: no money moves and the wallet does not contact Apple or Google, which is why
+\emph{Reserve, pay at the stall} exists. Without a mail server the emails are kept in the administration and not
+sent. Product pictures are drawings until the family photographs the real socks, and section and colour names are shown
+as the owners entered them, in one language.

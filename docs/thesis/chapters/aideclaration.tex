@@ -1,0 +1,83 @@
+% The Faculty of Informatics' Declaration on the use of AI tools (Dean's Instruction No. I/2026 (III. 26.), Annex 3),
+% filled in for this thesis. The same text, as the faculty's Word form, goes into the submitted .zip file.
+% Before submitting: set \neptuncode and the date in thesis.tex, check that every row is true, and sign.
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Declaration on the use of AI tools}
+\thispagestyle{plain}
+\noindent{\LARGE\bfseries Declaration on the use of AI tools}\par\medskip
+
+{\small\linespread{1.0}\selectfont\setlength{\parindent}{0pt}
+\begin{tabular}{@{}l p{9.2cm}@{}}
+	Name of the student: & Nurmuhammed Kanybekov \\
+	Neptun code: & \neptuncode \\
+	Name of the study program: & Computer Science BSc \\
+	Title: & Design and Implementation of AkVen Integrated E-Commerce and Inventory Management System \\
+	Type: & BSc thesis \\
+	Name of the supervisor: & Walid Guettala \\
+\end{tabular}
+
+\smallskip
+I hereby declare that
+
+$\square$ I did not use any artificial intelligence tools in the preparation of the submitted work.
+
+$\boxtimes$ I used artificial intelligence tools in the preparation of the submitted work as detailed below.
+
+\smallskip
+\renewcommand{\arraystretch}{1.1}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.1cm} >{\raggedright\arraybackslash}X
+	>{\raggedright\arraybackslash}p{2.1cm} >{\raggedright\arraybackslash}p{2.4cm}@{}}
+	\toprule
+	\textbf{Purpose} & \textbf{How was it used?} & \textbf{AI tool} & \textbf{Part of the work} \\
+	\midrule
+	Software development & I set the requirements, the architecture and the design decisions and described each
+	change; the assistant wrote the code, tests, migrations and scripts. I reviewed every change, ran the tests and the
+	CI pipeline, tried the features in the browser, asked for corrections, and accepted a change only when the tests
+	passed. & Claude (Anthropic), via Claude Code & The whole implementation (Chapters~\ref{ch:dev}--\ref{ch:test}) \\
+	\midrule
+	Writing the thesis & The assistant drafted and edited sections from my outline, notes and the code. I checked every
+	statement and number against the program and the test results, corrected and shortened the text, and decided its
+	structure and content. & Claude (Anthropic) & All chapters and the abstract \\
+	\midrule
+	Translations & Drafts of the Russian and Kyrgyz interface texts, checked and corrected by me as a speaker of both
+	languages. & Claude (Anthropic) & The application's texts \\
+	\midrule
+	Planning and review & Discussing plans and reviewing the project; used only after my own judgement, no text or code
+	taken over directly. & ChatGPT (OpenAI) & Planning \\
+	\bottomrule
+\end{tabularx}
+
+\smallskip
+\noindent The language model inside the product (Gemini, Section~\ref{sec:assistant}) is a component of the system, not a tool
+used to prepare this work.
+
+\smallskip
+I hereby declare and confirm with my signature that:
+\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+	\item I take full responsibility for the content of the thesis.
+	\item I have reviewed and understood the concept of plagiarism, and the provisions set out in Sections 74/A--E of
+	the Academic Regulations for Students (Eötvös Loránd University Organisational and Operational Regulations --
+	Volume~2) concerning the legal integrity of student work, and Dean's Instruction No.~I/2026 (III.~26.) on the use of
+	artificial intelligence in education, research, and administration.
+	\item I have used only the AI tools listed in the table above in the preparation of the student work.
+	\item I have not incorporated AI-generated text or code without verification and proper citation.
+\end{itemize}
+I acknowledge that:
+\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+	\item The direct use of AI-generated content presented as my own work, failure to comply with documentation
+	requirements regarding its use, and making false declarations are considered equivalent to plagiarism.
+	\item The text of my submitted work may be examined using plagiarism detection software after submission.
+	\item In case of suspected plagiarism, the supervisor may verify, orally or in writing, whether the results reflect
+	my own knowledge.
+	\item In the event of plagiarism, my thesis cannot be evaluated.
+	\item In case of plagiarism, disciplinary proceedings may be initiated against me.
+\end{itemize}
+
+\vspace{0.6cm}
+\noindent Budapest, \declarationdate \hfill
+\begin{tabular}[t]{c}
+	\IfFileExists{images/signature.png}{\includegraphics[height=1.2cm]{signature.png}\\[-2mm]}{\rule{6cm}{0.4pt}\\}
+	Signature of the student
+\end{tabular}
+}

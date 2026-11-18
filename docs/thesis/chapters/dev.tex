@@ -17,22 +17,21 @@ The system has three layers (Figure~\ref{fig:arch}):
 	Flyway migrations~\cite{flyway}; Hibernate validates it at start and never alters it.
 \end{enumerate}
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=\textwidth]{01-architecture-overview.pdf}
+	\includegraphics[width=\textwidth,height=0.40\textheight,keepaspectratio]{01-architecture-overview.pdf}
 	\caption{Architecture overview}
 	\label{fig:arch}
 \end{figure}
 
-The shape is deliberately modest. Open-source platforms such as Shopizer, Medusa and Saleor
-(Section~\ref{sec:related}) solve many shops on many servers; this project serves one family stall with a few thousand
-options, so one service and one database are enough, and every additional moving part (a message broker, a separate
-vector store, microservices) would add operational cost without benefit. What the platforms contributed is the idea
-that the administration is only another client of the same API with more rights.
+The shape is deliberately modest. Platforms such as Shopizer, Medusa and Saleor (Section~\ref{sec:related}) serve
+many shops on many servers; one family stall with a few thousand options needs one service and one database, and a
+message broker, a separate vector store or microservices would add operating cost without benefit. From the platforms
+the design takes the idea that the administration is only another client of the same API with more rights.
 
 \section{Technology stack}
 
-\begin{table}[H]
+\begin{table}[!htbp]
 	\centering
 	\begin{tabularx}{\textwidth}{l X}
 		\toprule
@@ -74,39 +73,29 @@ docs/               requirements, architecture, diagrams, this thesis
 docker-compose.yml  .github/workflows/ci.yml  .gitlab-ci.yml
 \end{lstlisting}
 
-The backend has about 10,800 lines of Java in 21 packages, organised by business feature rather than by technical
+The backend has about 12,700 lines of Java in 21 packages, organised by business feature rather than by technical
 layer: each package holds its entity, repository, service, controller and data-transfer records. The frontend has about
-17,200 lines of TypeScript and CSS. Tests add about 5,300 lines on the backend and 1,500 on the frontend, plus the
+24,000 lines of TypeScript and CSS. Tests add about 6,300 lines on the backend and 2,100 on the frontend, plus the
 browser journey.
 
 \section{System design}
 \label{sec:design-sys}
 
-\subsection{Layers inside the backend}
+\subsection{Layers and roles}
 
-Each request passes through the same layers:
-\begin{description}
-	\item[Filters.] A correlation-id filter gives every request an id that appears in the logs and in audit entries; the
-	JWT filter authenticates the caller from the token and reads the account from the database on every request.
-	\item[Controllers.] Thin REST controllers that validate the request body (Bean Validation) and pass the caller's
-	email, taken from the token and never from the body, to a service.
-	\item[Services.] All business rules, in transactions; owner-only and staff rules are enforced here with
-	\texttt{@PreAuthorize}, so they hold for every caller and not only for one URL.
-	\item[Repositories and entities.] Spring Data repositories; entities protect their own state transitions (an order
-	cannot skip from pending to handed over).
-\end{description}
+Each request passes through the same layers. A correlation-id filter gives it an id that appears in the logs and in
+audit entries, and the JWT filter authenticates the caller and reads the account from the database on every request.
+Thin controllers validate the body (Bean Validation) and pass the caller's email, taken from the token and never from
+the body, to a service. Services hold all business rules in transactions and enforce the roles with
+\texttt{@PreAuthorize}, so a rule holds for every caller and not only for one URL; entities protect their own state
+transitions. Errors share one format, RFC 7807 problem details: 400 for a broken business rule, 404, 409 for a conflict
+or a lost optimistic-lock race, 429 with \texttt{Retry-After} for a rate limit, and 402 for a declined payment.
 
-Errors are one format: a business-rule exception becomes 400, a missing record 404, a conflict or a
-lost optimistic-lock race 409, a rate limit 429 with \texttt{Retry-After}, and a declined payment 402, all as problem
-details whose text the frontend shows to the user.
-
-\subsection{Roles}
-
-There are four roles: \texttt{CUSTOMER}, \texttt{STAFF}, \texttt{ADMIN} (the owners) and \texttt{SUPER\_ADMIN}. A Spring
-role hierarchy makes \texttt{SUPER\_ADMIN} include \texttt{ADMIN}, so owner rules need not mention the super admin. URL
-rules give the public catalogue, sign-in, registration, the price quote, the shop's information, delivery areas,
-wholesale requests, checkout and a guest's own order (which the service opens only with its private link) to everyone, \texttt{/api/admin/**} to the team, and everything else to signed-in users; method
-security refines this inside the services.
+There are four roles: \texttt{CUSTOMER}, \texttt{STAFF}, \texttt{ADMIN} (the owners) and \texttt{SUPER\_ADMIN}, which a
+role hierarchy makes include \texttt{ADMIN}. URL rules open the catalogue, sign-in, the price quote, the shop's
+information, wholesale requests, checkout and a guest's own order (checked by the service through its private link) to
+everyone, give \texttt{/api/admin/**} to the team and everything else to signed-in users; method security refines this
+inside the services.
 
 \section{Data model}
 \label{sec:data}
@@ -119,131 +108,96 @@ the tables refer to each other by keys. The deliberate exceptions are copies tha
 keeps the product name, picture and price at the moment of sale, so that a receipt stays correct after the catalogue
 is edited.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=\textwidth]{04b-er-core.pdf}
+	\includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{04b-er-core.pdf}
 	\caption{The core of the data model}
 	\label{fig:er-core}
 \end{figure}
 
-\begingroup\small
-\begin{longtable}{p{4.6cm} p{9.4cm}}
-	\toprule
-	\textbf{Table} & \textbf{Purpose} \\
-	\midrule
-	\endhead
-	\texttt{product}, \texttt{variant} & A sock style and its sellable options (size, colour, pack, price, stock,
-	reserved stock, cost price and limit). Products are removed softly so old orders stay intact. \\
-	\texttt{catalog\_term} & The owners' sections and cuts. \\
-	\texttt{product\_image} & Ordered pictures, each optionally tied to one colour. \\
-	\texttt{customer\_order}, \texttt{order\_item} & Orders with their status, payment reference, pickup code, gift
-	packing and delivery copy; lines keep a snapshot of the name, picture and price paid and which rule set it. \\
-	\texttt{negotiation\_session}, \texttt{negotiation\_turn} & A conversation about one option and every message of it,
-	with the proposed and allowed discount and the assistant that answered. \\
-	\texttt{price\_tier}, \texttt{shop\_policy} & The ladder of discounts by pairs, the minimum order, exchange rates. \\
-	\texttt{delivery\_zone} & Delivery areas: courier or cargo carrier, fee, free-from amount, days, a note, and whether the
-	carrier is paid on receipt. \\
-	\texttt{outbound\_email} & The outbox: every email to a customer (and the owners' low-stock alerts), its language, state and attempts. \\
-	\texttt{wholesale\_request} & Requests from shops and companies with their status. \\
-	\texttt{customer\_details} & Contact and delivery details a customer asked to keep. \\
-	\texttt{family\_member}, \texttt{saved\_item}, \texttt{product\_review}, \texttt{stock\_request} & Family profiles,
-	saved socks, reviews and waiting for sold-out options. \\
-	\texttt{app\_user}, \texttt{app\_setting} & Accounts with role and state; small run-time settings. \\
-	\texttt{shop\_contact}, \texttt{pickup\_point}, \texttt{size\_chart\_row} & The shop's contacts, the stall with its
-	hours, and the size chart. \\
-	\texttt{audit\_log\_entry} & Who changed what, with the state before and after as JSON. \\
-	\texttt{product\_embedding} & Prepared for vector retrieval (pgvector); not used yet. \\
-	\bottomrule
+\begin{table}[!htbp]
+	\centering\small
+	\begin{tabularx}{\textwidth}{p{4.4cm} X}
+		\toprule
+		\textbf{Table} & \textbf{Purpose} \\
+		\midrule
+		\texttt{product}, \texttt{variant} & A sock style and its sellable options (size, colour, pack, price, stock,
+		reserved stock, cost price and limit); products are removed softly so old orders stay intact. \\
+		\texttt{customer\_order}, \texttt{order\_item} & Orders with status, payment reference, pickup code and a copy of
+		the delivery; lines keep a snapshot of the name, picture and price paid, and which rule set it. \\
+		\texttt{stock\_movement} & The stock ledger: every change of a variant's stock with its reason. \\
+		\texttt{negotiation\_session}, \texttt{\_turn} & A conversation and each message, with the proposed and allowed
+		discount and the assistant that answered. \\
+		\texttt{price\_tier}, \texttt{shop\_policy} & The ladder of discounts by pairs, the minimum order, exchange rates. \\
+		\texttt{delivery\_zone}, \texttt{pickup\_point} & Delivery areas with fee, free-from amount and days; the stall. \\
+		\texttt{outbound\_email} & The outbox of emails to customers and owners. \\
+		\texttt{app\_user}, \texttt{audit\_log\_entry} & Accounts with role and state; who changed what, before and after. \\
+		Further tables & Sections and cuts, pictures, wholesale requests, kept details, family, saved socks, reviews,
+		waiting lists, contacts, the size chart, settings, and \texttt{product\_embedding} prepared for pgvector. \\
+		\bottomrule
+	\end{tabularx}
 	\caption{The main tables}
 	\label{tab:tables}
-\end{longtable}
-\endgroup
+\end{table}
 
 \subsection{Integrity in the database}
 
-Several rules are enforced by the database as well as by the code, so that a bug in the service layer cannot write an
-impossible row:
-\begin{itemize}
-	\item \texttt{available\_qty} is a generated column (\texttt{stock\_qty - reserved\_qty}) and
-	\texttt{CHECK (stock\_qty >= reserved\_qty)} keeps stock from going below what is reserved.
-	\item \texttt{CHECK (validated\_discount\_pct <= proposed\_discount\_pct)} on negotiations: the allowed discount can
-	never exceed the proposal.
-	\item A paid order must have a payment reference; a delivery order must have an address; a negotiated offer can be
-	used by one order line only (a unique index).
-	\item Optimistic locking (a \texttt{version} column) on accounts, products, variants and orders turns a lost-update
-	race into an error instead of a silent overwrite~\cite{fowler2002peaa}.
-	\item Delivery fees, review ratings, wholesale quantities, contact kinds and statuses are checked by \texttt{CHECK}
-	constraints; e-mail addresses are unique regardless of case.
-\end{itemize}
-
-An order keeps a copy of everything that may change later (the product name and picture, the price paid, the delivery
-area's name, fee and days), so editing or deleting a product or a delivery area never changes an old receipt.
+The rules that must never be broken are enforced by the database as well as by the code, so that a bug in the service
+layer cannot write an impossible row: \texttt{available\_qty} is a generated column and
+\texttt{CHECK (stock\_qty >= reserved\_qty)} keeps stock from going below what is reserved;
+\texttt{CHECK (validated\_discount\_pct <= proposed\_discount\_pct)} keeps an allowed discount from exceeding its
+proposal; a paid order must have a payment reference and a delivery order an address; a negotiated offer can be used by
+one order line only; and a \texttt{version} column on accounts, products, variants and orders turns a lost-update race
+into an error instead of a silent overwrite~\cite{fowler2002peaa}.
 
 \section{REST API}
 
-The API has 116 endpoints. Table~\ref{tab:api} groups them; the full list with request and response shapes is
-generated at \texttt{/swagger-ui/index.html}.
+The API has 116 endpoints. Table~\ref{tab:api} groups them by audience; in demo mode the full list with request
+and response shapes is generated at \texttt{/swagger-ui/index.html}.
 
-\begin{longtable}{p{5.6cm} p{8.4cm}}
-	\toprule
-	\textbf{Endpoints} & \textbf{Purpose} \\
-	\midrule
-	\endhead
-	\multicolumn{2}{l}{\emph{Public}} \\
-	\texttt{GET /api/products}, \texttt{/facets} & Catalogue with filters and live counts per section, cut, size, colour. \\
-	\texttt{GET /api/products/\{slug\}} & A product with options and pictures, never cost or limit. \\
-	\texttt{POST /api/cart/quote} & Prices a bag: lines, collection step, minimum, next step. \\
-	\texttt{GET /api/pricing}, \texttt{/api/sizes} & Public price ladder; size chart and size finder. \\
-	\texttt{GET /api/shop/info}, \texttt{/delivery-zones} & Contacts, the stall, opening hours; delivery areas. \\
-	\texttt{POST /api/wholesale/requests} & A wholesale or company request (rate-limited). \\
-	\texttt{POST /api/auth/register}, \texttt{/login} & Accounts and tokens (rate-limited). \\
-	\multicolumn{2}{l}{\emph{Signed-in customer}} \\
-	\texttt{POST /api/negotiate} & One message of a negotiation. \\
-	\texttt{POST /api/orders}, \texttt{GET /api/orders} & Checkout (with \texttt{Idempotency-Key}); own orders; cancel. \\
-	\texttt{/api/family}, \texttt{/api/saved}, \texttt{/api/account/details} & Family, saved socks, kept details. \\
-	\texttt{/api/reviews}, \texttt{/api/stock-requests} & Own review; waiting for sold-out options. \\
-	\multicolumn{2}{l}{\emph{Team (staff and above)}} \\
-	\texttt{/api/admin/products}, \texttt{/variants}, \texttt{/terms} & Catalogue, options, pictures, sections and cuts. \\
-	\texttt{/api/admin/orders}, \texttt{/handover} & Orders, hand-over with code, fulfil, cancel. \\
-	\texttt{/api/admin/negotiations}, \texttt{/summary} & Transcripts, statistics, the dashboard. \\
-	\texttt{/api/admin/reviews}, \texttt{/wholesale} & Moderation; the wholesale inbox. \\
-	\multicolumn{2}{l}{\emph{Owners}} \\
-	\texttt{/api/admin/pricing}, \texttt{/delivery-zones} & Ladder, minimum, rates; delivery areas. \\
-	\texttt{/api/admin/customers}, \texttt{/shop}, \texttt{/sizes} & Customer accounts, contacts and stall, size chart. \\
-	\multicolumn{2}{l}{\emph{Super admin}} \\
-	\texttt{/api/admin/accounts}, \texttt{/assistant}, \texttt{/audit} & Team accounts, assistant switch and evaluation,
-	audit log. \\
-	\bottomrule
+\begin{table}[!htbp]
+	\centering\small
+	\begin{tabularx}{\textwidth}{p{2.6cm} X}
+		\toprule
+		\textbf{Audience} & \textbf{Endpoints} \\
+		\midrule
+		Public & \texttt{GET /api/products} with \texttt{/facets} (catalogue, filters, live counts) and
+		\texttt{/\{slug\}} (never cost or limit); \texttt{POST /api/cart/quote} (prices a bag); \texttt{/api/pricing},
+		\texttt{/api/sizes}, \texttt{/api/shop/info}, \texttt{/delivery-zones}; \texttt{POST /api/wholesale/requests},
+		\texttt{/api/auth/register}, \texttt{/login} (rate-limited); \texttt{POST /api/orders} and a guest's own order
+		through its private link. \\
+		Customer & \texttt{POST /api/negotiate}; own orders and cancelling; \texttt{/api/family}, \texttt{/api/saved},
+		\texttt{/api/account/details}, \texttt{/api/reviews}, \texttt{/api/stock-requests}. \\
+		Team & \texttt{/api/admin/products}, \texttt{/variants} (with stock movements), \texttt{/terms},
+		\texttt{/orders}, \texttt{/handover}, \texttt{/negotiations}, \texttt{/summary}, \texttt{/reviews},
+		\texttt{/wholesale}. \\
+		Owners & \texttt{/api/admin/pricing}, \texttt{/delivery-zones}, \texttt{/customers}, \texttt{/shop},
+		\texttt{/sizes}, \texttt{/emails}. \\
+		Super admin & \texttt{/api/admin/accounts}, \texttt{/assistant}, \texttt{/audit}. \\
+		\bottomrule
+	\end{tabularx}
 	\caption{The API by audience}
 	\label{tab:api}
-\end{longtable}
+\end{table}
 
 \section{Security}
 \label{sec:security}
 
 \begin{itemize}
-	\item \textbf{Passwords} are hashed with BCrypt; a password is limited to 72 characters, the length BCrypt reads, so a
-	longer one is refused rather than silently cut.
-	\item \textbf{Tokens.} Each installation signs its tokens with its own random 384-bit key unless one is configured; no
-	key is in the repository. The JWT filter reads the account on every request, so a disabled account or a new password
-	ends its sessions at once, and the role comes from the database, not from the token.
-	\item \textbf{Brute force and abuse.} Five failed sign-ins per account and address lock that pair for fifteen
-	minutes; sign-ups, chat messages and wholesale requests are rate-limited in sliding windows. The limiters forget old
-	entries once they hold many, so a flood of different addresses cannot grow memory without end.
-	\item \textbf{The visitor's address} is taken from \texttt{X-Forwarded-For} only when the request comes through a
-	proxy on a private network, so limits count visitors and not the web server.
-	\item \textbf{Input.} Every request body is validated; free text (reviews, gift cards, wholesale notes, saved
-	details) is stored as plain text with control characters removed and is rendered by React as text, never as markup.
-	The orders spreadsheet is protected against CSV injection~\cite{owaspcsv}. Uploaded pictures are accepted by their
-	content, not their name, with random stored names; SVG is refused.
-	\item \textbf{Secrets and private data.} Cost prices and limits never appear in customer responses (explicit DTOs,
-	asserted by tests). The language model's key is read from the environment and never stored, shown or logged; real
-	phone numbers come from the environment.
-	\item \textbf{Headers.} The API sends a strict Content-Security-Policy, \texttt{no-referrer} and a permissions policy;
-	the web server sends a CSP that allows only the site's own scripts, \texttt{nosniff} and
-	\texttt{frame-ancestors 'none'}. CORS allows only configured origins, without credentials.
-	\item \textbf{Audit.} Every change by the team is written to the audit log in the same transaction (the audit service
-	requires an existing transaction), with the correlation id of the request.
+	\item \textbf{Passwords and tokens.} Passwords are hashed with BCrypt and limited to the 72 characters BCrypt reads.
+	Each installation signs its tokens with its own random 384-bit key; the role comes from the database on every
+	request, so a disabled account or a new password ends its sessions at once.
+	\item \textbf{Abuse.} Five failed sign-ins per account and address lock that pair for fifteen minutes; sign-ups, chat
+	messages, guest checkouts and wholesale requests are rate-limited in sliding windows whose memory cannot grow
+	without end. The visitor's address is read from \texttt{X-Forwarded-For} only behind the local proxy.
+	\item \textbf{Input.} Every body is validated; free text is stored as plain text and rendered by React as text,
+	never as markup; the orders spreadsheet is protected against CSV injection~\cite{owaspcsv}; pictures are accepted
+	by their content, not their name, and SVG is refused.
+	\item \textbf{Secrets.} Cost prices and limits never appear in customer responses (explicit DTOs, asserted by tests);
+	the model's key, real phone numbers and passwords come from the environment and are never shown or logged.
+	\item \textbf{Headers and audit.} The API and the web server send a strict Content-Security-Policy,
+	\texttt{nosniff} and \texttt{frame-ancestors 'none'}; CORS allows only configured origins. Every change by the team is
+	written to the audit log in the same transaction, with the request's correlation id.
 \end{itemize}
 
 \section{Pricing and the PolicyValidator}
@@ -274,9 +228,9 @@ whether the limit stepped in.
 
 \lstinputlisting[language=Java, caption={Deciding the price of an order line}, label=src:decide]{listings/PricingDecide.java}
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=\textwidth]{02-negotiation-validation-path.pdf}
+	\includegraphics[width=\textwidth,height=0.42\textheight,keepaspectratio]{02-negotiation-validation-path.pdf}
 	\caption{The validation path: the proposal is untrusted until the validator has clamped it}
 	\label{fig:validation}
 \end{figure}
@@ -292,9 +246,9 @@ customer's message; by construction the context has no field for the cost price 
 model. It asks a \texttt{Negotiator} for a proposal (a discount and a reply), clamps the discount with the validator,
 stores the turn with both numbers, and fills the reply's placeholders with the allowed numbers.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=\textwidth]{03-sequence-negotiation-turn.pdf}
+	\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{03-sequence-negotiation-turn.pdf}
 	\caption{One negotiation turn}
 	\label{fig:sequence}
 \end{figure}
@@ -351,30 +305,23 @@ back on the shelf). The simulated wallet accepts only token shapes of Apple Pay 
 that looks like a card number.
 
 \paragraph{Reserve now, pay at handover.} Most customers of the stall pay in cash or with a bank app, and an online
-payment provider for Kyrgyzstan is future work. So a customer may also choose to pay in person. The order then becomes
-\emph{reserved}: its pairs are held exactly as during a wallet payment (\texttt{reserved\_qty}), so nobody else can buy
-them, but they are not sold and nothing is charged. A pickup order gets its code at once. At the stall the team checks
-the code and the last digits of the phone, takes the money and confirms; only then is the order sold, in one
-transaction: the variants are locked, the pairs leave the shelf, the ledger records the sale, and the low-stock check
-runs. A courier order is confirmed the same way from its page. A reservation holds its pairs for 48~hours; a
-scheduled job ends the ones nobody collected, locks each order again first (so a handover at the same moment always
-wins), gives the pairs back and writes to the customer. Because holding pairs costs the customer nothing, one
-reservation may hold at most 60~pairs; larger orders go through the wholesale request. The database keeps the rule
-that a reserved order always has its deadline (a check constraint), and pickup codes are unique among paid and reserved
-orders (a partial unique index).
+payment provider for Kyrgyzstan is future work, so a customer may also pay in person. The order then becomes
+\emph{reserved}: its pairs are held in \texttt{reserved\_qty} so nobody else can buy them, but nothing is sold or
+charged. At handover the team takes the money and confirms; only then, in one transaction, are the variants locked,
+the pairs taken off the shelf, the sale written to the ledger and the low-stock check run. A scheduled job ends
+reservations nobody collected within 48~hours; it locks each order first, so a handover at the same moment always wins,
+returns the pairs and writes to the customer. One reservation may hold at most 60~pairs, a check constraint requires
+its deadline, and a partial unique index keeps pickup codes unique among open orders.
 
-\paragraph{The stock ledger.} Stock used to be a single number per variant that each change overwrote, so ``why is
-it seven?'' had no answer in the data. Now every change to a variant's stock writes one row in \texttt{stock\_movement}
-with its reason (opening count, goods arrived, sale, cancelled sale, count corrected by hand), the order or the person
-behind it, and the stock right after it. The row is written by the same transaction as the change
-(\texttt{Propagation.MANDATORY} makes a call outside a transaction fail), and rows are only ever added. Two properties
-follow and are tested: a variant's rows add up to its stock, and each row's \emph{stock after} is the previous one plus
-its own change, so the history reads like a bank statement. Typing a new number into the stock field is kept as a
-correction by the difference, which is safe because an edit must name the version it was made on: a sale in between
-makes the edit fail instead of being overwritten. The owners see the history on each variant, with every sale linked
-to its order, and record a delivery with ``Goods arrived'', which also takes the pairs off ``on the way''.
+\paragraph{The stock ledger.} Every change to a variant's stock writes one row in \texttt{stock\_movement} with its
+reason (opening count, goods arrived, sale, cancelled sale, correction), the order or person behind it, and the stock
+right after it. The row is written in the same transaction as the change (\texttt{Propagation.MANDATORY} makes a call
+outside a transaction fail), and rows are only added. Two properties are tested: a variant's rows add up to its stock,
+and each row's \emph{stock after} is the previous one plus its change, so the history reads like a bank statement.
+Typing a new number into the stock field is recorded as a correction by the difference; this is safe because an edit
+must name the version it was made on, so a sale in between makes the edit fail instead of being overwritten.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
 	\begin{tabular}{lll}
 		\toprule
@@ -396,56 +343,34 @@ to its order, and record a delivery with ``Goods arrived'', which also takes the
 
 \section{Further domain features}
 
-\paragraph{Delivery areas.} \texttt{DeliveryService} answers which area an order travels in: the chosen active area,
-or the first active area of the country. Owners edit areas with checks that the longest time is not shorter than the
-shortest and that a free area has no free-from amount; every change is audited. A fresh installation starts with one free
-area per country, so delivery works as before until the owners set prices.
+\paragraph{Delivery.} \texttt{DeliveryService} chooses the area an order travels in. An area is a \emph{courier}
+area (Bishkek and the Chui region) or a \emph{cargo carrier} (to Osh, Kazakhstan, Uzbekistan and Russia) that may be
+paid on receipt; it has a fee, a free-from amount and the shortest and longest time. The order keeps its own copy of
+all of these, so a receipt never changes.
 
-\paragraph{Courier and cargo.} An area is a \emph{courier} area (Bishkek and the Chui region, where the family calls a
-taxi or brings a large order in its own car, free above the area's amount) or a \emph{cargo carrier} (the bus cargo to
-Osh, carriers to Kazakhstan, Uzbekistan and Russia), which can be paid by the customer on receipt. The order keeps its
-own copy of the kind and the payment on receipt, like the fee, so the receipt never changes.
+\paragraph{Emails through an outbox.} \texttt{Notifier} writes each email (order confirmed, handed over, cancelled; a
+wholesale request received; the owners' low-stock alert when a sale crosses the ``few left'' level) into
+\texttt{outbound\_email} \emph{inside the transaction that changes the order}, in the customer's language. A change that
+rolls back therefore sends nothing, and a mail server that is down loses nothing: \texttt{EmailSender} delivers the queue
+through any SMTP server and retries after 1, 2, 4 and 8 minutes. Emails are deleted after 90 days, and a test fails when
+a sentence is missing in one of the three languages.
 
-\paragraph{Automatic low-stock alerts.} When a paid order takes an option from above the owners' ``few left'' level
-to at or below it, \texttt{OrderService} collects it and \texttt{Notifier.lowStock} writes one email per order to every
-active owner and super admin: which socks, how many are left and how many are on the way, with a link to the dashboard.
-Only the crossing counts, so later sales of the same option do not repeat the alert, and like every email it is written
-in the order's transaction. The Telegram bot (future work) can send the same news from the same moment.
+\paragraph{Checkout without an account.} An order has either an account or a guest's email (a check constraint keeps
+exactly one). A guest opens the order at \texttt{/orders/<id>\#t=<key>}, where the key is an HMAC-SHA256 of the order id
+under a key derived from the installation's secret: nothing is stored, a retried checkout returns the same link, and the
+part after \texttt{\#} never reaches an access log. The server compares it in constant time. A lost link is emailed
+again to the order's own address, and the answer is the same whether anything matched, so the form reveals no
+customer. Negotiated prices still need an account, because an offer belongs to the account that negotiated it.
 
-\paragraph{Emails through an outbox.} \texttt{Notifier} writes each email to a customer (confirmed, handed over,
-cancelled; a wholesale request received) into \texttt{outbound\_email} \emph{inside the transaction that changes the
-order}, in the language the customer used at checkout. A change that rolls back therefore sends nothing, and a mail
-server that is down loses nothing: \texttt{EmailSender} delivers the queue every few seconds through any SMTP server, tries a
-refusal again after 1, 2, 4 and 8 minutes and then marks it failed. Without a mail server nothing leaves the shop and
-each email is marked \emph{not sent} but stays readable in the admin. Emails hold names and addresses, so they are
-deleted after 90 days. The texts live in three property files, and a test fails when a sentence is missing in one
-language. The acknowledgement of a wholesale request carries only its reference and number of pairs, never text the
-visitor typed, so the public form cannot be used to send someone's words to a stranger.
-
-\paragraph{Checkout without an account.} An order has either an account or a guest's email (a database check keeps
-exactly one). A guest opens the order at \texttt{/orders/<id>\#t=<key>}. The key is an HMAC-SHA256 of the order id
-under a key derived from the installation's secret, so nothing is stored, a retried checkout returns the same link, and
-the key can never pass as a login token. It stands after the \texttt{\#}, which browsers never send, so it reaches no
-access log; the page sends it in an \texttt{X-Order-Token} header and the server compares it in constant time. A guest
-who lost the link gives the email and the order number, and the link is emailed to the order's own address; the
-answer is the same whether anything matched, so the form reveals no customer. Guest checkouts and link requests are
-limited per address. Negotiated prices still need an account, because an offer belongs to the account that negotiated
-it; and guest orders are never joined to an account by email, because an email address is not proof of identity.
-
-\paragraph{Wholesale requests.} \texttt{WholesaleService} accepts requests without an account. The contact is checked
-against its kind (a phone number for WhatsApp and calls, a Telegram name or number, an e-mail address); text is cleaned;
-a hidden trap field, which people never see, makes a bot's request look accepted while nothing is kept; and a sliding
-window allows five requests per address and sixty for the whole shop per hour. The team moves a request through new, in
-progress, answered and closed; a picked-up request cannot become new again; every change is audited.
-
-\paragraph{Saved details, family and reviews.} Each customer reads and writes only their own family, saved socks and
-kept details: the services take the account from the token, never an id from the request. Reviews are accepted only from
-customers whose order with that sock was handed over, are shown only after approval and never show an e-mail address.
+\paragraph{Wholesale, family and reviews.} Wholesale requests need no account; the contact is checked against its kind,
+a hidden trap field quietly drops a bot's request, and a sliding window limits requests per address and per hour.
+Customers read and write only their own family, saved socks and kept details, because the services take the account
+from the token and never an id from the request. Reviews are accepted only from customers who received the sock and are
+shown after approval.
 
 \paragraph{Catalogue facets.} The filter counts are computed with criteria queries under the same specification as the
-list, each dimension ignoring its own selection, so the alternatives keep their counts. Sizes and colours count only
-options that are for sale (and in stock, or of the chosen colour or size, when those are chosen), so ``M'' means a
-product that can be bought in M.
+list, each dimension ignoring its own selection, so the alternatives keep their counts; sizes and colours count only
+options that can be bought.
 
 \section{Frontend}
 \label{sec:frontend}
@@ -471,54 +396,22 @@ administration, checkout, orders, the style guide) are loaded on demand, which k
 \subsection{Design system}
 \label{sec:design}
 
-The visual language comes from the stall: kraft price tags on strings, the family's handwriting (Caveat) beside a
-Garamond serif (Cormorant Garamond) and a clear sans-serif (Onest), navy and gold from the logo. Instead of plain boxes,
-the interface uses objects of the stall: socks pegged on a washing line (a \texttt{Clothesline} component that hangs
-drawn socks by the cuff and lets them swing from the peg), shelves on knitted, ribbed, spotted and wrapping-paper fabrics,
-contacts as paper tags, the promises in the footer as sewn-in labels, forms as sheets of paper pegged up, and the stall's
-door with an open or closed sign in Bishkek time. All product pictures are drawn by a script from the same sock shapes
-the interface uses, hanging on the line, on a transparent ground, so each stands on a calm backdrop chosen by the
-shop and the shop looks consistent until real photographs (cut out, they would stand on the same backdrops) replace
-them.
+The visual language comes from the stall and from the two countries behind the socks. From Kyrgyzstan come shyrdak felt
+for the dark bands and the footer, the ram's horn (\textit{kochkor müyüz}) as the heart between AK and VEN in the logo,
+and the oimo stitch; from Korea, hanji paper under cards, bojagi patchwork and a red dojang seal. Objects of the stall
+replace plain boxes: socks pegged on a washing line, kraft price tags, forms as sheets of paper. All product pictures
+are drawn by a script from the same sock shapes the interface uses, so the shop looks consistent until real photographs
+replace them.
 
-\paragraph{Two countries in one design.} The socks are knitted in Korea and chosen in Kyrgyzstan, and the design says
-so with a small, consistent set of motifs used across the whole site rather than as decoration in one corner. From
-Kyrgyzstan: shyrdak felt (the dark bands, the footer, the wholesale and \emph{Find us} headers), the ram's horn
-(\textit{kochkor müyüz}) as a rosette pressed into the felt and as the heart between AK and VEN in
-the logo, and the oimo stitch along the edges. From Korea: hanji paper under cards and notes, bojagi patchwork in the
-hero's tissue paper, and a red dojang seal, which stamps the bestseller ranks and carries each reviewer's initial.
-Cards that hold the shop's own words are \emph{sewn}: a felt strip on top, a dashed stitch inside the edge. One
-rule keeps it calm: patterns stay in frames, bands and headers, while the product pictures sit on plain single tones.
-
-\paragraph{A calm shopping path.} A design review late in the project found the opposite problem: the shopping pages
-were as decorated as the story pages, and the stylesheets had grown in layers (92 different font sizes, 42 corner
-radii, 100 shadows, 27 animations that never stopped). The rule since then is that the stall's warmth lives in a few
-signature places (the hero, the story, the container scene, the footer) and the path from shelf to checkout stays
-quiet: every product picture stands on the same paper colour and carries no logo; small labels are one style (small gold
-capitals after a hairline) and handwriting is kept for the family's own words; on a phone the filters of a shelf fold
-behind one button, so the first socks show on the first screen. Motion uses three durations (150, 250 and 400~ms):
-fast for feedback such as a button press or the bag's count, the middle one for panels and pictures, the slow one only
-for larger changes. Animations that looped without meaning were removed; what still loops tells something (a
-spinner, the loading thread, the ``open now'' dot, the lights of the container scene while it is on screen). The home
-page went from twelve sections to nine; the parts that left it kept their own pages.
-
-\paragraph{Performance.} Motion follows two rules that keep it smooth on cheap phones: only \texttt{transform} and
-\texttt{opacity} are animated, and nothing that changes the layout runs while scrolling. Measurements in Chromium's
-performance panel with the CPU slowed four times showed three further costs, each removed:
-\begin{itemize}
-	\item the felt and paper textures were SVG noise filters (\texttt{feTurbulence}) recomputed on every repaint; they are
-	now small PNG tiles drawn once;
-	\item every product picture carried an SVG drop-shadow filter; the generator now draws the shadow as three offset
-	copies of the outline, so no picture contains a filter;
-	\item endless animations (the swinging socks, the turning stamp) kept the compositor busy off screen; an
-	\texttt{IntersectionObserver} pauses them while they are out of view.
-\end{itemize}
-Hint layers (\texttt{will-change}) on every card were tried and measured worse (more layer work than they saved), so
-they are used only on the few elements that sway. Every animation stops for visitors who prefer reduced motion. A
-small \texttt{ScrollManager} restores the scroll position on Back and Forward, opens a new page at the top at once,
-and keeps the position when only a filter in the address changes.
-Colour contrast is checked by a test against WCAG 2.2 AA~\cite{wcag} for every pair of text and background tokens in
-both themes.
+A design review late in the project found the shopping pages as decorated as the story pages, and stylesheets grown in
+layers (92 font sizes, 42 corner radii, 27 endless animations). The rule since then is that the warmth lives in a few
+signature places (the hero, the story, the footer) while the path from shelf to checkout stays quiet: every product
+picture stands on the same plain colour, small labels share one style, and motion uses three durations (150, 250 and
+400~ms) and only \texttt{transform} and \texttt{opacity}. Profiling with a slowed CPU removed three further costs:
+SVG noise filters recomputed on every repaint became small PNG tiles, drop-shadow filters in product pictures became
+drawn shadows, and endless animations pause while off screen. Every animation stops for visitors who prefer reduced
+motion, and a test checks the colour contrast of every text and background pair in both themes against WCAG 2.2
+AA~\cite{wcag}.
 
 \subsection{State and data flow}
 
@@ -546,8 +439,32 @@ starts the whole system and checks the security headers.
 \paragraph{Live deployment.} The same Compose file runs the public demo on a small ARM virtual machine (two cores,
 12~GB of memory, Ubuntu~24.04) in a cloud provider's Frankfurt region. The backend and the web server listen only on
 the machine itself; Caddy in front of them obtains and renews the HTTPS certificate automatically and is the only
-service open to the internet. The secrets (database password, super-admin account, mail settings and, when it is used, the
-language-model key) live in an \texttt{.env} file on the server that never enters the repository.
+service open to the internet. The secrets (database password, super-admin account, mail settings and, when it is used,
+the language-model key) live in an \texttt{.env} file on the server that never enters the repository. A cron job
+deploys each new commit of the development branch after taking a backup, the containers restart by themselves after a
+reboot, and nightly backups are encrypted and copied off the server.
+
+\section{Use of AI tools in this work}
+\label{sec:ai-use}
+
+As the faculty's AI policy requires, this section summarises how AI tools were used across the whole work; the signed
+Declaration on the use of AI tools at the beginning of the thesis lists them in detail.
+
+The program was developed with an AI coding assistant, Claude by Anthropic, used through Claude Code. I wrote the
+requirements (Chapter~\ref{ch:spec}), chose the architecture and the technologies, and decided the important design
+questions: that the language model may only propose a discount and deterministic code decides
+(Section~\ref{sec:pricing}), that stock is locked in a fixed order and recorded in a ledger
+(Section~\ref{sec:orders}), and that customers may reserve and pay at the stall. For each change I described what was
+needed; the assistant wrote the code, the tests and the migrations; I reviewed the change, ran the test suites, and
+tried it in the browser and on a phone before accepting it. Continuous integration (Section~\ref{sec:running}) ran every
+suite on every change, and the evaluation (Section~\ref{sec:evaluation}) and the browser journey checked the system as a
+whole. Several defects that the assistant introduced or missed were found this way and corrected, for example tests that
+passed by chance and an option shown as sold out while the same colour was in stock.
+
+The thesis text was drafted and edited with the same assistant from my outline, my notes and the code; I checked every
+statement and number against the program and the test results and decided the structure and the content. The Russian
+and Kyrgyz texts of the interface were drafted with it and corrected by me. The language model inside the product
+(Section~\ref{sec:assistant}) is a component of the system, not a tool used to write it.
 
 \section{Design trade-offs and known limitations}
 

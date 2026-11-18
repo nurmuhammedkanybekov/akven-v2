@@ -48,3 +48,6 @@ docs/thesis/*.nlo
 docs/thesis/*.nls
 docs/thesis/*-SAVE-ERROR
 frontend/browser-failures/
+
+# A picture of the student's signature for the AI declaration (see docs/thesis/README.md)
+docs/thesis/images/signature.png

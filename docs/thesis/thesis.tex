@@ -4,6 +4,11 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{microtype}
+\usepackage{amssymb}
+
+% Filled in on the Declaration on the use of AI tools (chapters/aideclaration.tex). Set both before submitting.
+\newcommand{\neptuncode}{\rule{2.5cm}{0.4pt}}
+\newcommand{\declarationdate}{2026.\ \rule{2.5cm}{0.4pt}}
 
 \title{Design and Implementation of AkVen Integrated E-Commerce and Inventory Management System}
 \date{2026}
@@ -35,6 +40,9 @@
 % The topic registration form, as registered on 10 October 2026.
 \includepdf[pages=-]{topicdeclaration.pdf}
 
+\input{chapters/aideclaration.tex}
+\cleardoublepage
+
 \input{chapters/abstract.tex}
 \cleardoublepage
 
@@ -65,13 +73,8 @@ I would like to thank my supervisor, Walid Guettala, for his guidance, his trust
 work. I am also grateful to my parents, Akylbek and Venera, whose stall at Dordoi Bazaar is the reason this system
 exists, and who patiently answered my questions about their products, customers and daily work.
 
-\section*{Use of generative AI tools}
-During this project I used generative AI assistants as development and writing aids: to draft and review parts of the
-source code and the tests, to check my English, and to help structure parts of this document. I defined the problem,
-the requirements and the design decisions, reviewed and tested all generated material, and I take full responsibility
-for the content of the software and of this thesis. The language model used inside the product as a negotiation
-assistant (Section~\ref{sec:assistant}) is a separate component of the system and is evaluated in
-Chapter~\ref{ch:test}.
+The use of AI tools in this work is described in the Declaration on the use of AI tools at the beginning of the
+thesis and in Section~\ref{sec:ai-use}.
 
 \phantomsection
 \addcontentsline{toc}{chapter}{\biblabel}
@@ -86,10 +89,6 @@ Chapter~\ref{ch:test}.
 \phantomsection
 \addcontentsline{toc}{chapter}{\lsttablelabel}
 \listoftables
-\cleardoublepage
 
-\phantomsection
-\addcontentsline{toc}{chapter}{\lstcodelabel}
-\lstlistoflistings
 
 \end{document}

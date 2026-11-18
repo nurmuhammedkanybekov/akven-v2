@@ -15,7 +15,7 @@ administration rather than written into the code.
 
 \section{User classes and characteristics}
 
-\begin{table}[H]
+\begin{table}[!htbp]
 	\centering
 	\begin{tabularx}{\textwidth}{l X}
 		\toprule
@@ -51,16 +51,16 @@ Figures~\ref{fig:uc-customer} and~\ref{fig:uc-staff} show the use cases of the c
 important one, \emph{Negotiate price}, involves the assistant as a secondary actor: the customer talks, the assistant
 proposes, and the system decides.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.92\textwidth]{05a-use-cases-customer.pdf}
+	\includegraphics[width=\textwidth,height=0.42\textheight,keepaspectratio]{05a-use-cases-customer.pdf}
 	\caption{Use cases of visitors and customers}
 	\label{fig:uc-customer}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.92\textwidth]{05b-use-cases-staff-admin.pdf}
+	\includegraphics[width=\textwidth,height=0.36\textheight,keepaspectratio]{05b-use-cases-staff-admin.pdf}
 	\caption{Use cases of the staff, the owners and the super admin}
 	\label{fig:uc-staff}
 \end{figure}
@@ -174,32 +174,22 @@ were added as the shop grew.
 	\label{tab:nfr}
 \end{longtable}
 
-\section{Constraints}
+\section{Constraints and assumptions}
 
 \begin{itemize}
-	\item \textbf{Technology:} Java 17 and Spring Boot 3.5 for the server, PostgreSQL 16 with pgvector for the data,
-	React 18 with TypeScript for the client, Docker Compose for running the whole system.
+	\item \textbf{Technology:} Java 17 and Spring Boot 3.5, PostgreSQL 16 with pgvector, React 18 with TypeScript, and
+	Docker Compose for running the whole system.
 	\item \textbf{Time:} the ELTE milestones (requirements on 25 September, prototype on 20 October, final program on
 	10 November, draft on 22 November, submission on 1 December 2026).
-	\item \textbf{Business:} there is no agreement with a Kyrgyz payment provider, so payment goes through a wallet
-	interface with a simulated implementation; no real money moves.
-	\item \textbf{Privacy:} real phone numbers, passwords and API keys are never written into the repository; they come
-	from the environment of each installation.
+	\item \textbf{Payment:} there is no agreement with a Kyrgyz payment provider, so online payment goes through a wallet
+	interface with a simulated implementation, and customers can reserve and pay in person.
+	\item \textbf{Privacy:} real phone numbers, passwords and API keys never enter the repository; they come from the
+	environment of each installation.
+	\item \textbf{Language model:} one with an OpenAI-compatible chat API is assumed (Gemini by default~\cite{gemini});
+	without a key the rule-based assistant answers, so the shop never depends on the model.
+	\item \textbf{Demo data:} the catalogue of about 220 products with over 1,200 options is drawn by the project until
+	the family photographs the real socks; prices, limits and delivery fees in it are examples.
 \end{itemize}
 
-\section{Assumptions and dependencies}
-
-\begin{itemize}
-	\item A language model with an OpenAI-compatible chat API is available (Gemini by default~\cite{gemini}). Without a
-	key, the rule-based assistant answers, so the shop never depends on the model.
-	\item The demo catalogue (about 220 products with over 1,200 options) is drawn by the project itself until the family
-	photographs the real products; the drawings use the same sock shapes and colours as the brand.
-	\item Prices, limits, delivery fees and times in the demo are examples; the owners enter the real ones.
-\end{itemize}
-
-\section{User interface plan}
-
-The interface was planned as wireframes for the five key screens (catalogue, product with the bag, checkout, the
-negotiation chat and the administration dashboard) on a phone, a tablet and a laptop before it was built; the final
-design keeps that structure. Its visual language comes from the stall itself (Section~\ref{sec:design}): kraft price
-tags, the family's handwriting, socks hanging on a washing line, and container 70-E.
+The interface was planned as wireframes of the five key screens (catalogue, product with the bag, checkout, the chat
+and the dashboard) on a phone, a tablet and a laptop before it was built; the final design keeps that structure.
