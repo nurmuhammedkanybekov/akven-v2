@@ -20,7 +20,8 @@ Nurmuhammed Kanybekov · Supervisor: Guettala Walid
 5. [Architecture](#architecture)
 6. [Testing](#testing)
 7. [Documentation](#documentation)
-8. [Repository layout](#repository-layout)
+8. [Use of AI tools](#use-of-ai-tools)
+9. [Repository layout](#repository-layout)
 
 ## Background
 
@@ -200,7 +201,7 @@ Key design decisions (explained in [`docs/architecture.md`](docs/architecture.md
 |---|---|---|
 | Backend | `cd backend && mvn verify` | 284 tests, **96% line coverage**; the build fails below 80% |
 | Backend on PostgreSQL | see [`docs/development.md`](docs/development.md) | Migrations, constraints, and the last-pair and double-payment races over real HTTP |
-| Frontend | `cd frontend && npm test && npm run build` | 213 tests, including translation completeness and WCAG AA colour contrast |
+| Frontend | `cd frontend && npm test && npm run build` | 217 tests, including translation completeness and WCAG AA colour contrast |
 | End-to-end | `cd frontend && npm run e2e` | 29 steps in a real browser: the work of the owner, staff, customers (with and without an account) and the super admin, in three languages, with accessibility checks on every page |
 | Other browsers | `cd frontend && npm run e2e:browsers` (in CI) | The customer journey in WebKit (Safari) and Firefox, on a phone and a laptop |
 
@@ -219,7 +220,7 @@ The tests show, among other things, that:
 | Document | Contents |
 |---|---|
 | [`docs/thesis/thesis.pdf`](docs/thesis/thesis.pdf) | **The thesis**: specification, user documentation, developer documentation, testing and evaluation (ELTE IK format) |
-| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk -pdf thesis.tex` |
+| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk -pdf thesis.tex`; the AI declaration and how to sign it |
 | [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, use cases and requirements |
 | [`docs/traceability.md`](docs/traceability.md) | Where each requirement is implemented and which test covers it |
 | [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator, security |
@@ -232,6 +233,13 @@ The tests show, among other things, that:
 | [`docs/diagrams/`](docs/diagrams/README.md) | Architecture, validation path, negotiation sequence, data model, use cases |
 | [`docs/brand.md`](docs/brand.md) | Logo, colours, typography and motion |
 | [`docs/git-workflow.md`](docs/git-workflow.md) | Branches and publishing to GitLab |
+
+## Use of AI tools
+
+This project was developed with an AI coding assistant (Claude by Anthropic, through Claude Code), and the thesis text
+was drafted and edited with it. I set the requirements, the architecture and the design decisions, reviewed every
+change, and accepted it only after the automated tests and CI passed. The signed *Declaration on the use of AI tools*
+in the thesis, and Section 4.14 of it, describe this in detail, as the ELTE Faculty of Informatics requires.
 
 ## Repository layout
 
