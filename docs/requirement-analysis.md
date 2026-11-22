@@ -1,6 +1,10 @@
 # AK&VEN — Requirement Analysis
 
-**Milestone 1 deliverable.** Companion to [`architecture.md`](./architecture.md) and [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) — this document defines *what* the system must do; the architecture doc defines *how*. The use-case diagram and wireframes (next Milestone 1 deliverables) are drawn directly from the use cases listed here.
+**Milestone 1 deliverable (25 September 2026), kept as it was handed in.** The final requirements (FR-1 to FR-31,
+NFR-1 to NFR-12) are in Chapter 2 of the thesis, and their status is in [`traceability.md`](traceability.md). Section 9
+below lists where the final system differs from this first version.
+
+Companion to [`architecture.md`](./architecture.md) and [`diagrams/01-architecture-overview.svg`](./diagrams/01-architecture-overview.svg) — this document defines *what* the system must do; the architecture doc defines *how*. The use-case diagram and wireframes (next Milestone 1 deliverables) are drawn directly from the use cases listed here.
 
 ## 1. Purpose and scope
 
@@ -97,6 +101,32 @@ Implementation status of every requirement, with the tests that show it, is in [
 - [x] Actors and use cases identified
 - [x] Functional and non-functional requirements drafted
 - [x] Multi-device scope clarified (NFR-11: phone web + installed PWA, tablet, laptop for the storefront; laptop-primary + tablet for admin)
-- [ ] Reviewed with Prof. Guettala
+- [ ] Reviewed with the supervisor, Walid Guettala
 - [x] Use-case diagram (drawn directly from §3.1 — verified against this document, no gaps found)
 - [x] Wireframes for the 5 key screens across the full breakpoint matrix (catalog, product/cart, checkout, negotiation chat — phone browser + installed PWA, tablet, laptop; admin dashboard — laptop + tablet)
+
+## 9. Changes since Milestone 1
+
+The requirements above were the starting point. The final system, as described in the thesis, differs in these points:
+
+- **Roles.** There are four roles, not three: customer, staff, owner (called admin above) and super admin. Accounts
+  and the audit log belong to the super admin (FR-14).
+- **Accounts.** Customers can order without an account, with an email address and a private link to the order
+  (FR-27); negotiation needs a signed-in customer (FR-3).
+- **Grounding (FR-4).** The assistant receives the product's facts (fabric, care, origin, pack, stock and the public
+  price steps). The owners' discount limit is deliberately *not* given to the model; only the validator uses it
+  (FR-5). Vector retrieval with pgvector is prepared in the database but not used yet; it is future work.
+- **The limit.** The field `marginFloorPct` is the largest discount in percent that the owners allow for a variant,
+  not a margin computed from the cost price.
+- **Language model.** The provider is Google Gemini. A rule-based negotiator does the same job without a model, and
+  the super admin can switch between them at run time (FR-25).
+- **Payment.** The Apple Pay / Google Pay wallet is *simulated* and moves no money; no merchant account was set up.
+  Customers can also reserve an order and pay at the stall or to the courier (FR-31).
+- **Evaluation.** The negotiator was evaluated with sixteen simulated customers and the margin-safety tests, not with a
+  user study (thesis, Chapter 5).
+- **Added requirements.** FR-15 to FR-31 and NFR-12 were added during the semester: price steps for the whole bag,
+  delivery options, family profiles, gift boxes, reviews, waiting lists, wholesale requests, saved details, three
+  languages, opening hours, the assistant switch, order export, guest checkout, emails, the stock ledger, safe stock
+  under concurrent checkouts, reservations, and database checks for the most important rules.
+- **Partly met.** FR-4, NFR-5 and NFR-10 are only partly met; the reasons are in `traceability.md` and Section 5.7 of
+  the thesis.

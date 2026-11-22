@@ -220,7 +220,7 @@ The tests show, among other things, that:
 | Document | Contents |
 |---|---|
 | [`docs/thesis/thesis.pdf`](docs/thesis/thesis.pdf) | **The thesis**: specification, user documentation, developer documentation, testing and evaluation (ELTE IK format) |
-| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk thesis.tex` (LuaLaTeX, for the AkVen fonts); the AI declaration and how to sign it |
+| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk thesis.tex` (LuaLaTeX); the AI declaration and how to sign it |
 | [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, use cases and requirements |
 | [`docs/traceability.md`](docs/traceability.md) | Where each requirement is implemented and which test covers it |
 | [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator, security |
