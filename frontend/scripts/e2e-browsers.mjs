@@ -93,7 +93,10 @@ for (const [engineName, engine] of engines) {
       const [barBottom, gridTop] = await page.evaluate(() => [document.querySelector(".av-shelfbar").getBoundingClientRect().bottom, document.querySelector(".av-grid-products").getBoundingClientRect().top]);
       assert.ok(barBottom <= gridTop + 1, `the filter bar overlaps the socks by ${Math.round(barBottom - gridTop)}px`);
       // Click the sock's name: where the picture is, a pointer brings up "Quick view" (which is meant to catch the click).
-      await page.locator(".av-grid-products .av-card__name").first().click();
+      // Skip the sock the admin journey (npm run e2e) creates just before this script in CI: it is the newest, so it
+      // stands first on the shelf, and that journey leaves it with a single pair, whatever this run then finds.
+      await page.locator(".av-grid-products .av-card").filter({ hasNotText: /Mid-Long Socks [0-9a-z]{6,}/ }).first()
+        .locator(".av-card__name").click();
       await page.getByRole("button", { name: /^Add to bag/ }).first().click();
       await page.getByText(/Added to your bag/).waitFor();
       await page.goto(`${BASE}/cart`, { waitUntil: "networkidle" });
