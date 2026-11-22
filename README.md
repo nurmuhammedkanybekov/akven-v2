@@ -179,7 +179,7 @@ flowchart LR
 | Layer | Technology |
 |---|---|
 | Client | React 18, TypeScript, Vite. One installable PWA for customers and the team, with role-based routes. About 2,000 texts per language (English, Russian, Kyrgyz) with typed keys |
-| API | Spring Boot 3.5, Java 17, about 115 endpoints in 21 feature packages. JWT with four roles, method-level security, one error format (RFC 7807), OpenAPI at `/swagger-ui/index.html` in demo mode |
+| API | Spring Boot 3.5, Java 17, 115 endpoints in 21 feature packages. JWT with four roles, method-level security, one error format (RFC 7807), OpenAPI at `/swagger-ui/index.html` in demo mode |
 | Data | PostgreSQL 16. 26 schema migrations and 19 demo-data migrations (Flyway). Check constraints enforce the rules that must never break |
 | Assistant | A `Negotiator` interface with a rule-based implementation and a language-model implementation over any OpenAI-compatible API (Gemini by default), with fallback to the rules |
 | Delivery | Docker Compose (database, backend, nginx). CI on GitHub Actions and on the ELTE GitLab |
@@ -199,7 +199,7 @@ Key design decisions (explained in [`docs/architecture.md`](docs/architecture.md
 
 | Check | Command | Result |
 |---|---|---|
-| Backend | `cd backend && mvn verify` | 284 tests, **96% line coverage**; the build fails below 80% |
+| Backend | `cd backend && mvn verify` | 285 tests (11 of them on real PostgreSQL), **96% line coverage**; the build fails below 80% |
 | Backend on PostgreSQL | see [`docs/development.md`](docs/development.md) | Migrations, constraints, and the last-pair and double-payment races over real HTTP |
 | Frontend | `cd frontend && npm test && npm run build` | 217 tests, including translation completeness and WCAG AA colour contrast |
 | End-to-end | `cd frontend && npm run e2e` | 29 steps in a real browser: the work of the owner, staff, customers (with and without an account) and the super admin, in three languages, with accessibility checks on every page |
@@ -220,7 +220,7 @@ The tests show, among other things, that:
 | Document | Contents |
 |---|---|
 | [`docs/thesis/thesis.pdf`](docs/thesis/thesis.pdf) | **The thesis**: specification, user documentation, developer documentation, testing and evaluation (ELTE IK format) |
-| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk -pdf thesis.tex`; the AI declaration and how to sign it |
+| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk thesis.tex` (LuaLaTeX, for the AkVen fonts); the AI declaration and how to sign it |
 | [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, use cases and requirements |
 | [`docs/traceability.md`](docs/traceability.md) | Where each requirement is implemented and which test covers it |
 | [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator, security |
