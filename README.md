@@ -219,8 +219,6 @@ The tests show, among other things, that:
 
 | Document | Contents |
 |---|---|
-| [`docs/thesis/thesis.pdf`](docs/thesis/thesis.pdf) | **The thesis**: specification, user documentation, developer documentation, testing and evaluation (ELTE IK format) |
-| [`docs/thesis/`](docs/thesis/) | LaTeX source; build with `latexmk thesis.tex` (LuaLaTeX); the AI declaration and how to sign it |
 | [`docs/requirement-analysis.md`](docs/requirement-analysis.md) | Actors, use cases and requirements |
 | [`docs/traceability.md`](docs/traceability.md) | Where each requirement is implemented and which test covers it |
 | [`docs/architecture.md`](docs/architecture.md) | Layers, data model, the PolicyValidator, security |
@@ -236,12 +234,10 @@ The tests show, among other things, that:
 
 ## Use of AI tools
 
-This project was developed with an AI coding assistant (Claude by Anthropic, through Claude Code), and the thesis text
-was drafted and edited with it. I set the requirements, the architecture and the design decisions, reviewed every
-change, and accepted it only after the automated tests and CI passed. The *Declaration on the use of AI tools*
-that the ELTE Faculty of Informatics requires, with a summary for the developer documentation, is in
-[`docs/thesis/ai-declaration.pdf`](docs/thesis/ai-declaration.pdf); it joins the thesis once the supervisor has
-reviewed it.
+I used an AI coding assistant (Claude by Anthropic, through Claude Code) while building this project. I set the
+requirements, the architecture and the design decisions, reviewed every change, and accepted it only after the
+automated tests and CI passed. How and where AI tools were used is described in the *Declaration on the use of AI
+tools* submitted with my thesis, as the ELTE Faculty of Informatics requires.
 
 ## Repository layout
 
@@ -255,6 +251,6 @@ frontend/    The shop and the administration (React + TypeScript)
              src/i18n      English, Russian and Kyrgyz texts
              scripts/      product pictures, icons, screenshots and end-to-end tests
 deploy/      Server update script and Caddy configuration
-docs/        Documentation, including the thesis
+docs/        Documentation
 docker-compose.yml, .github/workflows/ci.yml, .gitlab-ci.yml
 ```

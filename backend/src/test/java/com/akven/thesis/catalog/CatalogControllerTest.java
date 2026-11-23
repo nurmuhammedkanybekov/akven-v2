@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Public storefront API. Most important test in this class: the JSON a customer receives
- * never contains costPrice or marginFloorPct (security requirement, CLAUDE checklist item 10).
+ * never contains costPrice or marginFloorPct (security requirement).
  * Test data uses its own collection name so filters are asserted against known rows only.
  */
 class CatalogControllerTest extends IntegrationTest {

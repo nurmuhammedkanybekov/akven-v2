@@ -20,15 +20,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
- * Verifies the Authorization: Bearer <token> header (Milestone 2 — this used
- * to be a stub that verified nothing; see the git history for that version).
+ * Verifies the Authorization: Bearer <token> header.
  *
  * A missing or invalid token is deliberately NOT an error here: it just
  * leaves the SecurityContext empty, so SecurityConfig's per-route rules are
- * what actually 401 an unauthenticated request to a protected endpoint —
- * exactly the same failure mode as before this filter did anything, just
- * now a *valid* token actually authenticates instead of every route always
- * 401ing.
+ * what return 401 for an unauthenticated request to a protected endpoint.
  *
  * Rebuilt for this project's JwtService rather than a direct port of the
  * Nevis IAM filter, since Nevis used session-backed auth in places this

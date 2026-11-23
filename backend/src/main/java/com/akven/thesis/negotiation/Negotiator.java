@@ -3,8 +3,8 @@ package com.akven.thesis.negotiation;
 import java.math.BigDecimal;
 
 /**
- * The assistant behind the chat. Milestone 2 ships a rule-based stand-in; Milestone 3 replaces it with an LLM that
- * uses retrieval over the product knowledge base. The contract stays the same, so nothing else changes.
+ * The assistant behind the chat: either the rule-based negotiator or the language-model negotiator, which the super
+ * admin can switch at run time.
  * An implementation is never trusted: whatever it returns is clamped by the PolicyValidator.
  */
 public interface Negotiator {

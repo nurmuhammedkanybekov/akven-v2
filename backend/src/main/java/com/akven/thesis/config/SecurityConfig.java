@@ -37,11 +37,9 @@ import java.util.List;
  * price but not marginFloorPct" — FR-11) belong on the service methods via
  * @PreAuthorize, which @EnableMethodSecurity turns on below.
  *
- * Milestone 2: JwtAuthenticationFilter now actually verifies tokens (see
- * that class) and authenticationManager is backed by a real
- * UserDetailsService (UserDetailsServiceImpl) + the PasswordEncoder bean
- * below — Spring Boot auto-configures the DaoAuthenticationProvider from
- * those two beans, so nothing else needs to change here for that to work.
+ * JwtAuthenticationFilter verifies the tokens, and Spring Boot builds the
+ * DaoAuthenticationProvider from UserDetailsServiceImpl and the
+ * PasswordEncoder bean below.
  */
 @Configuration
 @EnableMethodSecurity

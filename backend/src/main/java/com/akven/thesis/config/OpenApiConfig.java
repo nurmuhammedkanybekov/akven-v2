@@ -10,14 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Metadata for the live API docs at /swagger-ui/index.html (springdoc scans
- * every @RestController automatically — no per-endpoint annotation required
- * to show up here, though richer @Operation/@Schema annotations can be added
- * incrementally as real request/response bodies land in Phase 1–2).
- *
- * Bearer-JWT scheme is declared now even though JwtAuthenticationFilter is
- * still a stub (see that class) — once real tokens exist, "Authorize" in the
- * Swagger UI works immediately with no further config here.
+ * Metadata for the API docs at /swagger-ui/index.html (demo mode only). springdoc scans every @RestController, and
+ * the bearer-JWT scheme makes "Authorize" in the Swagger UI work with a token from /api/auth/login.
  */
 @Configuration
 public class OpenApiConfig {
@@ -28,10 +22,10 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("AK&VEN API")
-                        .description("Catalog, negotiation, orders, and admin API for the AK&VEN thesis project. "
-                                + "Public endpoints: GET /api/products/**. Everything else requires a bearer token; "
-                                + "/api/admin/** additionally requires STAFF or ADMIN.")
-                        .version("v0.1 (Milestone 1 skeleton)")
+                        .description("Catalogue, negotiation, orders and administration API of the AK&VEN shop. "
+                                + "The catalogue, the price quote, the shop information, wholesale requests and checkout are public; "
+                                + "everything else requires a bearer token, and /api/admin/** requires a team role.")
+                        .version("1.0")
                         .contact(new Contact().name("Nurmuhammed").url("https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed")))
                 .addSecurityItem(new SecurityRequirement().addList(bearerScheme))
                 .components(new Components().addSecuritySchemes(bearerScheme,

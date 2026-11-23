@@ -89,7 +89,7 @@ Grouped by the module each maps to in the architecture (Catalog & Orders, Negoti
 ## 7. Assumptions and open dependencies
 
 - Access to an LLM API (provider not yet finalized) with acceptable cost and latency for a conversational negotiation flow.
-- Availability of real or representative product/pricing data from the family business for the catalog and for grounding the RAG pipeline — flagged as an open question for Walid (see the thesis plan artifact).
+- Availability of real or representative product/pricing data from the family business for the catalog and for grounding the RAG pipeline — an open question for the supervisor.
 - An Apple Developer / Google Pay merchant account can be set up in time for Phase 2 integration work.
 - The evaluation method for the negotiator (user study vs. simulated benchmark vs. margin-safety test suite) is still to be confirmed with Walid — NFR-6's latency target and NFR-8's coverage scope may be refined once that's settled.
 

@@ -249,9 +249,7 @@ violation, margin-invariant violation, duplicate email by case, and
 
 ## Security
 
-See the full checklist (negotiator safety, auth/access, payments, operational)
-in the AK&VEN Architecture reference doc maintained alongside the thesis
-plan. Summary of what's already reflected in this codebase:
+Summary of the security measures in this codebase:
 
 - Passwords are never stored in plaintext — `passwordHash` (bcrypt, via the
   `PasswordEncoder` bean in `SecurityConfig`); demo/seed passwords are hashed

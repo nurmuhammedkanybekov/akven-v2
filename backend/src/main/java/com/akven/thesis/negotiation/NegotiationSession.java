@@ -44,7 +44,7 @@ public class NegotiationSession {
     private Variant variant;
 
     @Column(columnDefinition = "text")
-    private String transcript; // TODO Phase 2: normalize into a separate turn-by-turn table if needed for evaluation
+    private String transcript; // a readable copy of the conversation; the turns themselves are in negotiation_turn
 
     /** How many pairs the offer was negotiated for. The price only applies to an order of at least this many. */
     @Column(nullable = false)
