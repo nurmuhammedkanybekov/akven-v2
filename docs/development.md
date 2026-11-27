@@ -106,9 +106,7 @@ and the Docker start-up check; it exists so changes can be proven before they re
 ## Database
 
 Flyway runs the migrations in `backend/src/main/resources/db/migration`; the demo data lives apart in `db/seed`
-(including the example price ladder, the stall and the example size chart) and is only loaded by the demo profile. Never edit a migration that has been applied; add a new one. The data model up to V10 is drawn in [`diagrams/04b-er-core.svg`](diagrams/04b-er-core.svg) (core) and
-[`diagrams/04-er-data-model.svg`](diagrams/04-er-data-model.svg) (full schema).
-
-The diagrams do not yet show the tables added for Milestone 3 (`shop_policy`, `price_tier`, `shop_contact`,
-`pickup_point`, `size_chart_row`, `delivery_zone`) or the new columns on `variant`, `customer_order` and `order_item`
-(V35 adds `kind`, `pay_on_receipt` and `note` to a delivery area, and the same kind and pay-on-receipt to the order's copy).
+(including the example price ladder, the stall and the example size chart) and is only loaded by the demo profile. Never edit a migration that has been applied; add a new one. The core tables are drawn in
+[`diagrams/04b-er-core.svg`](diagrams/04b-er-core.svg), and the full schema (all 26 tables, up to V42) in
+[`diagrams/04-er-data-model.svg`](diagrams/04-er-data-model.svg), which is generated from a migrated database (see
+[`diagrams/README.md`](diagrams/README.md)).

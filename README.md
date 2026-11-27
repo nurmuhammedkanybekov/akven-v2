@@ -5,7 +5,7 @@ can negotiate prices but can never go below the owners' limit.**
 
 Bachelor's thesis, ELTE Faculty of Informatics, 2026
 *Design and Implementation of AkVen Integrated E-Commerce and Inventory Management System*
-Nurmuhammed Kanybekov · Supervisor: Guettala Walid
+Nurmuhammed Kanybekov · Supervisor: Walid Guettala
 
 [![pipeline status](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/badges/master/pipeline.svg)](https://szofttech.inf.elte.hu/gnn/thesis-bachelor-2026-2027-01/nurmuhammed/-/commits/master)
 

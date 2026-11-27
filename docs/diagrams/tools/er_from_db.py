@@ -17,9 +17,12 @@ from html import escape
 URL, OUT = sys.argv[1], sys.argv[2]
 
 BANDS = [
-    ("Identity and system", "#eef1f7", "#9aa6c2", ["app_user", "audit_log_entry", "app_setting", "shop_contact"]),
-    ("Orders and pricing", "#fbf5e3", "#d9bc6a", ["customer_order", "order_item", "pickup_point", "price_tier", "shop_policy", "size_chart_row"]),
-    ("Catalog", "#fbf5e3", "#d9bc6a", ["catalog_term", "product", "product_image", "variant", "product_embedding"]),
+    ("Identity and system", "#eef1f7", "#9aa6c2", ["app_user", "audit_log_entry", "app_setting", "shop_contact",
+                                                   "customer_details", "family_member", "saved_item", "outbound_email"]),
+    ("Orders and pricing", "#fbf5e3", "#d9bc6a", ["customer_order", "order_item", "pickup_point", "delivery_zone", "price_tier",
+                                                  "shop_policy", "size_chart_row", "wholesale_request"]),
+    ("Catalog and stock", "#fbf5e3", "#d9bc6a", ["catalog_term", "product", "product_image", "variant", "stock_movement",
+                                                 "stock_request", "product_review", "product_embedding"]),
     ("AI negotiation", "#f2eefa", "#a596cf", ["negotiation_session", "negotiation_turn"]),
 ]
 SHORT = {"character varying": "varchar", "timestamp with time zone": "timestamptz", "integer": "int", "boolean": "bool",

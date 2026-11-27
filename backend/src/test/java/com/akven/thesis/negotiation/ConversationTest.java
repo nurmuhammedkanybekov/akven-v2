@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /** A negotiation is a conversation: the assistant sees what was said, every turn is kept, the latest offer counts. */
 class ConversationTest extends IntegrationTest {
 
-    @MockBean private Negotiator assistant;
+    @MockitoBean private Negotiator assistant;
     @Autowired private OrderTestData data;
     @Autowired private NegotiationSessionRepository sessions;
     @Autowired private NegotiationTurnRepository turns;

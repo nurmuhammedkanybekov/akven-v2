@@ -146,5 +146,5 @@ never fades text, so it keeps full contrast at every moment, and all of it stops
 
 ## Open questions
 
-- Currency: prices are displayed in USD for now. The database has no currency column yet.
+- Currency: prices are stored in US dollars and shown in dollars, som or roubles at the owners' exchange rates.
 - Real product photography and the photo of the certificate replace the drawn placeholders when available.

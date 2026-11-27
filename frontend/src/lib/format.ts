@@ -1,4 +1,4 @@
-/** Prices are shown in one currency for now. The backend stores plain amounts (no currency column yet). */
+/** Formats an amount in one currency. Prices are stored in US dollars; the shop converts them with the owners' rates (see useMoney). */
 export function formatPrice(amount: number, currency = "USD", locale = "en"): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
 }

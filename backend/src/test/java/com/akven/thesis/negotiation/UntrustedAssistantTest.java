@@ -7,7 +7,7 @@ import com.akven.thesis.user.Role;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /** Whatever assistant sits behind the chat (rules, an LLM, a compromised one), the clamp and the stored evidence hold. */
 class UntrustedAssistantTest extends IntegrationTest {
 
-    @MockBean private Negotiator assistant;
+    @MockitoBean private Negotiator assistant;
     @Autowired private OrderTestData data;
     @Autowired private NegotiationSessionRepository sessions;
 

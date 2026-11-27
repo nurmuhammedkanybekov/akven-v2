@@ -13,7 +13,7 @@ import com.akven.thesis.user.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -48,7 +48,7 @@ class OrderControllerTest extends IntegrationTest {
     @Autowired private VariantRepository variants;
     @Autowired private AuditLogRepository auditLog;
     @Autowired private JdbcTemplate jdbc;
-    @SpyBean private SimulatedWalletProvider wallet;
+    @MockitoSpyBean private SimulatedWalletProvider wallet;
 
     // ---- helpers ----------------------------------------------------------------------------
 
